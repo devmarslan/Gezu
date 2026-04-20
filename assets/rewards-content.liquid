@@ -1,0 +1,838 @@
+{% comment %}
+  Rewards & Content Section
+  - Left: Rewards Card with tabs (Personal/Business)
+  - Middle Top: Promo Banner (Christmas Sale)
+  - Middle Bottom: Blog Posts Row
+  - Right: Blog/Tips Intro Card
+  - Fully responsive with mobile slider
+{% endcomment %}
+
+{{ 'section-rewards-content.css' | asset_url | stylesheet_tag }}
+
+<style>
+  #rewards-content-{{ section.id }} {
+    --section-bg-color: {{ section.settings.section_bg_color }};
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --section-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --section-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+    
+    /* Rewards Card */
+    --rewards-bg: {{ section.settings.rewards_bg_gradient }};
+    --rewards-title-color: {{ section.settings.rewards_title_color }};
+    --rewards-title-size: {{ section.settings.rewards_title_font_size }}px;
+    --rewards-title-size-mobile: {{ section.settings.rewards_title_font_size_mobile }}px;
+    --rewards-subtitle-color: {{ section.settings.rewards_subtitle_color }};
+    --rewards-subtitle-size: {{ section.settings.rewards_subtitle_font_size }}px;
+    --rewards-text-color: {{ section.settings.rewards_text_color }};
+    --rewards-text-size: {{ section.settings.rewards_text_font_size }}px;
+    --rewards-btn-bg: {{ section.settings.rewards_btn_bg }};
+    --rewards-btn-color: {{ section.settings.rewards_btn_color }};
+    
+    /* Promo Card */
+    --promo-bg-color: {{ section.settings.promo_bg_color }};
+    --promo-title-color: {{ section.settings.promo_title_color }};
+    --promo-title-size: {{ section.settings.promo_title_font_size }}px;
+    --promo-title-size-mobile: {{ section.settings.promo_title_font_size_mobile }}px;
+    --promo-text-color: {{ section.settings.promo_text_color }};
+    --promo-text-size: {{ section.settings.promo_text_font_size }}px;
+    --promo-link-color: {{ section.settings.promo_link_color }};
+    
+    /* Blog Intro Card */
+    --blog-intro-bg: {{ section.settings.blog_intro_bg }};
+    --blog-intro-title-color: {{ section.settings.blog_intro_title_color }};
+    --blog-intro-title-size: {{ section.settings.blog_intro_title_font_size }}px;
+    --blog-intro-text-color: {{ section.settings.blog_intro_text_color }};
+    --blog-intro-text-size: {{ section.settings.blog_intro_text_font_size }}px;
+    --blog-intro-link-color: {{ section.settings.blog_intro_link_color }};
+    
+    /* Tips Section */
+    --tips-title-color: {{ section.settings.tips_title_color }};
+    --tips-title-size: {{ section.settings.tips_title_font_size }}px;
+    --tips-title-size-mobile: {{ section.settings.tips_title_font_size_mobile }}px;
+    
+    /* Blog Card */
+    --blog-card-bg: {{ section.settings.blog_card_bg }};
+    --blog-card-title-color: {{ section.settings.blog_card_title_color }};
+    --blog-card-title-size: {{ section.settings.blog_card_title_font_size }}px;
+    --blog-card-title-size-mobile: {{ section.settings.blog_card_title_font_size_mobile }}px;
+  }
+
+  #rewards-content-{{ section.id }} .rewards-content-wrapper {
+    padding-top: var(--section-padding-top);
+    padding-bottom: var(--section-padding-bottom);
+    background-color: var(--section-bg-color);
+    {% if section.settings.section_bg_image != blank %}
+    background-image: url('{{ section.settings.section_bg_image | image_url: width: 1920 }}');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    {% endif %}
+  }
+
+  @media (max-width: 768px) {
+    #rewards-content-{{ section.id }} .rewards-content-wrapper {
+      padding-top: var(--section-padding-top-mobile);
+      padding-bottom: var(--section-padding-bottom-mobile);
+    }
+  }
+</style>
+
+<section id="rewards-content-{{ section.id }}" class="rewards-content-section">
+  <div class="rewards-content-wrapper">
+    <div class="page-width">
+      <div class="rewards-content-grid">
+        
+        {% comment %} Left Column - Rewards Card {% endcomment %}
+        <div class="rewards-card-column">
+          <div class="rewards-card" style="background: var(--rewards-bg);">
+            {% comment %} Decorative Elements {% endcomment %}
+            <div class="rewards-decorations">
+              {% if section.settings.coin_image_1 != blank %}
+                <img src="{{ section.settings.coin_image_1 | image_url: width: 80 }}" alt="" class="deco-coin coin-1">
+              {% else %}
+                <div class="deco-coin coin-1 default-coin">💰</div>
+              {% endif %}
+              {% if section.settings.coin_image_2 != blank %}
+                <img src="{{ section.settings.coin_image_2 | image_url: width: 80 }}" alt="" class="deco-coin coin-2">
+              {% else %}
+                <div class="deco-coin coin-2 default-coin">💵</div>
+              {% endif %}
+              <div class="deco-star">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="currentColor">
+                  <path d="M20 0l2 18h18l-14 10 6 18-12-10-12 10 6-18L0 18h18z"/>
+                </svg>
+              </div>
+            </div>
+
+            {% comment %} Logo/Title {% endcomment %}
+            <div class="rewards-header">
+              {% if section.settings.rewards_logo != blank %}
+                <img src="{{ section.settings.rewards_logo | image_url: width: 200 }}" alt="" class="rewards-logo">
+              {% endif %}
+              <h2 class="rewards-main-title">
+                <span class="title-small">{{ section.settings.rewards_title_small }}</span>
+                <span class="title-large">{{ section.settings.rewards_title_large }}</span>
+              </h2>
+            </div>
+
+            {% comment %} Tabs {% endcomment %}
+            <div class="rewards-tabs">
+              <button class="tab-btn active" data-tab="personal">{{ section.settings.tab_1_text }}</button>
+              <button class="tab-btn" data-tab="business">{{ section.settings.tab_2_text }}</button>
+            </div>
+
+            {% comment %} Content {% endcomment %}
+            <div class="rewards-content">
+              <h3 class="rewards-subtitle">{{ section.settings.rewards_subtitle }}</h3>
+              <p class="rewards-description">{{ section.settings.rewards_description }}</p>
+              
+              <ul class="rewards-benefits">
+                {% for block in section.blocks %}
+                  {% if block.type == 'benefit' %}
+                    <li class="benefit-item" {{ block.shopify_attributes }}>
+                      <svg class="check-icon" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M5.5 9l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span>{{ block.settings.benefit_text }}</span>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </div>
+
+            {% comment %} CTA Button {% endcomment %}
+            <a href="{{ section.settings.rewards_btn_link }}" class="rewards-btn">
+              {{ section.settings.rewards_btn_text }}
+            </a>
+          </div>
+        </div>
+
+        {% comment %} Middle & Right Columns {% endcomment %}
+        <div class="content-columns">
+          {% comment %} Top Row - Promo + Blog Intro {% endcomment %}
+          <div class="content-top-row">
+            {% comment %} Promo Card {% endcomment %}
+            <div class="promo-card">
+              <div class="promo-content">
+                <h3 class="promo-title">{{ section.settings.promo_title }}</h3>
+                <p class="promo-text">{{ section.settings.promo_description }}</p>
+                <a href="{{ section.settings.promo_link_url }}" class="promo-link">{{ section.settings.promo_link_text }}</a>
+              </div>
+              {% if section.settings.promo_image != blank %}
+                <div class="promo-image">
+                  <img src="{{ section.settings.promo_image | image_url: width: 200 }}" alt="" loading="lazy">
+                </div>
+              {% endif %}
+            </div>
+
+            {% comment %} Blog Intro Card {% endcomment %}
+            <div class="blog-intro-card">
+              <h3 class="blog-intro-title">{{ section.settings.blog_intro_title }}</h3>
+              <p class="blog-intro-text">{{ section.settings.blog_intro_description }}</p>
+              <a href="{{ section.settings.blog_intro_link_url }}" class="blog-intro-link">{{ section.settings.blog_intro_link_text }}</a>
+            </div>
+          </div>
+
+          {% comment %} Bottom Row - Tips/Blog Posts {% endcomment %}
+          <div class="content-bottom-row">
+            <div class="tips-section">
+              <h4 class="tips-title">{{ section.settings.tips_title }}</h4>
+              
+              {% comment %} Blog Posts Grid - Desktop {% endcomment %}
+              <div class="blog-posts-grid desktop-grid">
+                {% if section.settings.blog != blank %}
+                  {% for article in blogs[section.settings.blog].articles limit: section.settings.posts_count %}
+                    <a href="{{ article.url }}" class="blog-post-card">
+                      <div class="post-image">
+                        {% if article.image %}
+                          <img src="{{ article.image | image_url: width: 400 }}" alt="{{ article.title }}" loading="lazy">
+                        {% else %}
+                          <div class="post-placeholder">
+                            {{ 'image' | placeholder_svg_tag }}
+                          </div>
+                        {% endif %}
+                      </div>
+                      <p class="post-title">{{ article.title | truncate: 60 }}</p>
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  {% for i in (1..4) %}
+                    <div class="blog-post-card">
+                      <div class="post-image">
+                        <div class="post-placeholder">
+                          {{ 'image' | placeholder_svg_tag }}
+                        </div>
+                      </div>
+                      <p class="post-title">Lorem ipsum dolor sit amet consectetur.</p>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+              {% comment %} Blog Posts Slider - Mobile {% endcomment %}
+              {% if section.settings.enable_mobile_slider %}
+                <div class="blog-posts-mobile-slider mobile-slider">
+                  <div class="swiper blog-swiper-{{ section.id }}">
+                    <div class="swiper-wrapper">
+                      {% if section.settings.blog != blank %}
+                        {% for article in blogs[section.settings.blog].articles limit: section.settings.posts_count %}
+                          <div class="swiper-slide">
+                            <a href="{{ article.url }}" class="blog-post-card">
+                              <div class="post-image">
+                                {% if article.image %}
+                                  <img src="{{ article.image | image_url: width: 400 }}" alt="{{ article.title }}" loading="lazy">
+                                {% else %}
+                                  <div class="post-placeholder">
+                                    {{ 'image' | placeholder_svg_tag }}
+                                  </div>
+                                {% endif %}
+                              </div>
+                              <p class="post-title">{{ article.title | truncate: 60 }}</p>
+                            </a>
+                          </div>
+                        {% endfor %}
+                      {% else %}
+                        {% for i in (1..4) %}
+                          <div class="swiper-slide">
+                            <div class="blog-post-card">
+                              <div class="post-image">
+                                <div class="post-placeholder">
+                                  {{ 'image' | placeholder_svg_tag }}
+                                </div>
+                              </div>
+                              <p class="post-title">Lorem ipsum dolor sit amet consectetur.</p>
+                            </div>
+                          </div>
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                    {% if section.settings.show_mobile_pagination %}
+                      <div class="swiper-pagination blog-pagination-{{ section.id }}"></div>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const section = document.getElementById('rewards-content-{{ section.id }}');
+    
+    // Tabs functionality
+    const tabs = section.querySelectorAll('.tab-btn');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        tabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    {% if section.settings.enable_mobile_slider %}
+    // Mobile Slider
+    const blogSwiper{{ section.id | replace: '-', '_' }} = new Swiper('.blog-swiper-{{ section.id }}', {
+      slidesPerView: 1.3,
+      spaceBetween: 16,
+      centeredSlides: false,
+      loop: {{ section.settings.mobile_slider_loop }},
+      autoplay: {% if section.settings.mobile_slider_autoplay %}{ delay: {{ section.settings.mobile_slider_autoplay_speed }}, disableOnInteraction: false }{% else %}false{% endif %},
+      pagination: {
+        el: '.blog-pagination-{{ section.id }}',
+        clickable: true,
+      },
+      breakpoints: {
+        400: {
+          slidesPerView: 1.5,
+          spaceBetween: 16,
+        },
+        550: {
+          slidesPerView: 2.2,
+          spaceBetween: 16,
+        }
+      }
+    });
+    {% endif %}
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Rewards & Content",
+  "tag": "section",
+  "class": "rewards-content-section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Background"
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Background Color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "image_picker",
+      "id": "section_bg_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Mobile Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "═══ REWARDS CARD ═══"
+    },
+    {
+      "type": "text",
+      "id": "rewards_bg_gradient",
+      "label": "Background Gradient",
+      "default": "linear-gradient(180deg, #1e5799 0%, #2989d8 50%, #207cca 100%)"
+    },
+    {
+      "type": "image_picker",
+      "id": "rewards_logo",
+      "label": "Rewards Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "coin_image_1",
+      "label": "Decorative Coin 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "coin_image_2",
+      "label": "Decorative Coin 2"
+    },
+    {
+      "type": "text",
+      "id": "rewards_title_small",
+      "label": "Title Small Text",
+      "default": "My Gezu's"
+    },
+    {
+      "type": "text",
+      "id": "rewards_title_large",
+      "label": "Title Large Text",
+      "default": "Rewards"
+    },
+    {
+      "type": "range",
+      "id": "rewards_title_font_size",
+      "min": 24,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Title Font Size (Desktop)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "rewards_title_font_size_mobile",
+      "min": 20,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Title Font Size (Mobile)",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "rewards_title_color",
+      "label": "Title Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "tab_1_text",
+      "label": "Tab 1 Text",
+      "default": "Personal"
+    },
+    {
+      "type": "text",
+      "id": "tab_2_text",
+      "label": "Tab 2 Text",
+      "default": "Business"
+    },
+    {
+      "type": "text",
+      "id": "rewards_subtitle",
+      "label": "Subtitle",
+      "default": "Build More. Spend Less."
+    },
+    {
+      "type": "range",
+      "id": "rewards_subtitle_font_size",
+      "min": 18,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle Font Size",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "rewards_subtitle_color",
+      "label": "Subtitle Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "textarea",
+      "id": "rewards_description",
+      "label": "Description",
+      "default": "Become a GeZu Member and unlock special deals, early offers, and pro-level guidance."
+    },
+    {
+      "type": "range",
+      "id": "rewards_text_font_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Font Size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "rewards_text_color",
+      "label": "Text Color",
+      "default": "#e0e7ff"
+    },
+    {
+      "type": "text",
+      "id": "rewards_btn_text",
+      "label": "Button Text",
+      "default": "Sign in or create your account"
+    },
+    {
+      "type": "url",
+      "id": "rewards_btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "rewards_btn_bg",
+      "label": "Button Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "rewards_btn_color",
+      "label": "Button Text Color",
+      "default": "#1e5799"
+    },
+    {
+      "type": "header",
+      "content": "═══ PROMO CARD ═══"
+    },
+    {
+      "type": "color",
+      "id": "promo_bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "promo_title",
+      "label": "Promo Title",
+      "default": "Christmas Sale coming soon 2025"
+    },
+    {
+      "type": "range",
+      "id": "promo_title_font_size",
+      "min": 18,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "Promo Title Font Size (Desktop)",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "promo_title_font_size_mobile",
+      "min": 16,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Promo Title Font Size (Mobile)",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "promo_title_color",
+      "label": "Promo Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "textarea",
+      "id": "promo_description",
+      "label": "Promo Description",
+      "default": "Members unlock early access to our Christmas Sale, special prices, and limited-time hardware bundles. Sign up for free and never miss a deal."
+    },
+    {
+      "type": "range",
+      "id": "promo_text_font_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Promo Text Font Size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "promo_text_color",
+      "label": "Promo Text Color",
+      "default": "#666666"
+    },
+    {
+      "type": "text",
+      "id": "promo_link_text",
+      "label": "Promo Link Text",
+      "default": "Join Now"
+    },
+    {
+      "type": "url",
+      "id": "promo_link_url",
+      "label": "Promo Link URL"
+    },
+    {
+      "type": "color",
+      "id": "promo_link_color",
+      "label": "Promo Link Color",
+      "default": "#0066cc"
+    },
+    {
+      "type": "image_picker",
+      "id": "promo_image",
+      "label": "Promo Image"
+    },
+    {
+      "type": "header",
+      "content": "═══ BLOG INTRO CARD ═══"
+    },
+    {
+      "type": "color",
+      "id": "blog_intro_bg",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "blog_intro_title",
+      "label": "Title",
+      "default": "Explore Ideas, Tips & Inspiration"
+    },
+    {
+      "type": "range",
+      "id": "blog_intro_title_font_size",
+      "min": 16,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Title Font Size",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "blog_intro_title_color",
+      "label": "Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "textarea",
+      "id": "blog_intro_description",
+      "label": "Description",
+      "default": "Stay updated with practical tips, how-tos, and expert advice for every DIY or construction project. Our blogs help you make confident decisions and get better results with every build."
+    },
+    {
+      "type": "range",
+      "id": "blog_intro_text_font_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Font Size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "blog_intro_text_color",
+      "label": "Text Color",
+      "default": "#666666"
+    },
+    {
+      "type": "text",
+      "id": "blog_intro_link_text",
+      "label": "Link Text",
+      "default": "Visit our blogs"
+    },
+    {
+      "type": "url",
+      "id": "blog_intro_link_url",
+      "label": "Link URL"
+    },
+    {
+      "type": "color",
+      "id": "blog_intro_link_color",
+      "label": "Link Color",
+      "default": "#0066cc"
+    },
+    {
+      "type": "header",
+      "content": "═══ TIPS/BLOG SECTION ═══"
+    },
+    {
+      "type": "text",
+      "id": "tips_title",
+      "label": "Tips Section Title",
+      "default": "Tips for your next projects"
+    },
+    {
+      "type": "range",
+      "id": "tips_title_font_size",
+      "min": 14,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Tips Title Font Size (Desktop)",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "tips_title_font_size_mobile",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tips Title Font Size (Mobile)",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "tips_title_color",
+      "label": "Tips Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Select Blog"
+    },
+    {
+      "type": "range",
+      "id": "posts_count",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "Number of Posts",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "blog_card_bg",
+      "label": "Blog Card Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "blog_card_title_font_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Blog Card Title Font Size (Desktop)",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "blog_card_title_font_size_mobile",
+      "min": 11,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Blog Card Title Font Size (Mobile)",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "blog_card_title_color",
+      "label": "Blog Card Title Color",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Mobile Slider Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_mobile_slider",
+      "label": "Enable Mobile Slider for Blog Posts",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mobile_pagination",
+      "label": "Show Pagination Dots (Mobile)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_slider_loop",
+      "label": "Loop Slider (Mobile)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_slider_autoplay",
+      "label": "Autoplay Slider (Mobile)",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "mobile_slider_autoplay_speed",
+      "min": 2000,
+      "max": 9000,
+      "step": 500,
+      "unit": "ms",
+      "label": "Autoplay Speed (Mobile)",
+      "default": 5000
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit Item",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "text",
+          "id": "benefit_text",
+          "label": "Benefit Text",
+          "default": "Exclusive Discounts"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Rewards & Content",
+      "blocks": [
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_text": "Exclusive Discounts"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_text": "Early Access to seasonal sales, offers"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_text": "Expert Tips & Guides from industry professionals"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

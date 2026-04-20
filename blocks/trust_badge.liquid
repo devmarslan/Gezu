@@ -1,0 +1,294 @@
+<div class="hdt-trust-badges" {{ block.shopify_attributes }}>
+  <div class="hdt-trust-badges__container">
+    {%- if block.settings.badge_1_text != blank -%}
+      <div class="hdt-trust-badges__item">
+        <div class="hdt-trust-badges__icon">
+          {%- if block.settings.badge_1_icon == 'certified' -%}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="9" r="6"/>
+              <path d="M12 15v6"/>
+              <path d="M9 18l3 3 3-3"/>
+              <path d="M9 6.5L12 9l3-2.5"/>
+              <circle cx="12" cy="9" r="2"/>
+            </svg>
+          {%- elsif block.settings.badge_1_icon == 'delivery' -%}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="6" width="13" height="10" rx="1"/>
+              <path d="M16 10h3l2 2v4h-5"/>
+              <circle cx="7" cy="18" r="2"/>
+              <circle cx="18" cy="18" r="2"/>
+              <path d="M5 16h4"/>
+              <path d="M16 16h-1"/>
+            </svg>
+          {%- elsif block.settings.badge_1_icon == 'return' -%}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9"/>
+              <path d="M3 3v9h9"/>
+            </svg>
+          {%- elsif block.settings.badge_1_icon == 'check' -%}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
+          {%- endif -%}
+        </div>
+        <span class="hdt-trust-badges__text">{{ block.settings.badge_1_text }}</span>
+      </div>
+    {%- endif -%}
+
+    {%- if block.settings.badge_2_text != blank -%}
+      <div class="hdt-trust-badges__item">
+        <div class="hdt-trust-badges__icon">
+          {%- if block.settings.badge_2_icon == 'certified' -%}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="9" r="6"/>
+              <path d="M12 15v6"/>
+              <path d="M9 18l3 3 3-3"/>
+              <path d="M9 6.5L12 9l3-2.5"/>
+              <circle cx="12" cy="9" r="2"/>
+            </svg>
+          {%- elsif block.settings.badge_2_icon == 'delivery' -%}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="6" width="13" height="10" rx="1"/>
+              <path d="M16 10h3l2 2v4h-5"/>
+              <circle cx="7" cy="18" r="2"/>
+              <circle cx="18" cy="18" r="2"/>
+              <path d="M5 16h4"/>
+              <path d="M16 16h-1"/>
+            </svg>
+          {%- elsif block.settings.badge_2_icon == 'return' -%}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9"/>
+              <path d="M3 3v9h9"/>
+            </svg>
+          {%- elsif block.settings.badge_2_icon == 'check' -%}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
+          {%- endif -%}
+        </div>
+        <span class="hdt-trust-badges__text">{{ block.settings.badge_2_text }}</span>
+      </div>
+    {%- endif -%}
+
+    {%- if block.settings.badge_3_text != blank -%}
+      <div class="hdt-trust-badges__item">
+        <div class="hdt-trust-badges__icon">
+          {%- if block.settings.badge_3_icon == 'certified' -%}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="9" r="6"/>
+              <path d="M12 15v6"/>
+              <path d="M9 18l3 3 3-3"/>
+              <path d="M9 6.5L12 9l3-2.5"/>
+              <circle cx="12" cy="9" r="2"/>
+            </svg>
+          {%- elsif block.settings.badge_3_icon == 'delivery' -%}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="6" width="13" height="10" rx="1"/>
+              <path d="M16 10h3l2 2v4h-5"/>
+              <circle cx="7" cy="18" r="2"/>
+              <circle cx="18" cy="18" r="2"/>
+              <path d="M5 16h4"/>
+              <path d="M16 16h-1"/>
+            </svg>
+          {%- elsif block.settings.badge_3_icon == 'return' -%}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9"/>
+              <path d="M3 3v9h9"/>
+            </svg>
+          {%- elsif block.settings.badge_3_icon == 'check' -%}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
+          {%- endif -%}
+        </div>
+        <span class="hdt-trust-badges__text">{{ block.settings.badge_3_text }}</span>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+<style>
+  .hdt-trust-badges {
+    background-color: {{ block.settings.bg_color }};
+    padding: 14px 20px;
+    margin-top: 15px;
+    border-radius: 12px;
+  }
+
+  .hdt-trust-badges__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .hdt-trust-badges__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hdt-trust-badges__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: {{ block.settings.icon_color }};
+  }
+
+  .hdt-trust-badges__text {
+    font-size: 14px;
+    font-weight: 400;
+    color: {{ block.settings.text_color }};
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+ @media (min-width: 768px) and (max-width: 849px) {
+    .hdt-trust-badges__text {
+    font-size: 12px !important;
+    }
+  }
+  @media screen and (max-width: 749px) {
+    .hdt-trust-badges {
+      padding: 12px 15px;
+    }
+    
+    .hdt-trust-badges__container {
+      gap: 15px;
+      justify-content: space-between;
+    }
+    
+    .hdt-trust-badges__item {
+      gap: 6px;
+    }
+    
+    .hdt-trust-badges__icon svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .hdt-trust-badges__text {
+      font-size: 11px;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .hdt-trust-badges__container {
+      gap: 10px;
+    }
+    
+    .hdt-trust-badges__icon svg {
+      width: 16px;
+      height: 16px;
+    }
+    
+    .hdt-trust-badges__text {
+      font-size: 10px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Trust Badges",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Badge 1"
+    },
+    {
+      "type": "select",
+      "id": "badge_1_icon",
+      "label": "Icon",
+      "default": "certified",
+      "options": [
+        { "value": "certified", "label": "Certified Quality" },
+        { "value": "delivery", "label": "Delivery Truck" },
+        { "value": "return", "label": "Return Arrow" },
+        { "value": "check", "label": "Checkmark" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "badge_1_text",
+      "label": "Text",
+      "default": "Certified Quality"
+    },
+    {
+      "type": "header",
+      "content": "Badge 2"
+    },
+    {
+      "type": "select",
+      "id": "badge_2_icon",
+      "label": "Icon",
+      "default": "delivery",
+      "options": [
+        { "value": "certified", "label": "Certified Quality" },
+        { "value": "delivery", "label": "Delivery Truck" },
+        { "value": "return", "label": "Return Arrow" },
+        { "value": "check", "label": "Checkmark" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "badge_2_text",
+      "label": "Text",
+      "default": "Lowest Delivery"
+    },
+    {
+      "type": "header",
+      "content": "Badge 3"
+    },
+    {
+      "type": "select",
+      "id": "badge_3_icon",
+      "label": "Icon",
+      "default": "return",
+      "options": [
+        { "value": "certified", "label": "Certified Quality" },
+        { "value": "delivery", "label": "Delivery Truck" },
+        { "value": "return", "label": "Return Arrow" },
+        { "value": "check", "label": "Checkmark" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "badge_3_text",
+      "label": "Text",
+      "default": "30-Day Return"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon color",
+      "default": "#1a1a1a"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Trust Badges"
+    }
+  ]
+}
+{% endschema %}

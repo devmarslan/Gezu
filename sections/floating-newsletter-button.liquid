@@ -1,0 +1,340 @@
+<!-- sections/floating-newsletter-button.liquid -->
+{{ 'floating-newsletter-button.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .floating-newsletter-btn-section {
+    --btn-bg: {{ section.settings.button_bg }};
+    --btn-text: {{ section.settings.button_text_color }};
+    --btn-bg-hover: {{ section.settings.button_bg_hover }};
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  
+  {% unless section.settings.show_on_desktop %}
+    @media screen and (min-width: 750px) {
+      .floating-newsletter-btn-section {
+        display: none !important;
+      }
+    }
+  {% endunless %}
+  
+  {% unless section.settings.show_on_mobile %}
+    @media screen and (max-width: 749px) {
+      .floating-newsletter-btn-section {
+        display: none !important;
+      }
+    }
+  {% endunless %}
+{%- endstyle -%}
+
+<div class="floating-newsletter-btn-section" data-section-id="{{ section.id }}" id="floating-newsletter-section-{{ section.id }}">
+  <button 
+    type="button" 
+    class="floating-newsletter-btn floating-btn--{{ section.settings.position }} floating-btn--mobile-{{ section.settings.position_mobile }}"
+    id="floating-newsletter-trigger-{{ section.id }}"
+    aria-label="{{ section.settings.button_text | escape }}"
+  >
+    <span class="floating-btn__text">{{ section.settings.button_text }}</span>
+    {%- if section.settings.show_arrow -%}
+      <span class="floating-btn__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+      </span>
+    {%- endif -%}
+    <span class="floating-btn__close" id="floating-newsletter-close-{{ section.id }}" aria-label="Close">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </span>
+  </button>
+</div>
+<script>
+  (function() {
+    var key = 'fnl_minimized_{{ section.id }}';
+    if (localStorage.getItem(key) === '1') {
+      var btn = document.getElementById('floating-newsletter-trigger-{{ section.id }}');
+      if (btn) btn.classList.add('is-minimized');
+    }
+  })();
+</script>
+<script>
+(function() {
+  var STORAGE_KEY = 'fnl_minimized_{{ section.id }}';
+
+  function initFloatingBtn() {
+    const floatingBtn = document.getElementById('floating-newsletter-trigger-{{ section.id }}');
+    const closeBtn = document.getElementById('floating-newsletter-close-{{ section.id }}');
+    const section = document.getElementById('floating-newsletter-section-{{ section.id }}');
+    
+    if (!floatingBtn || !section) return;
+
+    // Restore minimized state across page loads / navigation
+    if (localStorage.getItem(STORAGE_KEY) === '1') {
+      floatingBtn.classList.add('is-minimized');
+    }
+    
+    // Close button click - minimize to vertical tab and persist
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        floatingBtn.classList.add('is-minimized');
+        localStorage.setItem(STORAGE_KEY, '1');
+      });
+    }
+    
+    // Listen for "Not interested" clicks in the newsletter popup
+    document.addEventListener('click', function(e) {
+      const target = e.target;
+      
+      // Check if clicked element is "Not interested" button
+      const isNotInterestedBtn = 
+        (target.textContent && target.textContent.trim().toLowerCase().includes('not interested')) ||
+        target.classList.contains('newsletter-decline') ||
+        target.classList.contains('modal-decline') ||
+        target.classList.contains('popup-decline') ||
+        target.closest('.newsletter-decline') ||
+        target.closest('.modal-decline') ||
+        target.hasAttribute('data-decline-newsletter') ||
+        target.closest('[data-decline-newsletter]');
+      
+      if (isNotInterestedBtn) {
+        // Close the newsletter popup
+        closeNewsletterPopup();
+      }
+    });
+    
+    // Function to close the newsletter popup
+    function closeNewsletterPopup() {
+      // Method 1: Find hdt-modal and call close() method
+      const hdtModal = document.querySelector('hdt-modal.hdt-modal-newsletter');
+      if (hdtModal && typeof hdtModal.close === 'function') {
+        hdtModal.close();
+        return;
+      }
+      
+      // Method 2: Close the dialog directly
+      const dialog = document.querySelector('.hdt-modal-newsletter dialog');
+      if (dialog && dialog.open) {
+        dialog.close();
+        return;
+      }
+      
+      // Method 3: Find by ID pattern and close
+      const newsletterDialogs = document.querySelectorAll('dialog[id*="Newsletter"], dialog[id*="newsletter"]');
+      newsletterDialogs.forEach(function(d) {
+        if (d.open) {
+          d.close();
+        }
+      });
+    }
+    
+    // Main button click - open newsletter popup or expand if minimized
+    floatingBtn.addEventListener('click', function(e) {
+      // Check if close button was clicked
+      if (e.target.closest('.floating-btn__close')) {
+        return;
+      }
+      
+      e.preventDefault();
+      
+      // If minimized, expand first and clear saved state
+      if (floatingBtn.classList.contains('is-minimized')) {
+        floatingBtn.classList.remove('is-minimized');
+        localStorage.removeItem(STORAGE_KEY);
+        return;
+      }
+      
+      // Method 1: Find hdt-modal with newsletter class and call open() method
+      const hdtModal = document.querySelector('hdt-modal.hdt-modal-newsletter');
+      if (hdtModal && typeof hdtModal.open === 'function') {
+        hdtModal.open();
+        return;
+      }
+      
+      // Method 2: Try the dialog inside hdt-modal
+      const dialog = document.querySelector('.hdt-modal-newsletter dialog');
+      if (dialog) {
+        if (typeof dialog.showModal === 'function' && !dialog.open) {
+          try {
+            dialog.showModal();
+            return;
+          } catch(err) {
+            console.log('Dialog showModal failed:', err);
+          }
+        }
+      }
+      
+      // Method 3: Find by ID pattern
+      const newsletterDialogs = document.querySelectorAll('dialog[id*="Newsletter"], dialog[id*="newsletter"]');
+      newsletterDialogs.forEach(function(d) {
+        if (!d.open && typeof d.showModal === 'function') {
+          try {
+            d.showModal();
+          } catch(err) {}
+        }
+      });
+    });
+  }
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFloatingBtn);
+  } else {
+    initFloatingBtn();
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Newsletter Button",
+  "class": "floating-newsletter-btn-wrapper",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Claim your 10% OFF"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrow",
+      "label": "Show Arrow Icon",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Desktop Position"
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Button Position (Desktop)",
+      "default": "bottom-left",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "Top Left"
+        },
+        {
+          "value": "top-right",
+          "label": "Top Right"
+        },
+        {
+          "value": "center-left",
+          "label": "Center Left"
+        },
+        {
+          "value": "center-right",
+          "label": "Center Right"
+        },
+        {
+          "value": "bottom-left",
+          "label": "Bottom Left"
+        },
+        {
+          "value": "bottom-right",
+          "label": "Bottom Right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Mobile Position"
+    },
+    {
+      "type": "select",
+      "id": "position_mobile",
+      "label": "Button Position (Mobile)",
+      "default": "bottom-center",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "Top Left"
+        },
+        {
+          "value": "top-right",
+          "label": "Top Right"
+        },
+        {
+          "value": "top-center",
+          "label": "Top Center"
+        },
+        {
+          "value": "center-left",
+          "label": "Center Left"
+        },
+        {
+          "value": "center-right",
+          "label": "Center Right"
+        },
+        {
+          "value": "bottom-left",
+          "label": "Bottom Left"
+        },
+        {
+          "value": "bottom-right",
+          "label": "Bottom Right"
+        },
+        {
+          "value": "bottom-center",
+          "label": "Bottom Center"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button Background",
+      "default": "#2563eb"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_hover",
+      "label": "Button Hover Background",
+      "default": "#1d4ed8"
+    },
+    {
+      "type": "header",
+      "content": "Visibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_mobile",
+      "label": "Show on Mobile",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_desktop",
+      "label": "Show on Desktop",
+      "default": true
+    }
+  ],
+  "enabled_on": {
+    "groups": ["custom.system"]
+  },
+  "presets": [
+    {
+      "name": "Floating Newsletter Button",
+      "category": "Promotional"
+    }
+  ]
+}
+{% endschema %}

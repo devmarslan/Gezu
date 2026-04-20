@@ -1,0 +1,724 @@
+{% comment %}
+  Membership Rewards Banner Section
+  Dynamic section with customizable text, colors, fonts, and padding
+{% endcomment %}
+
+{%- style -%}
+  /* Membership Rewards Banner Styles */
+  .membership-rewards-banner {
+    position: relative;
+    overflow: hidden;
+    background-color: {{ section.settings.bg_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .membership-rewards-banner__wrapper {
+    display: flex;
+    align-items: stretch;
+    min-height: 215px;
+    border-radius: 12px;
+    overflow: visible;
+    {% if section.settings.cont_bg_img != blank %}
+    background: url({{ section.settings.cont_bg_img | img_url: 'master' }});
+    background-size: cover;
+    background-repeat: no-repeat;
+    {% else %}
+    background: {{ section.settings.cont_bg_color }};
+    {% endif %}
+    position: relative;
+  }
+  .membership-rewards-banner__wrapper:after {
+    content: "";
+    background: url({{ section.settings.cont_absol_img | img_url: 'master' }});
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    right: -30px;
+    bottom: -30px;
+    display: block;
+  }
+
+  /* Left Badge Section */
+  .membership-rewards-banner__left {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 40px;
+    min-width: 420px;
+    /* background-color: {{ section.settings.left_bg_color }};
+    clip-path: ellipse(100% 100% at 0% 50%); */
+  }
+
+  /* .membership-rewards-banner__left::after {
+    content: '';
+    position: absolute;
+    right: -50px;
+    top: 0;
+    bottom: 0;
+    width: 100px;
+    background: inherit;
+    border-radius: 0 50% 50% 0;
+  } */
+
+  .membership-rewards-banner__badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    justify-content: space-between;
+    height: 80%;
+  }
+
+  .membership-rewards-banner__icon {
+    margin-bottom: 5px;
+  }
+
+  .membership-rewards-banner__icon img {
+    display: block;
+  }
+
+  .membership-rewards-banner__icon--default {
+    color: {{ section.settings.badge_title_color }};
+  }
+
+  .membership-rewards-banner__icon--default svg {
+    display: block;
+  }
+
+  .membership-rewards-banner__badge-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
+  .membership-rewards-banner__badge-title {
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: {{ section.settings.badge_title_color }};
+    font-size: {{ section.settings.badge_title_font_size }}px;
+  }
+
+  .membership-rewards-banner__badge-subtitle {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: {{ section.settings.badge_subtitle_color }};
+    font-size: {{ section.settings.badge_subtitle_font_size }}px;
+  }
+
+  /* Right Content Section */
+  .membership-rewards-banner__right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 20px 40px 20px 80px;
+    width: 70%;
+  }
+
+  .membership-rewards-banner__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 30px;
+  }
+
+  .membership-rewards-banner__text {
+    flex: 1;
+  }
+
+  .membership-rewards-banner__heading {
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    line-height: 1.3;
+    color: {{ section.settings.heading_color }};
+    font-size: {{ section.settings.heading_font_size }}px;
+  }
+
+  .membership-rewards-banner__heading-highlight {
+    font-weight: 400;
+    color: {{ section.settings.heading_highlight_color }};
+  }
+
+  .membership-rewards-banner__description {
+    margin: 0 0 20px 0;
+    line-height: 1.5;
+    max-width: 400px;
+    color: {{ section.settings.description_color }};
+    font-size: {{ section.settings.description_font_size }}px;
+  }
+
+  .membership-rewards-banner__cta {
+    display: inline-block;
+    text-decoration: underline;
+    font-weight: 600;
+    transition: color 0.3s ease;
+    color: {{ section.settings.cta_color }};
+    font-size: {{ section.settings.cta_font_size }}px;
+  }
+
+  .membership-rewards-banner__cta:hover {
+    text-decoration: underline;
+    color: {{ section.settings.cta_hover_color }};
+  }
+
+  /* Coins */
+  .membership-rewards-banner__coins {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+  }
+
+  .membership-rewards-banner__coin {
+    position: absolute;
+    animation: membershipCoinFloat 3s ease-in-out infinite;
+  }
+
+  .membership-rewards-banner__coin--1 {
+    top: 0;
+    right: 0;
+    animation-delay: 0s;
+  }
+
+  .membership-rewards-banner__coin--2 {
+    bottom: 5px;
+    right: 25px;
+    animation-delay: 0.5s;
+  }
+
+  @keyframes membershipCoinFloat {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  /* Responsive Styles */
+  @media screen and (max-width: 989px) {
+    .membership-rewards-banner__left {
+      min-width: 150px;
+      padding: 15px 30px 15px 80px;
+    }
+    
+    .membership-rewards-banner__right {
+      padding: 15px 30px 15px 140px;
+    }
+    
+    .membership-rewards-banner__description {
+      max-width: 300px;
+    }
+  }
+@media (min-width: 769px) and (max-width: 810px) {
+.membership-rewards-banner__description
+ {
+    font-size: 12px;
+}
+.membership-rewards-banner__heading {
+    font-size: 20px;
+}
+}
+
+  @media screen and (max-width: 768px) {
+    .membership-rewards-banner__wrapper {
+        {% if section.settings.cont_bg_img != blank %}
+        background: url({{ section.settings.cont_bg_img_mbl | img_url: 'master' }});
+        background-size: cover;
+        {% endif %}
+        min-height: 265px;
+        background-position: bottom;
+    }
+    .membership-rewards-banner__wrapper:after {
+        width: 80px;
+        height: 80px;
+        right: unset;
+        left: 0;
+        bottom: -20px;
+    }
+    .membership-rewards-banner__left {
+       display: none;
+    }
+    .membership-rewards-banner__right{
+        width: 100%;
+    }
+    .membership-rewards-banner__text {
+      text-align: center;
+    }
+  /* }
+
+  @media screen and (max-width: 749px) { */
+    .membership-rewards-banner {
+      padding-top: {{ section.settings.padding_top_mobile }}px;
+      padding-bottom: {{ section.settings.padding_bottom_mobile }}px;
+    }
+
+    .membership-rewards-banner__wrapper {
+      flex-direction: column;
+      border-radius: 12px;
+    }
+    
+    .membership-rewards-banner__left {
+      clip-path: none;
+      border-radius: 12px 12px 0 0;
+      padding: 20px;
+      min-width: auto;
+    }
+    
+    .membership-rewards-banner__left::after {
+      display: none;
+    }
+    
+    .membership-rewards-banner__badge {
+      flex-direction: row;
+      gap: 12px;
+    }
+    
+    .membership-rewards-banner__badge-text {
+      text-align: left;
+    }
+    
+    .membership-rewards-banner__icon {
+      margin-bottom: 0;
+    }
+    
+    .membership-rewards-banner__right {
+      padding: 20px;
+      border-radius: 0 0 12px 12px;
+    }
+    
+    .membership-rewards-banner__content {
+      flex-direction: column;
+      text-align: center;
+      gap: 20px;
+    }
+    
+    
+    
+    .membership-rewards-banner__heading {
+      font-size: {{ section.settings.heading_font_size_mobile }}px;
+    }
+
+    .membership-rewards-banner__description {
+      max-width: none;
+      font-size: {{ section.settings.description_font_size_mobile }}px;
+    }
+    
+    .membership-rewards-banner__coins {
+      width: 70px;
+      height: 60px;
+    }
+    
+    .membership-rewards-banner__coin--1 svg {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .membership-rewards-banner__coin--2 svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .membership-rewards-banner__heading {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="membership-rewards-banner">
+  <div class="hdt-container">
+    <div class="membership-rewards-banner__wrapper">
+      <!-- Left Badge Section -->
+      <div class="membership-rewards-banner__left">
+        <div class="membership-rewards-banner__badge">
+          {%- if section.settings.badge_icon != blank -%}
+            <div class="membership-rewards-banner__icon">
+              <img 
+                src="{{ section.settings.badge_icon | image_url: width: 60 }}" 
+                alt="{{ section.settings.badge_title }}"
+                width="60"
+                height="60"
+                loading="lazy"
+              >
+            </div>
+          {%- else -%}
+            <div class="membership-rewards-banner__icon membership-rewards-banner__icon--default">
+              <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56" fill="none">
+                <path d="M27.6631 8.21875C28.3098 8.21875 28.8311 8.74253 28.8754 9.38769C29.503 18.5382 36.8259 25.8476 45.9823 26.4536C46.6266 26.4962 47.1504 27.0164 47.1504 27.6621C47.1504 28.3078 46.6266 28.828 45.9823 28.8706C36.8116 29.4776 29.4803 36.8098 28.8727 45.9804C28.8299 46.6252 28.3093 47.1494 27.6631 47.1494C27.0168 47.1494 26.4962 46.6252 26.4535 45.9804C25.8468 36.8246 18.5377 29.5019 9.38769 28.8744C8.74253 28.8301 8.21875 28.3088 8.21875 27.6621C8.21875 27.0154 8.74253 26.4941 9.38769 26.4498C18.5234 25.8233 25.8241 18.5233 26.4508 9.38768C26.4951 8.74253 27.0164 8.21875 27.6631 8.21875Z" fill="#0047AB"/>
+                <path d="M29.3196 3.49296V1.78286C29.3196 1.67486 29.2745 1.57177 29.1952 1.49844L27.8393 0.244478C27.6903 0.106661 27.4601 0.107235 27.3118 0.245793L25.9706 1.49861C25.8922 1.57187 25.8477 1.67439 25.8477 1.78171V3.49296C25.8477 3.70692 26.0211 3.88037 26.2351 3.88037H28.9322C29.1461 3.88037 29.3196 3.70692 29.3196 3.49296Z" fill="#0047AB"/>
+                <path d="M29.3196 51.875V53.5851C29.3196 53.6931 29.2745 53.7962 29.1952 53.8695L27.8393 55.1234C27.6903 55.2613 27.4601 55.2607 27.3118 55.1221L25.9706 53.8693C25.8922 53.7961 25.8477 53.6935 25.8477 53.5862V51.875C25.8477 51.661 26.0211 51.4876 26.2351 51.4876H28.9322C29.1461 51.4876 29.3196 51.661 29.3196 51.875Z" fill="#0047AB"/>
+                <path d="M51.8742 29.5339L53.5843 29.5339C53.6923 29.5339 53.7954 29.4888 53.8687 29.4096L55.1227 28.0536C55.2605 27.9046 55.26 27.6745 55.1214 27.5262L53.8686 26.185C53.7953 26.1065 53.6928 26.062 53.5855 26.062L51.8742 26.062C51.6603 26.062 51.4868 26.2355 51.4868 26.4494V29.1465C51.4868 29.3605 51.6603 29.5339 51.8742 29.5339Z" fill="#0047AB"/>
+                <path d="M3.49296 29.5339L1.78286 29.5339C1.67486 29.5339 1.57177 29.4888 1.49844 29.4096L0.244478 28.0536C0.106661 27.9046 0.107235 27.6745 0.245793 27.5262L1.49861 26.185C1.57187 26.1065 1.67439 26.062 1.78171 26.062L3.49296 26.062C3.70692 26.062 3.88037 26.2355 3.88037 26.4494V29.1465C3.88037 29.3605 3.70692 29.5339 3.49296 29.5339Z" fill="#0047AB"/>
+              </svg>
+            </div>
+          {%- endif -%}
+          
+          <div class="membership-rewards-banner__badge-text">
+            {%- if section.settings.badge_title != blank -%}
+              <span class="membership-rewards-banner__badge-title">{{ section.settings.badge_title }}</span>
+            {%- endif -%}
+            {%- if section.settings.badge_subtitle != blank -%}
+              <span class="membership-rewards-banner__badge-subtitle">{{ section.settings.badge_subtitle }}</span>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Content Section -->
+      <div class="membership-rewards-banner__right">
+        <div class="membership-rewards-banner__content">
+          <div class="membership-rewards-banner__text">
+            {%- if section.settings.heading != blank or section.settings.heading_highlight != blank -%}
+              <h2 class="membership-rewards-banner__heading">
+                {{ section.settings.heading }}
+                {%- if section.settings.heading_highlight != blank -%}
+                  <span class="membership-rewards-banner__heading-highlight">{{ section.settings.heading_highlight }}</span>
+                {%- endif -%}
+              </h2>
+            {%- endif -%}
+            
+            {%- if section.settings.description != blank -%}
+              <p class="membership-rewards-banner__description">{{ section.settings.description }}</p>
+            {%- endif -%}
+            
+            {%- if section.settings.cta_text != blank -%}
+              <a href="{{ section.settings.cta_link }}" class="membership-rewards-banner__cta">
+                {{ section.settings.cta_text }}
+              </a>
+            {%- endif -%}
+          </div>
+          
+          {% comment %} {%- if section.settings.show_coins -%}
+            <div class="membership-rewards-banner__coins">
+              <div class="membership-rewards-banner__coin membership-rewards-banner__coin--1">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="50" height="50">
+                  <circle cx="20" cy="20" r="18" fill="{{ section.settings.coin_color }}"/>
+                  <circle cx="20" cy="20" r="14" fill="{{ section.settings.coin_inner_color }}"/>
+                  <text x="20" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="{{ section.settings.coin_symbol_color }}">$</text>
+                </svg>
+              </div>
+              <div class="membership-rewards-banner__coin membership-rewards-banner__coin--2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="35" height="35">
+                  <circle cx="20" cy="20" r="18" fill="{{ section.settings.coin_color }}"/>
+                  <circle cx="20" cy="20" r="14" fill="{{ section.settings.coin_inner_color }}"/>
+                  <text x="20" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="{{ section.settings.coin_symbol_color }}">$</text>
+                </svg>
+              </div>
+            </div>
+          {%- endif -%} {% endcomment %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collection Header Banner",
+  "tag": "section",
+  "class": "membership-rewards-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Badge Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_icon",
+      "label": "Badge Icon"
+    },
+    {
+      "type": "text",
+      "id": "badge_title",
+      "label": "Badge Title",
+      "default": "My Gezu's"
+    },
+    {
+      "type": "text",
+      "id": "badge_subtitle",
+      "label": "Badge Subtitle",
+      "default": "Rewards"
+    },
+    {
+      "type": "header",
+      "content": "Content Settings"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Our Members Save More."
+    },
+    {
+      "type": "text",
+      "id": "heading_highlight",
+      "label": "Heading Highlight Text",
+      "default": "Become our member today"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Become a GeZu Member and unlock special pricing, early offers, and pro-level guidance."
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Text",
+      "default": "Join for free"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_coins",
+      "label": "Show Coins",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Background Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background Color",
+      "default": "#fff"
+    },
+    {
+      "type": "color_background",
+      "id": "cont_bg_color",
+      "label": "Container Background Color",
+      "default": "#1a365d"
+    },
+    {
+      "type": "image_picker",
+      "id": "cont_bg_img",
+      "label": "Container Background Image(Desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "cont_bg_img_mbl",
+      "label": "Container Background Image(Mobile)"
+    },
+    
+    {
+      "type": "image_picker",
+      "id": "cont_absol_img",
+      "label": "Container Absolute Image"
+    },
+    {
+      "type": "header",
+      "content": "Badge Typography"
+    },
+    {
+      "type": "color",
+      "id": "badge_title_color",
+      "label": "Badge Title Color",
+      "default": "#2563eb"
+    },
+    {
+      "type": "range",
+      "id": "badge_title_font_size",
+      "label": "Badge Title Font Size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "badge_subtitle_color",
+      "label": "Badge Subtitle Color",
+      "default": "#2563eb"
+    },
+    {
+      "type": "range",
+      "id": "badge_subtitle_font_size",
+      "label": "Badge Subtitle Font Size",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "header",
+      "content": "Heading Typography"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "heading_highlight_color",
+      "label": "Heading Highlight Color",
+      "default": "#94a3b8"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading Font Size (Desktop)",
+      "min": 16,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size_mobile",
+      "label": "Heading Font Size (Mobile)",
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Description Typography"
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description Color",
+      "default": "#94a3b8"
+    },
+    {
+      "type": "range",
+      "id": "description_font_size",
+      "label": "Description Font Size (Desktop)",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "description_font_size_mobile",
+      "label": "Description Font Size (Mobile)",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "header",
+      "content": "CTA Typography"
+    },
+    {
+      "type": "color",
+      "id": "cta_color",
+      "label": "CTA Color",
+      "default": "#facc15"
+    },
+    {
+      "type": "color",
+      "id": "cta_hover_color",
+      "label": "CTA Hover Color",
+      "default": "#fde047"
+    },
+    {
+      "type": "range",
+      "id": "cta_font_size",
+      "label": "CTA Font Size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Coin Colors"
+    },
+    {
+      "type": "color",
+      "id": "coin_color",
+      "label": "Coin Outer Color",
+      "default": "#d97706"
+    },
+    {
+      "type": "color",
+      "id": "coin_inner_color",
+      "label": "Coin Inner Color",
+      "default": "#fbbf24"
+    },
+    {
+      "type": "color",
+      "id": "coin_symbol_color",
+      "label": "Coin Symbol Color",
+      "default": "#92400e"
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top (Desktop)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom (Desktop)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding Top (Mobile)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding Bottom (Mobile)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Header Banner"
+    }
+  ]
+}
+{% endschema %}

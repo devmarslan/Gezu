@@ -1,0 +1,368 @@
+<!-- ===== CONSENT BANNER V2 — gezuimpex.com ===== -->
+<style>
+  #cm-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 999998;
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+  }
+  #cm-box {
+    background: #fff;
+    border-radius: 12px;
+    max-width: 520px; width: 100%;
+    padding: 36px 32px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  #cm-box h2 { font-size: 20px; font-weight: 600; color: #111; margin: 0 0 10px; }
+  #cm-box p  { font-size: 14px; color: #555; line-height: 1.6; margin: 0; }
+  .cm-icon-wrap {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #fdecea;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+  }
+  .cm-label {
+    font-size: 11px; font-weight: 600; color: #0047ab;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin: 0 0 8px; text-align: center;
+  }
+  .cm-btn-accept {
+    width: 100%; padding: 13px;
+    background: #0047ab; color: #fff;
+    border: none; border-radius: 8px;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  .cm-btn-manage {
+    width: 100%; padding: 13px;
+    background: #fff; color: #111;
+    border: 1.5px solid #ddd; border-radius: 8px;
+    font-size: 15px; font-weight: 500; cursor: pointer;
+    margin-top: 10px;
+  }
+  .cm-footer { text-align: center; font-size: 12px; color: #999; margin: 16px 0 0; }
+  .cm-footer a { color: #0047ab; text-decoration: none; }
+  #cm-prefs { display: none; }
+  .cm-toggle-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid #f0f0f0;
+  }
+  .cm-toggle-row:last-of-type { border-bottom: none; }
+  .cm-toggle-label { font-size: 14px; font-weight: 500; color: #111; }
+  .cm-toggle-desc { font-size: 12px; color: #888; margin-top: 2px; }
+  .cm-switch { position: relative; display: inline-block; width: 42px; height: 24px; flex-shrink: 0; }
+  .cm-switch input { opacity: 0; width: 0; height: 0; }
+  .cm-slider {
+    position: absolute; inset: 0;
+    background: #ddd; border-radius: 24px;
+    cursor: pointer; transition: 0.2s;
+  }
+  .cm-slider:before {
+    content: ''; position: absolute;
+    width: 18px; height: 18px; left: 3px; bottom: 3px;
+    background: #fff; border-radius: 50%; transition: 0.2s;
+  }
+  .cm-switch input:checked + .cm-slider { background: #0047ab; }
+  .cm-switch input:checked + .cm-slider:before { transform: translateX(18px); }
+  .cm-switch input:disabled + .cm-slider { opacity: 0.5; cursor: not-allowed; }
+  .cm-btn-save {
+    width: 100%; padding: 13px;
+    background: #0047ab; color: #fff;
+    border: none; border-radius: 8px;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    margin-top: 20px;
+  }
+  .cm-back {
+    font-size: 13px; color: #0047ab; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-bottom: 16px; background: none; border: none; padding: 0;
+  }
+</style>
+
+<div id="cm-overlay" style="display:none;">
+  <div id="cm-box">
+
+    <!-- Schermata principale -->
+    <div id="cm-main">
+      <div style="text-align:center; margin-bottom:20px;">
+        <div class="cm-icon-wrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a81d06" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+          </svg>
+        </div>
+        <p class="cm-label" id="cm-t-label"></p>
+        <h2 id="cm-t-title"></h2>
+        <p id="cm-t-body"></p>
+      </div>
+      <button class="cm-btn-accept" id="cm-accept-all"></button>
+      <button class="cm-btn-manage" id="cm-open-prefs"></button>
+      <p class="cm-footer">
+        <a href="/fr/policies/privacy-policy" id="cm-t-privacy"></a>
+        &nbsp;·&nbsp;
+        <a href="/fr/policies/cookie-policy" id="cm-t-cookies"></a>
+      </p>
+    </div>
+
+    <!-- Pannello preferenze -->
+    <div id="cm-prefs">
+      <button class="cm-back" id="cm-back"></button>
+      <h2 id="cm-t-prefs-title" style="margin-bottom:4px;"></h2>
+      <p id="cm-t-prefs-body" style="margin-bottom:20px;"></p>
+
+      <div class="cm-toggle-row">
+        <div>
+          <div class="cm-toggle-label" id="cm-t-necessary"></div>
+          <div class="cm-toggle-desc" id="cm-t-necessary-desc"></div>
+        </div>
+        <label class="cm-switch">
+          <input type="checkbox" checked disabled>
+          <span class="cm-slider"></span>
+        </label>
+      </div>
+
+      <div class="cm-toggle-row">
+        <div>
+          <div class="cm-toggle-label" id="cm-t-analytics"></div>
+          <div class="cm-toggle-desc" id="cm-t-analytics-desc"></div>
+        </div>
+        <label class="cm-switch">
+          <input type="checkbox" id="cm-analytics">
+          <span class="cm-slider"></span>
+        </label>
+      </div>
+
+      <div class="cm-toggle-row">
+        <div>
+          <div class="cm-toggle-label" id="cm-t-marketing"></div>
+          <div class="cm-toggle-desc" id="cm-t-marketing-desc"></div>
+        </div>
+        <label class="cm-switch">
+          <input type="checkbox" id="cm-marketing">
+          <span class="cm-slider"></span>
+        </label>
+      </div>
+
+      <button class="cm-btn-save" id="cm-save-prefs"></button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  var COOKIE = 'gezuimpex_consent_v2';
+  var DAYS   = 365;
+
+  var i18n = {
+    fr: {
+      label:         'Gestion des cookies',
+      title:         'Votre vie privée nous importe',
+      body:          'Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser les publicités. Vous pouvez accepter tous les cookies ou gérer vos préférences.',
+      acceptAll:     'Accepter tout',
+      manage:        'Gérer les préférences',
+      privacy:       'Politique de confidentialité',
+      cookies:       'Politique de cookies',
+      prefsTitle:    'Préférences cookies',
+      prefsBody:     'Activez ou désactivez chaque catégorie selon vos préférences.',
+      back:          '← Retour',
+      necessary:     'Nécessaires',
+      necessaryDesc: 'Indispensables au fonctionnement du site',
+      analytics:     'Analytiques',
+      analyticsDesc: "Google Analytics — mesure d'audience anonymisée",
+      marketing:     'Marketing',
+      marketingDesc: 'Google Ads, Meta — publicités personnalisées',
+      save:          'Enregistrer mes choix'
+    },
+    en: {
+      label:         'Cookie settings',
+      title:         'Your privacy matters to us',
+      body:          'We use cookies to improve your browsing experience, analyse traffic and personalise ads. You can accept all cookies or manage your preferences.',
+      acceptAll:     'Accept all',
+      manage:        'Manage preferences',
+      privacy:       'Privacy policy',
+      cookies:       'Cookie policy',
+      prefsTitle:    'Cookie preferences',
+      prefsBody:     'Enable or disable each category according to your preferences.',
+      back:          '← Back',
+      necessary:     'Necessary',
+      necessaryDesc: 'Required for the website to function',
+      analytics:     'Analytics',
+      analyticsDesc: 'Google Analytics — anonymous audience measurement',
+      marketing:     'Marketing',
+      marketingDesc: 'Google Ads, Meta — personalised advertising',
+      save:          'Save my choices'
+    },
+    nl: {
+      label:         'Cookiebeheer',
+      title:         'Uw privacy is belangrijk voor ons',
+      body:          'Wij gebruiken cookies om uw browse-ervaring te verbeteren, verkeer te analyseren en advertenties te personaliseren. U kunt alle cookies accepteren of uw voorkeuren beheren.',
+      acceptAll:     'Alles accepteren',
+      manage:        'Voorkeuren beheren',
+      privacy:       'Privacybeleid',
+      cookies:       'Cookiebeleid',
+      prefsTitle:    'Cookie-voorkeuren',
+      prefsBody:     'Schakel elke categorie in of uit volgens uw voorkeuren.',
+      back:          '← Terug',
+      necessary:     'Noodzakelijk',
+      necessaryDesc: 'Vereist voor het functioneren van de website',
+      analytics:     'Analytisch',
+      analyticsDesc: 'Google Analytics — anonieme publieksmeting',
+      marketing:     'Marketing',
+      marketingDesc: 'Google Ads, Meta — gepersonaliseerde advertenties',
+      save:          'Mijn keuzes opslaan'
+    },
+    de: {
+      label:         'Cookie-Einstellungen',
+      title:         'Ihre Privatsphäre ist uns wichtig',
+      body:          'Wir verwenden Cookies, um Ihr Erlebnis zu verbessern, den Datenverkehr zu analysieren und Werbung zu personalisieren. Sie können alle Cookies akzeptieren oder Ihre Einstellungen verwalten.',
+      acceptAll:     'Alle akzeptieren',
+      manage:        'Einstellungen verwalten',
+      privacy:       'Datenschutzrichtlinie',
+      cookies:       'Cookie-Richtlinie',
+      prefsTitle:    'Cookie-Einstellungen',
+      prefsBody:     'Aktivieren oder deaktivieren Sie jede Kategorie nach Ihren Wünschen.',
+      back:          '← Zurück',
+      necessary:     'Notwendig',
+      necessaryDesc: 'Für den Betrieb der Website erforderlich',
+      analytics:     'Analytisch',
+      analyticsDesc: 'Google Analytics — anonyme Zielgruppenmessung',
+      marketing:     'Marketing',
+      marketingDesc: 'Google Ads, Meta — personalisierte Werbung',
+      save:          'Meine Auswahl speichern'
+    },
+    it: {
+      label:         'Gestione cookie',
+      title:         'La tua privacy è importante per noi',
+      body:          'Utilizziamo i cookie per migliorare la tua esperienza, analizzare il traffico e personalizzare gli annunci. Puoi accettare tutti i cookie o gestire le tue preferenze.',
+      acceptAll:     'Accetta tutto',
+      manage:        'Gestisci preferenze',
+      privacy:       'Informativa sulla privacy',
+      cookies:       'Informativa sui cookie',
+      prefsTitle:    'Preferenze cookie',
+      prefsBody:     'Attiva o disattiva ogni categoria secondo le tue preferenze.',
+      back:          '← Indietro',
+      necessary:     'Necessari',
+      necessaryDesc: 'Indispensabili per il funzionamento del sito',
+      analytics:     'Analitici',
+      analyticsDesc: 'Google Analytics — misurazione anonima del pubblico',
+      marketing:     'Marketing',
+      marketingDesc: 'Google Ads, Meta — pubblicità personalizzata',
+      save:          'Salva le mie scelte'
+    },
+    es: {
+      label:         'Gestión de cookies',
+      title:         'Tu privacidad nos importa',
+      body:          'Usamos cookies para mejorar tu experiencia, analizar el tráfico y personalizar los anuncios. Puedes aceptar todas las cookies o gestionar tus preferencias.',
+      acceptAll:     'Aceptar todo',
+      manage:        'Gestionar preferencias',
+      privacy:       'Política de privacidad',
+      cookies:       'Política de cookies',
+      prefsTitle:    'Preferencias de cookies',
+      prefsBody:     'Activa o desactiva cada categoría según tus preferencias.',
+      back:          '← Volver',
+      necessary:     'Necesarias',
+      necessaryDesc: 'Imprescindibles para el funcionamiento del sitio',
+      analytics:     'Analíticas',
+      analyticsDesc: 'Google Analytics — medición anónima de audiencia',
+      marketing:     'Marketing',
+      marketingDesc: 'Google Ads, Meta — publicidad personalizada',
+      save:          'Guardar mis preferencias'
+    }
+  };
+
+  var lang = (navigator.language || navigator.userLanguage || 'en').slice(0,2).toLowerCase();
+  var t    = i18n[lang] || i18n['en'];
+
+  function applyTranslations() {
+    document.getElementById('cm-t-label').textContent         = t.label;
+    document.getElementById('cm-t-title').textContent         = t.title;
+    document.getElementById('cm-t-body').textContent          = t.body;
+    document.getElementById('cm-accept-all').textContent      = t.acceptAll;
+    document.getElementById('cm-open-prefs').textContent      = t.manage;
+    document.getElementById('cm-t-privacy').textContent       = t.privacy;
+    document.getElementById('cm-t-cookies').textContent       = t.cookies;
+    document.getElementById('cm-back').textContent            = t.back;
+    document.getElementById('cm-t-prefs-title').textContent   = t.prefsTitle;
+    document.getElementById('cm-t-prefs-body').textContent    = t.prefsBody;
+    document.getElementById('cm-t-necessary').textContent     = t.necessary;
+    document.getElementById('cm-t-necessary-desc').textContent= t.necessaryDesc;
+    document.getElementById('cm-t-analytics').textContent     = t.analytics;
+    document.getElementById('cm-t-analytics-desc').textContent= t.analyticsDesc;
+    document.getElementById('cm-t-marketing').textContent     = t.marketing;
+    document.getElementById('cm-t-marketing-desc').textContent= t.marketingDesc;
+    document.getElementById('cm-save-prefs').textContent      = t.save;
+  }
+
+  function gtag() { window.dataLayer = window.dataLayer || []; window.dataLayer.push(arguments); }
+
+  function setCookie(val) {
+    var d = new Date();
+    d.setTime(d.getTime() + DAYS * 86400000);
+    document.cookie = COOKIE + '=' + encodeURIComponent(JSON.stringify(val))
+      + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax;Secure';
+  }
+
+  function getCookie() {
+    var m = document.cookie.match('(^| )' + COOKIE + '=([^;]+)');
+    try { return m ? JSON.parse(decodeURIComponent(m[2])) : null; } catch(e) { return null; }
+  }
+
+  function applyConsent(analytics, marketing) {
+    var a = analytics ? 'granted' : 'denied';
+    var m = marketing  ? 'granted' : 'denied';
+    gtag('consent', 'update', {
+      'analytics_storage':     a,
+      'ad_storage':            m,
+      'ad_user_data':          m,
+      'ad_personalization':    m,
+      'functionality_storage': a
+    });
+    window.dataLayer.push({
+      event:             'consent_update',
+      consent_analytics: a,
+      consent_marketing: m
+    });
+  }
+
+  function hideOverlay() {
+    document.getElementById('cm-overlay').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  var saved = getCookie();
+
+  if (saved) {
+    applyConsent(saved.analytics, saved.marketing);
+  } else {
+    applyTranslations();
+    document.getElementById('cm-overlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    document.getElementById('cm-accept-all').addEventListener('click', function() {
+      setCookie({ analytics: true, marketing: true });
+      applyConsent(true, true);
+      hideOverlay();
+    });
+
+    document.getElementById('cm-open-prefs').addEventListener('click', function() {
+      document.getElementById('cm-main').style.display  = 'none';
+      document.getElementById('cm-prefs').style.display = 'block';
+    });
+
+    document.getElementById('cm-back').addEventListener('click', function() {
+      document.getElementById('cm-prefs').style.display = 'none';
+      document.getElementById('cm-main').style.display  = 'block';
+    });
+
+    document.getElementById('cm-save-prefs').addEventListener('click', function() {
+      var a = document.getElementById('cm-analytics').checked;
+      var m = document.getElementById('cm-marketing').checked;
+      setCookie({ analytics: a, marketing: m });
+      applyConsent(a, m);
+      hideOverlay();
+    });
+  }
+
+})();
+</script>
+<!-- ===== END CONSENT BANNER ===== -->

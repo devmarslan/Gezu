@@ -1,0 +1,628 @@
+<!-- sections/main-product.liquid -->
+{% liquid
+  assign un_no_pick = true
+  if settings.pick_mode == 'no' and product.variants.size > 1
+    assign selected_variant = product.selected_variant
+    unless selected_variant
+      assign un_no_pick = false
+    endunless
+  elsif settings.pick_mode == 'first' and settings.hide_sold_out == false
+    assign selected_variant = product.selected_variant | default: product.variants.first
+  else
+    assign selected_variant = product.selected_or_first_available_variant
+  endif
+  assign product_form_id = 'product-form-'| append: section.id | append: product.id
+%}
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --pr-media-width: {{ section.settings.media_width }}%; --section-pt:{{ section.settings.padding_top }}px; --section-pb:{{ section.settings.padding_bottom }}px; --section-prate:{{ section.settings.padding_rate }};
+  }
+  #shopify-section-{{ section.id }} .hdt-product-info__list>.hdt-product__title {
+    font-size: 20px;
+    font-weight: 700;
+    max-width:80%
+  }
+  #shopify-section-{{ section.id }} .hdt-product__price .hdt-price {
+    font-size: 3.6rem; 
+    color: #0047AB;
+    font-weight: 500;
+    align-items: baseline;
+    flex-direction: column;
+  }
+  #shopify-section-{{ section.id }} span.taxify-price.taxify-price--inclusive .taxify-amount {
+    font-size: 3.6rem;
+    color: #0047AB;
+    font-weight: 500;
+  }
+  #shopify-section-{{ section.id }} .taxify-price {align-items: baseline;}
+  #shopify-section-{{ section.id }} span.taxify-price.taxify-price--exclusive .taxify-amount {
+     font-size: 3.6rem;
+    color: #0047AB;
+    font-weight: 500;
+  }
+
+  #shopify-section-{{ section.id }} .hdt-price .hdt-price__decimal {
+    font-size: 20px !important;
+  }
+  #shopify-section-{{ section.id }} .hdt-compare-at-price {
+    color: rgba(203, 36, 36, 1);
+  }
+  .bundler-volume-target-element.bndlr-automatic-volume-bundle {
+    display: none !important;
+  }
+  #shopify-section-{{ section.id }} .hdt-sku-wrapper {
+    color: rgba(0, 0, 0, 0.7);
+  }
+  #shopify-section-{{ section.id }} hdt-badge.hdt-badge.hdt-badge__on-sale
+  {
+      padding: 10px;
+      border-radius: 30px;
+  }
+  #shopify-section-{{ section.id }} .hdt-main-product-wrap {
+      gap: 80px;
+  }
+  #shopify-section-{{ section.id }} .hdt-product-info__list .hdt-product-info__item.hdt-product__price {
+    margin-block-end: 1.5rem;
+  }
+  .hdt-product-info__item.hdt-product__promo-banner, .hdt-product-info__item.hdt-product__inventory.for-desk {
+    margin-block-end: 1rem;
+  }
+
+  #shopify-section-{{ section.id }} .hdt-compare-at-price .taxify-amount {
+    color: rgba(203, 36, 36, 1) !important;
+    font-size: 1.6rem !important;
+    font-weight: 400 !important;
+  }
+  #shopify-section-{{ section.id }} .hdt-compare-at-price .taxify-price {
+    color: rgba(203, 36, 36, 1) !important;
+  }
+  #shopify-section-{{ section.id }} .hdt-compare-at-price .taxify-text-after{ display: none !important;}
+
+#shopify-section-{{ section.id }} .hdt-bmsm__price span.taxify-text-after {
+    display: none;
+}
+#shopify-section-{{ section.id }} .hdt-bmsm__price .taxify-amount {
+    font-size: 2rem !important;
+    font-weight: 600 !important;
+}
+
+@media (min-width:768px) {
+  #shopify-section-{{ section.id }} .hdt-product__media-item {
+      padding: 70px;
+  }
+}
+ @media (min-width:768px) and (max-width:930px) {
+  #shopify-section-{{ section.id }} .hdt-slider__button {
+      width: 30px !important;
+      height: 30px !important;
+  }
+}
+@media (max-width:767px) {
+  #shopify-section-{{ section.id }} .hdt-product__media-item {
+    padding: 60px;
+  }
+  /* #shopify-section-{{ section.id }} .hdt-product__price .hdt-price-wrapp {
+      justify-content: space-between;
+  } */
+  #shopify-section-{{ section.id }} .hdt-product__media {
+      border: 0px;
+  }
+  #shopify-section-{{ section.id }} .hdt-main-product-wrap {
+      gap: 30px;
+  }
+  #shopify-section-{{ section.id }} .hdt-product-info__list .areviews_main_header_container {display: none !important;}
+  #shopify-section-{{ section.id }} .hdt-sticky-atc__variant-price {
+    width: 100%;
+  }
+  #shopify-section-{{ section.id }} .hdt-product-info__list>.hdt-product__title {
+    max-width:100%
+  }
+}
+{%- endstyle -%}
+
+<div class="hdt-s-inner hdt-s-gradient" color-scheme="{{ section.settings.color_scheme }}" hdt-reveal="fade-in">
+  <div class="hdt-container {%- if section.settings.full_width -%}-full{%- endif %}">
+    <div class="hdt-section-spacing">
+      <div class="hdt-secion-main-product--{{ section.id }} hdt-row-grid hdt-grid-cols-1 md:hdt-grid-cols-2 hdt-main-product-wrap">
+        {% content_for 'block', type: '_product-medias', id: 'main-product' %}
+        {% content_for "blocks" %}
+      </div>
+      {%- if section.settings.product_list_fbt != blank -%}
+        <div color-scheme="{{ section.settings.fbt_color_scheme }}">
+          {% render 'product-form-bundle2', product_list: section.settings.product_list_fbt, product: product %}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+  {%- if section.settings.sticky_atc and product.available and request.page_type == 'product' -%}
+    {%- liquid
+      unless un_no_pick
+      assign selected_variant = product.variants.first
+      endunless
+      assign check_against_inventory = true
+      if selected_variant.inventory_management != 'shopify' or selected_variant.inventory_policy == 'continue'
+        assign check_against_inventory = false
+      endif
+      if selected_variant.quantity_rule.min > selected_variant.inventory_quantity and check_against_inventory
+        assign quantity_rule_soldout = true
+      endif
+      if selected_variant.inventory_management == 'shopify' and selected_variant.inventory_quantity <= 0 and selected_variant.available
+        assign is_pre_order = true
+      else
+        assign is_pre_order = false
+      endif
+      assign product_form_id_sticky = 'form-product-sticky' | append: product.id
+  
+      assign id_sticky = 'sticky-' | append: section.id
+      assign image = selected_variant.featured_image | default: product.featured_image | default: settings.placeholder_img
+    -%}
+  {{ 'hdt-sticky-atc.css' | asset_url | stylesheet_tag }}
+  <hdt-sticky-btn-atc form="{{ product_form_id }}" {% if product.has_only_default_variant %}is-pr-default {% endif %} color-scheme="{{ section.settings.color_scheme }}" class="hdt-sticky-btn-atc hdt-sticky_layout_mb--minimal hdt-s-gradient">
+    <div class="hdt-container">
+      <hdt-height-observer prefix="hdt-sticky-atc" class="hdt-flex hdt-align-center hdt-justify-center">
+        <div class="hdt-sticky-atc__product hdt-flex hdt-align-center">
+          <div class="hdt-sticky-atc__img hdt-radius-full hdt-oh hdt-relative">
+            {%- if image != blank -%}
+              {{ image | image_url: width: image.width | image_tag: loading: 'lazy', sizes: '80px', widths: '80, 160', data-widths: '[80, 160]', data-v-img: '' }}
+            {%- else -%}
+                <span class="hdt-sticky-atc__img-placeholder"></span>
+            {%- endif -%}
+          </div>
+          <div class="hdt-sticky-atc__product-infos">
+            <h3 class="hdt-sticky-atc__title hdt-text-lg hdt-font-medium hdt-hidden lg:hdt-block">{{ product.title }}</h3>
+          </div>
+        </div>
+        <div class="hdt-sticky-atc__infos">
+          <wrapp-hdt-pr-frm class="hdt-contents">
+            {%- form 'product', product, id: product_form_id_sticky, class: 'hdt-sticky-atc__form hdt-flex hdt-align-center', data-gift-card-recipient: false -%}
+              <div class="hdt-sticky-atc__variant-price">
+                {%- unless product.has_only_default_variant -%}
+                  <select name="id" class="hdt-select hdt-s-text hdt-truncate" tag-select>
+                    {%- for variant in product.variants -%}
+                      <option data-mdid="{{ variant.featured_media.id }}" {% if variant == selected_variant %}selected="selected"{% endif %}{% if variant.available == false %} disabled {% endif %} value="{{ variant.id }}">
+                        {%- liquid
+                          echo variant.title
+                          unless settings.currency_type == "2"
+                            echo variant.price | money | strip_html | prepend: ' - '
+                          endunless
+                          if variant.available == false
+                            echo 'products.product.sold_out' | t | prepend: ' - '
+                          endif
+                        -%}
+                      </option>
+                    {%- endfor -%}
+                  </select>
+                {%- else -%}
+                  <input type="hidden" name="id" value="{{ selected_variant.id }}">
+                  <span class="hdt-sticky-atc__product-monney hdt-money hdt-text-lg">{{ product.price | money }}</span>
+                {%- endunless -%}
+              </div>
+              <div class="hdt-sticky-atc__btns hdt-flex hdt-align-center">
+                <div class="hdt-sticky-atc__qty-selector">
+          {%- render 'product-qty-selector', selected_variant: selected_variant, product_form_id: product_form_id_sticky, id: id_sticky -%}
+                </div>
+                <button type="submit" name="add" class="hdt-sticky-atc__submit hdt-btn hdt-oh hdt-btn-solid hdt-font-semibold hdt-relative hdt-truncate hdt-btn-loading__svg"{% if selected_variant.available == false or quantity_rule_soldout %} disabled="true"{% endif %}>
+                  <span class="hdt-btn-atc_text">{% if is_pre_order %}{{ 'products.product.pre_order' | t }}{% elsif selected_variant.available == false or quantity_rule_soldout %}{{ 'products.product.sold_out' | t }}{% else %}{{ 'products.product.add_to_cart' | t }}{% endif %}</span> 
+                  <span class="hdt-loading__spinner hdt-absolute" hidden>
+                    <svg width="16" height="16" class="hdt-svg-spinner" focusable="false" role="presentation" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg"><circle class="hdt-path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle></svg>
+                  </span>
+                </button>
+              </div>
+            {%- endform -%}
+          </wrapp-hdt-pr-frm>
+        </div>
+      </hdt-height-observer>
+    </div>
+  </hdt-sticky-btn-atc>
+  {%- endif -%}
+</div>
+<script>
+(function() {
+  if (window.__hdtQuantityFixV2) return;
+  window.__hdtQuantityFixV2 = true;
+
+  // FIX 1: Make +/- buttons work correctly
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.hdt-quantity__button');
+    if (!btn) return;
+
+    var wrapp = btn.closest('hdt-quantity-wrapp, .hdt-quantity-wrapp-fixed');
+    if (!wrapp) return;
+
+    var input = wrapp.querySelector('.hdt-quantity__input');
+    if (!input) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
+    var min = parseInt(input.min) || 1;
+    var max = parseInt(input.max) || 9999;
+    var step = parseInt(input.step) || 1;
+    var current = parseInt(input.value) || min;
+    var newVal;
+
+    var isPlus = btn.name === 'plus' || btn.classList.contains('is--plus');
+    newVal = isPlus ? Math.min(current + step, max) : Math.max(current - step, min);
+
+    input.value = newVal;
+
+    var minusBtn = wrapp.querySelector('[name="minus"], .is--minus');
+    var plusBtn = wrapp.querySelector('[name="plus"], .is--plus');
+    if (minusBtn) minusBtn.classList.toggle('disabled', newVal <= min);
+    if (plusBtn) plusBtn.classList.toggle('disabled', newVal >= max);
+
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+
+    // SYNC all quantity inputs AND hidden fields
+    syncAllQuantities(newVal, input);
+  }, true);
+
+  // FIX 2: Sync on manual typing
+  document.addEventListener('input', function(e) {
+    if (!e.target.classList.contains('hdt-quantity__input')) return;
+    if (e.target.name !== 'quantity') return;
+    syncAllQuantities(e.target.value, e.target);
+  });
+
+  // FIX 3: Sync on change
+  document.addEventListener('change', function(e) {
+    if (!e.target.classList.contains('hdt-quantity__input')) return;
+    if (e.target.name !== 'quantity') return;
+    syncAllQuantities(e.target.value, e.target);
+  });
+
+  function syncAllQuantities(val, sourceInput) {
+    // Sync all visible quantity inputs
+    document.querySelectorAll('.hdt-quantity__input[name="quantity"]').forEach(function(inp) {
+      if (inp !== sourceInput) {
+        inp.value = val;
+      }
+      
+      // CRITICAL: Sync to hidden field inside the form
+      var formId = inp.getAttribute('form');
+      if (formId) {
+        var form = document.getElementById(formId);
+        if (form) {
+          var hiddenQty = form.querySelector('input[type="hidden"][name="quantity"]');
+          if (!hiddenQty) {
+            // Create hidden quantity field inside the form
+            hiddenQty = document.createElement('input');
+            hiddenQty.type = 'hidden';
+            hiddenQty.name = 'quantity';
+            form.appendChild(hiddenQty);
+          }
+          hiddenQty.value = val;
+        }
+      }
+    });
+  }
+
+  // FIX 4: Ensure quantity is correct RIGHT BEFORE form submit
+  document.addEventListener('submit', function(e) {
+    var form = e.target;
+    if (!form.matches || !form.matches('form[action*="/cart/add"]')) return;
+
+    // Find the visible quantity input linked to this form
+    var formId = form.id;
+    var visibleInput = document.querySelector('.hdt-quantity__input[form="' + formId + '"]');
+    
+    if (visibleInput) {
+      var qty = parseInt(visibleInput.value) || 1;
+      
+      // Ensure hidden field exists and has correct value
+      var hiddenQty = form.querySelector('input[type="hidden"][name="quantity"]');
+      if (!hiddenQty) {
+        hiddenQty = document.createElement('input');
+        hiddenQty.type = 'hidden';
+        hiddenQty.name = 'quantity';
+        form.appendChild(hiddenQty);
+      }
+      hiddenQty.value = qty;
+      
+      console.log('Form submit - quantity set to:', qty);
+    }
+  }, true);
+
+  // FIX 5: Also intercept AJAX form submissions (theme uses fetch)
+  var originalFetch = window.fetch;
+  window.fetch = function(url, options) {
+    if (url && url.toString().includes('/cart/add') && options && options.body) {
+      // Check if body is FormData
+      if (options.body instanceof FormData) {
+        // Find the quantity from visible inputs
+        var visibleInput = document.querySelector('.hdt-quantity__input[name="quantity"]');
+        if (visibleInput) {
+          var qty = parseInt(visibleInput.value) || 1;
+          // Delete existing quantity and set correct one
+          options.body.delete('quantity');
+          options.body.append('quantity', qty);
+          console.log('AJAX cart/add - quantity set to:', qty);
+        }
+      }
+    }
+    return originalFetch.apply(this, arguments);
+  };
+
+  // Initialize: sync any existing values on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    var firstInput = document.querySelector('.hdt-quantity__input[name="quantity"]');
+    if (firstInput) {
+      syncAllQuantities(firstInput.value, null);
+    }
+  });
+})();
+</script>
+{% comment %} <script>
+(function() {
+  if (window.__taxifyVariantFixV2) return;
+  window.__taxifyVariantFixV2 = true;
+
+  function syncTaxifyPrices() {
+    document.querySelectorAll('hdt-price.taxify-original-hidden').forEach(function(originalPrice) {
+      var parent = originalPrice.parentElement;
+      if (!parent) return;
+
+      var taxifyContainer = parent.querySelector('.taxify-price-container');
+      if (!taxifyContainer) return;
+
+      // Parse price from hidden original
+      var integerEl = originalPrice.querySelector('.hdt-price__integer');
+      var decimalEl = originalPrice.querySelector('.hdt-price__decimal');
+      var moneyEl = originalPrice.querySelector('.hdt-money');
+      var basePrice;
+
+      if (integerEl && decimalEl) {
+        basePrice = parseFloat(integerEl.textContent.replace(/[^0-9]/g, '') + '.' + decimalEl.textContent.replace(/[^0-9]/g, ''));
+      } else if (moneyEl) {
+        basePrice = parseFloat(moneyEl.textContent.replace(/[^0-9.]/g, ''));
+      }
+
+      if (isNaN(basePrice)) return;
+
+      // Get currency symbol
+      var rawText = (moneyEl || integerEl || originalPrice).textContent;
+      var symbolMatch = rawText.match(/[£$€]/);
+      var currencySymbol = symbolMatch ? symbolMatch[0] : '£';
+
+      // 16% VAT
+      var inclPrice = (basePrice * 1.16).toFixed(2);
+      var exclPrice = basePrice.toFixed(2);
+
+      // Update inclusive amount
+      var inclAmount = taxifyContainer.querySelector('.taxify-price--inclusive .taxify-amount');
+      if (inclAmount) inclAmount.textContent = currencySymbol + inclPrice;
+
+      // Update exclusive amount
+      var exclAmount = taxifyContainer.querySelector('.taxify-price--exclusive .taxify-amount');
+      if (exclAmount) exclAmount.textContent = currencySymbol + exclPrice;
+    });
+  }
+
+  // Listen to variant:change
+  document.addEventListener('variant:change', function() {
+    setTimeout(syncTaxifyPrices, 150);
+  }, true);
+
+  // MutationObserver backup
+  document.querySelectorAll('hdt-price.taxify-original-hidden').forEach(function(el) {
+    new MutationObserver(function() {
+      setTimeout(syncTaxifyPrices, 100);
+    }).observe(el, { childList: true, subtree: true, characterData: true });
+  });
+})();
+</script> {% endcomment %}
+
+<style>
+{% comment %} .hdt-compare-at-price {
+    display: none !important;
+}
+.sale-badge {
+    display: none !important;
+} {% endcomment %}
+</style>
+
+<script>
+  function afterSuccess() {
+  btn.classList.add('success');
+  btn.querySelector('.x-cs-btn-text').textContent = '{{ block.settings.btn_success_text | default: "Added to Cart!" }}';
+  setTimeout(function(){
+    btn.classList.remove('success');
+    btn.querySelector('.x-cs-btn-text').textContent = '{{ block.settings.btn_text | default: "Get Started" }}';
+  }, 2000);
+
+  // Use Eurus theme's built-in cart update mechanism
+  fetch(window.Shopify.routes.root + 'cart.js')
+    .then(function(r){ return r.json(); })
+    .then(function(cart){
+      // Update count badges
+      document.querySelectorAll('#cart-icon-bubble span, .cart-count-bubble span, [data-cart-count], .x-cart-item-count')
+        .forEach(function(el){ el.innerHTML = cart.item_count; });
+
+      if (window.Alpine) {
+        // Update Alpine cart store
+        if (Alpine.store('xCartHelper')) {
+          Alpine.store('xCartHelper').currentItemCount = cart.item_count;
+        }
+        // Trigger cart re-render via section rendering API
+        fetch('/?sections=cart-drawer')
+          .then(function(r){ return r.json(); })
+          .then(function(data){
+            if (data['cart-drawer']) {
+              var parser = new DOMParser();
+              var doc = parser.parseFromString(data['cart-drawer'], 'text/html');
+
+              // Replace cart items
+              var newItems = doc.querySelector('#CartDrawer-CartItems');
+              var oldItems = document.querySelector('#CartDrawer-CartItems');
+              if (newItems && oldItems) oldItems.innerHTML = newItems.innerHTML;
+
+              // Replace item count badge inside drawer
+              var newCount = doc.querySelector('.x-cart-item-count');
+              var oldCount = document.querySelector('#CartDrawer .x-cart-item-count');
+              if (newCount && oldCount) oldCount.outerHTML = newCount.outerHTML;
+
+              // Replace totals
+              var newTotal = doc.querySelector('.cart-drawer-price-total');
+              var oldTotal = document.querySelector('.cart-drawer-price-total');
+              if (newTotal && oldTotal) oldTotal.innerHTML = newTotal.innerHTML;
+            }
+
+            // Fire theme events
+            document.dispatchEvent(new CustomEvent('eurus:cart:items-changed'));
+
+            // Open minicart
+            if (afterAction === 'minicart' && Alpine.store('xMiniCart')) {
+              Alpine.store('xMiniCart').openCart();
+            }
+          });
+      }
+
+      if (afterAction === 'cart') {
+        window.location.href = '/cart';
+      }
+    });
+}
+</script>
+
+{% schema %}
+{
+  "name": "Main product",
+  "class": "hdt-section hdt-section--feature-product",
+  "max_blocks": 1,
+  "blocks": [
+    {
+      "type": "_group-product"
+    },
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.main-product.settings.header_sticky_atc.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_atc",
+      "label": "t:sections.main-product.settings.sticky_atc.label",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:sections.main-product.settings.header_fbt.content"
+    },
+    {
+      "type": "product_list",
+      "id": "product_list_fbt",
+      "label": "t:sections.main-product.settings.product_list_fbt.label",
+      "limit": 10
+    },
+    {
+      "type": "color_scheme",
+      "id": "fbt_color_scheme",
+      "label": "Frequently Bought Together Color scheme",
+      "visible_if": "{{ section.settings.product_list_fbt != blank }}"
+    },
+    {
+      "type": "header",
+      "content": "Section settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mainprod_wishbtn",
+      "label": "show Wishlist Button(absolute)",
+      "default": false
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Make section full width",
+      "default": false
+    },
+    /*{
+      "type": "range",
+      "id": "space_lg",
+      "label": "Vertical space",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "space_md",
+      "label": "Tablet vertical space",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "space",
+      "label": "Mobile vertical space",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "style.layout_panel",
+      "id": "layout",
+      "label": "Layout",
+      "default": {
+        "flex-direction": "row",
+        "gap": "20px",
+        "justify-content": "center",
+        "align-items": "center",
+
+        "@media (--mobile)": {
+          "flex-wrap": "wrap"
+        }
+      }
+    },*/
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_rate",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:sections.all.padding.padding_rate",
+      "default": 75
+    }
+  ]
+}
+{% endschema %}

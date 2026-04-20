@@ -1,0 +1,417 @@
+/* ==========================================================================
+   FAQ Section - CSS
+   ========================================================================== */
+
+/* Base Styles */
+.faq-section {
+  width: 100%;
+}
+
+.faq-wrapper {
+  position: relative;
+}
+
+.faq-section .page-width {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==========================================================================
+   Main Container - Two Column Layout
+   ========================================================================== */
+.faq-container {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 60px;
+  align-items: start;
+}
+
+
+/* ==========================================================================
+   Left Column - Header & Contact
+   ========================================================================== */
+.faq-header-column {
+  /* position: sticky;
+  top: 20px; */
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.faq-header {
+  margin-bottom: 40px;
+}
+
+.faq-heading {
+  font-size: var(--heading-size, 32px);
+  font-weight: 500;
+  color: var(--heading-color, #000000);
+  margin: 0 0 16px;
+  line-height: 1.2;
+}
+
+.faq-description {
+  font-size: var(--description-size, 14px);
+  color: var(--description-color, #666666);
+  margin: 0;
+  line-height: 1.7;
+}
+
+/* Contact Card */
+.faq-contact-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background-color: var(--contact-bg, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.contact-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.contact-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contact-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.contact-title {
+  font-size: var(--contact-title-size, 14px);
+  font-weight: 600;
+  color: var(--contact-title-color, #000000);
+  margin: 0 0;
+  line-height: 1.3;
+}
+
+.contact-text {
+  font-size: var(--contact-text-size, 13px);
+  color: var(--contact-text-color, #666666);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   Right Column - Accordion
+   ========================================================================== */
+.faq-accordion-column {
+  /* Takes remaining space */
+}
+
+.faq-accordion {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Accordion Item */
+.accordion-item {
+  border-bottom: 1px solid var(--accordion-border-color, #e5e5e5);
+}
+
+.accordion-item:first-child {
+  border-top: 1px solid var(--accordion-border-color, #e5e5e5);
+}
+
+/* Accordion Header */
+.accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: opacity 0.3s ease;
+}
+
+.accordion-header:hover {
+  opacity: 0.7;
+}
+
+.accordion-question {
+  font-size: var(--question-size, 16px);
+  font-weight: 500;
+  color: var(--question-color, #000000);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.accordion-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--accordion-icon-color, #666666);
+  transition: transform 0.3s ease;
+}
+
+.accordion-item.active .accordion-icon {
+  transform: rotate(180deg);
+}
+
+/* Accordion Content */
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.accordion-answer {
+  padding: 0 0 20px;
+  font-size: var(--answer-size, 14px);
+  color: var(--answer-color, #666666);
+  line-height: 1.7;
+}
+
+.accordion-answer p {
+  margin: 0 0 12px;
+}
+
+.accordion-answer p:last-child {
+  margin-bottom: 0;
+}
+
+.accordion-answer ul,
+.accordion-answer ol {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+.accordion-answer a {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.accordion-answer a:hover {
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   Responsive Styles
+   ========================================================================== */
+
+/* Large Desktop */
+@media (min-width: 1200px) {
+  .faq-container {
+    gap: 80px;
+  }
+}
+
+/* Medium Desktop */
+@media (max-width: 1199px) and (min-width: 992px) {
+  .faq-container {
+    gap: 50px;
+  }
+}
+
+/* Tablet Landscape */
+@media (max-width: 991px) and (min-width: 769px) {
+  .faq-container {
+    grid-template-columns: 1fr 1.2fr;
+    gap: 40px;
+  }
+  
+  .faq-header {
+    margin-bottom: 0px;
+    text-align: center;
+  }
+  
+  .accordion-header {
+    padding: 18px 0;
+  }
+}
+
+/* Tablet Portrait and Below */
+@media (max-width: 768px) {
+  .faq-section .page-width {
+    padding: 0 16px;
+  }
+  
+  .faq-container {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .faq-header-column {
+    position: relative;
+    top: 0;
+  }
+  
+  .faq-header {
+    margin-bottom: 0px;
+    text-align: center;
+  }
+  
+  .faq-heading {
+    font-size: var(--heading-size-mobile, 26px);
+    margin-bottom: 12px;
+  }
+  
+  .faq-description {
+    font-size: var(--description-size-mobile, 13px);
+    max-width: 90%;
+    margin: 0 auto;
+  }
+  
+  .faq-contact-card {
+    padding: 16px;
+  }
+  .contact-text{
+    font-size: 14px;
+  }
+  .contact-title{font-size: 14px;}
+  
+  .contact-avatar {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .accordion-header {
+    padding: 16px 0;
+    gap: 12px;
+  }
+  
+  .accordion-question {
+    font-size: var(--question-size-mobile, 14px);
+  }
+  
+  .accordion-icon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .accordion-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .accordion-answer {
+    padding: 0 0 16px;
+    font-size: var(--answer-size-mobile, 13px);
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .faq-section .page-width {
+    padding: 0 12px;
+  }
+  
+  /* .faq-contact-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  } */
+  
+  .accordion-header {
+    padding: 14px 0;
+  }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+/* .accordion-header:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+.accordion-header:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+} */
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .accordion-icon,
+  .accordion-content,
+  .accordion-header {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+@media print {
+  .faq-container {
+    display: block;
+  }
+  
+  .faq-header-column {
+    margin-bottom: 30px;
+  }
+  
+  .accordion-content {
+    max-height: none !important;
+    overflow: visible;
+  }
+  
+  .accordion-icon {
+    display: none;
+  }
+  
+  .accordion-item {
+    page-break-inside: avoid;
+  }
+}
+
+/* ==========================================================================
+   High Contrast Mode
+   ========================================================================== */
+@media (forced-colors: active) {
+  .accordion-item {
+    border-color: currentColor;
+  }
+  
+  .faq-contact-card {
+    border: 1px solid currentColor;
+  }
+  
+  /* .accordion-header:focus {
+    outline: 3px solid currentColor;
+  } */
+}
+
+/* ==========================================================================
+   Animation Enhancement
+   ========================================================================== */
+.accordion-item.active .accordion-answer {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accordion-item.active .accordion-answer {
+    animation: none;
+  }
+}

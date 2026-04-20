@@ -1,0 +1,695 @@
+{% comment %}
+  Geo Location Popup - Fully Scoped (no CSS/JS conflicts)
+  Custom dropdowns with flag images in options
+  
+  SETUP:
+  1. Save as snippets/geo-location-popup.liquid
+  2. Add {% render 'geo-location-popup' %} in theme.liquid before </body>
+{% endcomment %}
+
+{%- if localization.available_countries.size > 1 -%}
+
+<style>
+  /* ===== GEO POPUP — All styles scoped under #geoLocPopup ===== */
+  #geoLocPopup {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 999999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+  #geoLocPopup.is-visible { display: flex; }
+
+  #geoLocPopup *,
+  #geoLocPopup *::before,
+  #geoLocPopup *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  #geoLocPopup .glp-modal {
+    background: #fff;
+    border-radius: 8px;
+    max-width: 460px;
+    width: 100%;
+    padding: 32px 28px 28px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    animation: glpSlideIn 0.3s ease forwards;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  @keyframes glpSlideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Close */
+  #geoLocPopup .glp-close {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #333;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0;
+    transition: background 0.2s;
+  }
+  #geoLocPopup .glp-close:hover { background: #f5f5f5; }
+
+  /* Title & text */
+  #geoLocPopup .glp-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 8px;
+    padding: 0 30px 0 0;
+    line-height: 1.3;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  #geoLocPopup .glp-text {
+    font-size: 14px;
+    color: #555;
+    margin: 0 0 24px;
+    padding: 0;
+    line-height: 1.55;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  #geoLocPopup .glp-text strong {
+    color: #1a1a1a;
+    font-weight: 700;
+  }
+
+  /* Labels */
+  #geoLocPopup .glp-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 6px;
+    padding: 0;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* Field wrapper */
+  #geoLocPopup .glp-field {
+    position: relative;
+    margin: 0 0 18px;
+    padding: 0;
+  }
+
+  /* ===== CUSTOM DROPDOWN ===== */
+  #geoLocPopup .glp-dropdown {
+    position: relative;
+    width: 100%;
+  }
+
+  /* Trigger button (looks like select) */
+  #geoLocPopup .glp-dropdown-trigger {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 46px;
+    padding: 0 36px 0 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    position: relative;
+    font-family: inherit;
+    text-align: left;
+    color: #1a1a1a;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 46px;
+    box-shadow: none;
+    outline: none;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  #geoLocPopup .glp-dropdown-trigger:focus,
+  #geoLocPopup .glp-dropdown.is-open .glp-dropdown-trigger {
+    border-color: #333;
+  }
+
+  #geoLocPopup .glp-dropdown-trigger img {
+    width: 22px;
+    height: 16px;
+    border-radius: 2px;
+    object-fit: cover;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  #geoLocPopup .glp-dropdown-trigger .glp-flag--emoji {
+    font-size: 18px;
+    margin-right: 10px;
+    line-height: 1;
+    flex: none;
+  }
+
+  #geoLocPopup .glp-dropdown-trigger span {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Arrow */
+  #geoLocPopup .glp-dropdown-trigger svg {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #666;
+    transition: transform 0.2s;
+  }
+  #geoLocPopup .glp-dropdown.is-open .glp-dropdown-trigger svg {
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  /* Options list */
+  #geoLocPopup .glp-dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 10;
+    display: none;
+    padding: 4px 0;
+    list-style: none;
+  }
+  #geoLocPopup .glp-dropdown.is-open .glp-dropdown-list {
+    display: block;
+  }
+
+  /* Scrollbar styling */
+  #geoLocPopup .glp-dropdown-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  #geoLocPopup .glp-dropdown-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  #geoLocPopup .glp-dropdown-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+  }
+
+  /* Individual option */
+  #geoLocPopup .glp-dropdown-option {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 400;
+    color: #1a1a1a;
+    transition: background 0.15s;
+    line-height: 1.4;
+    text-transform: none;
+    letter-spacing: 0;
+    list-style: none;
+  }
+  #geoLocPopup .glp-dropdown-option:hover {
+    background: #f5f5f5;
+  }
+  #geoLocPopup .glp-dropdown-option.is-selected {
+    background: #0047ab;
+    color: #fff;
+  }
+
+  #geoLocPopup .glp-dropdown-option img {
+    width: 22px;
+    height: 16px;
+    border-radius: 2px;
+    object-fit: cover;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  #geoLocPopup .glp-dropdown-option .glp-flag--emoji {
+    font-size: 18px;
+    margin-right: 10px;
+    line-height: 1;
+  }
+
+  /* Button */
+  #geoLocPopup .glp-btn {
+    width: 100%;
+    height: 48px;
+    background: #0047ab;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background 0.2s;
+    margin: 6px 0 0;
+    padding: 0;
+    line-height: 48px;
+    text-align: center;
+    display: block;
+    box-shadow: none;
+    font-family: inherit;
+  }
+  #geoLocPopup .glp-btn:hover { background: #053478; }
+
+  /* Hidden native selects for form submission */
+  #geoLocPopup .glp-hidden-select {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Form reset inside popup */
+  #geoLocPopup form {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+  }
+
+  @media (max-width: 480px) {
+    #geoLocPopup .glp-modal { padding: 24px 20px 20px; }
+    #geoLocPopup .glp-title { font-size: 19px; }
+    #geoLocPopup .glp-dropdown-list { max-height: 180px; }
+  }
+</style>
+
+<div id="geoLocPopup">
+  <div class="glp-modal">
+    <button class="glp-close" data-glp-close aria-label="Close">&times;</button>
+
+    <h2 class="glp-title">Welcome to {{ shop.name }}</h2>
+    <p class="glp-text" data-glp-text>Please select your shipping country</p>
+
+    {%- form 'localization', id: 'glpForm', class: '' -%}
+
+      {%- comment -%}--- 1. SHIP TO ---{%- endcomment -%}
+      {%- if localization.available_countries.size > 1 -%}
+        <label class="glp-label">Ship to</label>
+        <div class="glp-field">
+          <!-- Hidden native select for form submission -->
+          <select name="country_code" class="glp-hidden-select" data-glp-country>
+            {%- for country in localization.available_countries -%}
+              <option value="{{ country.iso_code }}"
+                data-flag="{{ country | image_url: width: 32 }}"
+                data-name="{{ country.name }}"
+                data-cur="{{ country.currency.iso_code }}"
+                data-sym="{{ country.currency.symbol }}"
+                {% if country.iso_code == localization.country.iso_code %}selected{% endif %}
+              >{{ country.name }}</option>
+            {%- endfor -%}
+          </select>
+
+          <!-- Custom dropdown -->
+          <div class="glp-dropdown" data-glp-dd="country">
+            <button type="button" class="glp-dropdown-trigger" aria-haspopup="listbox">
+              <img src="{{ localization.country | image_url: width: 32 }}" alt="{{ localization.country.name }}" width="22" height="16" loading="lazy">
+              <span>{{ localization.country.name }}</span>
+              <svg width="10" viewBox="0 0 19 12"><polyline fill="none" stroke="currentColor" points="17 2 9.5 10 2 2" stroke-width="2" stroke-linecap="square"></polyline></svg>
+            </button>
+            <ul class="glp-dropdown-list" role="listbox">
+              {%- for country in localization.available_countries -%}
+                <li class="glp-dropdown-option{% if country.iso_code == localization.country.iso_code %} is-selected{% endif %}"
+                    role="option"
+                    data-value="{{ country.iso_code }}"
+                    data-flag="{{ country | image_url: width: 32 }}"
+                    data-name="{{ country.name }}"
+                    data-cur="{{ country.currency.iso_code }}"
+                    data-sym="{{ country.currency.symbol }}">
+                  <img src="{{ country | image_url: width: 32 }}" alt="{{ country.name }}" width="22" height="16" loading="lazy">
+                  {{ country.name }}
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%}--- 2. CURRENCY ---{%- endcomment -%}
+      <label class="glp-label">Currency</label>
+      <div class="glp-field">
+        <!-- Hidden native select -->
+        <select class="glp-hidden-select" data-glp-currency>
+          {%- assign glp_added = '' -%}
+          {%- for country in localization.available_countries -%}
+            {%- assign ck = country.currency.iso_code -%}
+            {%- unless glp_added contains ck -%}
+              {%- if glp_added != '' -%}{%- assign glp_added = glp_added | append: ',' -%}{%- endif -%}
+              {%- assign glp_added = glp_added | append: ck -%}
+              <option value="{{ country.currency.iso_code }}"
+                data-flag="{{ country | image_url: width: 32 }}"
+                data-country="{{ country.iso_code }}"
+                {% if country.currency.iso_code == localization.country.currency.iso_code %}selected{% endif %}
+              >{{ country.currency.symbol }} {{ country.currency.iso_code }}</option>
+            {%- endunless -%}
+          {%- endfor -%}
+        </select>
+
+        <!-- Custom dropdown -->
+        <div class="glp-dropdown" data-glp-dd="currency">
+          <button type="button" class="glp-dropdown-trigger" aria-haspopup="listbox">
+            <img src="{{ localization.country | image_url: width: 32 }}" alt="{{ localization.country.currency.iso_code }}" width="22" height="16" loading="lazy">
+            <span>{{ localization.country.currency.symbol }} {{ localization.country.currency.iso_code }}</span>
+            <svg width="10" viewBox="0 0 19 12"><polyline fill="none" stroke="currentColor" points="17 2 9.5 10 2 2" stroke-width="2" stroke-linecap="square"></polyline></svg>
+          </button>
+          <ul class="glp-dropdown-list" role="listbox">
+            {%- assign glp_added2 = '' -%}
+            {%- for country in localization.available_countries -%}
+              {%- assign ck2 = country.currency.iso_code -%}
+              {%- unless glp_added2 contains ck2 -%}
+                {%- if glp_added2 != '' -%}{%- assign glp_added2 = glp_added2 | append: ',' -%}{%- endif -%}
+                {%- assign glp_added2 = glp_added2 | append: ck2 -%}
+                <li class="glp-dropdown-option{% if country.currency.iso_code == localization.country.currency.iso_code %} is-selected{% endif %}"
+                    role="option"
+                    data-value="{{ country.currency.iso_code }}"
+                    data-flag="{{ country | image_url: width: 32 }}"
+                    data-country="{{ country.iso_code }}">
+                  <img src="{{ country | image_url: width: 32 }}" alt="{{ country.currency.iso_code }}" width="22" height="16" loading="lazy">
+                  {{ country.currency.symbol }} {{ country.currency.iso_code }}
+                </li>
+              {%- endunless -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+      </div>
+
+      {%- comment -%}--- 3. LANGUAGE ---{%- endcomment -%}
+      {%- if localization.available_languages.size > 1 -%}
+        <label class="glp-label">Language</label>
+        <div class="glp-field">
+          <!-- Hidden native select for form submission -->
+          <select name="language_code" class="glp-hidden-select" data-glp-lang>
+            {%- for language in localization.available_languages -%}
+              <option value="{{ language.iso_code }}"
+                {% if language.iso_code == localization.language.iso_code %}selected{% endif %}
+              >{{ language.endonym_name }}</option>
+            {%- endfor -%}
+          </select>
+
+          <!-- Custom dropdown -->
+          <div class="glp-dropdown" data-glp-dd="language">
+            <button type="button" class="glp-dropdown-trigger" aria-haspopup="listbox">
+              <span class="glp-flag--emoji">🌐</span>
+              <span>{{ localization.language.endonym_name }}</span>
+              <svg width="10" viewBox="0 0 19 12"><polyline fill="none" stroke="currentColor" points="17 2 9.5 10 2 2" stroke-width="2" stroke-linecap="square"></polyline></svg>
+            </button>
+            <ul class="glp-dropdown-list" role="listbox">
+              {%- for language in localization.available_languages -%}
+                <li class="glp-dropdown-option{% if language.iso_code == localization.language.iso_code %} is-selected{% endif %}"
+                    role="option"
+                    data-value="{{ language.iso_code }}">
+                  <span class="glp-flag--emoji">🌐</span>
+                  {{ language.endonym_name }}
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        </div>
+      {%- endif -%}
+
+      <button type="submit" class="glp-btn">SHOP NOW</button>
+    {%- endform -%}
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ===== CONFIG ===== */
+  var KEY = 'glp_geo_dismissed';
+  var DAYS = 30;
+  var CURRENT = {{ localization.country.iso_code | json }};
+
+  /* ===== REFS ===== */
+  var root     = document.getElementById('geoLocPopup');
+  if (!root) return;
+
+  var textEl   = root.querySelector('[data-glp-text]');
+  var closeBtn = root.querySelector('[data-glp-close]');
+  var form     = root.querySelector('#glpForm');
+  var cSel     = root.querySelector('[data-glp-country]');
+  var cuSel    = root.querySelector('[data-glp-currency]');
+  var langSel  = root.querySelector('[data-glp-lang]');
+  var syncing  = false;
+
+  /* Custom dropdown refs */
+  var ddCountry  = root.querySelector('[data-glp-dd="country"]');
+  var ddCurrency = root.querySelector('[data-glp-dd="currency"]');
+  var ddLanguage = root.querySelector('[data-glp-dd="language"]');
+
+  /* ===== CUSTOM DROPDOWN LOGIC ===== */
+  function initDropdown(ddEl, nativeSelect, onChange) {
+    if (!ddEl || !nativeSelect) return;
+
+    var trigger = ddEl.querySelector('.glp-dropdown-trigger');
+    var list    = ddEl.querySelector('.glp-dropdown-list');
+    var options = ddEl.querySelectorAll('.glp-dropdown-option');
+
+    /* Toggle open/close */
+    trigger.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      /* Close other dropdowns first */
+      var allDDs = root.querySelectorAll('.glp-dropdown.is-open');
+      for (var i = 0; i < allDDs.length; i++) {
+        if (allDDs[i] !== ddEl) allDDs[i].classList.remove('is-open');
+      }
+      ddEl.classList.toggle('is-open');
+
+      /* Scroll selected option into view */
+      if (ddEl.classList.contains('is-open')) {
+        var selected = list.querySelector('.is-selected');
+        if (selected) {
+          selected.scrollIntoView({ block: 'nearest' });
+        }
+      }
+    });
+
+    /* Option click */
+    for (var i = 0; i < options.length; i++) {
+      options[i].addEventListener('click', function(e) {
+        e.stopPropagation();
+        var li   = this;
+        var val  = li.getAttribute('data-value');
+        var flag = li.getAttribute('data-flag');
+        var text = li.textContent.trim();
+
+        /* Update trigger display */
+        var trigImg  = trigger.querySelector('img');
+        var trigSpan = trigger.querySelector('span:not(.glp-flag--emoji)');
+
+        if (trigImg && flag) {
+          trigImg.src = flag;
+        }
+        if (trigSpan) trigSpan.textContent = text;
+
+        /* Update selected state */
+        var siblings = ddEl.querySelectorAll('.glp-dropdown-option');
+        for (var j = 0; j < siblings.length; j++) {
+          siblings[j].classList.remove('is-selected');
+        }
+        li.classList.add('is-selected');
+
+        /* Sync native select */
+        nativeSelect.value = val;
+
+        /* Close */
+        ddEl.classList.remove('is-open');
+
+        /* Fire callback */
+        if (onChange) onChange(li, val);
+      });
+    }
+  }
+
+  /* Close all dropdowns on outside click */
+  document.addEventListener('click', function(e) {
+    if (!root.contains(e.target)) {
+      var openDDs = root.querySelectorAll('.glp-dropdown.is-open');
+      for (var i = 0; i < openDDs.length; i++) openDDs[i].classList.remove('is-open');
+    } else {
+      /* If clicked inside modal but not on a dropdown */
+      var clickedDD = e.target.closest('.glp-dropdown');
+      var openDDs = root.querySelectorAll('.glp-dropdown.is-open');
+      for (var i = 0; i < openDDs.length; i++) {
+        if (openDDs[i] !== clickedDD) openDDs[i].classList.remove('is-open');
+      }
+    }
+  });
+
+  /* ===== STORAGE ===== */
+  function isDismissed() {
+    try {
+      var d = JSON.parse(localStorage.getItem(KEY));
+      return d && Date.now() < (d.ts + DAYS * 86400000);
+    } catch(e) { return false; }
+  }
+  function dismiss() {
+    try { localStorage.setItem(KEY, JSON.stringify({ ts: Date.now() })); } catch(e) {}
+  }
+
+  /* ===== SHOW / HIDE ===== */
+  function show(iso) {
+    if (iso && cSel) {
+      var found = false;
+      for (var i = 0; i < cSel.options.length; i++) {
+        if (cSel.options[i].value === iso) {
+          cSel.value = iso;
+          /* Also update custom dropdown */
+          selectCustomOption(ddCountry, iso);
+          syncCountryToCurrency(iso);
+          if (textEl) textEl.innerHTML = 'It looks like you\'re visiting from <strong>' + cSel.options[i].getAttribute('data-name') + '</strong>. Please confirm your shipping preferences';
+          found = true;
+          break;
+        }
+      }
+      if (!found && textEl) {
+        textEl.innerHTML = 'We\'re sorry, but we do not currently ship to <strong>' + iso + '</strong>. Please select your shipping country';
+      }
+    }
+    root.classList.add('is-visible');
+  }
+
+  function hide() {
+    root.classList.remove('is-visible');
+    dismiss();
+  }
+
+  /* ===== HELPER: Select option in custom dropdown by value ===== */
+  function selectCustomOption(ddEl, value) {
+    if (!ddEl) return;
+    var options = ddEl.querySelectorAll('.glp-dropdown-option');
+    var trigger = ddEl.querySelector('.glp-dropdown-trigger');
+
+    for (var i = 0; i < options.length; i++) {
+      if (options[i].getAttribute('data-value') === value) {
+        /* Remove previous selection */
+        for (var j = 0; j < options.length; j++) options[j].classList.remove('is-selected');
+        options[i].classList.add('is-selected');
+
+        /* Update trigger */
+        var trigImg  = trigger.querySelector('img');
+        var trigSpan = trigger.querySelector('span:not(.glp-flag--emoji)');
+        var flag     = options[i].getAttribute('data-flag');
+
+        if (trigImg && flag) trigImg.src = flag;
+        if (trigSpan) trigSpan.textContent = options[i].textContent.trim();
+        break;
+      }
+    }
+  }
+
+  /* ===== SYNC: Country → Currency ===== */
+  function syncCountryToCurrency(countryIso) {
+    if (syncing) return;
+    syncing = true;
+
+    /* Find currency for this country from native select */
+    if (cSel && cuSel) {
+      var opt = cSel.querySelector('option[value="' + countryIso + '"]');
+      if (opt) {
+        var targetCur = opt.getAttribute('data-cur');
+        cuSel.value = targetCur;
+        selectCustomOption(ddCurrency, targetCur);
+      }
+    }
+    syncing = false;
+  }
+
+  /* ===== SYNC: Currency → Country ===== */
+  function syncCurrencyToCountry(currencyIso) {
+    if (syncing) return;
+    syncing = true;
+
+    if (cuSel && cSel) {
+      var opt = cuSel.querySelector('option[value="' + currencyIso + '"]');
+      if (opt) {
+        var targetCountry = opt.getAttribute('data-country');
+        cSel.value = targetCountry;
+        selectCustomOption(ddCountry, targetCountry);
+      }
+    }
+    syncing = false;
+  }
+
+  /* ===== INIT ===== */
+  function init() {
+    if (isDismissed()) return;
+
+    /* Close handlers */
+    if (closeBtn) closeBtn.addEventListener('click', hide);
+    root.addEventListener('click', function(e) { if (e.target === root) hide(); });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        /* Close open dropdowns first, then popup */
+        var openDDs = root.querySelectorAll('.glp-dropdown.is-open');
+        if (openDDs.length > 0) {
+          for (var i = 0; i < openDDs.length; i++) openDDs[i].classList.remove('is-open');
+        } else if (root.classList.contains('is-visible')) {
+          hide();
+        }
+      }
+    });
+
+    /* Init custom dropdowns with sync callbacks */
+    initDropdown(ddCountry, cSel, function(li, val) {
+      syncCountryToCurrency(val);
+    });
+
+    initDropdown(ddCurrency, cuSel, function(li, val) {
+      syncCurrencyToCountry(val);
+    });
+
+    initDropdown(ddLanguage, langSel, null);
+
+    /* Form submit */
+    if (form) form.addEventListener('submit', function() { dismiss(); });
+
+    /* Geo detect */
+    fetch('https://ip2c.org/s')
+      .then(function(r) { return r.text(); })
+      .then(function(data) {
+        var p = data.split(';');
+        if (p[0] === '1' && p[1] && p[1] !== CURRENT) show(p[1]);
+      })
+      .catch(function() {});
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+{%- endif -%}

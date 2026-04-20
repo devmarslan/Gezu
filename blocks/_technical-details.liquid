@@ -1,0 +1,409 @@
+{% comment %} {% assign current_variant = product.selected_or_first_available_variant %} {% endcomment %}
+ {% assign current_variant = product.selected_variant | default: product.variants[0] %}
+{% assign details_list = current_variant.metafields.custom.technical_details.value %}
+{% assign unique_id = block.id | default: section.id %}
+
+{% comment %} Check if current variant has technical details {% endcomment %}
+{% assign has_details = false %}
+{% if details_list != blank and details_list.size > 0 %}
+  {% assign has_details = true %}
+{% endif %}
+
+<div class="technical-details-section {% unless has_details %}hidden{% endunless %}" 
+     id="tech-details-{{ unique_id }}" 
+     data-section-id="{{ unique_id }}"
+     data-variant-id="{{ current_variant.id }}">
+  <div class="technical-details-container">
+    <div class="technical-details-header">
+      <h2 class="technical-details-title">{{ block.settings.title }}</h2>
+      <div class="unit-switcher">
+        <span class="unit-btn active" data-unit="mm" onclick="switchTechUnit('mm', 'tech-details-{{ unique_id }}')">{{ block.settings.mm_label }}</span>
+        <span class="unit-btn" data-unit="cm" onclick="switchTechUnit('cm', 'tech-details-{{ unique_id }}')">{{ block.settings.cm_label }}</span>
+        <span class="unit-btn" data-unit="in" onclick="switchTechUnit('in', 'tech-details-{{ unique_id }}')">{{ block.settings.in_label }}</span>
+      </div>
+    </div>
+    
+    <div class="technical-details-table" data-variant-details>
+      {% if has_details %}
+        {% for detail in details_list %}
+          {% assign detail_clean = detail | strip %}
+          {% if detail_clean != '' %}
+            {% assign parts = detail_clean | split: '|' %}
+            {% assign label = parts[0] | strip %}
+            {% assign values_string = parts[1] | strip %}
+            {% assign values = values_string | split: ',' %}
+            
+            {% assign mm_value = values[0] | strip %}
+            {% assign cm_value = values[1] | strip %}
+            {% assign in_value = values[2] | strip %}
+            
+            <div class="detail-row {% cycle 'row-gray', 'row-white' %}">
+              <div class="detail-label">{{ label }}</div>
+              <div class="detail-values">
+                <span class="value-item active" data-unit="mm">{{ mm_value }}</span>
+                <span class="value-item" data-unit="cm">{{ cm_value }}</span>
+                <span class="value-item" data-unit="in">{{ in_value }}</span>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var sectionId = 'tech-details-{{ unique_id }}';
+  var section = document.getElementById(sectionId);
+  if (!section) return;
+
+  // Store ALL variant metafields data
+  var variantMetafields = {
+    {% for variant in product.variants %}
+      "{{ variant.id }}": {% if variant.metafields.custom.technical_details.value != blank %}{{ variant.metafields.custom.technical_details.value | json }}{% else %}null{% endif %}{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  };
+
+  function switchTechUnit(unit, sectionId) {
+    var sec = document.getElementById(sectionId);
+    if (!sec) return;
+    
+    sec.querySelectorAll('.unit-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-unit') === unit);
+    });
+    
+    sec.querySelectorAll('.value-item').forEach(function(val) {
+      val.classList.toggle('active', val.getAttribute('data-unit') === unit);
+    });
+    
+    sec.setAttribute('data-active-unit', unit);
+  }
+  
+  // Make function global
+  window.switchTechUnit = switchTechUnit;
+
+  function updateTechnicalDetails(variantId) {
+    var details = variantMetafields[variantId];
+    var tableContainer = section.querySelector('[data-variant-details]');
+    var activeUnit = section.getAttribute('data-active-unit') || 'mm';
+    
+    // HIDE/SHOW section based on metafield existence
+    if (!details || details.length === 0) {
+      section.classList.add('hidden');
+      section.style.display = 'none';
+      return;
+    } else {
+      section.classList.remove('hidden');
+      section.style.display = '';
+    }
+    
+    // Build table HTML
+    var html = '';
+    var rowIndex = 0;
+    
+    details.forEach(function(detail) {
+      var detailClean = detail.trim();
+      if (detailClean !== '') {
+        var parts = detailClean.split('|');
+        var label = parts[0] ? parts[0].trim() : '';
+        var valuesString = parts[1] ? parts[1].trim() : '';
+        var values = valuesString.split(',');
+        
+        var mmValue = values[0] ? values[0].trim() : '';
+        var cmValue = values[1] ? values[1].trim() : '';
+        var inValue = values[2] ? values[2].trim() : '';
+        
+        var rowClass = rowIndex % 2 === 0 ? 'row-gray' : 'row-white';
+        
+        html += '<div class="detail-row ' + rowClass + '">';
+        html += '<div class="detail-label">' + label + '</div>';
+        html += '<div class="detail-values">';
+        html += '<span class="value-item' + (activeUnit === 'mm' ? ' active' : '') + '" data-unit="mm">' + mmValue + '</span>';
+        html += '<span class="value-item' + (activeUnit === 'cm' ? ' active' : '') + '" data-unit="cm">' + cmValue + '</span>';
+        html += '<span class="value-item' + (activeUnit === 'in' ? ' active' : '') + '" data-unit="in">' + inValue + '</span>';
+        html += '</div>';
+        html += '</div>';
+        
+        rowIndex++;
+      }
+    });
+    
+    tableContainer.innerHTML = html;
+    section.setAttribute('data-variant-id', variantId);
+  }
+
+  // Listen for ALL variant change methods
+  
+  // 1. Custom event
+  document.addEventListener('variant:changed', function(e) {
+    if (e.detail && e.detail.variant) {
+      updateTechnicalDetails(e.detail.variant.id);
+    }
+  });
+
+  // 2. Shopify section event
+  document.addEventListener('shopify:section:load', function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var variantId = urlParams.get('variant');
+    if (variantId) updateTechnicalDetails(variantId);
+  });
+
+  // 3. Native form element change
+  document.addEventListener('change', function(e) {
+    if (e.target.matches('select[name="id"], input[name="id"], input[type="radio"][name*="option"]')) {
+      setTimeout(function() {
+        var variantInput = document.querySelector('select[name="id"], input[name="id"]:checked, input[name="id"]');
+        if (variantInput && variantInput.value) {
+          updateTechnicalDetails(variantInput.value);
+        }
+      }, 50);
+    }
+  });
+
+  // 4. URL change detection
+  var lastUrl = location.href;
+  new MutationObserver(function() {
+    if (location.href !== lastUrl) {
+      lastUrl = location.href;
+      var urlParams = new URLSearchParams(window.location.search);
+      var variantId = urlParams.get('variant');
+      if (variantId) updateTechnicalDetails(variantId);
+    }
+  }).observe(document.body, { subtree: true, childList: true });
+
+  // 5. Swatch/button clicks (common in themes)
+  document.addEventListener('click', function(e) {
+    var swatch = e.target.closest('[data-variant-id], [data-value], .swatch, .variant-option, .product-form__option');
+    if (swatch) {
+      setTimeout(function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var variantId = urlParams.get('variant');
+        if (variantId) {
+          updateTechnicalDetails(variantId);
+        } else {
+          var variantInput = document.querySelector('select[name="id"], input[name="id"]:checked, input[name="id"]');
+          if (variantInput && variantInput.value) {
+            updateTechnicalDetails(variantInput.value);
+          }
+        }
+      }, 100);
+    }
+  });
+
+})();
+</script>
+
+<style>
+  .technical-details-section {
+    padding: {{ block.settings.padding_top }}px 0px {{ block.settings.padding_bottom }}px;
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+  }
+  
+  .technical-details-section.hidden {
+    display: none !important;
+  }
+  
+  .technical-details-container {
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .technical-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0px;
+  }
+  
+  .technical-details-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #000;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  
+  .unit-switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .unit-btn {
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #9ca3af;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .unit-btn:hover,
+  .unit-btn:active {
+    color: #374151;
+  }
+  
+  .unit-btn.active {
+    color: #1f2937;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 2px;
+  }
+  
+  .technical-details-table {
+    padding: 0 0px 12px;
+  }
+  
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+  }
+  
+  .detail-row:last-child {
+    margin-bottom: 0;
+  }
+  
+  .detail-row.row-white {
+    background-color: #ffffff;
+  }
+  
+  .detail-row.row-gray {
+    background-color: #f9fafb;
+  }
+  
+  .detail-label {
+    font-size: 15px;
+    color: #374151;
+    font-weight: 400;
+    flex: 1;
+    padding-right: 20px;
+  }
+  
+  .detail-values {
+    font-size: 15px;
+    color: #1f2937;
+    font-weight: 500;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  
+  .value-item {
+    display: none;
+  }
+  
+  .value-item.active {
+    display: inline;
+  }
+  
+  @media (max-width: 768px) {
+    .detail-row {
+      padding: 14px 16px;
+      gap: 8px;
+    }
+    
+    .detail-values {
+      text-align: left;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .technical-details-section {
+      padding: 0px;
+    }
+    
+    .technical-details-title {
+      font-size: 14px;
+    }
+    
+    .unit-btn {
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    
+    .detail-label,
+    .detail-values {
+      font-size: 14px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Technical Details",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Technical Details"
+    },
+    {
+      "type": "text",
+      "id": "mm_label",
+      "label": "MM Button Label",
+      "default": "MM"
+    },
+    {
+      "type": "text",
+      "id": "cm_label",
+      "label": "CM Button Label",
+      "default": "CM"
+    },
+    {
+      "type": "text",
+      "id": "in_label",
+      "label": "IN Button Label",
+      "default": "IN"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max Width",
+      "min": 800,
+      "max": 1400,
+      "step": 50,
+      "default": 900,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Technical Details"
+    }
+  ]
+}
+{% endschema %}

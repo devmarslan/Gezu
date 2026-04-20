@@ -1,0 +1,508 @@
+<!doctype html>
+  {%- liquid
+    assign iso_code  = request.locale.iso_code
+    assign config_rtl  = settings.right_to_left | default: 'enable-with-list'
+    assign is_rtl = false
+    assign dir = 'ltr'
+    if config_rtl == 'enable-with-list'
+      assign iso_code_ck = iso_code | split: '-' | first | append: ';' | prepend: ';'
+      assign lis_rtl = ';ae;ar;arc;bqi;ckb;dv;fa;glk;ha;he;kwh;ks;ku;mzn;nqo;pnb;ps;sd;ug;ur;yi;'
+      if lis_rtl contains iso_code_ck
+        assign is_rtl = true
+        assign dir = 'rtl'
+      endif
+    elsif config_rtl == 'enable'
+      assign is_rtl = true
+      assign dir = 'rtl'
+    endif
+  -%}
+<html class="no-js hdt-pr-img__effect-{{ settings.effect_secondary_image }} hdt-badge__shape-{{ settings.badge_shape }} dir--{{ dir }}{% if request.design_mode %} shopify-design-mode{% endif %}{% if settings.minimal_products %} hdt-minimal-products{% endif %}{% if settings.hidden_badges %} hdt-hidden-pr-badges{% endif %}{% if settings.hidden_quickview %} hdt-hidden-products-quickview{% endif %}{% if settings.hidden_wishlist %} hdt-hidden-products-wishlist{% endif %}{% if settings.hidden_compare %} hdt-hidden-products-compare{% endif %}{% if settings.uppercase_title %} hdt-pr-uppercase_title{% endif %}" lang="{{ request.locale.iso_code }}" dir="{{ dir }}">
+  <head>
+    <!-- 1. CONSENT DEFAULT — deve essere il primo script in assoluto -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      'analytics_storage':     'denied',
+      'ad_storage':            'denied',
+      'ad_user_data':          'denied',
+      'ad_personalization':    'denied',
+      'functionality_storage': 'denied',
+      'security_storage':      'granted',
+      'wait_for_update':       800,
+      'region': ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','GB','NO','IS','LI']
+    });
+  </script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {% assign currency_variable = settings.lgrd_license_key %}
+    {%- unless template == 'product.only_config' and request.design_mode == false -%}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="">
+    <link rel="canonical" href="{{ canonical_url }}">
+
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+      <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 48, height: 48 }}">
+    {%- endif -%}
+    
+
+    {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
+      <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    {%- endunless -%}
+    {%- if settings.library_font == 'google' -%}{{ settings.embed_google_font }}{%- endif -%}
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; {{ 'general.meta.tag' | t }} "{{ current_tags | join: ', ' }}"{% endif -%}
+      {%- if current_page != 1 %} &ndash; {{ 'general.meta.page' | t }} {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+
+    {%- if page_description %}<meta name="description" content="{{ page_description | escape }}">{% endif %}
+
+    {%- liquid
+      render 'social-meta-tags'
+      render 'scripts'
+      render 'css-variables', is_rtl: is_rtl
+      echo 'theme.css' | asset_url | stylesheet_tag
+      echo 'hdt-product-card.scss.css' | asset_url | stylesheet_tag
+      if request.page_type == "policy"
+      echo 'hdt-policy.css' | asset_url | stylesheet_tag
+      endif
+    -%}
+    {{ content_for_header }}
+    {%- endunless -%}
+
+    <script src='https://areviewsapp.com/js_codes/collection_rating.js' defer></script>
+    {% render 'theme_jquery', currency_variable: currency_variable %}
+  </head>
+
+  <body class="hdt-page-type-{{ request.page_type }}{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %} template-{{ template.name }}">
+    {%- unless template == 'product.only_config' and request.design_mode == false -%}
+      {%- if request.page_type == "index" or request.page_type == "policy" -%}
+      <h1 class="hdt-hidden">{{ page_title | default: shop.name }}</h1>
+      {%- endif -%}
+      {%- sections 'header-group' -%}
+    {%- endunless -%}
+    <main id="MainContent" class="content-for-layout focus-none" role="main" tabindex="-1">
+      {%- if request.page_type == "policy" -%}
+        {%- section 'main-heading' -%}
+      {%- endif -%}
+      {{ content_for_layout }}
+    </main>
+
+    {%- unless template == 'product.only_config' and request.design_mode == false -%}
+    {%- sections 'footer-group' -%}
+    <a class="skip-to-content-link button sr-only" href="#MainContent">
+      {{ 'accessibility.skip_to_text' | t }}
+    </a>
+
+    {%- liquid
+      sections 'system-group'
+      # Include the detailed compare popup
+        render 'compare-popup-detailed'
+      if settings.enable_compare_popup
+        render 'compare-offcanvas'
+      endif
+      # theme-check-disable NestedSnippet
+      render 'system-bottom'
+      # theme-check-enable NestedSnippet
+      render 'structured-data'
+      render 's-dom-temp'
+    -%}
+    {%- endunless -%}
+ <script>
+  function watchUCButtons() {
+    var aside = document.querySelector('#usercentrics-cmp-ui');
+    if (!aside || !aside.shadowRoot) {
+      setTimeout(watchUCButtons, 500);
+      return;
+    }
+    var shadow = aside.shadowRoot;
+    shadow.addEventListener('click', function(e) {
+      var btn = e.target.closest('button');
+      if (btn) {
+        var action = btn.getAttribute('data-action');
+        // Accept All or Deny buttons
+        if (action === 'consent' || action === 'deny') {
+          setTimeout(function() {
+            var fingerprint = shadow.querySelector('button.fingerprint, #uc-privacy-button');
+            if (fingerprint) fingerprint.style.display = 'none';
+          }, 500);
+        }
+      }
+    });
+  }
+  watchUCButtons();
+</script>
+<script>
+(function() {
+  // PART 1: Update URL when variant changes
+  // Monitor the product form's hidden id input
+  const picker = document.querySelector('hdt-variant-picker');
+  if (!picker) return;
+
+  const formId = picker.getAttribute('form');
+  const formEl = document.getElementById(formId);
+
+  function getVariantId() {
+    // Try from form input first
+    if (formEl) {
+      const idInput = formEl.querySelector('input[name="id"]');
+      if (idInput && idInput.value) return idInput.value;
+    }
+    // Fallback to picker attribute
+    return picker.getAttribute('selected-variant');
+  }
+
+  function updateURLWithVariant() {
+    const variantId = getVariantId();
+    if (variantId) {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get('variant') !== variantId) {
+        url.searchParams.set('variant', variantId);
+        window.history.replaceState({}, '', url.toString());
+      }
+    }
+  }
+
+  // Watch for clicks on variant options
+  document.addEventListener('click', function(e) {
+    const option = e.target.closest('hdt-richlist button[role="option"]');
+    if (option) {
+      // Use increasing timeouts to catch async updates
+      setTimeout(updateURLWithVariant, 100);
+      setTimeout(updateURLWithVariant, 300);
+      setTimeout(updateURLWithVariant, 600);
+    }
+  });
+
+  // MutationObserver on the picker for selected-variant changes
+  new MutationObserver(function() {
+    updateURLWithVariant();
+  }).observe(picker, { attributes: true, attributeFilter: ['selected-variant'] });
+
+  // MutationObserver on form id input
+  if (formEl) {
+    const idInput = formEl.querySelector('input[name="id"]');
+    if (idInput) {
+      new MutationObserver(function() {
+        updateURLWithVariant();
+      }).observe(idInput, { attributes: true, attributeFilter: ['value'] });
+
+      // Also override the value setter to catch programmatic changes
+      const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+      const originalSet = descriptor.set;
+      Object.defineProperty(idInput, 'value', {
+        get: descriptor.get,
+        set: function(val) {
+          originalSet.call(this, val);
+          setTimeout(updateURLWithVariant, 50);
+        }
+      });
+    }
+  }
+
+  // PART 2: On page load, select variant from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlVariantId = urlParams.get('variant');
+
+  if (urlVariantId && urlVariantId !== picker.getAttribute('selected-variant')) {
+    // Find variant data from the page
+    let variantData = null;
+    try {
+      const scripts = document.querySelectorAll('script[type="application/json"]');
+      scripts.forEach(function(script) {
+        try {
+          const data = JSON.parse(script.textContent);
+          if (data.variants || (data.product && data.product.variants)) {
+            const variants = data.variants || data.product.variants;
+            variantData = variants.find(function(v) {
+              return String(v.id) === String(urlVariantId);
+            });
+          }
+        } catch(e) {}
+      });
+    } catch(e) {}
+
+    if (variantData) {
+      // Update hidden option inputs to match the URL variant
+      variantData.options.forEach(function(optionValue, index) {
+        const fieldset = picker.querySelector('fieldset[data-index="' + index + '"]');
+        if (fieldset) {
+          // Update hidden input
+          const hiddenInput = fieldset.querySelector('input[is-value]');
+          if (hiddenInput) hiddenInput.value = optionValue;
+
+          // Update the button text
+          const selectBtn = fieldset.querySelector('button.hdt-select');
+          if (selectBtn) selectBtn.textContent = optionValue;
+
+          // Update the legend display value
+          const updateSpan = fieldset.querySelector('span[update-value]');
+          if (updateSpan) updateSpan.textContent = optionValue;
+
+          // Update richlist selected state
+          const richlist = fieldset.querySelector('hdt-richlist');
+          if (richlist) {
+            richlist.setAttribute('selected', optionValue);
+            richlist.querySelectorAll('button[role="option"]').forEach(function(btn) {
+              btn.setAttribute('aria-selected', btn.value === optionValue ? 'true' : 'false');
+            });
+          }
+        }
+      });
+
+      // Update the picker's selected-variant attribute
+      picker.setAttribute('selected-variant', urlVariantId);
+
+      // Update form id input
+      if (formEl) {
+        const idInput = formEl.querySelector('input[name="id"]');
+        if (idInput) idInput.value = urlVariantId;
+      }
+    }
+  }
+
+  // Set initial URL if no variant param exists
+  if (!urlVariantId) {
+    updateURLWithVariant();
+  }
+})();
+</script>
+{% render 'custom-geo-location-popup' %}
+{% render 'custom-price-toggle' %}
+
+
+
+{% comment %} <script>
+  // Country/Currency filter for HDT popover
+if (!customElements.get('country-filter')) {
+  customElements.define('country-filter', class extends HTMLElement {
+    connectedCallback() {
+      this._input = this.querySelector('input[type="search"]');
+      if (!this._input) return;
+
+      this._input.addEventListener('input', () => this._filter());
+
+      // Clear button (×) support
+      this._input.addEventListener('search', () => this._filter());
+    }
+
+    _filter() {
+      const query = this._input.value.trim().toLowerCase();
+      const list = this.closest('.hdt-popover__body').querySelector('hdt-richlist');
+      if (!list) return;
+
+      list.querySelectorAll('button[role="option"]').forEach(btn => {
+        const name = (btn.dataset.name || btn.textContent).toLowerCase();
+        btn.style.display = name.includes(query) ? '' : 'none';
+      });
+    }
+  });
+}
+</script> {% endcomment %}
+<script>
+if (!customElements.get('country-filter')) {
+  customElements.define('country-filter', class extends HTMLElement {
+    connectedCallback() {
+      this._input = this.querySelector('input[type="search"]');
+      if (!this._input) return;
+
+      this._input.addEventListener('input', () => this._filter());
+      this._input.addEventListener('search', () => this._filter());
+    }
+
+    _filter() {
+      const query = this._input.value.trim().toLowerCase();
+      const list = this.closest('.hdt-popover__body')?.querySelector('hdt-richlist');
+      if (!list) return;
+
+      // Remove old separator
+      list.querySelector('.cf-separator')?.remove();
+
+      if (!this._origOrder) {
+        this._origOrder = [...list.querySelectorAll('button[role="option"]')];
+      }
+
+      // Check if this is inside currency popover AND on mobile
+      const isCurrencyPopover = !!this.closest('.hdt-popover-currencies');
+      const isMobile = window.innerWidth <= 767;
+
+      if (isCurrencyPopover && isMobile) {
+        if (!query) {
+          this._origOrder.forEach(btn => {
+            btn.style.display = '';
+            list.appendChild(btn);
+          });
+          return;
+        }
+
+        const matched = [];
+        const unmatched = [];
+
+        this._origOrder.forEach(btn => {
+          const txt = (btn.textContent || '').toLowerCase();
+          const val = (btn.getAttribute('value') || '').toLowerCase();
+          const nm = (btn.getAttribute('data-name') || '').toLowerCase();
+
+          if (txt.includes(query) || val.includes(query) || nm.includes(query)) {
+            matched.push(btn);
+          } else {
+            unmatched.push(btn);
+          }
+        });
+
+        matched.forEach(btn => {
+          btn.style.display = '';
+          list.appendChild(btn);
+        });
+
+        // Add separator between matched and unmatched
+        if (matched.length && unmatched.length) {
+          const sep = document.createElement('div');
+          sep.className = 'cf-separator';
+          sep.style.cssText = 'border-top:1px solid rgba(128,128,128,0.25);margin:8px 0 4px;padding:6px 0 2px;font-size:11px;color:rgba(128,128,128,0.8);letter-spacing:0.5px;text-transform:uppercase;pointer-events:none;';
+          sep.textContent = 'Other Currencies';
+          list.appendChild(sep);
+        }
+
+        unmatched.forEach(btn => {
+          btn.style.display = '';
+          list.appendChild(btn);
+        });
+        return;
+      }
+
+      // Default: hide non-matches (desktop, language popover, etc.)
+      list.querySelectorAll('button[role="option"]').forEach(btn => {
+        const name = (btn.dataset.name || btn.textContent).toLowerCase();
+        btn.style.display = name.includes(query) ? '' : 'none';
+      });
+    }
+  });
+}
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const field = document.querySelector('[name="id"]');
+    if (!field) return;
+
+    field.addEventListener('change', function () {
+        if (window.Taxify && typeof window.Taxify.rescanAllElements === 'function') {
+            window.Taxify.rescanAllElements();
+        }
+    });
+});
+
+
+</script>
+<script>
+ document.addEventListener('DOMContentLoaded', function () {
+    const rescanTaxify = function () {
+        if (window.Taxify && typeof window.Taxify.rescanAllElements === 'function') {
+            window.Taxify.rescanAllElements();
+        }
+    };
+
+    const field = document.querySelector('[name="id"]');
+    if (field) {
+        field.addEventListener('change', rescanTaxify);
+    }
+
+    document.addEventListener('dialog:opening', rescanTaxify, true);
+    document.addEventListener('bundler:total_cart_values', rescanTaxify, true);
+    document.addEventListener('dialog:close', rescanTaxify, true);
+});
+</script>
+
+{% comment %} hide compare price {% endcomment %}
+<script>
+  (function () {
+  'use strict';
+
+  function parsePrice(text) {
+    if (!text) return NaN;
+    // Remove currency symbols, spaces, commas — keep digits and dot
+    return parseFloat(text.replace(/[^\d.]/g, ''));
+  }
+
+  function checkPriceContainer(container) {
+    // Taxify-rendered compare-at price (the "exclusive" / tax-excl span)
+    const compareEl = container.querySelector(
+      '.taxify-price-container.hdt-compare-at-price .taxify-amount'
+    );
+    // Taxify-rendered base/current price
+    const baseEl = container.querySelector(
+      '.taxify-price-container.hdt-price .taxify-amount'
+    );
+
+    // Fallback to native Shopify money spans if Taxify hasn't fired yet
+    const compareElFallback = container.querySelector('.hdt-compare-at-price .money');
+    const baseElFallback    = container.querySelector('.hdt-price .money');
+
+    const comparePrice = parsePrice((compareEl || compareElFallback)?.textContent);
+    const basePrice    = parsePrice((baseEl    || baseElFallback)?.textContent);
+
+    if (isNaN(comparePrice) || isNaN(basePrice)) return;
+
+    // Walk up to the wrapper that holds the badge class
+    const priceWrap = container.closest('.hdt-price-wrapp');
+
+    if (comparePrice < basePrice) {
+      // --- HIDE ---
+      // Hide every compare-at element (native + taxify)
+      container.querySelectorAll(
+        '.hdt-compare-at-price, .taxify-price-container.hdt-compare-at-price'
+      ).forEach(el => el.style.setProperty('display', 'none', 'important'));
+
+      // Hide badge + strip the class that makes it visible
+      if (priceWrap) {
+        priceWrap.classList.remove('hdt-price--show-badge');
+        priceWrap.querySelectorAll('.sale-badge').forEach(el =>
+          el.style.setProperty('display', 'none', 'important')
+        );
+      }
+
+    } else {
+      // --- RESTORE (variant switch back to valid sale) ---
+      container.querySelectorAll(
+        '.hdt-compare-at-price, .taxify-price-container.hdt-compare-at-price'
+      ).forEach(el => el.style.removeProperty('display'));
+
+      if (priceWrap) {
+        priceWrap.querySelectorAll('.sale-badge').forEach(el =>
+          el.style.removeProperty('display')
+        );
+        // Re-add badge class only if there actually is a compare price
+        if (compareEl || compareElFallback) {
+          priceWrap.classList.add('hdt-price--show-badge');
+        }
+      }
+    }
+  }
+
+  function runAll() {
+    document.querySelectorAll('.hdt-price__container').forEach(checkPriceContainer);
+  }
+
+  // Run immediately (catches server-rendered prices)
+  runAll();
+
+  // Re-run whenever Taxify or variant JS mutates the price area
+  const observer = new MutationObserver(runAll);
+  observer.observe(document.body, {
+    childList:       true,
+    subtree:         true,
+    attributes:      true,
+    attributeFilter: ['data-taxify-processed', 'class', 'style']
+  });
+
+})();
+</script>
+{% render 'consent-banner' %}
+  </body>
+
+
+</html>

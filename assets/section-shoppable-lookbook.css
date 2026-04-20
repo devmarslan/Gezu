@@ -1,0 +1,659 @@
+/* ==========================================================================
+   Shoppable Lookbook Section - CSS
+   ========================================================================== */
+
+/* Base Styles */
+.shoppable-lookbook-section {
+  width: 100%;
+}
+
+.lookbook-wrapper {
+  position: relative;
+}
+
+.shoppable-lookbook-section .page-width {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.lookbook-container.full-width {
+  width: 100%;
+}
+
+/* ==========================================================================
+   Section Header
+   ========================================================================== */
+.lookbook-header {
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.lookbook-heading {
+  margin: 0 0 10px;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.lookbook-subheading {
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   Tab Content Background
+   ========================================================================== */
+.lookbook-tab-content {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ==========================================================================
+   Lookbook Image Container
+   ========================================================================== */
+.lookbook-image-container {
+  position: relative;
+  width: 100%;
+  height: var(--image-height, 500px);
+  overflow: hidden;
+}
+
+.lookbook-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Desktop/Mobile Image Switching */
+.lookbook-image-desktop {
+  display: block;
+}
+
+.lookbook-image-mobile {
+  display: none;
+}
+
+/* ==========================================================================
+   Hotspot Styles
+   ========================================================================== */
+.hotspot {
+  position: absolute;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+  left: var(--desktop-x, 50%);
+  top: var(--desktop-y, 50%);
+}
+
+/* When hotspot is active, raise its z-index so popup appears above other hotspots */
+.hotspot.active {
+  z-index: 20;
+}
+
+.hotspot-button {
+  width: var(--hotspot-size, 40px);
+  height: var(--hotspot-size, 40px);
+  border-radius: 50%;
+  background-color: var(--hotspot-bg, #0066cc);
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  color: var(--hotspot-color, #ffffff);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+/* .hotspot-button::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: var(--hotspot-bg, #0066cc);
+  animation: pulse 2s ease-out infinite;
+  opacity: 0;
+  z-index: -1;
+} */
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.hotspot-button:hover {
+  transform: scale(1.15);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.hotspot.active .hotspot-button {
+  transform: scale(1.1);
+  background-color: var(--hotspot-bg, #0066cc);
+}
+
+.hotspot.active .hotspot-button::before {
+  animation: none;
+}
+
+.hotspot-button svg {
+  width: 14px;
+  height: 14px;
+}
+
+.hotspot-button svg .icon-vertical {
+  transition: opacity 0.2s ease;
+}
+
+.hotspot.active .hotspot-button svg .icon-vertical {
+  opacity: 0;
+}
+
+/* ==========================================================================
+   Product Popup Styles
+   ========================================================================== */
+.hotspot-popup {
+  position: absolute;
+  background-color: var(--popup-bg, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  min-width: 260px;
+  max-width: 300px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.hotspot.active .hotspot-popup {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Popup Position Variations */
+.hotspot-popup.popup-bottom {
+  top: calc(100% + 15px);
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+}
+
+.hotspot.active .hotspot-popup.popup-bottom {
+  transform: translateX(-50%) translateY(0);
+}
+
+.hotspot-popup.popup-top {
+  bottom: calc(100% + 15px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+}
+
+.hotspot.active .hotspot-popup.popup-top {
+  transform: translateX(-50%) translateY(0);
+}
+
+.hotspot-popup.popup-left {
+  right: calc(100% + 15px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-10px);
+}
+
+.hotspot.active .hotspot-popup.popup-left {
+  transform: translateY(-50%) translateX(0);
+}
+
+.hotspot-popup.popup-right {
+  left: calc(100% + 15px);
+  top: 50%;
+  transform: translateY(-50%) translateX(10px);
+}
+
+.hotspot.active .hotspot-popup.popup-right {
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Popup Arrow */
+.popup-arrow {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: var(--popup-bg, #ffffff);
+  transform: rotate(45deg);
+}
+
+.popup-bottom .popup-arrow {
+  top: -6px;
+  left: 50%;
+  margin-left: -6px;
+}
+
+.popup-top .popup-arrow {
+  bottom: -6px;
+  left: 50%;
+  margin-left: -6px;
+}
+
+.popup-left .popup-arrow {
+  right: -6px;
+  top: 50%;
+  margin-top: -6px;
+}
+
+.popup-right .popup-arrow {
+  left: -6px;
+  top: 50%;
+  margin-top: -6px;
+}
+
+/* Popup Inner Content */
+.popup-inner {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.popup-image {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #f5f5f5;
+  flex-shrink: 0;
+}
+
+.popup-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.popup-content {
+  flex: 1;
+  min-width: 100%;
+}
+
+.popup-title {
+  font-size: var(--popup-title-size, 14px);
+  font-weight: 400;
+  color: var(--popup-title-color, #000000);
+  margin: 0 0 8px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.popup-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.current-price {
+  font-size: var(--popup-price-size, 14px);
+  font-weight: 700;
+  color: var(--popup-price-color, #0047AB);
+}
+
+.compare-price {
+  font-size: calc(var(--popup-price-size, 14px) - 2px);
+  color: var(--popup-compare-color, #999999);
+  text-decoration: line-through;
+}
+
+.discount-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--popup-discount-color, #e53935);
+}
+
+/* Add to Cart Button */
+.popup-form {
+  margin: 0;
+}
+
+.popup-add-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  background-color: var(--popup-btn-bg, #0066cc);
+  color: var(--popup-btn-color, #ffffff);
+  border: none;
+  border-radius: 25px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.popup-add-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.popup-add-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 1800px) {
+  .lookbook-image {
+    object-fit: cover;
+    height: auto;
+  }
+}
+
+/* ==========================================================================
+   Responsive Styles
+   ========================================================================== */
+
+/* Large Desktop */
+@media (min-width: 1200px) {
+  .hotspot-popup {
+    min-width: 280px;
+  }
+}
+
+/* Tablet Landscape */
+@media (max-width: 991px) {
+  .lookbook-image-container {
+    height: auto;
+  }
+  
+  .hotspot-button {
+    width: calc(var(--hotspot-size, 40px) * 0.9);
+    height: calc(var(--hotspot-size, 40px) * 0.9);
+  }
+  
+  .hotspot-popup {
+    min-width: 240px;
+    max-width: 260px;
+    padding: 14px;
+  }
+}
+
+/* Tablet Portrait */
+@media (max-width: 768px) {
+  .shoppable-lookbook-section .page-width {
+    padding: 0 16px;
+  }
+  
+  .lookbook-header {
+    margin-bottom: 20px;
+  }
+  
+  /* .lookbook-image-container {
+    height: var(--image-height-mobile, 300px);
+  } */
+
+  /* Switch to mobile image when available */
+  .lookbook-image-container[data-has-mobile-image="true"] .lookbook-image-desktop {
+    display: none;
+  }
+  
+  .lookbook-image-container[data-has-mobile-image="true"] .lookbook-image-mobile {
+    display: block;
+  }
+
+  /* Switch hotspot to mobile position */
+  .hotspot {
+    left: var(--mobile-x, var(--desktop-x, 50%));
+    top: var(--mobile-y, var(--desktop-y, 50%));
+  }
+  
+  .hotspot-button {
+    width: var(--hotspot-size-mobile, 32px);
+    height: var(--hotspot-size-mobile, 32px);
+    border-width: 2px;
+  }
+  
+  .hotspot-button svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  /* Mobile Popup Base Styles */
+  .hotspot-popup {
+    min-width: 220px;
+    max-width: 240px;
+    padding: 12px;
+  }
+
+  /* Mobile Popup Position: Center (Fixed at bottom) */
+  .hotspot-popup[data-mobile-position="center"] {
+    position: fixed;
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 20px !important;
+    transform: translateX(-50%) translateY(20px) !important;
+  }
+  
+  .hotspot.active .hotspot-popup[data-mobile-position="center"] {
+    transform: translateX(-50%) translateY(0) !important;
+  }
+
+  .hotspot-popup[data-mobile-position="center"] .popup-arrow {
+    display: none;
+  }
+
+  /* Mobile Popup Position: Top */
+  .hotspot-popup[data-mobile-position="top"] {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    top: auto !important;
+    left: 50%;
+    right: auto !important;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  
+  .hotspot.active .hotspot-popup[data-mobile-position="top"] {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .hotspot-popup[data-mobile-position="top"] .popup-arrow {
+    display: block;
+    bottom: -6px;
+    top: auto;
+    left: 50%;
+    margin-left: -6px;
+  }
+
+  /* Mobile Popup Position: Bottom */
+  .hotspot-popup[data-mobile-position="bottom"] {
+    position: absolute;
+    top: calc(100% + 10px);
+    bottom: auto !important;
+    left: 50%;
+    right: auto !important;
+    transform: translateX(-50%) translateY(10px);
+  }
+  
+  .hotspot.active .hotspot-popup[data-mobile-position="bottom"] {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .hotspot-popup[data-mobile-position="bottom"] .popup-arrow {
+    display: block;
+    top: -6px;
+    bottom: auto;
+    left: 50%;
+    margin-left: -6px;
+  }
+
+  /* Mobile Popup Position: Left */
+  .hotspot-popup[data-mobile-position="left"] {
+    position: absolute;
+    right: calc(100% + 10px);
+    left: auto !important;
+    top: 50%;
+    bottom: auto !important;
+    transform: translateY(-50%) translateX(-10px);
+  }
+  
+  .hotspot.active .hotspot-popup[data-mobile-position="left"] {
+    transform: translateY(-50%) translateX(0);
+  }
+
+  .hotspot-popup[data-mobile-position="left"] .popup-arrow {
+    display: block;
+    right: -6px;
+    left: auto;
+    top: 50%;
+    margin-top: -6px;
+  }
+
+  /* Mobile Popup Position: Right */
+  .hotspot-popup[data-mobile-position="right"] {
+    position: absolute;
+    left: calc(100% + 10px);
+    right: auto !important;
+    top: 50%;
+    bottom: auto !important;
+    transform: translateY(-50%) translateX(10px);
+  }
+  
+  .hotspot.active .hotspot-popup[data-mobile-position="right"] {
+    transform: translateY(-50%) translateX(0);
+  }
+
+  .hotspot-popup[data-mobile-position="right"] .popup-arrow {
+    display: block;
+    left: -6px;
+    right: auto;
+    top: 50%;
+    margin-top: -6px;
+  }
+  
+  .popup-inner {
+    gap: 12px;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .popup-image {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .popup-title {
+    font-size: 13px;
+  }
+  
+  .popup-add-btn {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .lookbook-image-container {
+    height: calc(var(--image-height-mobile, 300px) * 0.9);
+  }
+  
+  .hotspot-button {
+    width: calc(var(--hotspot-size-mobile, 32px) * 0.9);
+    height: calc(var(--hotspot-size-mobile, 32px) * 0.9);
+  }
+  
+  /* Only center position gets full-width treatment on small mobile */
+  .hotspot-popup[data-mobile-position="center"] {
+    min-width: 200px;
+    max-width: 90vw;
+    left: 5% !important;
+    right: 5% !important;
+    transform: translateX(0) translateY(20px) !important;
+  }
+  
+  .hotspot.active .hotspot-popup[data-mobile-position="center"] {
+    transform: translateX(0) translateY(0) !important;
+  }
+
+  /* Other positions get smaller popup */
+  .hotspot-popup[data-mobile-position="top"],
+  .hotspot-popup[data-mobile-position="bottom"],
+  .hotspot-popup[data-mobile-position="left"],
+  .hotspot-popup[data-mobile-position="right"] {
+    min-width: 180px;
+    max-width: 200px;
+  }
+}
+
+.hotspot-popup .popup-arrow {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+.hotspot-button:focus {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.popup-add-btn:focus {
+  outline: 2px solid var(--popup-btn-bg, #0066cc);
+  outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .hotspot-button::before {
+    animation: none;
+  }
+  
+  .hotspot-button,
+  .hotspot-popup,
+  .popup-add-btn,
+  .hotspot-button svg {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+@media print {
+  .hotspot {
+    display: none;
+  }
+  
+  .lookbook-image-container {
+    height: auto;
+  }
+}
+
+/* ==========================================================================
+   High Contrast Mode
+   ========================================================================== */
+@media (forced-colors: active) {
+  .hotspot-button {
+    border: 3px solid currentColor;
+  }
+  
+  .hotspot-popup {
+    border: 2px solid currentColor;
+  }
+  
+  .popup-add-btn {
+    border: 2px solid currentColor;
+  }
+}

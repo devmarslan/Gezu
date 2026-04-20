@@ -1,0 +1,33 @@
+{% comment %}
+  Compare Metafields Data Section
+  This section outputs variant metafields as JSON for the compare popup
+  
+  Usage: Fetched via /products/{handle}?section_id=compare-metafields-data
+{% endcomment %}
+
+{%- capture metafields_json -%}
+{
+{%- assign has_output = false -%}
+{%- for variant in product.variants -%}
+  {%- if variant.metafields.custom.technical_details.value != blank -%}
+    {%- if has_output -%},{%- endif -%}
+    "{{ variant.id }}": {{ variant.metafields.custom.technical_details.value | json }}
+    {%- assign has_output = true -%}
+  {%- endif -%}
+{%- endfor -%}
+}
+{%- endcapture -%}
+
+<div 
+  id="compare-metafields-{{ product.id }}"
+  data-product-id="{{ product.id }}"
+  data-variant-metafields='{{ metafields_json | strip_newlines | replace: "'" , "&#39;" }}'
+  style="display: none;">
+</div>
+
+{% schema %}
+{
+  "name": "Compare Metafields Data",
+  "settings": []
+}
+{% endschema %}

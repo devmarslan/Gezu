@@ -1,0 +1,66 @@
+<!-- snippets/compare-offcanvas.liquid -->
+<link href="{{ 'hdt-compare.css' | asset_url }}" rel="stylesheet" media="print" onload="this.media='all'">
+<hdt-drawer class="hdt-drawer hdt-contents" color-scheme="{{ settings.color_scheme_dialog }}">
+  <dialog id="drawerCompare" class="hdt-dialog hdt-dialog-drawer" scroll-lock pos="bottom">
+    <button ref="closeButton" class="hdt-s-text hdt-dialog-btn__close" aria-controls="drawerCompare" aria-label="{{ 'accessibility.close' | t | escape }}">{%- render 'icon' with 'close' -%}</button>
+    <div class="hdt-dialog-drawer__inner">
+      <div class="hdt-dialog-drawer__body">
+        <div class="hdt-container">
+          <div class="hdt-compare-list hdt-flex hdt-align-center">
+            <div slot="header" class="hdt-compare-head hdt-flex hdt-align-center">
+              <h3 class="hdt-compare-head__title">{{ 'compare_popup.title' | t }}</h3>
+            </div>
+            <offcanvas-compare class="hdt-compare-offcanvas hdt-compare-products hdt-flex hdt-current-scrollbar hdt-ratio--adapt_image"></offcanvas-compare>
+            <div class="hdt-compare-buttons hdt-flex hdt-align-center">
+              <div class="hdt-compare-buttons-wrap">
+                <hdt-compare-a>
+                  {%- comment -%} Button to open Compare Popup {%- endcomment -%}
+                  <button type="button" id="openComparePopup" class="hdt-compapre-button__view-page hdt-btn hdt-text-base hdt-oh hdt-inline-flex hdt-align-center hdt-justify-center hdt-relative hdt-btn-solid hdt-font-semibold">
+                    {{ 'compare_popup.viewpage' | t | default: 'Compare' }}
+                  </button>
+                </hdt-compare-a>
+                <div class="hdt-compapre-button__clear-all">
+                  <hdt-clear-all class="hdt-btn hdt-text-base hdt-oh hdt-inline-flex hdt-align-center hdt-justify-center hdt-relative hdt-btn-link hdt-font-semibold" of-fn="compare">{{ 'compare_popup.clear' | t }}</hdt-clear-all>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</hdt-drawer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var compareBtn = document.getElementById('openComparePopup');
+  
+  if (compareBtn) {
+    compareBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Find and click the close button to properly close the drawer
+      var closeBtn = document.querySelector('#drawerCompare .hdt-dialog-btn__close');
+      if (closeBtn) {
+        closeBtn.click();
+      }
+      
+      // Wait for drawer to close, then open popup
+      setTimeout(function() {
+        // Open the compare popup
+        var popup = document.getElementById('comparePopupModal');
+        if (popup) {
+          popup.classList.add('is-open');
+          document.body.style.overflow = 'hidden';
+          
+          // Load products if ComparePopup exists
+          if (window.ComparePopup && typeof window.ComparePopup.loadProducts === 'function') {
+            window.ComparePopup.loadProducts();
+          }
+        }
+      }, 300); // Wait for drawer close animation
+    });
+  }
+});
+</script>

@@ -1,0 +1,602 @@
+{% comment %} {%- comment -%}
+  Renders a card price
+
+  Accepts:
+  - product: {Object} Product Liquid object (required)
+  - use_variant: {Boolean} Renders selected or first variant price instead of overall product pricing (optional)
+  - show_badges: {Boolean} Renders 'Sale' and 'Sold Out' tags if the product matches the condition (optional)
+  - price_class: {String} Adds a price class to the price element (optional)
+  - show_compare_at_price: {Boolean} Renders the compare at price if the product matches the condition (optional)
+  - show_volume_note: {Boolean} (optional)
+
+  Usage:
+  {%- render 'card-price', product: card_product, show_volume_note: true -%} (used on card, product on sidebar)
+  {%- render 'price', product: product, use_variant: true, form_id: form_id -%} (used on product page, quick view, featured product...)
+  {%- render 'line-item-price', line_item: item -%} (used on cart, order page...)
+{%- endcomment -%}
+
+{%- liquid
+  if show_compare_at_price == nil
+    assign show_compare_at_price = true
+  endif
+  assign selected_or_first_available_variant = product.selected_or_first_available_variant
+  if use_variant
+    assign target = selected_or_first_available_variant
+  else
+    assign target = product
+  endif
+
+  assign compare_at_price = target.compare_at_price
+  assign price = target.price | default: 1999
+  assign price_min = product.price_min
+  assign price_max = product.price_max
+  assign available = target.available | default: false
+  if settings.currency_code_enabled
+    assign money_price = price | money_with_currency
+    assign money_compare_at_price = compare_at_price | money_with_currency
+    assign money_price_min = price_min | money_with_currency
+    assign money_price_max = price_max | money_with_currency
+  else
+    assign money_price = price | money
+    assign money_compare_at_price = compare_at_price | money
+    assign money_price_min = price_min | money
+    assign money_price_max = price_max | money
+  endif
+  if compare_at_price > price
+    assign on_sale = true
+  else
+    assign on_sale = false
+  endif
+  assign price_varies_item = ''
+  if target == product and product.price_varies
+    assign price_varies_item = ' hdt-price-item--range'
+    if settings.price_varies_style == "1"
+      assign money_price = 'products.product.volume_pricing.price_range_html' | t: minimum: money_price_min, maximum: money_price_max
+    else
+      assign money_price = 'products.product.price.from_price_html' | t: price: money_price_min
+    endif
+  endif
+-%}
+
+<div class="hdt-price-wrapp {{ price_class }}{% if show_badges %} hdt-price--show-badge{% endif %}">
+  <div class="hdt-price__list">
+    {%- if product.quantity_price_breaks_configured? -%}
+      {%- if show_compare_at_price and compare_at_price -%}
+        {%- unless product.price_varies == false and product.compare_at_price_varies -%}
+          <hdt-compare-at-price class="hdt-compare-at-price">
+            <span class="sr-only sr-only--inline">{{ 'products.product.price.regular_price' | t }}</span>
+            <span class="hdt-money">
+                {{ money_compare_at_price }}
+            </span>
+          </hdt-compare-at-price>
+        {%- endunless -%}
+      {%- endif -%}
+      <span class="hdt-price hdt-price-item--range">
+        <span class="sr-only sr-only--inline">{{ 'products.product.price.regular_price' | t }}</span>
+        {{- 'products.product.volume_pricing.price_range_html' | t: minimum: money_price_min, maximum: money_price_max -}}
+      </span>
+    {%- else -%}
+       
+        <hdt-price class="hdt-price{{ price_varies_item }}">
+          <span class="sr-only sr-only--inline">{{ 'products.product.price.sale_price' | t }}</span>
+          {%- if price_varies_item != '' %}
+            <span class="hdt-money">
+              {%- if money_price contains '.' -%}
+                {% comment %} {%- assign parts = money_price | split: '.' -%}
+                {{ parts[0] }}.<span class="hdt-price__decimal">{{ parts[1] | slice: 0, 2 }}</span> {% endcomment %}
+              {%- else -%}
+                {{ money_price }}
+              {%- endif -%}
+            </span>
+          {% else %}
+            <span class="hdt-money">
+              {%- if money_price contains '.' -%}
+                {% comment %} {%- assign parts = money_price | split: '.' -%}
+                {{ parts[0] }}.<span class="hdt-price__decimal">{{ parts[1] | slice: 0, 2 }}</span> {% endcomment %}
+              {%- else -%}
+                {{ money_price }}
+              {%- endif -%}
+            </span>
+          {%- endif -%}
+        </hdt-price>
+        {%- if compare_at_price and on_sale and show_compare_at_price -%}
+          <hdt-compare-at-price class="hdt-compare-at-price">
+            <span class="sr-only sr-only--inline">{{ 'products.product.price.regular_price' | t }}</span>
+            <span class="hdt-money">
+                {{ money_compare_at_price }}
+            </span>
+          </hdt-compare-at-price>
+        {%- endif -%}
+    {%- endif -%}
+    {%- if selected_or_first_available_variant.unit_price_measurement -%}
+    <hdt-unit-price class="hdt-unit-price">
+      <span class="sr-only">{{ 'products.product.price.unit_price' | t }}</span>
+      <span class="hdt-hdt-price-item hdt-price-item--last">
+        <span class="hdt-money">
+          {%- assign unit_price_value = selected_or_first_available_variant.unit_price | money -%}
+          {%- if unit_price_value contains '.' -%}
+            {% comment %} {%- assign parts = unit_price_value | split: '.' -%}
+            {{ parts[0] }}.<span class="hdt-price__decimal">{{ parts[1] | slice: 0, 2 }}</span> {% endcomment %}
+          {%- else -%}
+            {{ unit_price_value }}
+          {%- endif -%}
+        </span>
+        <span aria-hidden="true">/</span>
+        <span class="sr-only">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+        <span>
+          {%- if selected_or_first_available_variant.unit_price_measurement.reference_value != 1 -%}
+            {{- selected_or_first_available_variant.unit_price_measurement.reference_value -}}
+          {%- endif -%}
+          {{ selected_or_first_available_variant.unit_price_measurement.reference_unit }}
+        </span>
+      </span>
+    </hdt-unit-price>
+    {%- endif -%}
+  </div>
+  {%- if show_badges %}{% render 'badges', product: product, use_variant: use_variant %}{% endif -%}
+</div>
+{%- if show_volume_note and product.quantity_price_breaks_configured? -%}
+  <div class="hdt-volume-pricing-note">{{ 'products.product.volume_pricing.note' | t }}</div>
+{%- endif -%}
+
+<style>
+  /* Global price decimal styling - works in all sections EXCEPT compare-at-price */
+  .hdt-price .hdt-price__decimal,
+  .hdt-price-wrapp .hdt-price__decimal,
+  hdt-price .hdt-price__decimal,
+  .hdt-unit-price .hdt-price__decimal {
+    font-size: calc(1em * 0.7) !important;
+    margin-left: 1px;
+    font-weight: inherit;
+    display: inline;
+    vertical-align: baseline;
+  }
+
+  /* Compare-at-price should NOT have decimal styling */
+  .hdt-compare-at-price .hdt-price__decimal,
+  hdt-compare-at-price .hdt-price__decimal {
+    font-size: inherit !important;
+    margin-left: 0;
+  }
+
+  .hdt-money {
+    display: inline;
+    white-space: nowrap;
+  }
+
+  /* Hide sr-only text (accessibility only) */
+  .sr-only,
+  .sr-only--inline {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    visibility: hidden !important;
+  }
+</style>
+{% comment %} 
+<script>
+  // Fix price decimals after reload, variant selection, and AJAX loads (including recently viewed)
+  class PriceDecimalFormatter {
+    constructor() {
+      this.decimalClass = 'hdt-price__decimal';
+      // Only target .hdt-money that are NOT inside hdt-compare-at-price
+      this.priceSelector = '.hdt-money';
+      this.init();
+    }
+
+    init() {
+      // Format prices on page load
+      this.formatAllPrices();
+
+      // Watch for variant changes
+      document.querySelectorAll('form[id]').forEach(form => {
+        form.addEventListener('change', () => {
+          setTimeout(() => this.formatAllPrices(), 100);
+        });
+      });
+
+      // Global MutationObserver for ALL price updates including recently viewed
+      const observer = new MutationObserver((mutations) => {
+        clearTimeout(this.mutationTimeout);
+        this.mutationTimeout = setTimeout(() => this.formatAllPrices(), 50);
+      });
+
+      // Observe the entire body for dynamically loaded content
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true
+      });
+    }
+
+    formatAllPrices() {
+      document.querySelectorAll(this.priceSelector).forEach(element => {
+        // Skip if inside hdt-compare-at-price (don't apply decimal formatting to compare prices)
+        if (element.closest('hdt-compare-at-price') || element.closest('.hdt-compare-at-price')) {
+          return;
+        }
+
+        // Skip if already has decimal span properly formatted
+        if (element.querySelector(`.${this.decimalClass}`)) {
+          return;
+        }
+
+        // Get only the visible price text from .hdt-money
+        const priceText = this.getVisiblePriceText(element);
+
+        if (priceText && priceText.includes('.')) {
+          this.formatPrice(element, priceText);
+        }
+      });
+    }
+
+    getVisiblePriceText(element) {
+      let text = '';
+      
+      element.childNodes.forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          text += node.textContent;
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          // Skip sr-only elements
+          if (node.classList.contains('sr-only') || node.classList.contains('sr-only--inline')) {
+            return;
+          }
+          // Skip already formatted decimal spans
+          if (node.classList.contains(this.decimalClass)) {
+            return;
+          }
+          text += node.textContent;
+        }
+      });
+      
+      return text.trim();
+    }
+
+    formatPrice(element, priceText) {
+      // Extract just the price value (currency + number)
+      const priceMatch = priceText.match(/([£$€¥₹]?\s*[\d,]+\.\d+)/);
+      if (!priceMatch) return;
+      
+      const cleanPrice = priceMatch[0].trim();
+      const lastDotIndex = cleanPrice.lastIndexOf('.');
+      
+      if (lastDotIndex === -1) return;
+
+      const beforeDecimal = cleanPrice.substring(0, lastDotIndex + 1); // Include the dot
+      const decimalPart = cleanPrice.substring(lastDotIndex + 1);
+
+      // Clear the element and rebuild
+      element.innerHTML = '';
+      
+      // Add integer part with dot
+      const textNode = document.createTextNode(beforeDecimal);
+      element.appendChild(textNode);
+      
+      // Add decimal span
+      const decimalSpan = document.createElement('span');
+      decimalSpan.className = this.decimalClass;
+      decimalSpan.textContent = decimalPart;
+      element.appendChild(decimalSpan);
+    }
+  }
+
+  // Initialize only once
+  if (!window.PriceDecimalFormatterInitialized) {
+    window.PriceDecimalFormatterInitialized = true;
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        new PriceDecimalFormatter();
+      });
+    } else {
+      new PriceDecimalFormatter();
+    }
+
+    // Re-run on page reload
+    window.addEventListener('pageshow', () => {
+      setTimeout(() => new PriceDecimalFormatter(), 100);
+    });
+
+    // Cart updates
+    document.addEventListener('cart:updated', () => {
+      new PriceDecimalFormatter();
+    });
+    
+    // Tab changes
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.hdt-tabs-item-title')) {
+        setTimeout(() => new PriceDecimalFormatter(), 150);
+      }
+    });
+
+    // Recently viewed products loaded event
+    document.addEventListener('recently-viewed:loaded', () => {
+      setTimeout(() => new PriceDecimalFormatter(), 100);
+    });
+  }
+</script> {% endcomment %} {% endcomment %}
+{%- comment -%}
+  Renders a card price
+
+  Accepts:
+  - product: {Object} Product Liquid object (required)
+  - use_variant: {Boolean} Renders selected or first variant price instead of overall product pricing (optional)
+  - show_badges: {Boolean} Renders 'Sale' and 'Sold Out' tags if the product matches the condition (optional)
+  - price_class: {String} Adds a price class to the price element (optional)
+  - show_compare_at_price: {Boolean} Renders the compare at price if the product matches the condition (optional)
+  - show_volume_note: {Boolean} (optional)
+
+  Usage:
+  {%- render 'card-price', product: card_product, show_volume_note: true -%} (used on card, product on sidebar)
+  {%- render 'price', product: product, use_variant: true, form_id: form_id -%} (used on product page, quick view, featured product...)
+  {%- render 'line-item-price', line_item: item -%} (used on cart, order page...)
+{%- endcomment -%}
+
+{%- liquid
+  if show_compare_at_price == nil
+    assign show_compare_at_price = true
+  endif
+  assign selected_or_first_available_variant = product.selected_or_first_available_variant
+  if use_variant
+    assign target = selected_or_first_available_variant
+  else
+    assign target = product
+  endif
+
+  assign compare_at_price = target.compare_at_price
+  assign price = target.price | default: 1999
+  assign price_min = product.price_min
+  assign price_max = product.price_max
+  assign available = target.available | default: false
+  if settings.currency_code_enabled
+    assign money_price = price | money_with_currency
+    assign money_compare_at_price = compare_at_price | money_with_currency
+    assign money_price_min = price_min | money_with_currency
+    assign money_price_max = price_max | money_with_currency
+  else
+    assign money_price = price | money
+    assign money_compare_at_price = compare_at_price | money
+    assign money_price_min = price_min | money
+    assign money_price_max = price_max | money
+  endif
+  if compare_at_price > price
+    assign on_sale = true
+  else
+    assign on_sale = false
+  endif
+  assign price_varies_item = ''
+  if target == product and product.price_varies
+    assign price_varies_item = ' hdt-price-item--range'
+    if settings.price_varies_style == "1"
+      assign money_price = 'products.product.volume_pricing.price_range_html' | t: minimum: money_price_min, maximum: money_price_max
+    else
+      assign money_price = 'products.product.price.from_price_html' | t: price: money_price_min
+    endif
+  endif
+-%}
+
+{%- if localization.market.handle == 'sweden' or localization.market.handle == 'hungary' or localization.market.handle == 'serbia' or localization.market.handle == 'moldova' or localization.market.handle == 'iceland' -%}
+  {%- comment -%} SWEDEN MARKET: Plain price, no decimal styling {%- endcomment -%}
+  <div class="hdt-price-wrapp {{ price_class }}{% if show_badges %} hdt-price--show-badge 1122{% endif %}">
+    <div class="hdt-price__list re">
+      {%- if product.quantity_price_breaks_configured? -%}
+        {%- if show_compare_at_price and compare_at_price -%}
+          {%- unless product.price_varies == false and product.compare_at_price_varies -%}
+            <hdt-compare-at-price class="hdt-compare-at-price">
+              <span class="sr-only sr-only--inline">{{ 'products.product.price.regular_price' | t }}</span>
+              <span class="hdt-money">{{ money_compare_at_price }}</span>
+            </hdt-compare-at-price>
+          {%- endunless -%}
+        {%- endif -%}
+        <span class="hdt-price hdt-price-item--range">
+          <span class="sr-only sr-only--inline">{{ 'products.product.price.regular_price' | t }}</span>
+          {{- 'products.product.volume_pricing.price_range_html' | t: minimum: money_price_min, maximum: money_price_max -}}
+        </span>
+      {%- else -%}
+        <hdt-price class="hdt-price{{ price_varies_item }}">
+          <span class="sr-only sr-only--inline">{{ 'products.product.price.sale_price' | t }}</span>
+          <span class="hdt-money">{{ money_price }}</span>
+        </hdt-price>
+        {%- if compare_at_price and on_sale and show_compare_at_price -%}
+          <hdt-compare-at-price class="hdt-compare-at-price">
+            <span class="sr-only sr-only--inline">{{ 'products.product.price.regular_price' | t }}</span>
+            <span class="hdt-money">{{ money_compare_at_price }}</span>
+          </hdt-compare-at-price>
+        {%- endif -%}
+      {%- endif -%}
+      {%- if selected_or_first_available_variant.unit_price_measurement -%}
+        <hdt-unit-price class="hdt-unit-price">
+          <span class="sr-only">{{ 'products.product.price.unit_price' | t }}</span>
+          <span class="hdt-hdt-price-item hdt-price-item--last">
+            <span class="hdt-money">{{ selected_or_first_available_variant.unit_price | money }}</span>
+            <span aria-hidden="true">/</span>
+            <span class="sr-only">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+            <span>
+              {%- if selected_or_first_available_variant.unit_price_measurement.reference_value != 1 -%}
+                {{- selected_or_first_available_variant.unit_price_measurement.reference_value -}}
+              {%- endif -%}
+              {{ selected_or_first_available_variant.unit_price_measurement.reference_unit }}
+            </span>
+          </span>
+        </hdt-unit-price>
+      {%- endif -%}
+    </div>
+    {%- if show_badges %}{% render 'badges', product: product, use_variant: use_variant %}{% endif -%}
+  </div>
+
+{%- else -%}
+  {%- comment -%} ALL OTHER MARKETS: Decimal-styled price {%- endcomment -%}
+  <div class="hdt-price-wrapp {{ price_class }}{% if show_badges %} hdt-price--show-badge 1133{% endif %}">
+    <div class="hdt-price__list de">
+      {%- if product.quantity_price_breaks_configured? -%}
+        {%- if show_compare_at_price and compare_at_price -%}
+          {%- unless product.price_varies == false and product.compare_at_price_varies -%}
+            <hdt-compare-at-price class="hdt-compare-at-price">
+              <span class="sr-only sr-only--inline">{{ 'products.product.price.regular_price' | t }}</span>
+              <span class="hdt-money">{{ money_compare_at_price }}</span>
+            </hdt-compare-at-price>
+          {%- endunless -%}
+        {%- endif -%}
+        <span class="hdt-price hdt-price-item--range">
+          <span class="sr-only sr-only--inline">{{ 'products.product.price.regular_price' | t }}</span>
+          {{- 'products.product.volume_pricing.price_range_html' | t: minimum: money_price_min, maximum: money_price_max -}}
+        </span>
+      {%- else -%}
+        <hdt-price class="hdt-price{{ price_varies_item }}">
+          <span class="sr-only sr-only--inline">{{ 'products.product.price.sale_price' | t }}</span>
+          <span class="hdt-money">
+            {%- if money_price contains '.' -%}
+              {%- assign parts = money_price | split: '.' -%}
+              {{ parts[0] }}.<span class="hdt-price__decimal">{{ parts[1] | slice: 0, 2 }}</span>
+            {%- else -%}
+              {{ money_price }}
+            {%- endif -%}
+          </span>
+        </hdt-price>
+        {%- if compare_at_price and on_sale and show_compare_at_price -%}
+          <hdt-compare-at-price class="hdt-compare-at-price">
+            <span class="sr-only sr-only--inline">{{ 'products.product.price.regular_price' | t }}</span>
+            <span class="hdt-money">{{ money_compare_at_price }}</span>
+          </hdt-compare-at-price>
+        {%- endif -%}
+      {%- endif -%}
+      {%- if selected_or_first_available_variant.unit_price_measurement -%}
+        <hdt-unit-price class="hdt-unit-price">
+          <span class="sr-only">{{ 'products.product.price.unit_price' | t }}</span>
+          <span class="hdt-hdt-price-item hdt-price-item--last">
+            <span class="hdt-money">
+              {%- assign unit_price_value = selected_or_first_available_variant.unit_price | money -%}
+              {%- if unit_price_value contains '.' -%}
+                {%- assign parts = unit_price_value | split: '.' -%}
+                {{ parts[0] }}.<span class="hdt-price__decimal">{{ parts[1] | slice: 0, 2 }}</span>
+              {%- else -%}
+                {{ unit_price_value }}
+              {%- endif -%}
+            </span>
+            <span aria-hidden="true">/</span>
+            <span class="sr-only">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+            <span>
+              {%- if selected_or_first_available_variant.unit_price_measurement.reference_value != 1 -%}
+                {{- selected_or_first_available_variant.unit_price_measurement.reference_value -}}
+              {%- endif -%}
+              {{ selected_or_first_available_variant.unit_price_measurement.reference_unit }}
+            </span>
+          </span>
+        </hdt-unit-price>
+      {%- endif -%}
+    </div>
+    {%- if show_badges %}{% render 'badges', product: product, use_variant: use_variant %}{% endif -%}
+  </div>
+
+  <style>
+    .hdt-price .hdt-price__decimal,
+    .hdt-price-wrapp .hdt-price__decimal,
+    hdt-price .hdt-price__decimal,
+    .hdt-unit-price .hdt-price__decimal {
+      font-size: calc(1em * 0.7) !important;
+      margin-left: 1px;
+      font-weight: inherit;
+      display: inline;
+      vertical-align: baseline;
+    }
+    .hdt-compare-at-price .hdt-price__decimal,
+    hdt-compare-at-price .hdt-price__decimal {
+      font-size: inherit !important;
+      margin-left: 0;
+    }
+    .hdt-money {
+      display: inline;
+      white-space: nowrap;
+    }
+    .sr-only,
+    .sr-only--inline {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+      visibility: hidden !important;
+    }
+  </style>
+
+{%- endif -%}
+
+{%- if show_volume_note and product.quantity_price_breaks_configured? -%}
+  <div class="hdt-volume-pricing-note">{{ 'products.product.volume_pricing.note' | t }}</div>
+{%- endif -%}
+
+<script>
+if (!window._cardPriceSymbolFixed) {
+  window._cardPriceSymbolFixed = true;
+
+  var RIGHT_SYMBOLS = ['kč', 'kr.', 'kr', 'ft', 'ден', 'zł', 'lei', 'рсд', 'км', 'l'];
+
+  function isRight(sym) {
+    return RIGHT_SYMBOLS.indexOf(sym.trim().toLowerCase()) !== -1;
+  }
+
+  function reformatCardPrices() {
+    document.querySelectorAll('.hdt-price__list.de hdt-price .hdt-money, .hdt-price__list.de .hdt-compare-at-price .hdt-money').forEach(function(el) {
+      // Collect text nodes only (skip sr-only, skip decimal spans already set)
+      var text = '';
+      el.childNodes.forEach(function(node) {
+        if (node.nodeType === 3) text += node.textContent;
+        else if (node.nodeType === 1 && !node.classList.contains('sr-only') && !node.classList.contains('hdt-price__decimal')) {
+          text += node.textContent;
+        }
+      });
+      text = text.trim();
+      if (!text) return;
+
+      // LEFT symbol pattern: e.g. £15.40 or €15,40 or CHF 15.40
+      var leftMatch = text.match(/^([^\d\s,\.]+)\s*([\d.,]+(?:<[^>]+>\d+<\/[^>]+>)?)$/);
+      // RIGHT symbol pattern: e.g. 15.40kr or 15.40 KM
+      var rightMatch = text.match(/^([\d.,]+)\s*([^\d\s,\.]+)$/);
+
+      if (leftMatch) {
+        var sym = leftMatch[1].trim();
+        var num = leftMatch[2].trim();
+        if (isRight(sym)) {
+          // Move symbol to right
+          var decimalSpan = el.querySelector('.hdt-price__decimal');
+          var decHTML = decimalSpan ? '.<span class="hdt-price__decimal">' + decimalSpan.textContent + '</span>' : '';
+          var numClean = decimalSpan ? num.split('.')[0] : num;
+          el.innerHTML = (decimalSpan ? numClean + decHTML : num) + sym;
+        } else {
+          // Keep left but ensure space
+          if (el.innerHTML.indexOf(sym) === -1 && el.innerHTML.indexOf(sym + ' ') === -1) {
+            el.innerHTML = el.innerHTML.replace(sym, sym);
+          }
+        }
+      } else if (rightMatch) {
+        var num = rightMatch[1].trim();
+        var sym = rightMatch[2].trim();
+        if (!isRight(sym)) {
+          // Move to left
+          el.innerHTML = sym + num;
+        }
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', reformatCardPrices);
+  } else {
+    reformatCardPrices();
+  }
+
+  // Re-run for dynamic loads (recently viewed, quick view etc)
+  document.addEventListener('recently-viewed:loaded', reformatCardPrices);
+  document.addEventListener('cart:updated', reformatCardPrices);
+}
+</script>

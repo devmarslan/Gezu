@@ -1,0 +1,259 @@
+<style>
+  #shopify-section-{{ section.id }} .hdt-product-media__main.ab {
+    position: relative;
+  }
+  #shopify-section-{{ section.id }} .hdt-product-media-icotxt {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  #shopify-section-{{ section.id }} .hdt-icontext-top,
+  #shopify-section-{{ section.id }} .hdt-icontext-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    padding: 12px;
+  }
+
+  #shopify-section-{{ section.id }} .hdt-icontext-top {
+    top: 0px;
+    justify-content: center;
+  }
+
+  #shopify-section-{{ section.id }} .hdt-icontext-bottom {
+    bottom: 12px;
+  }
+
+  #shopify-section-{{ section.id }} .hdt-icon-box {
+    display: flex;
+    align-items: center;
+    gap: var(--gap);
+    background: var(--bg);
+    color: var(--color);
+    padding: var(--py) var(--px);
+    border-radius: var(--radius);
+    font-weight: var(--weight);
+    pointer-events: auto;
+    max-width: max-content;
+    border: 1px solid var(--bordr);
+  }
+
+  #shopify-section-{{ section.id }} .hdt-icon-box img {
+    width: var(--icon);
+    height: var(--icon);
+    object-fit: contain;
+  }
+ @media (min-width:831px) and (max-width:920px) {
+  .hdt-icon-box span{
+   font-size:10px !important;
+}
+ }
+ @media (min-width:768px) and (max-width:830px) {
+  .hdt-icon-box span{
+   font-size:8px !important;
+}
+ }
+@media (max-width:767px) {
+    #shopify-section-{{ section.id }} .hdt-icontext-top {
+        {% comment %} top: -50px !important;
+        left: -15px  !important; {% endcomment %}
+        top: 0px !important;
+    }
+    #shopify-section-{{ section.id }} .hdt-icontext-bottom {
+        bottom: 0px !important;
+    }
+    #shopify-section-{{ section.id }} .hdt-icontext-top {
+      justify-content: flex-start;
+      padding: 12px 0;
+  }
+}
+@media (max-width:400px) {
+  #shopify-section-{{ section.id }} .hdt-icon-box {
+    padding: var(--py) 10px !important;
+  }
+  #shopify-section-{{ section.id }} .hdt-icon-box span {
+      font-size: 10px !important;
+  }
+}
+
+</style>
+
+<div class="hdt-icontext-wrap-{{ block.id }}">
+
+  {%- if block.settings.text_1 != blank or block.settings.text_2 != blank -%}
+  <div class="hdt-icontext-top">
+
+    {%- if block.settings.text_1 != blank -%}
+    <div class="hdt-icon-box"
+      style="
+        --bg: {{ block.settings.bg_1 }};
+        --color: {{ block.settings.color_1 }};
+        --icon: {{ block.settings.icon_size_1 }}px;
+        --px: {{ block.settings.px_1 }}px;
+        --py: {{ block.settings.py_1 }}px;
+        --radius: {{ block.settings.radius_1 }}px;
+        --gap: {{ block.settings.gap_1 }}px;
+        --weight: {{ block.settings.weight_1 }};
+        --bordr:  {{ block.settings.bordr_1 }};
+      ">
+      {% if block.settings.icon_1 %}
+        <img src="{{ block.settings.icon_1 | image_url: width: 80 }}">
+      {% endif %}
+      <span class="text-{{ block.settings.text_1 }}" style="font-size:{{ block.settings.fontsize_1 }}px; line-height:normal;">{{ block.settings.text_1 }}</span>
+    </div>
+    {%- endif -%}
+
+    {%- if block.settings.text_2 != blank -%}
+    <div class="hdt-icon-box"
+      style="
+        --bg: {{ block.settings.bg_2 }};
+        --color: {{ block.settings.color_2 }};
+        --icon: {{ block.settings.icon_size_2 }}px;
+        --px: {{ block.settings.px_2 }}px;
+        --py: {{ block.settings.py_2 }}px;
+        --radius: {{ block.settings.radius_2 }}px;
+        --gap: {{ block.settings.gap_2 }}px;
+        --weight: {{ block.settings.weight_2 }};
+        --bordr:  {{ block.settings.bordr_2 }};
+      ">
+      {% if block.settings.icon_2 %}
+        <img src="{{ block.settings.icon_2 | image_url: width: 80 }}">
+      {% endif %}
+      <span class="text-{{ block.settings.text_2 }}" style="font-size:{{ block.settings.fontsize_2 }}px;">{{ block.settings.text_2 }}</span>
+    </div>
+    {%- endif -%}
+
+  </div>
+  {%- endif -%}
+{%- if block.settings.text_3 != blank -%}
+  {% comment %} {%- assign base_quantity = product.metafields.custom.base_quantity | default: 1000 -%}  {% endcomment %}
+
+  {%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign variant_qty = current_variant.inventory_quantity | default: 0 -%}
+{%- assign extra_percent = variant_qty | times: 0.30 | round -%}
+{%- assign base_quantity = variant_qty | plus: extra_percent -%}
+{%- if base_quantity < 5 -%}
+  {%- assign base_quantity = 10 -%}
+{%- endif -%}
+
+{%- assign remaining_qty = base_quantity | minus: variant_qty -%}
+{%- if remaining_qty < 5 -%}
+  {%- assign remaining_qty = 5 -%}
+{%- endif -%}
+
+{%- assign display_text = block.settings.text_3 | replace: '[qty]', remaining_qty -%}
+  
+  <div class="hdt-icontext-bottom">
+    <div class="hdt-icon-box"
+      data-base-quantity="{{ base_quantity }}"
+      style="
+        --bg: {{ block.settings.bg_3 }};
+        --color: {{ block.settings.color_3 }};
+        --icon: {{ block.settings.icon_size_3 }}px;
+        --px: {{ block.settings.px_3 }}px;
+        --py: {{ block.settings.py_3 }}px;
+        --radius: {{ block.settings.radius_3 }}px;
+        --gap: {{ block.settings.gap_3 }}px;
+        --weight: {{ block.settings.weight_3 }};
+        --bordr: {{ block.settings.bordr_3 }};
+      ">
+      {% if block.settings.icon_3 %}
+        <img src="{{ block.settings.icon_3 | image_url: width: 80 }}">
+      {% endif %}
+      <span class="text-remaining-qty" style="font-size:{{ block.settings.fontsize_3 }}px;">
+        <p>{{ display_text }}</p>
+      </span>
+    </div>
+  </div>
+{%- endif -%}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const baseQuantity = {{ base_quantity }};
+  const remainingCountEl = document.querySelector('.remaining-count');
+  
+  // Listen for variant change
+  document.addEventListener('variant:change', function(e) {
+    if (e.detail && e.detail.variant) {
+      const variantQty = e.detail.variant.inventory_quantity || 0;
+      const remaining = baseQuantity - variantQty;
+      if (remainingCountEl) {
+        remainingCountEl.textContent = remaining;
+      }
+    }
+  });
+  
+  // Alternative: Listen for Shopify's native variant change
+  const variantSelector = document.querySelector('select[name="id"], input[name="id"]');
+  if (variantSelector) {
+    variantSelector.addEventListener('change', function() {
+      const variantId = this.value;
+      const productJson = document.querySelector('[data-product-json]');
+      if (productJson) {
+        const product = JSON.parse(productJson.textContent);
+        const variant = product.variants.find(v => v.id == variantId);
+        if (variant && remainingCountEl) {
+          const remaining = baseQuantity - (variant.inventory_quantity || 0);
+          remainingCountEl.textContent = remaining;
+        }
+      }
+    });
+  }
+});
+</script>
+</div>
+{% schema %}
+{
+  "name": "Product Media IconText",
+  "tag": null,
+  "settings": [
+
+    { "type": "header", "content": "Box 1 (Top Left)" },
+    { "type": "image_picker", "id": "icon_1", "label": "Icon" },
+    { "type": "richtext", "id": "text_1", "label": "Text" },
+    { "type": "color", "id": "bg_1", "label": "BG Color", "default": "#ffffff" },
+    { "type": "color", "id": "bordr_1", "label": "Border Color", "default": "#ffffff" },
+    { "type": "color", "id": "color_1", "label": "Text Color", "default": "#000000" },
+    { "type": "range", "id": "fontsize_1", "label": "Font Size (px)", "min": 10, "max": 50, "default": 16 },
+    { "type": "range", "id": "icon_size_1", "label": "Icon Size", "min": 12, "max": 40, "default": 18 },
+    { "type": "range", "id": "px_1", "label": "Padding X", "min": 4, "max": 24, "default": 12 },
+    { "type": "range", "id": "py_1", "label": "Padding Y", "min": 4, "max": 20, "default": 8 },
+    { "type": "range", "id": "radius_1", "label": "Border Radius", "min": 0, "max": 20, "default": 8 },
+    { "type": "range", "id": "gap_1", "label": "Gap", "min": 4, "max": 16, "default": 8 },
+
+    { "type": "header", "content": "Box 2 (Top Right)" },
+    { "type": "image_picker", "id": "icon_2", "label": "Icon" },
+    { "type": "richtext", "id": "text_2", "label": "Text" },
+    { "type": "color", "id": "bg_2", "label": "BG Color", "default": "#ffffff" },
+    { "type": "color", "id": "bordr_2", "label": "Border Color", "default": "#ffffff" },
+    { "type": "color", "id": "color_2", "label": "Text Color", "default": "#000000" },
+    { "type": "range", "id": "fontsize_2", "label": "Font Size (px)", "min": 10, "max": 50, "default": 16 },
+    { "type": "range", "id": "icon_size_2", "label": "Icon Size", "min": 12, "max": 40, "default": 18 },
+    { "type": "range", "id": "px_2", "label": "Padding X", "min": 4, "max": 24, "default": 12 },
+    { "type": "range", "id": "py_2", "label": "Padding Y", "min": 4, "max": 20, "default": 8 },
+    { "type": "range", "id": "radius_2", "label": "Border Radius", "min": 0, "max": 20, "default": 8 },
+    { "type": "range", "id": "gap_2", "label": "Gap", "min": 4, "max": 16, "default": 8 },
+
+    { "type": "header", "content": "Box 3 (Bottom Center)" },
+    { "type": "image_picker", "id": "icon_3", "label": "Icon" },
+    { "type": "richtext", "id": "text_3", "label": "Text" },
+    { "type": "color", "id": "bg_3", "label": "BG Color", "default": "#ffffff" },
+    { "type": "color", "id": "bordr_3", "label": "Border Color", "default": "#ffffff" },
+    { "type": "color", "id": "color_3", "label": "Text Color", "default": "#000000" },
+    { "type": "range", "id": "fontsize_3", "label": "Font Size (px)", "min": 10, "max": 50, "default": 16 },
+    { "type": "range", "id": "icon_size_3", "label": "Icon Size", "min": 12, "max": 40, "default": 18 },
+    { "type": "range", "id": "px_3", "label": "Padding X", "min": 4, "max": 24, "default": 12 },
+    { "type": "range", "id": "py_3", "label": "Padding Y", "min": 4, "max": 20, "default": 8 },
+    { "type": "range", "id": "radius_3", "label": "Border Radius", "min": 0, "max": 20, "default": 8 },
+    { "type": "range", "id": "gap_3", "label": "Gap", "min": 4, "max": 16, "default": 8 },
+
+  ],
+  "presets": [
+    { "name": "Product Media IconText" }
+  ]
+}
+{% endschema %}

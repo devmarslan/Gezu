@@ -1,0 +1,841 @@
+<!-- menu_mobile_panels.liquid - Slide Panel Navigation -->
+{%- liquid
+  assign menu_mobile = section.settings.main_menu_mobile | default: section.settings.main_menu | default: linklists.theme_brands
+  assign menu_categories = section.settings.menu_categories
+-%}
+
+<div class="mobile-panel-menu">
+  <!-- Main Menu Panel -->
+  <div class="menu-panel menu-panel--main is-active" data-panel="main">
+    <div class="menu-panel__header">
+      <span class="menu-panel__title">Menu</span>
+      <button class="menu-panel__close" type="button" aria-label="Close menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="menu-panel__body">
+      <ul class="menu-panel__list">
+        <!-- SHOP Item at Top - Uses Categories Menu -->
+        {%- if menu_categories != blank -%}
+          <li class="menu-panel__item mbl-category{% if section.settings.hide_mbl_menu_categories %} hide-categorymenu{% endif %}">
+            <button class="menu-panel__link menu-panel__link--has-children" data-open-panel="panel-shop">
+              <span class="menu-panel__icon category-mbl-ico">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M4.83416 0H1.61897C0.726277 0 0 0.726277 0 1.61897V4.83416C0 5.72685 0.726277 6.45312 1.61897 6.45312H4.83416C5.72685 6.45312 6.45312 5.72685 6.45312 4.83416V1.61897C6.45312 0.726277 5.72685 0 4.83416 0ZM5.35938 4.83416C5.35938 5.12375 5.12375 5.35938 4.83416 5.35938H1.61897C1.32937 5.35938 1.09375 5.12375 1.09375 4.83416V1.61897C1.09375 1.32937 1.32937 1.09375 1.61897 1.09375H4.83416C5.12375 1.09375 5.35938 1.32937 5.35938 1.61897V4.83416ZM12.3594 0H9.1875C8.28286 0 7.54688 0.735984 7.54688 1.64062V4.8125C7.54688 5.71714 8.28286 6.45312 9.1875 6.45312H12.3594C13.264 6.45312 14 5.71714 14 4.8125V1.64062C14 0.735984 13.264 0 12.3594 0ZM12.9062 4.8125C12.9062 5.11405 12.6609 5.35938 12.3594 5.35938H9.1875C8.88595 5.35938 8.64062 5.11405 8.64062 4.8125V1.64062C8.64062 1.33908 8.88595 1.09375 9.1875 1.09375H12.3594C12.6609 1.09375 12.9062 1.33908 12.9062 1.64062V4.8125ZM4.83416 7.54688H1.61897C0.726277 7.54688 0 8.27315 0 9.16584V12.381C0 13.2737 0.726277 14 1.61897 14H4.83416C5.72685 14 6.45312 13.2737 6.45312 12.381V9.16584C6.45312 8.27315 5.72685 7.54688 4.83416 7.54688ZM5.35938 12.381C5.35938 12.6706 5.12375 12.9062 4.83416 12.9062H1.61897C1.32937 12.9062 1.09375 12.6706 1.09375 12.381V9.16584C1.09375 8.87625 1.32937 8.64062 1.61897 8.64062H4.83416C5.12375 8.64062 5.35938 8.87625 5.35938 9.16584V12.381ZM12.3594 7.54688H9.1875C8.28286 7.54688 7.54688 8.28286 7.54688 9.1875V12.3594C7.54688 13.264 8.28286 14 9.1875 14H12.3594C13.264 14 14 13.264 14 12.3594V9.1875C14 8.28286 13.264 7.54688 12.3594 7.54688ZM12.9062 12.3594C12.9062 12.6609 12.6609 12.9062 12.3594 12.9062H9.1875C8.88595 12.9062 8.64062 12.6609 8.64062 12.3594V9.1875C8.64062 8.88595 8.88595 8.64062 9.1875 8.64062H12.3594C12.6609 8.64062 12.9062 8.88595 12.9062 9.1875V12.3594Z" fill="currentColor"></path>
+                </svg>
+              </span>
+              <span class="menu-panel__link-text">{{ section.settings.title_categories | default: 'Categories' }}</span>
+              <svg class="menu-panel__arrow" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </li>
+        {%- endif -%}
+
+        <!-- Regular Menu Items -->
+        {%- for link in menu_mobile.links -%}
+          <li class="menu-panel__item">
+            {%- if link.links != blank -%}
+              <button class="menu-panel__link menu-panel__link--has-children" data-open-panel="panel-{{ forloop.index }}">
+                {%- assign cat_img = link.object.image | default: link.object.featured_image | default: link.object.products.first.featured_image -%}
+                {%- if cat_img != null -%}
+                  <span class="menu-panel__icon">
+                    {{ cat_img | image_url: width: 1000 | image_tag: loading: 'lazy', width: 24, height: 24, class: 'menu-panel__icon-img' }}
+                  </span>
+                {%- endif -%}
+                <span class="menu-panel__link-text">{{ link.title | remove: "[is_heading]" | split: '[' | first }}</span>
+                <svg class="menu-panel__arrow" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            {%- else -%}
+              <a href="{{ link.url }}" class="menu-panel__link">
+                {%- assign cat_img = link.object.image | default: link.object.featured_image | default: link.object.products.first.featured_image -%}
+                {%- if cat_img != null -%}
+                  <span class="menu-panel__icon">
+                    {{ cat_img | image_url: width: 1000 | image_tag: loading: 'lazy', width: 24, height: 24, class: 'menu-panel__icon-img' }}
+                  </span>
+                {%- endif -%}
+                <span class="menu-panel__link-text">{{ link.title | remove: "[is_heading]" | split: '[' | first }}</span>
+              </a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+
+  <!-- SHOP Panel - Categories Submenu -->
+  {%- if menu_categories != blank -%}
+    <div class="menu-panel menu-panel--sub" data-panel="panel-shop">
+      <div class="menu-panel__header">
+        <button class="menu-panel__back" data-back-panel="main">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span>Back to Main Menu</span>
+        </button>
+        <button class="menu-panel__close" type="button" aria-label="Close menu">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="menu-panel__body">
+        <div class="menu-panel__section-header">
+          <span class="menu-panel__section-title">{{ section.settings.title_categories | default: 'Categories' }}</span>
+          <a href="{{ routes.collections_url }}" class="menu-panel__shop-all">Shop All</a>
+        </div>
+        <ul class="menu-panel__list">
+          {%- for link in menu_categories.links -%}
+            <li class="menu-panel__item">
+              {%- if link.links != blank -%}
+                <button class="menu-panel__link menu-panel__link--has-children" data-open-panel="panel-shop-{{ forloop.index }}">
+                  {%- assign cat_img = link.object.image | default: link.object.featured_image | default: link.object.products.first.featured_image -%}
+                  {%- if cat_img != null -%}
+                    <span class="menu-panel__icon">
+                      {{ cat_img | image_url: width: 1000 | image_tag: loading: 'lazy', width: 24, height: 24, class: 'menu-panel__icon-img' }}
+                    </span>
+                  {%- endif -%}
+                  <span class="menu-panel__link-text">{{ link.title | remove: "[is_heading]" | split: '[' | first }}</span>
+                  <svg class="menu-panel__arrow" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
+              {%- else -%}
+                <a href="{{ link.url }}" class="menu-panel__link">
+                  {%- assign cat_img = link.object.image | default: link.object.featured_image | default: link.object.products.first.featured_image -%}
+                  {%- if cat_img != null -%}
+                    <span class="menu-panel__icon">
+                      {{ cat_img | image_url: width: 1000 | image_tag: loading: 'lazy', width: 24, height: 24, class: 'menu-panel__icon-img' }}
+                    </span>
+                  {%- endif -%}
+                  <span class="menu-panel__link-text">{{ link.title | remove: "[is_heading]" | split: '[' | first }}</span>
+                </a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    </div>
+
+    <!-- SHOP Level 2 Subpanels -->
+    {%- for link in menu_categories.links -%}
+      {%- if link.links != blank -%}
+        <div class="menu-panel menu-panel--sub" data-panel="panel-shop-{{ forloop.index }}">
+          <div class="menu-panel__header">
+            <button class="menu-panel__back" data-back-panel="panel-shop">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              <span>Back to Shop</span>
+            </button>
+            <button class="menu-panel__close" type="button" aria-label="Close menu">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <div class="menu-panel__body">
+            <div class="menu-panel__section-header">
+              <span class="menu-panel__section-title">{{ link.title | remove: "[is_heading]" | split: '[' | first }}</span>
+              <a href="{{ link.url }}" class="menu-panel__shop-all">Shop All</a>
+            </div>
+            <ul class="menu-panel__list">
+              {%- for childlink in link.links -%}
+                <li class="menu-panel__item">
+                  {%- if childlink.links != blank -%}
+                    <button class="menu-panel__link menu-panel__link--has-children" data-open-panel="panel-shop-{{ forloop.parentloop.index }}-{{ forloop.index }}">
+                      {%- assign cat_img = childlink.object.image | default: childlink.object.featured_image | default: childlink.object.products.first.featured_image -%}
+                      {%- if cat_img != null -%}
+                        <span class="menu-panel__icon">
+                          {{ cat_img | image_url: width: 1000 | image_tag: loading: 'lazy', width: 24, height: 24, class: 'menu-panel__icon-img' }}
+                        </span>
+                      {%- endif -%}
+                      <span class="menu-panel__link-text">{{ childlink.title | remove: "[is_heading]" | split: '[' | first }}</span>
+                      <svg class="menu-panel__arrow" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                      </svg>
+                    </button>
+                  {%- else -%}
+                    <a href="{{ childlink.url }}" class="menu-panel__link">
+                      {%- assign cat_img = childlink.object.image | default: childlink.object.featured_image | default: childlink.object.products.first.featured_image -%}
+                      {%- if cat_img != null -%}
+                        <span class="menu-panel__icon">
+                          {{ cat_img | image_url: width: 1000 | image_tag: loading: 'lazy', width: 24, height: 24, class: 'menu-panel__icon-img' }}
+                        </span>
+                      {%- endif -%}
+                      <span class="menu-panel__link-text">{{ childlink.title | remove: "[is_heading]" | split: '[' | first }}</span>
+                    </a>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        </div>
+
+        <!-- SHOP Level 3 Subpanels -->
+        {%- for childlink in link.links -%}
+          {%- if childlink.links != blank -%}
+            <div class="menu-panel menu-panel--sub" data-panel="panel-shop-{{ forloop.parentloop.index }}-{{ forloop.index }}">
+              <div class="menu-panel__header">
+                <button class="menu-panel__back" data-back-panel="panel-shop-{{ forloop.parentloop.index }}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                  <span>Back to {{ link.title | remove: "[is_heading]" | split: '[' | first }}</span>
+                </button>
+                <button class="menu-panel__close" type="button" aria-label="Close menu">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              <div class="menu-panel__body">
+                <div class="menu-panel__section-header">
+                  <span class="menu-panel__section-title">{{ childlink.title | remove: "[is_heading]" | split: '[' | first }}</span>
+                  <a href="{{ childlink.url }}" class="menu-panel__shop-all">Shop All</a>
+                </div>
+                <ul class="menu-panel__list">
+                  {%- for grandchildlink in childlink.links -%}
+                    <li class="menu-panel__item">
+                      <a href="{{ grandchildlink.url }}" class="menu-panel__link">
+                        {%- assign cat_img = grandchildlink.object.image | default: grandchildlink.object.featured_image | default: grandchildlink.object.products.first.featured_image -%}
+                        {%- if cat_img != null -%}
+                          <span class="menu-panel__icon">
+                            {{ cat_img | image_url: width: 1000 | image_tag: loading: 'lazy', width: 24, height: 24, class: 'menu-panel__icon-img' }}
+                          </span>
+                        {%- endif -%}
+                        <span class="menu-panel__link-text">{{ grandchildlink.title | remove: "[is_heading]" | split: '[' | first }}</span>
+                      </a>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  <!-- Level 1 Subpanels for Main Menu -->
+  {%- for link in menu_mobile.links -%}
+    {%- if link.links != blank -%}
+      <div class="menu-panel menu-panel--sub" data-panel="panel-{{ forloop.index }}">
+        <div class="menu-panel__header">
+          <button class="menu-panel__back" data-back-panel="main">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>Back to Main Menu</span>
+          </button>
+          <button class="menu-panel__close" type="button" aria-label="Close menu">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="menu-panel__body">
+          <div class="menu-panel__section-header">
+            <span class="menu-panel__section-title">{{ link.title | remove: "[is_heading]" | split: '[' | first }}</span>
+            <a href="{{ link.url }}" class="menu-panel__shop-all">Shop All</a>
+          </div>
+          <ul class="menu-panel__list">
+            {%- for childlink in link.links -%}
+              <li class="menu-panel__item">
+                {%- if childlink.links != blank -%}
+                  <button class="menu-panel__link menu-panel__link--has-children" data-open-panel="panel-{{ forloop.parentloop.index }}-{{ forloop.index }}">
+                    {%- assign cat_img = childlink.object.image | default: childlink.object.featured_image | default: childlink.object.products.first.featured_image -%}
+                    {%- if cat_img != null -%}
+                      <span class="menu-panel__icon">
+                        {{ cat_img | image_url: width: 1000 | image_tag: loading: 'lazy', width: 24, height: 24, class: 'menu-panel__icon-img' }}
+                      </span>
+                    {%- endif -%}
+                    <span class="menu-panel__link-text">{{ childlink.title | remove: "[is_heading]" | split: '[' | first }}</span>
+                    <svg class="menu-panel__arrow" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </button>
+                {%- else -%}
+                  <a href="{{ childlink.url }}" class="menu-panel__link">
+                    {%- assign cat_img = childlink.object.image | default: childlink.object.featured_image | default: childlink.object.products.first.featured_image -%}
+                    {%- if cat_img != null -%}
+                      <span class="menu-panel__icon">
+                        {{ cat_img | image_url: width: 1000 | image_tag: loading: 'lazy', width: 24, height: 24, class: 'menu-panel__icon-img' }}
+                      </span>
+                    {%- endif -%}
+                    <span class="menu-panel__link-text">{{ childlink.title | remove: "[is_heading]" | split: '[' | first }}</span>
+                  </a>
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Level 2 Subpanels -->
+      {%- for childlink in link.links -%}
+        {%- if childlink.links != blank -%}
+          <div class="menu-panel menu-panel--sub" data-panel="panel-{{ forloop.parentloop.index }}-{{ forloop.index }}">
+            <div class="menu-panel__header">
+              <button class="menu-panel__back" data-back-panel="panel-{{ forloop.parentloop.index }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                <span>Back to {{ link.title | remove: "[is_heading]" | split: '[' | first }}</span>
+              </button>
+              <button class="menu-panel__close" type="button" aria-label="Close menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div class="menu-panel__body">
+              <div class="menu-panel__section-header">
+                <span class="menu-panel__section-title">{{ childlink.title | remove: "[is_heading]" | split: '[' | first }}</span>
+                <a href="{{ childlink.url }}" class="menu-panel__shop-all">Shop All</a>
+              </div>
+              <ul class="menu-panel__list">
+                {%- for grandchildlink in childlink.links -%}
+                  <li class="menu-panel__item">
+                    <a href="{{ grandchildlink.url }}" class="menu-panel__link">
+                      {%- assign cat_img = grandchildlink.object.image | default: grandchildlink.object.featured_image | default: grandchildlink.object.products.first.featured_image -%}
+                      {%- if cat_img != null -%}
+                        <span class="menu-panel__icon">
+                          {{ cat_img | image_url: width: 1000 | image_tag: loading: 'lazy', width: 24, height: 24, class: 'menu-panel__icon-img' }}
+                        </span>
+                      {%- endif -%}
+                      <span class="menu-panel__link-text">{{ grandchildlink.title | remove: "[is_heading]" | split: '[' | first }}</span>
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+  {%- endfor -%}
+</div>
+
+<!-- Mobile Panel Footer -->
+<div class="menu-panel__footer">
+  {%- if section.settings.enabled_user -%}
+    <div class="menu-panel__footer-item">
+      <a href="{{ routes.account_url }}" class="menu-panel__footer-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>{% if customer %}{{ 'customer.account.title' | t }}{% else %}{{ 'customer.account.login' | t }}{% endif %}</span>
+      </a>
+    </div>
+  {%- endif -%}
+  {%- if section.settings.enabled_wishlist -%}
+    <div class="menu-panel__footer-item">
+      <a href="{{ routes.search_url }}/?view=wishlist" class="menu-panel__footer-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="19" viewBox="0 0 17 19" fill="none">
+          <path d="M15.8333 0H0.633333C0.465363 0 0.304272 0.0667261 0.185499 0.185499C0.0667261 0.304272 0 0.465363 0 0.633333V18.3667C4.51103e-05 18.487 0.034376 18.6048 0.0989722 18.7064C0.163568 18.8079 0.255756 18.889 0.36474 18.94C0.473725 18.991 0.594994 19.01 0.714348 18.9946C0.833701 18.9792 0.946199 18.9301 1.03867 18.8531L8.23333 12.8579L15.428 18.8531C15.5418 18.9479 15.6852 18.9999 15.8333 19C15.9261 18.9998 16.0177 18.9795 16.1019 18.9405C16.2109 18.8894 16.3032 18.8083 16.3678 18.7067C16.4324 18.605 16.4667 18.4871 16.4667 18.3667V0.633333C16.4667 0.465363 16.3999 0.304272 16.2812 0.185499C16.1624 0.0667261 16.0013 0 15.8333 0ZM15.2 17.0151L8.63867 11.5469C8.52486 11.4521 8.38144 11.4002 8.23333 11.4002C8.08523 11.4002 7.9418 11.4521 7.828 11.5469L1.26667 17.0151V1.26667H15.2V17.0151Z" fill="black"></path>
+        </svg>
+        <span>{{ 'general.wishlist.wishlist_text' | t }}</span>
+      </a>
+    </div>
+  {%- endif -%}
+  <div class="menu-panel__footer-item">
+    <a href="/search" class="menu-panel__footer-link" style="display:none;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <span>{{ 'general.search.search_text' | t }}</span>
+    </a>
+  </div>
+  <div class="menu-panel__footer-localization">
+    {%- if localization.available_countries.size >= 1 -%}
+      {%- unless localization.available_countries.size <= 1 and settings.currency_type == "1" -%}
+        {%- render 'hdt_currency' -%}
+      {%- endunless -%}
+    {%- endif -%}
+    {%- if localization.available_languages.size > 1 -%}
+      {%- render 'hdt_language' -%}
+    {%- endif -%}
+  </div>
+</div>
+
+<style>
+/* Mobile Panel Menu Styles */
+.mobile-panel-menu {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 120px);
+  height: calc(100dvh - 120px);
+  overflow: hidden;
+}
+
+.menu-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+  will-change: transform;
+}
+
+.menu-panel--main {
+  transform: translateX(0);
+  z-index: 2;
+}
+
+.menu-panel.is-active {
+  transform: translateX(0);
+  z-index: 10;
+}
+
+.menu-panel.is-hidden {
+  transform: translateX(-30%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Header */
+.menu-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #003da5;
+  color: #fff;
+  min-height: 52px;
+  flex-shrink: 0;
+}
+
+.menu-panel__title {
+  font-size: 16px;
+  font-weight: 600;
+  flex: 1;
+  text-align: left;
+}
+
+.menu-panel__back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.menu-panel__back svg {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.menu-panel__close {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+
+.menu-panel__close svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Body */
+.menu-panel__body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.menu-panel__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid #e5e5e5;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+span.menu-panel__icon.category-mbl-ico svg {
+    width: 18px;
+    height: 18px;
+}
+.menu-panel__section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.menu-panel__shop-all {
+  font-size: 14px;
+  font-weight: 600;
+  color: #003da5;
+  text-decoration: none;
+}
+
+.menu-panel__shop-all:hover {
+  text-decoration: underline;
+}
+
+/* List */
+.menu-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-panel__item {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.menu-panel__item:last-child {
+  border-bottom: none;
+}
+
+.menu-panel__link {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  text-decoration: none;
+  color: #1a1a1a;
+  font-size: 15px;
+  font-weight: 400;
+  cursor: pointer;
+  text-align: left;
+  gap: 12px;
+  transition: background 0.15s ease;
+}
+
+.menu-panel__link:hover,
+.menu-panel__link:active {
+  background: #f5f5f5;
+}
+
+.menu-panel__link--has-children {
+  padding-right: 12px;
+}
+
+.menu-panel__icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #003da5;
+  display:none;
+}
+
+.menu-panel__icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.menu-panel__icon-img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.menu-panel__link-text {
+  flex: 1;
+  line-height: 1.3;
+}
+
+.menu-panel__arrow {
+  flex-shrink: 0;
+  color: #999;
+  width: 20px;
+  height: 20px;
+}
+
+/* Footer */
+.menu-panel__footer {
+  padding: 16px;
+  border-top: 1px solid #e5e5e5;
+  background: #f8f8f8;
+  flex-shrink: 0;
+}
+
+.menu-panel__footer-item {
+  margin-bottom: 14px;
+}
+
+.menu-panel__footer-item:last-of-type {
+  margin-bottom: 0;
+}
+
+.menu-panel__footer-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #1a1a1a;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.menu-panel__footer-link svg {
+  color: #003da5;
+}
+
+.menu-panel__footer-link:hover {
+  color: #003da5;
+}
+
+.menu-panel__footer-localization {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Dialog adjustments */
+.hdt-drawer-menu-mb .hdt-dialog-drawer__inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0 !important;
+}
+
+.hdt-drawer-menu-mb .hdt-dialog-btn__close {
+  display: none !important;
+}
+
+.hdt-drawer-menu-mb .hdt-dialog-drawer {
+  max-width: 320px;
+  width: 85vw;
+}
+
+/* Animation */
+@media (prefers-reduced-motion: no-preference) {
+  .menu-panel {
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@media (max-width: 768px){
+  .menu-panel__item.mbl-category.hide-categorymenu {display:none !important;}
+}
+</style>
+
+<script>
+(function() {
+  document.addEventListener('DOMContentLoaded', function() {
+    initMobilePanelMenu();
+  });
+
+  // Re-init when drawer opens (for lazy loaded content)
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('[aria-controls="menu_mobile"]')) {
+      setTimeout(initMobilePanelMenu, 100);
+    }
+  });
+
+  function initMobilePanelMenu() {
+    const panelMenu = document.querySelector('.mobile-panel-menu');
+    if (!panelMenu) return;
+    
+    // Prevent double initialization
+    if (panelMenu.dataset.initialized === 'true') return;
+    panelMenu.dataset.initialized = 'true';
+
+    const panels = panelMenu.querySelectorAll('.menu-panel');
+    const panelHistory = ['main'];
+
+    // Handle all clicks in panel menu
+    panelMenu.addEventListener('click', function(e) {
+      // Open panel button
+      const openBtn = e.target.closest('[data-open-panel]');
+      if (openBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const targetPanel = openBtn.getAttribute('data-open-panel');
+        openPanel(targetPanel);
+        return;
+      }
+
+      // Back button
+      const backBtn = e.target.closest('[data-back-panel]');
+      if (backBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const targetPanel = backBtn.getAttribute('data-back-panel');
+        goBackToPanel(targetPanel);
+        return;
+      }
+
+      // Close button
+      const closeBtn = e.target.closest('.menu-panel__close');
+      if (closeBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeMenu();
+        return;
+      }
+    });
+
+    function openPanel(panelId) {
+      const currentPanel = panelMenu.querySelector('.menu-panel.is-active');
+      if (currentPanel) {
+        currentPanel.classList.remove('is-active');
+        currentPanel.classList.add('is-hidden');
+      }
+
+      const targetPanel = panelMenu.querySelector(`[data-panel="${panelId}"]`);
+      if (targetPanel) {
+        targetPanel.classList.remove('is-hidden');
+        targetPanel.classList.add('is-active');
+        panelHistory.push(panelId);
+      }
+    }
+
+    function goBackToPanel(panelId) {
+      const currentPanel = panelMenu.querySelector('.menu-panel.is-active');
+      if (currentPanel) {
+        currentPanel.classList.remove('is-active');
+      }
+
+      const targetPanel = panelMenu.querySelector(`[data-panel="${panelId}"]`);
+      if (targetPanel) {
+        targetPanel.classList.remove('is-hidden');
+        targetPanel.classList.add('is-active');
+        
+        const index = panelHistory.indexOf(panelId);
+        if (index > -1) {
+          panelHistory.splice(index + 1);
+        }
+      }
+    }
+
+    function closeMenu() {
+      const dialog = document.querySelector('#menu_mobile');
+      
+      // Method 1: Try clicking outside the dialog to trigger backdrop close
+      const backdrop = document.querySelector('.hdt-dialog-backdrop, [data-dialog-backdrop]');
+      if (backdrop) {
+        backdrop.click();
+      }
+      
+      // Method 2: Find and click the drawer's close button (ref="closeButton")
+      const drawerCloseBtn = document.querySelector('#menu_mobile .hdt-dialog-btn__close, [ref="closeButton"]');
+      if (drawerCloseBtn) {
+        drawerCloseBtn.click();
+      }
+      
+      // Method 3: Try native dialog close
+      if (dialog && typeof dialog.close === 'function') {
+        try {
+          dialog.close();
+        } catch(e) {
+          console.log('Dialog close failed');
+        }
+      }
+      
+      // Method 4: Manually close - remove open attribute and hide
+      if (dialog) {
+        dialog.removeAttribute('open');
+        dialog.classList.remove('hdt-dialog--open', 'is-open', 'active');
+        dialog.style.visibility = 'hidden';
+        dialog.style.opacity = '0';
+        dialog.style.pointerEvents = 'none';
+      }
+      
+      // Method 5: Find drawer component and trigger close
+      const drawerElement = document.querySelector('hdt-drawer.hdt-drawer-menu-mb');
+      if (drawerElement && drawerElement.close) {
+        drawerElement.close();
+      }
+      
+      // Method 6: Dispatch ESC keydown event to trigger dialog close
+      document.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'Escape',
+        keyCode: 27,
+        which: 27,
+        bubbles: true
+      }));
+      
+      // Method 7: Remove body scroll lock classes
+      document.body.classList.remove('hdt-overflow-hidden', 'overflow-hidden', 'scroll-lock', 'hdt-body-scroll-lock');
+      document.documentElement.classList.remove('hdt-overflow-hidden', 'overflow-hidden');
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      
+      // Reset panels after close
+      setTimeout(function() {
+        resetPanels();
+        // Reset dialog visibility if it was manually hidden
+        if (dialog) {
+          dialog.style.visibility = '';
+          dialog.style.opacity = '';
+          dialog.style.pointerEvents = '';
+        }
+      }, 350);
+    }
+
+    function resetPanels() {
+      panels.forEach(function(panel) {
+        panel.classList.remove('is-active', 'is-hidden');
+      });
+      const mainPanel = panelMenu.querySelector('[data-panel="main"]');
+      if (mainPanel) {
+        mainPanel.classList.add('is-active');
+      }
+      panelHistory.length = 0;
+      panelHistory.push('main');
+    }
+
+    // Listen for dialog close event to reset panels
+    const menuDialog = document.querySelector('#menu_mobile');
+    if (menuDialog) {
+      menuDialog.addEventListener('close', resetPanels);
+      
+      // Also listen for when dialog is hidden via attribute change
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.attributeName === 'open' && !menuDialog.hasAttribute('open')) {
+            resetPanels();
+          }
+        });
+      });
+      observer.observe(menuDialog, { attributes: true });
+    }
+  }
+})();
+</script>

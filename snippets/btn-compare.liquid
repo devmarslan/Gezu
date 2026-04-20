@@ -1,0 +1,48 @@
+{%- comment -%}
+  Renders a btn compare
+
+  Accepts:
+  - product_id: {Number} The ID of the product. (required)
+  - class: {String} a list class. (optional)
+  - disable_sr_only: {Boolean} remove class sr_only (optional)
+  - placement: {String} position tooltip (optional)
+
+  Usage:
+  {%- render 'btn-compare', product_id: product.id, class: 'xxx' -%}
+{%- endcomment -%}
+ {% liquid
+  if section.id contains 'quick-add' or section.id contains 'quick-view' or section.id contains 'search' or section.id contains 'cart-drawer' or section.id contains 'header'
+    assign inner_tooltip = true
+  endif 
+  %}
+
+{%- if settings.compare_mode == "1" -%}
+<hdt-compare class="{{ class }} aa ab" role="button" data-id="{{ product_id }}" data-handle="{{ product_handle }}" action="add" placement="{{ placement | default: 'none' }}"{% if inner_tooltip %} inner{%endif %}>
+  {% comment %} <svg height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false" class="hdt-svg-cp"><use xlink:href="#hdt-icon-cp"></use></svg> {% endcomment %}
+  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="#fff">
+  <rect x="0.5" y="0.5" width="14" height="14" stroke="#999"/>
+  </svg>
+  {% if section.settings.show_compare_solid_btn %}
+  <span class="compare-txt">{{ 'general.compare.compare' | t }}</span>
+  {% endif %}
+  <span {% unless disable_sr_only %}class="sr-only"{% endunless %}>{{ 'general.compare.add_to_compare' | t }}</span>
+</hdt-compare>
+{%- elsif settings.compare_mode == "2" and shop.customer_accounts_enabled -%}
+  {%- if customer -%}
+    <hdt-compare class="{{ class }} bb" role="button" data-id="{{ product_id }}" data-handle="{{ product_handle }}" action="add" placement="{{ placement | default: 'none' }}"{% if inner_tooltip %} inner{%endif %}>
+      {% comment %} <svg height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false" class="hdt-svg-cp"><use xlink:href="#hdt-icon-cp"></use></svg> {% endcomment %}
+       <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="#fff">
+      <rect x="0.5" y="0.5" width="14" height="14" stroke="#999"/>
+      </svg>
+      <span {% unless disable_sr_only %}class="sr-only"{% endunless %}>{{ 'general.compare.add_to_compare' | t }}</span>
+    </hdt-compare>
+  {%- else -%}
+    <hdt-tooltip class="{{ class }} hdt-card-product__btn-compare-er" placement="{{ placement | default: 'none' }}"{% if inner_tooltip %} inner{%endif %}>
+      <a type="button" href="{{ routes.account_login_url }}" {% unless customer or request.page_type contains 'customers' or settings.login_sidebar == false %} aria-controls="login-form-popup" {% endunless %} aria-expanded="false" placement="{{ placement | default: 'none' }}">
+        {% comment %} <svg height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false" class="hdt-svg-cp"><use xlink:href="#hdt-icon-cp"></use></svg> {% endcomment %}
+         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="#fff"><rect x="0.5" y="0.5" width="14" height="14" stroke="black"/></svg>
+        <span {% unless disable_sr_only %}class="sr-only"{% endunless %}>{{ 'general.compare.login_to_use_compare' | t }}</span>
+      </a>
+    </hdt-tooltip>
+  {%- endif -%}
+{%- endif -%}

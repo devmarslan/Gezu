@@ -1,0 +1,1522 @@
+{% comment %}
+  Why Choose Us Section
+  - Left: Video/Image with overlay text and play button (plays inline)
+  - Right: 2x2 Features Grid with icons
+  - Bottom: Trust badge/text
+  - Mobile: Heading on top, image below, 2x2 grid features
+{% endcomment %}
+
+<style>
+  #why-choose-us-{{ section.id }} {
+    --section-bg-color: {{ section.settings.section_bg_color }};
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --section-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --section-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+    --video-heading-color: {{ section.settings.video_heading_color }};
+    --video-heading-size: {{ section.settings.video_heading_font_size }}px;
+    --video-heading-size-mobile: {{ section.settings.video_heading_font_size_mobile }}px;
+    --main-title-color: {{ section.settings.main_title_color }};
+    --main-title-size: {{ section.settings.main_title_font_size }}px;
+    --main-title-size-mobile: {{ section.settings.main_title_font_size_mobile }}px;
+    --main-desc-color: {{ section.settings.main_description_color }};
+    --main-desc-size: {{ section.settings.main_description_font_size }}px;
+    --main-desc-size-mobile: {{ section.settings.main_description_font_size_mobile }}px;
+    --feature-title-color: {{ section.settings.feature_title_color }};
+    --feature-title-size: {{ section.settings.feature_title_font_size }}px;
+    --feature-title-size-mobile: {{ section.settings.feature_title_font_size_mobile }}px;
+    --feature-desc-color: {{ section.settings.feature_description_color }};
+    --feature-desc-size: {{ section.settings.feature_description_font_size }}px;
+    --feature-desc-size-mobile: {{ section.settings.feature_description_font_size_mobile }}px;
+    --icon-color: {{ section.settings.icon_color }};
+    --icon-size: {{ section.settings.icon_size }}px;
+    --icon-size-mobile: {{ section.settings.icon_size_mobile }}px;
+    --badge-bg-color: {{ section.settings.badge_bg_color }};
+    --badge-text-color: {{ section.settings.badge_text_color }};
+    --badge-font-size: {{ section.settings.badge_font_size }}px;
+    --badge-font-size-mobile: {{ section.settings.badge_font_size_mobile }}px;
+    --play-btn-color: {{ section.settings.play_button_color }};
+    --play-btn-bg: {{ section.settings.play_button_bg }};
+  }
+
+  #why-choose-us-{{ section.id }} .why-choose-wrapper {
+    position: relative;
+    padding-top: var(--section-padding-top);
+    padding-bottom: var(--section-padding-bottom);
+    background-color: var(--section-bg-color);
+    {% if section.settings.section_bg_image != blank %}
+    background-image: url('{{ section.settings.section_bg_image | image_url: width: 1920 }}');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    {% endif %}
+  }
+
+  #why-choose-us-{{ section.id }} .hdt-container {
+    position: relative;
+  }
+
+  @media (max-width: 768px) {
+    #why-choose-us-{{ section.id }} .why-choose-wrapper {
+      padding-top: var(--section-padding-top-mobile);
+      padding-bottom: var(--section-padding-bottom-mobile);
+    }
+  }
+
+  #why-choose-us-{{ section.id }} .mobile-section-heading {
+    display: none;
+    font-size: var(--video-heading-size-mobile, 22px);
+    font-weight: 700;
+    color: #000000;
+    margin: 0;
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  @media (max-width: 767px) {
+    #why-choose-us-{{ section.id }} .mobile-section-heading {
+      display: block;
+    }
+  }
+
+  #why-choose-us-{{ section.id }} .hdt-container::before,
+  #why-choose-us-{{ section.id }} .hdt-container::after {
+    content: '';
+    position: absolute;
+    left: 50px;
+    right: 50px;
+    height: 1px;
+    background-color: #e0e0e0;
+  }
+
+  #why-choose-us-{{ section.id }} .hdt-container::before {
+    top: -70px;
+  }
+
+  #why-choose-us-{{ section.id }} .hdt-container::after {
+    bottom: -80px;
+  }
+
+  {% if section.settings.hide_borders %}
+  #why-choose-us-{{ section.id }} .hdt-container::before,
+  #why-choose-us-{{ section.id }} .hdt-container::after {
+    display: none;
+  }
+  {% endif %}
+
+  #why-choose-us-{{ section.id }} .border-star {
+    position: absolute;
+    left: 0;
+    right: 0;
+    {% comment %} background-color: var(--section-bg-color, #f8f8f8); {% endcomment %}
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  #why-choose-us-{{ section.id }} .border-star.bottom-star {
+    bottom: -105px;
+  }
+
+  #why-choose-us-{{ section.id }} .media-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: linear-gradient(to right, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
+    padding: 30px;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 3;
+    cursor: pointer;
+  }
+
+  #why-choose-us-{{ section.id }} .media-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* Darker overlay when showing over active video (paused state) */
+  #why-choose-us-{{ section.id }} .media-overlay.video-paused {
+    background: rgba(0,0,0,0.4);
+  }
+
+  #why-choose-us-{{ section.id }} .media-heading {
+    font-size: var(--video-heading-size, 28px);
+    font-weight: 700;
+    color: var(--video-heading-color, #ffffff);
+    margin: 0;
+    line-height: 1.3;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  @media (max-width: 767px) {
+    #why-choose-us-{{ section.id }} .media-heading {
+      display: none;
+    }
+    
+    #why-choose-us-{{ section.id }} .media-overlay {
+      background: rgba(0,0,0,0.2);
+    }
+  }
+
+  #why-choose-us-{{ section.id }} .play-button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--play-btn-bg, #ffffff);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  #why-choose-us-{{ section.id }} .play-button svg {
+    color: var(--play-btn-color, #000000);
+    margin-left: 3px;
+    width: 40px;
+    height: 40px;
+  }
+
+  #why-choose-us-{{ section.id }} .play-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    #why-choose-us-{{ section.id }} .media-overlay {
+      gap: 16px;
+      padding: 20px;
+    }
+
+    #why-choose-us-{{ section.id }} .play-button {
+      width: 50px;
+      height: 50px;
+    }
+
+    #why-choose-us-{{ section.id }} .play-button svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .why-choose-us-section *,
+  .why-choose-us-section *::before,
+  .why-choose-us-section *::after {
+    box-sizing: border-box;
+  }
+
+  .why-choose-us-section .why-choose-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: stretch;
+  }
+
+  .why-choose-us-section .why-choose-media {
+    position: relative;
+    width: 100%;
+  }
+
+  .why-choose-us-section .media-wrapper {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    height: 100%;
+    min-height: 400px;
+  }
+
+  .why-choose-us-section .media-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .why-choose-us-section .media-image.hidden {
+    opacity: 0;
+  }
+
+  .why-choose-us-section .media-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+  }
+
+  .why-choose-us-section .media-placeholder.hidden {
+    opacity: 0;
+  }
+
+  .why-choose-us-section .media-placeholder svg {
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+  }
+
+  /* Inline Video Styles */
+  #why-choose-us-{{ section.id }} .inline-video-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1;
+    background-color: #000;
+  }
+
+  #why-choose-us-{{ section.id }} .inline-video-container.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  #why-choose-us-{{ section.id }} .inline-video-container video,
+  #why-choose-us-{{ section.id }} .inline-video-container iframe {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .why-choose-us-section .why-choose-features {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .why-choose-us-section .features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .why-choose-us-section .feature-item {
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .why-choose-us-section .feature-icon {
+    width: var(--icon-size, 48px);
+    height: var(--icon-size, 48px);
+    flex-shrink: 0;
+  }
+
+  .why-choose-us-section .feature-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .why-choose-us-section .feature-icon .default-icon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .why-choose-us-section .feature-icon .default-icon svg {
+    width: 100%;
+    height: 100%;
+    color: var(--icon-color, #c9a227);
+  }
+
+  .why-choose-us-section .feature-icon .default-icon svg path {
+    fill: var(--icon-color, #c9a227);
+  }
+
+  .why-choose-us-section .feature-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  @media(min-width:1000px) {
+    {% if section.settings.main_title != blank %}
+    #shopify-section-{{ section.id }} .why-choose-us-section .why-choose-features {
+      justify-content: center;
+    }
+    {% endif %}
+
+    {% if section.settings.video_right != blank %}
+    #shopify-section-{{ section.id }} .why-choose-us-section .why-choose-container {
+      display: flex !important;
+      flex-direction: row-reverse;
+    }
+    .why-choose-us-section .why-choose-media {
+      width: 55%;
+    }
+    .why-choose-us-section .why-choose-features {
+      width: 40%;
+    }
+    {% endif %}
+  }
+
+  .why-choose-us-section .main-content-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .why-choose-us-section .main-feature-title {
+    font-size: var(--main-title-size, 18px);
+    font-weight: 500;
+    color: var(--main-title-color, #000000);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .why-choose-us-section .main-feature-description {
+    font-size: var(--main-desc-size, 14px);
+    color: var(--main-desc-color, #666666);
+    margin: 20px 0 0;
+    line-height: 1.6;
+    max-width: 86%;
+  }
+
+  .why-choose-us-section .feature-title {
+    font-size: var(--feature-title-size, 18px);
+    font-weight: 600;
+    color: var(--feature-title-color, #000000);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .why-choose-us-section .feature-description {
+    font-size: var(--feature-desc-size, 14px);
+    color: var(--feature-desc-color, #666666);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .why-choose-us-section .hdt-btn.main-content-btn {
+    background: {{ section.settings.btn_bgcolor }};
+    color: {{ section.settings.btn_txtcolor }};
+    width: max-content;
+    margin-top: 20px;
+    min-width: 290px;
+    min-height: 50px;
+    border-radius: 12px;
+  }
+
+  .why-choose-us-section .trust-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: var(--badge-bg-color, #ffffff);
+    padding: 10px 25px;
+    border-radius: 30px;
+    width: max-content;
+    margin-left: 25px;
+  }
+
+  .why-choose-us-section .badge-icon,
+  .why-choose-us-section .badge-icon-svg {
+    width: 20px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  .why-choose-us-section .badge-text {
+    font-size: var(--badge-font-size, 13px);
+    color: var(--badge-text-color, #333333);
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  @media (min-width: 1400px) {
+    .why-choose-us-section .why-choose-container {
+      gap: 60px;
+    }
+    .why-choose-us-section .features-grid {
+      gap: 30px;
+    }
+    .why-choose-us-section .feature-item {
+      padding: 28px;
+    }
+  }
+
+  @media (max-width: 1399px) {
+    .why-choose-us-section .why-choose-container {
+      gap: 30px;
+    }
+    .why-choose-us-section .feature-item {
+      padding: 20px;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .why-choose-us-section .why-choose-container {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+    .why-choose-us-section .media-wrapper {
+      min-height: 350px;
+      max-height: 400px;
+    }
+    .why-choose-us-section .features-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .why-choose-us-section .feature-item {
+      padding: 20px;
+    }
+  }
+
+  @media (max-width: 899px) {
+    .why-choose-us-section .media-wrapper {
+      min-height: 300px;
+      max-height: 350px;
+    }
+    .why-choose-us-section .features-grid {
+      gap: 16px;
+    }
+    .why-choose-us-section .feature-item {
+      padding: 18px;
+      gap: 12px;
+    }
+    .why-choose-us-section .feature-icon {
+      width: var(--icon-size-mobile, 40px);
+      height: var(--icon-size-mobile, 40px);
+    }
+    .why-choose-us-section .main-feature-title {
+      font-size: var(--main-title-size-mobile, 16px);
+    }
+    .why-choose-us-section .main-feature-description {
+      font-size: var(--main-desc-size-mobile, 13px);
+    }
+    .why-choose-us-section .feature-title {
+      font-size: var(--feature-title-size-mobile, 16px);
+    }
+    .why-choose-us-section .feature-description {
+      font-size: var(--feature-desc-size-mobile, 13px);
+    }
+    .why-choose-us-section .trust-badge {
+      padding: 14px 16px;
+    }
+    .why-choose-us-section .badge-text {
+      font-size: var(--badge-font-size-mobile, 11px);
+    }
+  }
+
+  @media (max-width: 767px) {
+    #why-choose-us-{{ section.id }} .main-feature-title.mobile-title {
+      display: block !important;
+      text-align: center;
+    }
+    #why-choose-us-{{ section.id }} span.main-feature-description {
+      margin: 0 !important;
+      text-align: center;
+    }
+    .why-choose-us-section .main-content-box {
+      align-items: center;
+    }
+    #why-choose-us-{{ section.id }} h3.main-feature-title {
+      display: none;
+    }
+    #why-choose-us-{{ section.id }} .hdt-container::before,
+    #why-choose-us-{{ section.id }} .hdt-container::after {
+      left: 15px;
+      right: 15px;
+    }
+    #why-choose-us-{{ section.id }} .hdt-container::before {
+      top: -40px;
+    }
+    .why-choose-us-section .why-choose-container {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .why-choose-us-section .media-wrapper {
+      min-height: 220px;
+      max-height: 280px;
+      border-radius: 12px;
+    }
+    .why-choose-us-section .features-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .why-choose-us-section .feature-item {
+      padding: 16px 12px;
+      gap: 10px;
+      border-radius: 10px;
+      align-items: center;
+      text-align: center;
+    }
+    .why-choose-us-section .feature-icon {
+      width: 36px;
+      height: 36px;
+    }
+    .why-choose-us-section .feature-content {
+      align-items: center;
+      gap: 6px;
+    }
+    .why-choose-us-section .feature-title {
+      font-size: 14px;
+      text-align: center;
+    }
+    .why-choose-us-section .feature-description {
+      font-size: 12px;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .why-choose-us-section .why-choose-features {
+      gap: 16px;
+    }
+    .why-choose-us-section .trust-badge {
+      padding: 14px 16px;
+      gap: 15px;
+      border-radius: 30px;
+      justify-content: center;
+      width: 90%;
+      margin: 0 auto;
+    }
+    .why-choose-us-section .badge-text {
+      text-align: left;
+      line-height: normal;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .why-choose-us-section .mobile-section-heading {
+      font-size: 24px;
+    }
+    .why-choose-us-section .media-wrapper {
+      min-height: 200px;
+      max-height: 240px;
+      border-radius: 10px;
+    }
+    .why-choose-us-section .features-grid {
+      gap: 12px;
+    }
+    .why-choose-us-section .feature-item {
+      padding: 14px 10px;
+      gap: 8px;
+    }
+    .why-choose-us-section .feature-icon {
+      width: 32px;
+      height: 32px;
+    }
+    .why-choose-us-section .feature-description {
+      font-size: 11px;
+    }
+    .why-choose-us-section .trust-badge {
+      flex-direction: row;
+      text-align: center;
+      padding: 12px 20px;
+    }
+  }
+
+  @media (max-width: 375px) {
+    .why-choose-us-section .mobile-section-heading {
+      font-size: 22px;
+    }
+    .why-choose-us-section .media-wrapper {
+      min-height: 180px;
+      max-height: 220px;
+    }
+    .why-choose-us-section .features-grid {
+      gap: 10px;
+    }
+    .why-choose-us-section .feature-item {
+      padding: 12px 8px;
+    }
+    .why-choose-us-section .feature-icon {
+      width: 28px;
+      height: 28px;
+    }
+    .why-choose-us-section .feature-title {
+      font-size: 12px;
+    }
+    .why-choose-us-section .feature-description {
+      font-size: 10px;
+      line-height: 1.3;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .why-choose-us-section .feature-item,
+    .why-choose-us-section .play-button {
+      transition: none;
+    }
+    .why-choose-us-section .feature-item:hover,
+    .why-choose-us-section .play-button:hover {
+      transform: none;
+    }
+  }
+
+  @media (prefers-contrast: high) {
+    .why-choose-us-section .feature-item,
+    .why-choose-us-section .trust-badge {
+      border: 2px solid #000000;
+    }
+  }
+
+  @media print {
+    .why-choose-us-section .why-choose-container {
+      display: block;
+    }
+    .why-choose-us-section .why-choose-media {
+      display: none;
+    }
+    .why-choose-us-section .features-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .why-choose-us-section .feature-item {
+      box-shadow: none;
+      border: 1px solid #cccccc;
+      break-inside: avoid;
+    }
+  }
+</style>
+
+<section id="why-choose-us-{{ section.id }}" class="why-choose-us-section">
+  <div class="why-choose-wrapper">
+    <div class="hdt-container">
+      {% if section.settings.show_topbar %}
+      <div class="border-star top-star"></div>
+      {% endif %}
+      {% if section.settings.show_bottombar %}
+      <div class="border-star bottom-star">
+        <svg xmlns="http://www.w3.org/2000/svg" width="51" height="51" viewBox="0 0 51 51" fill="none">
+          <path d="M25.48 7.57031C26.0717 7.57031 26.5558 8.04956 26.5961 8.63991C27.1711 17.0727 33.9197 23.8094 42.3575 24.3662C42.9489 24.4052 43.4297 24.8868 43.4297 25.4795C43.4297 26.0722 42.9489 26.5538 42.3575 26.5928C33.9073 27.1505 27.1514 33.9072 26.5938 42.3575C26.5547 42.9489 26.0727 43.4297 25.48 43.4297C24.8873 43.4297 24.4052 42.9489 24.3662 42.3575C23.8093 33.9197 17.0727 27.1711 8.63991 26.5961C8.04956 26.5558 7.57031 26.0712 7.57031 25.4795C7.57031 24.8878 8.04956 24.4032 8.63991 24.3629C17.0603 23.7888 23.7897 17.0602 24.3639 8.63991C24.4041 8.04956 24.8883 7.57031 25.48 7.57031Z" fill="#696969"/>
+          <path d="M27.0046 3.28094V1.6144C27.0046 1.53265 26.9705 1.4546 26.9105 1.39909L25.5978 0.185078C25.4849 0.0807455 25.3107 0.0811801 25.1984 0.186073L23.8997 1.39921C23.8403 1.45468 23.8066 1.53229 23.8066 1.61353V3.28094C23.8066 3.44291 23.9379 3.57422 24.0999 3.57422H26.7113C26.8733 3.57422 27.0046 3.44291 27.0046 3.28094Z" fill="#696969"/>
+          <path d="M27.0046 47.7191V49.3856C27.0046 49.4674 26.9705 49.5454 26.9105 49.6009L25.5978 50.8149C25.4849 50.9193 25.3107 50.9188 25.1984 50.8139L23.8997 49.6008C23.8403 49.5453 23.8066 49.4677 23.8066 49.3865V47.7191C23.8066 47.5571 23.9379 47.4258 24.0999 47.4258H26.7113C26.8733 47.4258 27.0046 47.5571 27.0046 47.7191Z" fill="#696969"/>
+          <path d="M47.7191 27.2038L49.3856 27.2038C49.4674 27.2038 49.5454 27.1697 49.6009 27.1097L50.8149 25.797C50.9193 25.6842 50.9188 25.51 50.8139 25.3977L49.6008 24.0989C49.5453 24.0396 49.4677 24.0059 49.3865 24.0059L47.7191 24.0059C47.5571 24.0059 47.4258 24.1372 47.4258 24.2991V26.9106C47.4258 27.0725 47.5571 27.2038 47.7191 27.2038Z" fill="#696969"/>
+          <path d="M3.28094 27.2038L1.6144 27.2038C1.53265 27.2038 1.4546 27.1697 1.39909 27.1097L0.185078 25.797C0.0807455 25.6842 0.0811801 25.51 0.186073 25.3977L1.39921 24.0989C1.45468 24.0396 1.53229 24.0059 1.61353 24.0059L3.28094 24.0059C3.44291 24.0059 3.57422 24.1372 3.57422 24.2991V26.9106C3.57422 27.0725 3.44291 27.2038 3.28094 27.2038Z" fill="#696969"/>
+        </svg>
+      </div>
+      {% endif %}
+
+      <div class="why-choose-container">
+        {% if section.settings.video_heading != blank %}
+        <h2 class="mobile-section-heading">{{ section.settings.video_heading }}</h2>
+        {% endif %}
+
+        {% if section.settings.main_title != blank %}
+        <h3 class="main-feature-title mobile-title" style="display:none">{{ section.settings.main_title }}</h3>
+        {% endif %}
+
+        <div class="why-choose-media">
+          <div class="media-wrapper">
+            {% if section.settings.video_thumbnail != blank %}
+            <img 
+              src="{{ section.settings.video_thumbnail | image_url: width: 800 }}" 
+              alt="{{ section.settings.video_heading }}"
+              class="media-image"
+              id="thumbnail-{{ section.id }}"
+              loading="lazy"
+              width="800"
+              height="500"
+            >
+            {% else %}
+            <div class="media-placeholder" id="thumbnail-{{ section.id }}">
+              {{ 'lifestyle-1' | placeholder_svg_tag }}
+            </div>
+            {% endif %}
+
+            {% comment %} Inline Video Container {% endcomment %}
+            <div class="inline-video-container" id="inline-video-{{ section.id }}">
+              {% if section.settings.shopify_video != blank %}
+              {{ section.settings.shopify_video | video_tag: autoplay: false, loop: false, muted: false, controls: true, class: 'inline-shopify-video' }}
+              {% endif %}
+              <iframe id="video-iframe-{{ section.id }}" src="" frameborder="0" allowfullscreen allow="autoplay; encrypted-media" style="display: none;"></iframe>
+            </div>
+
+            <div class="media-overlay" id="media-overlay-{{ section.id }}">
+              {% if section.settings.video_heading != blank %}
+              <h2 class="media-heading">{{ section.settings.video_heading }}</h2>
+              {% endif %}
+
+              {% assign has_video = false %}
+              {% if section.settings.shopify_video != blank %}
+              {% assign has_video = true %}
+              {% elsif section.settings.video_url != blank %}
+              {% assign has_video = true %}
+              {% endif %}
+
+              {% if has_video %}
+              <button class="play-button" 
+                {% if section.settings.shopify_video != blank %}
+                data-video-type="shopify"
+                {% else %}
+                data-video-type="external"
+                data-video-url="{{ section.settings.video_url }}"
+                {% endif %}
+                aria-label="Play video">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="why-choose-features">
+          {% if section.settings.main_title != blank %}
+          <div class="main-content-box">
+            {% if section.settings.main_title != blank %}
+            <h3 class="main-feature-title">{{ section.settings.main_title }}</h3>
+            {% endif %}
+            {% if section.settings.main_description != blank %}
+            <span class="main-feature-description">{{ section.settings.main_description }}</span>
+            {% endif %}
+            {%- if section.settings.btn_label != blank -%}
+            <a href="{{ section.settings.btn_link }}" class="hdt-btn main-content-btn hdt-mt-btn hdt-text-base hdt-oh hdt-inline-flex hdt-align-center hdt-justify-center hdt-relative hdt-btn-solid hdt-font-medium">
+              <span>{{ section.settings.btn_label }}</span>
+            </a>
+            {%- endif -%}
+          </div>
+          {% endif %}
+
+          <div class="features-grid">
+            {% for block in section.blocks %}
+            {% if block.type == 'feature' %}
+            <div class="feature-item" {{ block.shopify_attributes }}>
+              <div class="feature-icon">
+                {% if block.settings.custom_icon != blank %}
+                <img 
+                  src="{{ block.settings.custom_icon | image_url: width: 80 }}" 
+                  alt=""
+                  width="40"
+                  height="40"
+                  loading="lazy"
+                >
+                {% else %}
+                <div class="default-icon">
+                  {% case block.settings.icon_type %}
+                  {% when 'experience' %}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="38" viewBox="0 0 32 38" fill="none">
+                    <path d="M23.6824 33.0077C23.4795 33.2057 23.1526 33.2009 22.9562 32.998C22.7581 32.7951 22.763 32.4682 22.9659 32.2718C25.6969 29.6197 27.6871 26.238 28.9366 22.1301C30.1556 18.1173 30.6709 13.4057 30.4809 7.99846C27.6339 8.04355 24.8514 7.44129 22.3232 6.28515C19.8305 5.14509 17.5875 3.46233 15.7725 1.32232C13.9577 3.46237 11.713 5.14509 9.22176 6.28515C6.69364 7.44133 3.91101 8.04195 1.0658 7.99846C0.803324 15.4813 1.89026 21.6325 4.32983 26.4457C6.77423 31.2734 10.5908 34.7691 15.7741 36.9287C16.6131 36.5793 17.4134 36.1961 18.1734 35.7806C18.9915 35.333 19.7741 34.8434 20.5164 34.312C20.7483 34.1478 21.0687 34.2025 21.233 34.4328C21.3972 34.6647 21.3425 34.9851 21.1122 35.1494C20.3425 35.7001 19.5261 36.2121 18.663 36.6824C17.8015 37.1526 16.9014 37.5809 15.9658 37.9626C15.8466 38.0109 15.7081 38.0141 15.5793 37.9626C10.0591 35.7114 6.00321 32.0273 3.41193 26.9082C0.838714 21.8262 -0.280407 15.3402 0.0593527 7.44973C0.0706247 7.16632 0.308945 6.9457 0.592366 6.95699C3.45542 7.07776 6.26217 6.51096 8.79491 5.35156C11.3276 4.19217 13.5904 2.4418 15.3679 0.197044C15.3921 0.164839 15.4211 0.135853 15.4549 0.110088C15.6771 -0.0654308 16.0007 -0.0267844 16.1763 0.195432C17.954 2.44015 20.2181 4.19212 22.7509 5.3516C25.2855 6.511 28.0905 7.07781 30.9535 6.95703C31.2369 6.94576 31.4752 7.16797 31.4865 7.44977C31.7312 13.1822 31.2079 18.176 29.9165 22.4269C28.6154 26.7071 26.5365 30.2337 23.6815 33.0064L23.6824 33.0077ZM16.2541 12.8937L17.6002 16.4846L21.4311 16.6553C21.7145 16.6666 21.9351 16.9081 21.9222 17.1915C21.9158 17.3461 21.8417 17.4814 21.7274 17.5716L18.7291 19.9628L19.75 23.66C19.8257 23.9338 19.6646 24.2172 19.3909 24.2913C19.2427 24.3315 19.0898 24.3041 18.9706 24.2252L15.7694 22.1109L12.5698 24.2252C12.3331 24.3814 12.0126 24.317 11.8581 24.0803C11.7695 23.9483 11.7518 23.7888 11.7953 23.6471L12.8146 19.9612L9.81466 17.57C9.59244 17.3928 9.5554 17.0692 9.73253 16.847C9.83237 16.7214 9.98052 16.6537 10.1303 16.6521L13.945 16.483L15.2912 12.8921C15.3894 12.6264 15.6857 12.4912 15.9514 12.591C16.0963 12.6458 16.2026 12.7585 16.2525 12.8921L16.2541 12.8937ZM16.7581 17.1611L15.7742 14.5348L14.7952 17.1466C14.7292 17.3415 14.5488 17.4848 14.3298 17.4945L11.5295 17.6201L13.7227 19.3672C13.8789 19.4928 13.9546 19.7021 13.8982 19.9067L13.1511 22.6103L15.4795 21.0725C15.647 20.9549 15.8772 20.9453 16.0576 21.0644L18.3973 22.6103L17.655 19.9276C17.5906 19.7295 17.6517 19.5041 17.824 19.3656L20.0172 17.6184L17.217 17.4928C17.0173 17.4848 16.8321 17.3576 16.758 17.1595L16.7581 17.1611ZM11.0994 9.72164C11.3571 9.60409 11.6614 9.71842 11.7789 9.97445C11.8965 10.2321 11.7821 10.5364 11.5261 10.654L11.4279 10.6991C11.1702 10.8166 10.8659 10.7023 10.7484 10.4462C10.6308 10.1886 10.7452 9.88425 11.0012 9.76673L11.0994 9.72164ZM9.58735 10.2997C9.85788 10.2176 10.1445 10.3706 10.2266 10.6411C10.3088 10.9116 10.1558 11.1983 9.88526 11.2804C9.19766 11.4897 8.49077 11.6427 7.77419 11.7345C7.23314 11.8037 6.68405 11.8375 6.13331 11.8359C5.98195 16.7217 6.70174 20.7376 8.29591 23.8854C9.89652 27.0464 12.3892 29.3408 15.7725 30.7659C19.1557 29.3392 21.6501 27.0446 23.2491 23.8854C24.8433 20.7373 25.5647 16.7196 25.4117 11.8359C23.547 11.8391 21.7258 11.435 20.0672 10.6765C18.444 9.93258 16.9722 8.84887 15.7709 7.47532C15.4328 7.8634 15.0721 8.22731 14.6968 8.56385C14.1606 9.04534 13.5842 9.48012 12.9771 9.86493C12.7371 10.0163 12.4199 9.94384 12.2685 9.70391C12.1172 9.46398 12.1896 9.14674 12.4296 8.99537C12.9835 8.64594 13.5133 8.24659 14.0092 7.79895C14.502 7.35774 14.9561 6.87465 15.3667 6.35776C15.3908 6.32555 15.4214 6.29656 15.4536 6.26919C15.6759 6.09367 15.9995 6.13232 16.175 6.35454C17.3425 7.82954 18.8304 8.98089 20.4952 9.74257C22.1602 10.5042 24.0056 10.8778 25.888 10.7973C26.1714 10.786 26.4097 11.0082 26.421 11.29C26.6481 16.5814 25.8961 20.9342 24.1683 24.3478C22.4211 27.7986 19.6869 30.2831 15.967 31.8001C15.8478 31.8484 15.7093 31.8516 15.5805 31.8001C11.8608 30.2832 9.12662 27.7986 7.37918 24.3478C5.64975 20.9341 4.89776 16.5798 5.12643 11.29C5.1377 11.0066 5.37602 10.786 5.65944 10.7973C6.32931 10.8263 6.99436 10.7973 7.64651 10.7152C8.30834 10.6314 8.95888 10.4913 9.58848 10.2981L9.58735 10.2997ZM22.397 34.1624C22.178 34.3428 21.8543 34.3138 21.6724 34.0948C21.492 33.8758 21.521 33.5522 21.74 33.3702L21.8221 33.3009C22.0411 33.1206 22.3648 33.1496 22.5467 33.3686C22.7271 33.5876 22.6981 33.9112 22.4791 34.0932L22.397 34.1624Z" fill="currentColor"/>
+                  </svg>
+                  {% when 'quality' %}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="44" height="42" viewBox="0 0 44 42" fill="none">
+                    <path d="M16.4719 41.8311C15.9442 41.8311 15.4749 41.7622 15.0368 41.6201C13.648 41.1688 12.6605 40.0472 11.7049 38.9622C11.1147 38.2919 10.5568 37.6587 9.93052 37.2031C9.29257 36.7391 8.51036 36.3987 7.68202 36.0391C6.36421 35.4659 5.00185 34.8735 4.15548 33.7095C3.3176 32.5587 3.17336 31.0855 3.03335 29.6606C2.94479 28.7554 2.86047 27.901 2.61335 27.1379C2.38002 26.4199 1.9563 25.705 1.50766 24.9483C0.766293 23.6978 0 22.4055 0 20.9158C0 19.4267 0.766293 18.1338 1.50766 16.8834C1.9563 16.1266 2.38055 15.4118 2.61335 14.6932C2.861 13.9306 2.94479 13.0758 3.03335 12.1705C3.17336 10.7456 3.31813 9.27294 4.15548 8.12165C5.00238 6.95815 6.36474 6.3658 7.68202 5.79254C8.51089 5.43246 9.2931 5.092 9.93105 4.62799C10.5573 4.17245 11.1147 3.53927 11.7055 2.86896C12.6605 1.78448 13.6485 0.662883 15.0368 0.211592C15.4754 0.06894 15.9447 0 16.4724 0C17.3649 0 18.2897 0.203108 19.1833 0.399321C20.0461 0.588641 20.9386 0.784854 21.7638 0.784854C22.5889 0.784854 23.4815 0.588641 24.3443 0.399321C25.2389 0.202577 26.1632 0 27.0552 0C27.5828 0 28.0522 0.0694703 28.4902 0.211592C29.8796 0.662883 30.867 1.78448 31.8226 2.86949C32.4129 3.5398 32.9702 4.17245 33.5965 4.62799C34.234 5.092 35.0167 5.43246 35.8445 5.79254C37.1618 6.3658 38.5247 6.95815 39.371 8.12165C40.2089 9.27241 40.3537 10.7461 40.4932 12.1711C40.5817 13.0763 40.6655 13.9306 40.9132 14.6927C41.1465 15.4112 41.5702 16.1261 42.0189 16.8823C42.7602 18.1328 43.527 19.4257 43.527 20.9148C43.527 22.4039 42.7608 23.6968 42.0194 24.9472C41.5707 25.704 41.1465 26.4183 40.9137 27.1369C40.666 27.8994 40.5823 28.7548 40.4932 29.6595C40.3532 31.085 40.2089 32.5577 39.371 33.7089C38.5247 34.8719 37.1623 35.4648 35.845 36.0375C35.0167 36.3981 34.2345 36.7381 33.5965 37.2026C32.9697 37.6581 32.4123 38.2919 31.8216 38.9616C30.8665 40.0461 29.8791 41.1677 28.4902 41.6185C28.0522 41.7611 27.5823 41.8301 27.0547 41.8301C26.1616 41.8301 25.2378 41.627 24.3443 41.4307C23.4809 41.2425 22.5889 41.0463 21.7638 41.0463C20.9386 41.0463 20.0461 41.2425 19.1828 41.4323C18.2887 41.6285 17.3644 41.8311 16.4719 41.8311Z" fill="currentColor"/>
+                  </svg>
+                  {% when 'pricing' %}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="38" height="37" viewBox="0 0 38 37" fill="none">
+                    <path d="M19.7103 5.08458C19.6299 5.00439 19.5334 4.94212 19.4271 4.90186C19.3209 4.86159 19.2074 4.84424 19.094 4.85095L13.4828 5.15306C13.2222 4.1332 12.7301 3.18713 12.0446 2.38833C11.3591 1.58952 10.4987 0.959501 9.53022 0.547195C8.56172 0.134889 7.51121 -0.0486008 6.46029 0.0109794C5.40937 0.0705595 4.38633 0.371605 3.47064 0.890733C2.55495 1.40986 1.77126 2.13309 1.18044 3.00425C0.589624 3.87541 0.207587 4.87105 0.0640068 5.91382C-0.0795738 6.95659 0.019167 8.01842 0.352559 9.01683C0.685951 10.0153 1.24502 10.9234 1.98634 11.6707C2.8659 12.5532 3.97081 13.1774 5.18068 13.4753L4.87857 19.0785C4.87248 19.1902 4.88976 19.3021 4.92929 19.4068C4.96882 19.5115 5.02975 19.6069 5.10817 19.6867L22.1876 36.7622C22.338 36.9135 22.5423 36.9989 22.7556 36.9998C22.8627 37.002 22.9692 36.9829 23.0688 36.9434C23.1684 36.904 23.2591 36.8451 23.3357 36.7702L36.7938 23.3121C36.8702 23.2362 36.9306 23.1457 36.9714 23.0461C37.0122 22.9465 37.0326 22.8397 37.0315 22.732C37.0306 22.5187 36.9451 22.3144 36.7938 22.1641L19.7103 5.08458Z" fill="currentColor"/>
+                  </svg>
+                  {% when 'shipping' %}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" viewBox="0 0 40 32" fill="none">
+                    <path d="M13.0414 12.6222C13.0414 12.3522 12.8239 12.1348 12.554 12.1348H0.487442C0.217467 12.1348 0 12.3522 0 12.6222C0 12.8922 0.217477 13.1096 0.487442 13.1096H12.554C12.824 13.1096 13.0414 12.8922 13.0414 12.6222Z" fill="currentColor"/>
+                    <path d="M39.9971 6.65535C39.9915 6.45849 39.864 6.28601 39.6878 6.20727L31.5175 3.01447L23.8872 0.033516C23.7728 -0.0114797 23.6435 -0.0114796 23.5291 0.0353908L7.93635 6.20905C7.76011 6.28966 7.62887 6.4659 7.62887 6.66275V10.1912C7.62887 10.4612 7.84635 10.6786 8.11631 10.6786C8.38627 10.6786 8.60376 10.4612 8.60376 10.1912V7.39584L23.3249 13.5791V30.6175L8.60184 24.2374V22.597C8.59621 21.9539 7.63257 21.9595 7.62695 22.597V24.558C7.62695 24.753 7.74319 24.9292 7.9213 25.0061L23.623 31.8099C23.6849 31.8362 23.7505 31.8493 23.8161 31.8493C23.8799 31.8493 23.9417 31.838 24.0017 31.8118L39.6977 25.3434C39.8814 25.2685 39.9995 25.0903 39.9995 24.8916V17.3942C39.9902 16.7512 39.0303 16.7587 39.0246 17.3942V24.5652L24.3016 30.6324V13.5791L39.0246 7.39583V15.4447C39.0284 16.0821 39.9939 16.0877 39.9995 15.4447V6.65574L39.9971 6.65535Z" fill="currentColor"/>
+                  </svg>
+                  {% else %}
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M20 4l4 8 8 1-6 6 2 8-8-4-8 4 2-8-6-6 8-1z"/>
+                  </svg>
+                  {% endcase %}
+                </div>
+                {% endif %}
+              </div>
+              <div class="feature-content">
+                {% if block.settings.title != blank %}
+                <h3 class="feature-title">{{ block.settings.title }}</h3>
+                {% endif %}
+                {% if block.settings.description != blank %}
+                <p class="feature-description">{{ block.settings.description }}</p>
+                {% endif %}
+              </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+
+          {% if section.settings.badge_text != blank %}
+          <div class="trust-badge">
+            {% if section.settings.badge_icon != blank %}
+            <img 
+              src="{{ section.settings.badge_icon | image_url: width: 100 }}" 
+              alt=""
+              class="badge-icon"
+              width="20"
+              height="20"
+            >
+            {% else %}
+            <svg class="badge-icon-svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 1l2.5 5 5.5.8-4 3.9 1 5.3-5-2.6-5 2.6 1-5.3-4-3.9 5.5-.8z"/>
+            </svg>
+            {% endif %}
+            <span class="badge-text">{{ section.settings.badge_text }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const section = document.getElementById('why-choose-us-{{ section.id }}');
+    const playBtn = section.querySelector('.play-button');
+    const inlineVideoContainer = document.getElementById('inline-video-{{ section.id }}');
+    const mediaOverlay = document.getElementById('media-overlay-{{ section.id }}');
+    const thumbnail = document.getElementById('thumbnail-{{ section.id }}');
+    const iframe = document.getElementById('video-iframe-{{ section.id }}');
+    const shopifyVideo = inlineVideoContainer ? inlineVideoContainer.querySelector('video') : null;
+    const mediaHeading = mediaOverlay ? mediaOverlay.querySelector('.media-heading') : null;
+    
+    function getVideoEmbedUrl(url) {
+      // YouTube
+      let match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+      if (match) {
+        return 'https://www.youtube.com/embed/' + match[1] + '?autoplay=1&rel=0';
+      }
+      // Vimeo
+      match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+      if (match) {
+        return 'https://player.vimeo.com/video/' + match[1] + '?autoplay=1';
+      }
+      return url;
+    }
+
+    function showPlayButton(isPaused) {
+      mediaOverlay.classList.remove('hidden');
+      if (isPaused) {
+        mediaOverlay.classList.add('video-paused');
+        // Hide heading when showing paused overlay
+        if (mediaHeading) mediaHeading.style.display = 'none';
+      }
+    }
+
+    function hidePlayButton() {
+      mediaOverlay.classList.add('hidden');
+      mediaOverlay.classList.remove('video-paused');
+    }
+
+    function resetToThumbnail() {
+      inlineVideoContainer.classList.remove('active');
+      mediaOverlay.classList.remove('hidden');
+      mediaOverlay.classList.remove('video-paused');
+      // Show heading again
+      if (mediaHeading) mediaHeading.style.display = '';
+      if (thumbnail) {
+        thumbnail.classList.remove('hidden');
+      }
+      if (shopifyVideo) {
+        shopifyVideo.currentTime = 0;
+      }
+    }
+
+    function playVideo() {
+      const videoType = playBtn.getAttribute('data-video-type');
+      
+      // Hide overlay and thumbnail
+      hidePlayButton();
+      if (thumbnail) {
+        thumbnail.classList.add('hidden');
+      }
+      
+      // Show video container
+      inlineVideoContainer.classList.add('active');
+      
+      if (videoType === 'shopify' && shopifyVideo) {
+        // Show and play Shopify hosted video
+        shopifyVideo.style.display = 'block';
+        if (iframe) iframe.style.display = 'none';
+        shopifyVideo.play();
+      } else {
+        // Show external video (YouTube/Vimeo)
+        const videoUrl = playBtn.getAttribute('data-video-url');
+        if (iframe) {
+          iframe.src = getVideoEmbedUrl(videoUrl);
+          iframe.style.display = 'block';
+        }
+        if (shopifyVideo) shopifyVideo.style.display = 'none';
+      }
+    }
+
+    function resumeVideo() {
+      if (shopifyVideo && shopifyVideo.paused) {
+        shopifyVideo.play();
+      }
+    }
+
+    function toggleVideoPlayPause() {
+      if (shopifyVideo) {
+        if (shopifyVideo.paused) {
+          shopifyVideo.play();
+        } else {
+          shopifyVideo.pause();
+        }
+      }
+    }
+    
+    if (playBtn && inlineVideoContainer) {
+      // Play button click
+      playBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (shopifyVideo && shopifyVideo.paused && inlineVideoContainer.classList.contains('active')) {
+          // Video is paused, resume it
+          resumeVideo();
+        } else {
+          playVideo();
+        }
+      });
+
+      // Click on overlay (outside play button) to play/resume
+      mediaOverlay.addEventListener('click', function(e) {
+        if (e.target !== playBtn && !playBtn.contains(e.target)) {
+          if (shopifyVideo && shopifyVideo.paused && inlineVideoContainer.classList.contains('active')) {
+            // Video is paused, resume it
+            resumeVideo();
+          } else {
+            playVideo();
+          }
+        }
+      });
+
+      if (shopifyVideo) {
+        // Click/tap on video to toggle play/pause (works on mobile and desktop)
+        shopifyVideo.addEventListener('click', function(e) {
+          // Check if click is on the video controls area (bottom ~40px)
+          const videoRect = shopifyVideo.getBoundingClientRect();
+          const clickY = e.clientY - videoRect.top;
+          const controlsHeight = 50; // Approximate height of video controls
+          
+          // If click is not in the controls area, toggle play/pause
+          if (clickY < videoRect.height - controlsHeight) {
+            e.preventDefault();
+            toggleVideoPlayPause();
+          }
+        });
+
+        // Also handle touch events for better mobile support
+        shopifyVideo.addEventListener('touchend', function(e) {
+          // Check if it's a tap (not a scroll or other gesture)
+          if (e.changedTouches.length === 1) {
+            const touch = e.changedTouches[0];
+            const videoRect = shopifyVideo.getBoundingClientRect();
+            const touchY = touch.clientY - videoRect.top;
+            const controlsHeight = 50;
+            
+            // If touch is not in the controls area, toggle play/pause
+            if (touchY < videoRect.height - controlsHeight) {
+              // Small delay to differentiate from other gestures
+              toggleVideoPlayPause();
+            }
+          }
+        });
+
+        // Show play button when video is paused
+        shopifyVideo.addEventListener('pause', function() {
+          // Only show if video hasn't ended (currentTime < duration)
+          if (shopifyVideo.currentTime < shopifyVideo.duration) {
+            showPlayButton(true); // true = video is paused
+          }
+        });
+
+        // Hide play button when video starts playing
+        shopifyVideo.addEventListener('play', function() {
+          hidePlayButton();
+        });
+
+        // Handle video end - reset to thumbnail state
+        shopifyVideo.addEventListener('ended', function() {
+          resetToThumbnail();
+        });
+      }
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Why Choose Us",
+  "tag": "section",
+  "class": "why-choose-us-section-wrapper",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "hide_borders",
+      "label": "Hide Borders",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Section Background"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_topbar",
+      "label": "Show Topbar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bottombar",
+      "label": "Show Bottombar",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Background Color",
+      "default": "#f8f8f8"
+    },
+    {
+      "type": "image_picker",
+      "id": "section_bg_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Mobile Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Video/Image Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "video_thumbnail",
+      "label": "Video Thumbnail Image"
+    },
+    {
+      "type": "text",
+      "id": "video_heading",
+      "label": "Video Heading",
+      "default": "Why Choose GeZu Impex"
+    },
+    {
+      "type": "range",
+      "id": "video_heading_font_size",
+      "min": 18,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Video Heading Font Size (Desktop)",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "video_heading_font_size_mobile",
+      "min": 16,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "Video Heading Font Size (Mobile)",
+      "default": 22
+    },
+    {
+      "type": "color",
+      "id": "video_heading_color",
+      "label": "Video Heading Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "video_right",
+      "label": "Video on Right",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Video Source"
+    },
+    {
+      "type": "video",
+      "id": "shopify_video",
+      "label": "Shopify Hosted Video",
+      "info": "Upload a video to Shopify. This takes priority over external URL."
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "External Video URL (YouTube/Vimeo)",
+      "info": "Used if no Shopify hosted video is selected. Paste YouTube or Vimeo video URL"
+    },
+    {
+      "type": "header",
+      "content": "Play Button Settings"
+    },
+    {
+      "type": "color",
+      "id": "play_button_bg",
+      "label": "Play Button Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "play_button_color",
+      "label": "Play Button Icon Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Main Content Settings"
+    },
+    {
+      "type": "text",
+      "id": "main_title",
+      "label": "Main Title"
+    },
+    {
+      "type": "range",
+      "id": "main_title_font_size",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Main Title Font Size (Desktop)",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "main_title_font_size_mobile",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Main Title Font Size (Mobile)",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "main_title_color",
+      "label": "Main Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "richtext",
+      "id": "main_description",
+      "label": "Main Description"
+    },
+    {
+      "type": "range",
+      "id": "main_description_font_size",
+      "min": 14,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Main Description Font Size (Desktop)",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "main_description_font_size_mobile",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Main Description Font Size (Mobile)",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "main_description_color",
+      "label": "Main Description Color",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Main Button Label"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Main Button Link"
+    },
+    {
+      "type": "color",
+      "id": "btn_bgcolor",
+      "label": "Button Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "btn_txtcolor",
+      "label": "Button Text Color",
+      "default": "#fff"
+    },
+    {
+      "type": "header",
+      "content": "Feature Icon Settings"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 30,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon Size (Desktop)",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "icon_size_mobile",
+      "min": 24,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon Size (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon Color",
+      "default": "#c9a227"
+    },
+    {
+      "type": "header",
+      "content": "Feature Title Settings"
+    },
+    {
+      "type": "range",
+      "id": "feature_title_font_size",
+      "min": 14,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Feature Title Font Size (Desktop)",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "feature_title_font_size_mobile",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Feature Title Font Size (Mobile)",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "feature_title_color",
+      "label": "Feature Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Feature Description Settings"
+    },
+    {
+      "type": "range",
+      "id": "feature_description_font_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Feature Description Font Size (Desktop)",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "feature_description_font_size_mobile",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Feature Description Font Size (Mobile)",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "feature_description_color",
+      "label": "Feature Description Color",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Trust Badge Settings"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "No.1 in Customer Satisfaction among home improvement retailers*"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_icon",
+      "label": "Badge Icon"
+    },
+    {
+      "type": "range",
+      "id": "badge_font_size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Badge Font Size (Desktop)",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "badge_font_size_mobile",
+      "min": 10,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Badge Font Size (Mobile)",
+      "default": 11
+    },
+    {
+      "type": "color",
+      "id": "badge_bg_color",
+      "label": "Badge Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge Text Color",
+      "default": "#333333"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon_type",
+          "label": "Icon Type",
+          "options": [
+            { "value": "experience", "label": "Experience/Shield" },
+            { "value": "quality", "label": "Quality/Stars" },
+            { "value": "pricing", "label": "Pricing/Tag" },
+            { "value": "shipping", "label": "Shipping/Box" },
+            { "value": "star", "label": "Star" }
+          ],
+          "default": "experience"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_icon",
+          "label": "Custom Icon (overrides icon type)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Feature Title",
+          "default": "20+ Years of Industry Experience"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Feature Description",
+          "default": "Lorem ipsum dolor sit amet consectetur."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Why Choose Us",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "icon_type": "experience",
+            "title": "20+ Years of Industry Experience",
+            "description": "Lorem ipsum dolor sit amet consectetur."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon_type": "quality",
+            "title": "Superior Quality Hardware",
+            "description": "Lorem ipsum dolor sit amet consectetur."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon_type": "pricing",
+            "title": "Competitive Pricing",
+            "description": "Lorem ipsum dolor sit amet consectetur."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon_type": "shipping",
+            "title": "Europe-wide Shipping",
+            "description": "Lorem ipsum dolor sit amet consectetur."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

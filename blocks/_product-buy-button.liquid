@@ -1,0 +1,1555 @@
+{% comment %} {%- assign has_form_atc = true -%} {% endcomment %}
+{%- comment -%}
+  Renders product buy-buttons.
+  Accepts:
+  - product: {Object} product object.
+  - selected_variant: {Object} (required)
+  - block: {Object} passing the block information.
+  - product_form_id: {String} product form id.
+  - section_id: {String} id of section to which this snippet belongs.
+  - show_pickup_availability: {Boolean} for the pickup availability. If true the pickup availability is rendered, false - not rendered (optional).
+
+  data-hide-errors: use if you want show hidden cart error
+
+  Usage:
+  {% render 'buy-buttons', block: block, product: product, product_form_id: product_form_id, section_id: section.id, show_pickup_availability: true %}
+{%- endcomment -%}
+{%- liquid
+  unless product
+    assign product = section.settings.product
+  endunless
+  if product == blank 
+    continue
+  endif
+  assign un_no_pick = true
+  if settings.pick_mode == 'no' and product.variants.size > 1
+    assign selected_variant = product.selected_variant
+    unless selected_variant
+      assign un_no_pick = false
+    endunless
+  elsif settings.pick_mode == 'first' and settings.hide_sold_out == false
+    assign selected_variant = product.selected_variant | default: product.variants.first
+  else
+    assign selected_variant = product.selected_or_first_available_variant
+  endif
+  assign product_form_id = 'product-form-'| append: section.id | append: product.id
+-%}
+<div class="hdt-product-info__item hdt-product__buy-button" data-type="{{ block.type }}" {{ block.shopify_attributes }} style="width:100%;">
+  {%- if product != blank -%}
+    {%- liquid
+      if selected_variant.inventory_management == 'shopify' and selected_variant.inventory_quantity <= 0 and selected_variant.available
+        assign is_pre_order = true
+      else
+        assign is_pre_order = false
+      endif
+      assign gift_card_recipient_feature_active = false
+      if block.settings.show_gift_card_recipient and product.gift_card?
+        assign gift_card_recipient_feature_active = true
+      endif
+  
+      assign show_dynamic_checkout = false
+      if block.settings.show_dynamic_checkout and gift_card_recipient_feature_active == false
+        assign show_dynamic_checkout = true
+      endif
+  
+      assign check_against_inventory = true
+      if selected_variant.inventory_management != 'shopify' or selected_variant.inventory_policy == 'continue'
+        assign check_against_inventory = false
+      endif
+      if selected_variant.quantity_rule.min > selected_variant.inventory_quantity and check_against_inventory
+        assign quantity_rule_soldout = true
+      endif
+      assign variant_picker_block = section.blocks | where: 'type', 'variant_picker' | first
+
+      assign price = selected_variant.price | default: 1999
+      if settings.currency_code_enabled
+        assign money_price = price | money_with_currency
+      else
+        assign money_price = price | money
+      endif
+      if product == product and product.price_varies
+      assign money_price_clone = money_price
+      assign money_price = 'products.product.price.from_price_html' | t: price: money_price
+    endif
+    -%}
+    <wrapp-hdt-pr-frm class="hdt-contents">
+      {%- form 'product', product, id: product_form_id, class: 'hdt-main-product-form', data-gift-card-recipient: gift_card_recipient_feature_active -%}
+        <input type="hidden" name="id" value="{{ selected_variant.id }}"{% if variant_picker_block != blank and product.has_only_default_variant == false %} disabled{% endif %}>
+        {%- if gift_card_recipient_feature_active -%}
+          {%- render 'gift-card-recipient-form', product: product, form: form, section: section, form_id: product_form_id -%}
+        {%- endif -%}
+        <div class="hdt-form__message-wrapper hdt-form-message--error" role="alert" hidden>{% render 'icon' with 'error' %} <span class="hdt-error-message"></span></div>
+        <hdt-buy-buttons class="hdt-product-form__buttons" form="{{ product_form_id }}">
+          <div class="hdt-product-form__top-buttons hdt-flex">
+            <div class="hdt-flex hdt-product-form-buttons hdt-gap-3">
+              <button type="submit" name="add" class="hdt-product-form__submit hdt-btn hdt-oh hdt-btn-solid hdt-font-semibold hdt-relative hdt-truncate hdt-btn-loading__svg"{% if selected_variant.available == false or quantity_rule_soldout or un_no_pick == false %} disabled="true"{% endif %}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="17" viewBox="0 0 21 17" fill="none">
+                <path d="M19.7438 3.30699C19.3613 2.89361 18.7662 2.64199 18.1499 2.64199H5.20693L4.80313 1.31201C4.56935 0.539182 3.76174 0 2.82662 0H0.658837C0.297539 0 0 0.251618 0 0.557155C0 0.862692 0.297539 1.11431 0.658837 1.11431H2.82662C3.14541 1.11431 3.4217 1.29404 3.50671 1.56363L6.09955 10.2984C6.33333 11.0712 7.14094 11.6104 8.07606 11.6104H16.5559C17.4911 11.6104 18.3199 11.0712 18.5324 10.2984L20.1264 4.76278C20.2752 4.25954 20.1477 3.72036 19.7438 3.30699ZM18.83 4.51116L17.236 10.0468C17.151 10.3164 16.8747 10.4961 16.5559 10.4961H8.07606C7.75727 10.4961 7.48098 10.3164 7.39597 10.0468L5.54698 3.77428H18.1499C18.3624 3.77428 18.5749 3.86414 18.7025 4.00792C18.83 4.1517 18.8937 4.33143 18.83 4.51116Z" fill="white"/>
+                <path d="M8.52279 12.3293C7.31138 12.3293 6.3125 13.1741 6.3125 14.1985C6.3125 15.223 7.31138 16.0677 8.52279 16.0677C9.7342 16.0677 10.7331 15.223 10.7331 14.1985C10.7331 13.1741 9.7342 12.3293 8.52279 12.3293ZM8.52279 14.9354C8.03398 14.9354 7.65143 14.6119 7.65143 14.1985C7.65143 13.7851 8.03398 13.4616 8.52279 13.4616C9.0116 13.4616 9.39416 13.7851 9.39416 14.1985C9.39416 14.5939 8.99035 14.9354 8.52279 14.9354Z" fill="white"/>
+                <path d="M15.8333 12.3293C14.6219 12.3293 13.623 13.1741 13.623 14.1985C13.623 15.223 14.6219 16.0677 15.8333 16.0677C17.0447 16.0677 18.0436 15.223 18.0436 14.1985C18.0224 13.1741 17.0447 12.3293 15.8333 12.3293ZM15.8333 14.9354C15.3445 14.9354 14.962 14.6119 14.962 14.1985C14.962 13.7851 15.3445 13.4616 15.8333 13.4616C16.3222 13.4616 16.7047 13.7851 16.7047 14.1985C16.7047 14.5939 16.3009 14.9354 15.8333 14.9354Z" fill="white"/>
+                </svg>
+                <span class="hdt-btn-atc_text">{% if un_no_pick == false %}{{ 'products.product.choose_options' | t }}{% elsif is_pre_order %}{{ 'products.product.pre_order' | t }}{% elsif selected_variant.available == false or quantity_rule_soldout %}{{ 'products.product.sold_out' | t }}{% else %}{{ 'products.product.add_to_cart' | t }}{% endif %}</span> 
+                {%- if block.settings.show_price_variant -%}
+                  <hdt-qty-price variant-price="{{ price }}" class="hdt-qty-price"{% if un_no_pick == false %} hidden{% endif %} form="{{ product_form_id }}">{% comment %}<span style="display:inline-block;margin:0 2px;"> - </span>{% endcomment %}<span class="hdt-money">{{ money_price_clone | default: money_price }}</span></hdt-qty-price>
+                {%- endif -%}
+                <span class="hdt-loading__spinner hdt-absolute" hidden>
+                  <svg width="16" height="16" class="hdt-svg-spinner" focusable="false" role="presentation" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg"><circle class="hdt-path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle></svg>
+                </span>
+              </button>
+              
+              {% comment %} REQUEST A QUOTE POPUP Button {% endcomment %}
+              {%- if block.settings.show_request_quote -%}
+                <button type="button" class="hdt-request-quote__btn hdt-btn hdt-oh hdt-btn-outline hdt-font-semibold hdt-relative hdt-truncate hdt-flex hdt-align-center hdt-justify-center" aria-controls="modal-quote-{{ block.id }}">
+                  <span>{{ block.settings.quote_button_text | default: 'Request a quote' }}</span>
+                </button>
+              {%- endif -%}
+              {% comment %} END REQUEST A QUOTE Button {% endcomment %}
+              
+              {%- liquid
+                if block.settings.show_wishlist
+                  capture btn_wishlist_code
+                    if settings.wishlist_mode != '0'
+                      render 'btn-wishlist', class: 'hdt-product-form__btn-wishlist hdt-flex hdt-align-center hdt-justify-center hdt-relative hdt-s-text', placement: 'top'
+                    endif
+                  endcapture
+                  echo btn_wishlist_code | replace_first: '19041994', product.id | replace_first: 'handle_nt_94', product.handle
+                endif
+                if block.settings.show_compare and settings.compare_mode != "0"
+                  render 'btn-compare', product_id: product.id, product_handle: product.handle, class: 'hdt-product-form__btn-compare hdt-flex hdt-align-center hdt-justify-center hdt-relative hdt-s-text', placement: 'top'
+                endif
+              -%}
+            </div>
+            {%- if show_dynamic_checkout and product.available -%}
+              {{ form | payment_button }}
+            {%- endif -%}
+          </div>
+        </hdt-buy-buttons>
+      {%- endform -%}
+    </wrapp-hdt-pr-frm>
+    
+    {% comment %} REQUEST A QUOTE MODAL {% endcomment %}
+    {%- if block.settings.show_request_quote -%}
+      <hdt-modal effect="slide" color-scheme="{{ settings.color_scheme_dialog }}">
+        <dialog id="modal-quote-{{ block.id }}" class="hdt-dialog hdt-dialog-modal hdt-product__modal hdt-modal-popup__quote hdt-s-gradient" scroll-lock>
+          <div class="hdt-dialog-modal__header">
+            <h3 class="hdt-product__modal-title">{{ block.settings.quote_popup_title | default: 'Request a customized quote' }}</h3>
+            <button type="button" ref="closeButton" class="hdt-s-text hdt-quote-modal-close" data-modal-id="modal-quote-{{ block.id }}" aria-label="{{ 'accessibility.close' | t | escape }}">
+              {%- render 'icon' with 'close' -%}
+            </button>
+          </div>
+          <div class="hdt-dialog-modal__inner hdt-current-scrollbar">
+            {%- if block.settings.quote_popup_description != blank -%}
+              <p class="hdt-request-quote__description hdt-s-text2 hdt-mb-4">{{ block.settings.quote_popup_description }}</p>
+            {%- endif -%}
+            
+            {%- assign quote_form_id = 'QuoteRequestForm' | append: block.id | append: product.id -%}
+            {%- form 'contact', id: quote_form_id, class: 'hdt-request-quote__form' -%}
+              <input type="hidden" name="contact[subject]" value="Quote Request">
+              
+              {%- liquid
+                capture status_quote_mirror
+                  echo '<div class="hdt-order-last form-status-mirror-' | append: quote_form_id | append: '" style="display: none">'
+                  capture status_quote
+                    render 'form-status', form: form, form_id: quote_form_id
+                  endcapture
+                  echo status_quote
+                  echo '</div>'
+                endcapture
+                echo status_quote
+              -%}
+              
+              <div class="hdt-request-quote__field">
+                <label for="{{ quote_form_id }}-name" class="hdt-s-text2 hdt-block hdt-mb-1">
+                  {{ 'templates.contact.form.name' | t }}
+                </label>
+                <input 
+                  type="text" 
+                  id="{{ quote_form_id }}-name" 
+                  name="contact[name]" 
+                  required="required" 
+                  class="hdt-request-quote__input"
+                  data-quote-field="name"
+                  value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+                  placeholder="{{ 'templates.contact.form.name' | t }}"
+                >
+              </div>
+              
+              {%- if block.settings.quote_show_company -%}
+                <div class="hdt-request-quote__field">
+                  <label for="{{ quote_form_id }}-company" class="hdt-s-text2 hdt-block hdt-mb-1">
+                    {{ block.settings.quote_company_label | default: 'Company name' }}
+                  </label>
+                  <input 
+                    type="text" 
+                    id="{{ quote_form_id }}-company" 
+                    name="contact[company]" 
+                    class="hdt-request-quote__input"
+                    data-quote-field="company"
+                    placeholder="{{ block.settings.quote_company_label | default: 'Company name' }}"
+                  >
+                </div>
+              {%- endif -%}
+              
+              <div class="hdt-request-quote__field">
+                <label for="{{ quote_form_id }}-email" class="hdt-s-text2 hdt-block hdt-mb-1">
+                   {{ 'templates.contact.form.email' | t }}
+                </label>
+                <input 
+                  type="email" 
+                  id="{{ quote_form_id }}-email" 
+                  name="contact[email]" 
+                  autocorrect="off" 
+                  autocapitalize="off" 
+                  required="required"
+                  class="hdt-request-quote__input"
+                  data-quote-field="email"
+                  value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+                  placeholder="{{ 'templates.contact.form.email' | t }}"
+                  {%- if form.errors contains 'email' %} aria-invalid="true" aria-describedby="{{ quote_form_id }}-email-error"{% endif -%}
+                >
+              </div>
+              
+              {%- if block.settings.quote_show_phone -%}
+                <div class="hdt-request-quote__field">
+                  <label for="{{ quote_form_id }}-phone" class="hdt-s-text2 hdt-block hdt-mb-1">
+                    {{ 'templates.contact.form.phone' | t }}
+                  </label>
+                  <input 
+                    type="tel" 
+                    id="{{ quote_form_id }}-phone" 
+                    name="contact[phone]" 
+                    pattern="[0-9\-]*" 
+                    class="hdt-request-quote__input"
+                    data-quote-field="phone"
+                    value="{% if customer %}{{ customer.phone }}{% endif %}"
+                    placeholder="{{ 'templates.contact.form.phone' | t }}"
+                  >
+                </div>
+              {%- endif -%}
+              
+              <!-- Product Info Section -->
+              <div class="hdt-request-quote__product-section">
+                <div class="hdt-request-quote__product-header">
+                  <span class="hdt-s-text2 hdt-font-medium quote-header-number">{{ block.settings.quote_number_label | default: 'Number' }}</span>
+                  <span class="hdt-s-text2 hdt-font-medium quote-header-qty">Qty</span>
+                  <span class="hdt-s-text2 hdt-font-medium">{{ block.settings.quote_article_label | default: 'Article(number)' }}</span>
+                </div>
+                
+                <div class="hdt-request-quote__products-list" id="quote-products-list-{{ block.id }}">
+                  <!-- Initial Product Item -->
+                  <div class="hdt-request-quote__product-item" data-product-id="{{ product.id }}" data-index="0">
+                    <div class="hdt-request-quote__product-row">
+                      <div class="hdt-request-quote__row-number">1</div>
+                      <div class="hdt-request-quote__qty-wrapper">
+                        <input 
+                          type="number" 
+                          name="contact[products][0][quantity]" 
+                          value="1" 
+                          min="1" 
+                          class="hdt-request-quote__qty-input"
+                          aria-label="Quantity"
+                        >
+                      </div>
+                      <div class="hdt-request-quote__product-image">
+                        {%- if product.featured_image != blank -%}
+                          <img src="{{ product.featured_image | image_url: width: 80 }}" alt="{{ product.title | escape }}" width="50" height="50" loading="lazy">
+                        {%- else -%}
+                          <div class="hdt-request-quote__no-image">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                              <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                          </div>
+                        {%- endif -%}
+                      </div>
+                      <div class="hdt-request-quote__product-info">
+                        <span class="hdt-request-quote__product-title">{{ product.title }}</span>
+                        <span class="hdt-request-quote__product-sku">{% if product.selected_or_first_available_variant.sku != blank %}SKU: {{ product.selected_or_first_available_variant.sku }}{% else %}ID: {{ product.id }}{% endif %}</span>
+                        <input type="hidden" name="contact[products][0][id]" value="{{ product.id }}">
+                        <input type="hidden" name="contact[products][0][title]" value="{{ product.title }}">
+                        <input type="hidden" name="contact[products][0][sku]" value="{{ product.selected_or_first_available_variant.sku | default: product.id }}">
+                        <input type="hidden" name="contact[products][0][url]" value="{{ request.origin }}{{ product.url }}">
+                      </div>
+                      <button type="button" class="hdt-request-quote__remove-btn" aria-label="Remove item" data-action="remove">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Hidden field to store all products data for email -->
+                <textarea name="contact[product_list]" id="quote-product-data-{{ block.id }}" style="display:none !important;">{{ product.title }} ({% if product.selected_or_first_available_variant.sku != blank %}{{ product.selected_or_first_available_variant.sku }}{% else %}{{ product.id }}{% endif %}) x 1 - {{ request.origin }}{{ product.url }}</textarea>
+              </div>
+              
+              {%- if block.settings.quote_show_add_more -%}
+                <!-- Add More Products Button -->
+                <div class="hdt-request-quote__add-wrapper">
+                  <button type="button" class="hdt-request-quote__add-btn" id="add-more-products-{{ block.id }}" data-block-id="{{ block.id }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>{{ block.settings.quote_add_product_text | default: 'Add another product' }}</span>
+                  </button>
+                </div>
+                
+                <!-- Product Search/Select Panel -->
+                <div class="hdt-request-quote__product-selector" id="product-selector-{{ block.id }}">
+                  <div class="hdt-request-quote__selector-header">
+                    <h4>{{ block.settings.quote_select_product_title | default: 'Select a product' }}</h4>
+                    <button type="button" class="hdt-request-quote__selector-close" data-action="close-selector">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="hdt-request-quote__search-wrapper">
+                    <span class="hdt-request-quote__search-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                    </span>
+                    <input 
+                      type="text" 
+                      class="hdt-request-quote__search-input" 
+                      id="product-search-{{ block.id }}"
+                      placeholder="{{ block.settings.quote_search_placeholder | default: 'Search products...' }}"
+                      autocomplete="off"
+                    >
+                  </div>
+                  <div class="hdt-request-quote__products-dropdown" id="products-dropdown-{{ block.id }}">
+                    <div class="hdt-request-quote__dropdown-loading">
+                      <svg width="20" height="20" class="hdt-svg-spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                        <circle class="hdt-path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                      </svg>
+                      <span>Loading products...</span>
+                    </div>
+                  </div>
+                </div>
+              {%- endif -%}
+              
+              <div class="hdt-request-quote__field">
+                <label for="{{ quote_form_id }}-comments" class="hdt-s-text2 hdt-block hdt-mb-1">
+                  {{ block.settings.quote_comments_label | default: 'Comments' }}
+                </label>
+                <textarea 
+                  rows="4" 
+                  id="{{ quote_form_id }}-comments" 
+                  name="contact[body]" 
+                  class="hdt-request-quote__textarea"
+                  data-quote-field="comments"
+                  placeholder="{{ block.settings.quote_comments_placeholder | default: 'Add any additional details or requirements...' }}"
+                >{% if form.body %}{{ form.body }}{% endif %}</textarea>
+              </div>
+              
+              <!-- Saved confirmation message -->
+              <div class="hdt-request-quote__saved-msg" id="quote-saved-msg-{{ block.id }}" style="display:none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Quote saved! Continue browsing and come back anytime.</span>
+              </div>
+              
+              <div class="hdt-request-quote__buttons hdt-flex hdt-gap-3 hdt-mt-4">
+                <button type="button" class="hdt-request-quote__save-btn hdt-btn hdt-btn-outline hdt-font-medium" id="quote-save-btn-{{ block.id }}">
+                  {{ block.settings.quote_save_button_text | default: 'Save & continue searching' }}
+                </button>
+                <button type="submit" class="hdt-request-quote__submit-btn hdt-btn hdt-btn-solid hdt-font-semibold">
+                  <span class="hdt-truncate">{{ block.settings.quote_submit_button_text | default: 'Request a quote' }}</span>
+                  <span class="hdt-loading__spinner hdt-absolute" hidden>
+                    <svg width="16" height="16" class="hdt-svg-spinner" focusable="false" role="presentation" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                      <circle class="hdt-path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                    </svg>
+                  </span>
+                </button>
+              </div>
+            {%- endform -%}
+          </div>
+        </dialog>
+      </hdt-modal>
+      
+      {{ status_quote_mirror }}
+      
+      <style>
+        .hdt-request-quote__btn {
+          min-height: 64px;
+          padding: 0 50px;
+          gap: 8px;
+          border-width: 2px;
+          white-space: nowrap;
+          border: 1px solid #000;
+          color: #000 !important;
+          border-radius: 12px;
+          font-weight: 400;
+          overflow: visible;
+        }
+        .hdt-request-quote__btn:hover {
+          background-color: var(--color-button);
+          color: var(--color-button-text);
+        }
+        .hdt-modal-popup__quote {
+          max-width: 550px;
+          width: 100%;
+        }
+        .hdt-modal-popup__quote .hdt-product__modal-title {font-weight: 500;}
+        .hdt-request-quote__description {
+          color: var(--color-foreground-secondary);
+          font-size: 14px;
+          line-height: 1.5;
+        }
+        .hdt-request-quote__field {
+          margin-bottom: 16px;
+        }
+        .hdt-request-quote__field label {
+          font-size: 14px;
+          margin-bottom: 6px;
+        }
+        .hdt-required {
+          color: #dc2626;
+        }
+        .hdt-request-quote__input,
+        .hdt-request-quote__textarea {
+          width: 100%;
+          padding: 10px 14px;
+          border: 1px solid var(--color-border);
+          border-radius: 6px;
+          font-size: 14px;
+          background-color: var(--color-background);
+          color: var(--color-foreground);
+          transition: border-color 0.2s ease;
+          --color-border: #cecece;
+        }
+        .hdt-request-quote__input:focus,
+        .hdt-request-quote__textarea:focus {
+          outline: none;
+          border-color: var(--color-button);
+        }
+        .hdt-request-quote__product-section {
+          margin: 20px 0 0;
+          padding: 0;
+          border-top: 1px solid var(--color-border);
+        }
+        .hdt-request-quote__product-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 13px;
+          color: var(--color-foreground-secondary);
+          border-bottom: 1px solid var(--color-border);
+          padding: 10px 0;
+        }
+        .hdt-request-quote__product-header .quote-header-number {
+          width: 36px;
+          flex-shrink: 0;
+          text-align: center;
+        }
+        .hdt-request-quote__product-header .quote-header-qty {
+          width: 56px;
+          flex-shrink: 0;
+          text-align: center;
+        }
+        .hdt-request-quote__products-list {
+          max-height: 280px;
+          overflow-y: auto;
+        }
+        .hdt-request-quote__product-item {
+          padding: 12px 0;
+          border-bottom: 1px solid var(--color-border);
+        }
+        .hdt-request-quote__product-item:last-child {
+          border-bottom: none;
+        }
+        .hdt-request-quote__product-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .hdt-request-quote__row-number {
+          width: 36px;
+          flex-shrink: 0;
+          text-align: center;
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--color-foreground);
+        }
+        .hdt-request-quote__qty-wrapper {
+          width: 56px;
+          flex-shrink: 0;
+        }
+        .hdt-request-quote__qty-input {
+          width: 100%;
+          padding: 8px 4px;
+          border: 1px solid var(--color-border);
+          border-radius: 4px;
+          text-align: center;
+          font-size: 14px;
+          background-color: var(--color-background);
+          --color-border: #cecece;
+        }
+        .hdt-request-quote__qty-input:focus {
+          outline: none;
+          border-color: var(--color-button);
+        }
+        .hdt-request-quote__product-image {
+          width: 50px;
+          height: 50px;
+          flex-shrink: 0;
+          border-radius: 6px;
+          overflow: hidden;
+          border: 1px solid var(--color-border);
+          background: #f5f5f5;
+        }
+        .hdt-request-quote__product-image img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .hdt-request-quote__no-image {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #999;
+        }
+        .hdt-request-quote__product-info {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .hdt-request-quote__product-title {
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--color-foreground);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .hdt-request-quote__product-sku {
+          font-size: 12px;
+          color: #666;
+        }
+        .hdt-request-quote__remove-btn {
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid var(--color-border);
+          border-radius: 4px;
+          background: var(--color-background);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+          --color-border: #cecece;
+        }
+        .hdt-request-quote__remove-btn:hover {
+          border-color: #dc2626;
+          color: #dc2626;
+          background: #fef2f2;
+        }
+        .hdt-request-quote__add-wrapper {
+          padding: 12px 0 10px;
+          border-bottom: 1px solid var(--color-border);
+          margin-bottom: 16px;
+        }
+        .hdt-request-quote__add-btn {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 12px 16px;
+          border: 2px dashed #ccc;
+          border-radius: 8px;
+          background: transparent;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-size: 14px;
+          color: #666;
+        }
+        .hdt-request-quote__add-btn:hover {
+          border-color: var(--color-button);
+          color: var(--color-button);
+          background: #f9fafb;
+        }
+        .hdt-request-quote__product-selector {
+          display: none;
+          background: var(--color-background);
+          border: 1px solid var(--color-border);
+          border-radius: 8px;
+          padding: 16px;
+          margin-bottom: 16px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          --color-border: #ddd;
+        }
+        .hdt-request-quote__product-selector.is-open {
+          display: block;
+        }
+        .hdt-request-quote__selector-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 12px;
+        }
+        .hdt-request-quote__selector-header h4 {
+          font-size: 15px;
+          font-weight: 600;
+          margin: 0;
+        }
+        .hdt-request-quote__selector-close {
+          width: 28px;
+          height: 28px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          border-radius: 4px;
+          transition: background 0.2s;
+        }
+        .hdt-request-quote__selector-close:hover {
+          background: #f5f5f5;
+        }
+        .hdt-request-quote__search-wrapper {
+          position: relative;
+          margin-bottom: 12px;
+        }
+        .hdt-request-quote__search-input {
+          width: 100%;
+          padding: 10px 14px 10px 42px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          font-size: 14px;
+          background-color: var(--color-background);
+        }
+        .hdt-request-quote__search-input:focus {
+          outline: none;
+          border-color: var(--color-button);
+        }
+        .hdt-request-quote__search-icon {
+          position: absolute;
+          left: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #999;
+          pointer-events: none;
+        }
+        .hdt-request-quote__products-dropdown {
+          max-height: 250px;
+          overflow-y: auto;
+          border: 1px solid #eee;
+          border-radius: 6px;
+          background: #fff;
+        }
+        .hdt-request-quote__dropdown-loading {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          padding: 24px;
+          color: #666;
+          font-size: 14px;
+        }
+        .hdt-request-quote__dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 12px;
+          border-bottom: 1px solid #eee;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .hdt-request-quote__dropdown-item:last-child {
+          border-bottom: none;
+        }
+        .hdt-request-quote__dropdown-item:hover {
+          background: #f5f5f5;
+        }
+        .hdt-request-quote__dropdown-image {
+          width: 45px;
+          height: 45px;
+          flex-shrink: 0;
+          border-radius: 4px;
+          overflow: hidden;
+          border: 1px solid #eee;
+          background: #f5f5f5;
+        }
+        .hdt-request-quote__dropdown-image img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .hdt-request-quote__dropdown-info {
+          flex: 1;
+          min-width: 0;
+        }
+        .hdt-request-quote__dropdown-title {
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--color-foreground);
+          display: block;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .hdt-request-quote__dropdown-sku {
+          font-size: 11px;
+          color: #888;
+        }
+        .hdt-request-quote__dropdown-empty {
+          padding: 24px;
+          text-align: center;
+          color: #888;
+          font-size: 14px;
+        }
+        .hdt-request-quote__buttons {
+          flex-wrap: wrap;
+          margin-bottom: 10px;
+        }
+        .hdt-request-quote__save-btn {
+          flex: 1;
+          min-width: 150px;
+          padding: 12px 16px;
+          font-size: 14px;
+          border-radius: 8px;
+        }
+        .hdt-request-quote__submit-btn {
+          flex: 1;
+          min-width: 150px;
+          padding: 12px 16px;
+          font-size: 14px;
+          background-color: #0047ab !important;
+          color: #fff !important;
+          position: relative;
+          border-radius: 8px;
+          font-weight: 500;
+        }
+        .hdt-request-quote__submit-btn:hover {
+          background-color: #0047ab !important;
+        }
+        .hdt-product-form-buttons {
+          flex-wrap: wrap;
+        }
+        .hdt-dialog-modal.hdt-modal-popup__quote .hdt-dialog-modal__header:after {
+          content: "";
+          background: #999;
+          width: 90%;
+          height: 1px;
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          margin: 0 auto;
+        }
+        .hdt-dialog-modal.hdt-modal-popup__quote .hdt-dialog-modal__header {
+          padding: 0 3.6rem 10px;
+          margin-bottom: 2rem;
+          position: relative;
+        }
+        .hdt-request-quote__form {
+          margin-top: 10px;
+        }
+        .hdt-dialog-modal .hdt-dialog-modal__inner {
+          overflow-x: hidden;
+        }
+        .hdt-product-form__submit svg:first-of-type {
+          display: inline-block !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+        }
+        .hdt-request-quote__saved-msg {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 14px;
+          background: #ecfdf5;
+          border: 1px solid #a7f3d0;
+          border-radius: 8px;
+          color: #065f46;
+          font-size: 13px;
+          font-weight: 500;
+          margin-bottom: 12px;
+          animation: quoteSavedFadeIn 0.3s ease;
+        }
+        .hdt-request-quote__saved-msg svg {
+          flex-shrink: 0;
+          color: #059669;
+        }
+        @keyframes quoteSavedFadeIn {
+          from { opacity: 0; transform: translateY(-6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .hdt-request-quote__badge {
+          position: absolute;
+          top: -6px;
+          right: -6px;
+          background: #0047ab;
+          color: #fff !important;
+          font-size: 11px;
+          font-weight: 600;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          line-height: 1;
+        }
+        .hdt-quote-success-toast {
+          position: fixed;
+          bottom: 24px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: #065f46;
+          color: #fff;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-size: 14px;
+          z-index: 99999;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          animation: quoteSavedFadeIn 0.3s ease;
+          white-space: nowrap;
+        }
+        @media screen and (max-width: 999px) {
+          .hdt-modal-popup__quote {
+            max-width: 93%;
+          }
+          .hdt-request-quote__btn {
+            margin: 0 !important;
+            font-weight: 500;
+          }
+          .hdt-section--feature-product .hdt-product-form__buttons .hdt-product-form-buttons {
+            flex-direction: column;
+          }
+          .hdt-request-quote__buttons {
+            flex-direction: column;
+          }
+          .hdt-request-quote__save-btn,
+          .hdt-request-quote__submit-btn {
+            width: 100%;
+          }
+          .hdt-product-form-buttons {
+            width: 100%;
+          }
+          .hdt-product-form-buttons .hdt-product-form__submit,
+          .hdt-product-form-buttons .hdt-request-quote__btn {
+            flex: 1;
+          }
+          .hdt-request-quote__product-row {
+            flex-wrap: wrap;
+          }
+          .hdt-request-quote__qty-wrapper {
+            width: 50px;
+          }
+          .hdt-request-quote__row-number {
+            width: 28px;
+          }
+          .hdt-request-quote__product-header .quote-header-number {
+            width: 28px;
+          }
+          .hdt-request-quote__product-header .quote-header-qty {
+            width: 50px;
+          }
+          .hdt-request-quote__product-image {
+            width: 45px;
+            height: 45px;
+          }
+          .hdt-request-quote__buttons button.hdt-request-quote__submit-btn {
+            margin: 10px 0 0 !important;
+          }
+          .hdt-dialog-modal.hdt-modal-popup__quote .hdt-dialog-modal__header:after {
+            width: 92%;
+          }
+          .hdt-dialog-modal.hdt-modal-popup__quote .hdt-dialog-modal__header {
+            padding: 0 2rem 10px;
+          }
+        }
+      </style>
+    {%- endif -%}
+
+    <script>
+      (function() {
+        var blockId = '{{ block.id }}';
+        var currentProductId = '{{ product.id }}';
+        var productsList = document.getElementById('quote-products-list-' + blockId);
+        var addBtn = document.getElementById('add-more-products-' + blockId);
+        var productSelector = document.getElementById('product-selector-' + blockId);
+        var searchInput = document.getElementById('product-search-' + blockId);
+        var dropdown = document.getElementById('products-dropdown-' + blockId);
+        var productDataField = document.getElementById('quote-product-data-' + blockId);
+        var saveBtn = document.getElementById('quote-save-btn-' + blockId);
+        var savedMsg = document.getElementById('quote-saved-msg-' + blockId);
+        
+        if (!productsList) return;
+        
+        var productIndex = 1;
+        var allProducts = [];
+        var productsLoaded = false;
+        
+        var STORAGE_KEY = 'hdt_quote_data';
+
+        // ── HELPERS ──────────────────────────────────
+        var noImageSVG = '<div class="hdt-request-quote__no-image"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>';
+        var removeSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+
+        function buildProductRowHTML(idx, qty, imgHtml, title, skuDisplay, id, sku, url) {
+          return '<div class="hdt-request-quote__product-row">' +
+            '<div class="hdt-request-quote__row-number">' + idx + '</div>' +
+            '<div class="hdt-request-quote__qty-wrapper">' +
+              '<input type="number" name="contact[products][' + idx + '][quantity]" value="' + qty + '" min="1" class="hdt-request-quote__qty-input" aria-label="Quantity">' +
+            '</div>' +
+            '<div class="hdt-request-quote__product-image">' + imgHtml + '</div>' +
+            '<div class="hdt-request-quote__product-info">' +
+              '<span class="hdt-request-quote__product-title">' + title + '</span>' +
+              '<span class="hdt-request-quote__product-sku">' + skuDisplay + '</span>' +
+              '<input type="hidden" name="contact[products][' + idx + '][id]" value="' + id + '">' +
+              '<input type="hidden" name="contact[products][' + idx + '][title]" value="' + title + '">' +
+              '<input type="hidden" name="contact[products][' + idx + '][sku]" value="' + sku + '">' +
+              '<input type="hidden" name="contact[products][' + idx + '][url]" value="' + url + '">' +
+            '</div>' +
+            '<button type="button" class="hdt-request-quote__remove-btn" aria-label="Remove item" data-action="remove">' + removeSVG + '</button>' +
+          '</div>';
+        }
+
+        // ── RENUMBER ─────────────────────────────────
+        function renumberProducts() {
+          var items = productsList.querySelectorAll('.hdt-request-quote__product-item');
+          for (var i = 0; i < items.length; i++) {
+            var numEl = items[i].querySelector('.hdt-request-quote__row-number');
+            if (numEl) numEl.textContent = i + 1;
+          }
+        }
+
+        // ── REMOVE HANDLER ───────────────────────────
+        function attachRemoveHandler(itemEl) {
+          var btn = itemEl.querySelector('[data-action="remove"]');
+          if (!btn) return;
+          btn.addEventListener('click', function() {
+            if (productsList.querySelectorAll('.hdt-request-quote__product-item').length > 1) {
+              itemEl.remove();
+              renumberProducts();
+              updateProductData();
+              saveQuoteToStorage();
+              updateQuoteBadge();
+            }
+          });
+        }
+
+        // ── LOCAL STORAGE ────────────────────────────
+        function getSavedQuote() {
+          try { var r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null; } catch(e) { return null; }
+        }
+
+        function saveQuoteToStorage() {
+          try {
+            var form = productsList.closest('form');
+            var data = { fields: {}, products: [], savedAt: Date.now() };
+            if (form) {
+              ['name','company','email','phone','comments'].forEach(function(f) {
+                var el = form.querySelector('[data-quote-field="' + f + '"]');
+                if (el) data.fields[f] = el.value;
+              });
+            }
+            productsList.querySelectorAll('.hdt-request-quote__product-item').forEach(function(item) {
+              var imgEl = item.querySelector('.hdt-request-quote__product-image img');
+              data.products.push({
+                id:       (item.querySelector('input[name*="[id]"]') || {}).value || '',
+                title:    (item.querySelector('input[name*="[title]"]') || {}).value || '',
+                sku:      (item.querySelector('input[name*="[sku]"]') || {}).value || '',
+                url:      (item.querySelector('input[name*="[url]"]') || {}).value || '',
+                image:    imgEl ? imgEl.src : '',
+                quantity: (item.querySelector('.hdt-request-quote__qty-input') || {}).value || '1'
+              });
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            return true;
+          } catch(e) { console.error('Error saving quote:', e); return false; }
+        }
+
+        function clearSavedQuote() {
+          try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+        }
+
+        // ── CLOSE MODAL (no reload) ──────────────────
+        function closeQuoteModal() {
+          var dialog = document.getElementById('modal-quote-' + blockId);
+          if (!dialog) return;
+          // Use HDT theme's own close button trigger
+          var themeCloseBtn = dialog.querySelector('button[ref="closeButton"]');
+          if (themeCloseBtn) {
+            var evt = new MouseEvent('click', { bubbles: true, cancelable: true });
+            themeCloseBtn.dispatchEvent(evt);
+          }
+          // Fallback cleanup
+          setTimeout(function() {
+            if (dialog.hasAttribute('open')) {
+              if (typeof dialog.close === 'function') try { dialog.close(); } catch(e) {}
+              dialog.removeAttribute('open');
+            }
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            document.body.classList.remove('scroll-lock', 'overflow-hidden', 'hdt-overflow-hidden');
+            document.documentElement.style.overflow = '';
+            document.documentElement.classList.remove('scroll-lock', 'overflow-hidden', 'hdt-overflow-hidden');
+          }, 100);
+        }
+
+        // ── RESTORE ──────────────────────────────────
+        function restoreSavedQuote() {
+          var saved = getSavedQuote();
+          if (!saved) return;
+          if (saved.savedAt && (Date.now() - saved.savedAt) > 30*24*60*60*1000) { clearSavedQuote(); return; }
+
+          var form = productsList.closest('form');
+          if (form && saved.fields) {
+            ['name','company','email','phone','comments'].forEach(function(f) {
+              var el = form.querySelector('[data-quote-field="' + f + '"]');
+              if (el && saved.fields[f]) el.value = saved.fields[f];
+            });
+          }
+
+          if (saved.products && saved.products.length > 0) {
+            productsList.innerHTML = '';
+            productIndex = 0;
+
+            saved.products.forEach(function(p) {
+              var imgHtml = p.image ? '<img src="' + p.image + '" alt="" width="50" height="50" loading="lazy">' : noImageSVG;
+              var skuDisplay = p.sku ? 'SKU: ' + p.sku : 'ID: ' + p.id;
+              var el = document.createElement('div');
+              el.className = 'hdt-request-quote__product-item';
+              el.dataset.productId = p.id;
+              el.dataset.index = productIndex;
+              el.innerHTML = buildProductRowHTML(productIndex + 1, p.quantity || 1, imgHtml, p.title, skuDisplay, p.id, p.sku, p.url);
+              productsList.appendChild(el);
+              attachRemoveHandler(el);
+              productIndex++;
+            });
+
+            var exists = saved.products.some(function(p) { return String(p.id) === String(currentProductId); });
+            if (!exists) addCurrentPageProduct();
+
+            renumberProducts();
+            updateProductData();
+          }
+        }
+
+        // ── ADD CURRENT PAGE PRODUCT ─────────────────
+        function addCurrentPageProduct() {
+          var img = '{{ product.featured_image | image_url: width: 80 }}';
+          var title = {{ product.title | json }};
+          var sku = {{ product.selected_or_first_available_variant.sku | default: product.id | json }};
+          var url = '{{ request.origin }}{{ product.url }}';
+          var skuDisplay = '{% if product.selected_or_first_available_variant.sku != blank %}SKU: {{ product.selected_or_first_available_variant.sku }}{% else %}ID: {{ product.id }}{% endif %}';
+          var imgHtml = img ? '<img src="' + img + '" alt="" width="50" height="50" loading="lazy">' : noImageSVG;
+
+          var el = document.createElement('div');
+          el.className = 'hdt-request-quote__product-item';
+          el.dataset.productId = currentProductId;
+          el.dataset.index = productIndex;
+          el.innerHTML = buildProductRowHTML(productIndex + 1, 1, imgHtml, title, skuDisplay, currentProductId, sku, url);
+          productsList.appendChild(el);
+          attachRemoveHandler(el);
+          productIndex++;
+          renumberProducts();
+        }
+
+        // ── SAVE BUTTON ──────────────────────────────
+        if (saveBtn) {
+          saveBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (saveQuoteToStorage()) {
+              updateQuoteBadge();
+              if (savedMsg) {
+                savedMsg.style.display = 'flex';
+                setTimeout(function() { savedMsg.style.display = 'none'; }, 3000);
+              }
+              setTimeout(function() { closeQuoteModal(); }, 800);
+            }
+          });
+        }
+
+        // ── BADGE ────────────────────────────────────
+        function updateQuoteBadge() {
+          var btn = document.querySelector('.hdt-request-quote__btn');
+          if (!btn) return;
+          var old = btn.querySelector('.hdt-request-quote__badge');
+          if (old) old.remove();
+          var saved = getSavedQuote();
+          if (saved && saved.products && saved.products.length > 0) {
+            var badge = document.createElement('span');
+            badge.className = 'hdt-request-quote__badge';
+            badge.textContent = saved.products.length;
+            btn.style.position = 'relative';
+            btn.appendChild(badge);
+          }
+        }
+
+        // ── MODAL OPEN OBSERVER ──────────────────────
+        var modalDialog = document.getElementById('modal-quote-' + blockId);
+        var hasRestored = false;
+        if (modalDialog) {
+          new MutationObserver(function(muts) {
+            muts.forEach(function(m) {
+              if (m.attributeName === 'open' && modalDialog.hasAttribute('open') && !hasRestored) {
+                restoreSavedQuote();
+                hasRestored = true;
+              }
+            });
+          }).observe(modalDialog, { attributes: true });
+        }
+        updateQuoteBadge();
+
+        // ── AJAX FORM SUBMIT (no reload) ─────────────
+        var quoteForm = productsList.closest('form');
+        if (quoteForm) {
+          quoteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Merge product data into body
+            var bodyField = quoteForm.querySelector('[name="contact[body]"]');
+            var productData = productDataField ? productDataField.value : '';
+            var comments = bodyField ? bodyField.value : '';
+
+            var nameField = quoteForm.querySelector('[data-quote-field="name"]');
+            var companyField = quoteForm.querySelector('[data-quote-field="company"]');
+            var phoneField = quoteForm.querySelector('[data-quote-field="phone"]');
+            var emailField = quoteForm.querySelector('[data-quote-field="email"]');
+
+            var fullBody = '--- CUSTOMER DETAILS ---\n' +
+              'Name: ' + (nameField ? nameField.value : 'N/A') + '\n' +
+              'Email: ' + (emailField ? emailField.value : 'N/A') + '\n' +
+              'Company: ' + (companyField ? companyField.value : 'N/A') + '\n' +
+              'Phone: ' + (phoneField ? phoneField.value : 'N/A') + '\n\n' +
+              '--- PRODUCTS ---\n' + productData + '\n\n' +
+              '--- COMMENTS ---\n' + (comments || 'None');
+            if (bodyField) bodyField.value = fullBody;
+
+            var submitBtn = quoteForm.querySelector('.hdt-request-quote__submit-btn');
+            var spinner = submitBtn && submitBtn.querySelector('.hdt-loading__spinner');
+            var btnText = submitBtn && submitBtn.querySelector('.hdt-truncate');
+
+            if (submitBtn) submitBtn.disabled = true;
+            if (spinner) spinner.hidden = false;
+            if (btnText) btnText.style.opacity = '0.5';
+
+            var formData = new FormData(quoteForm);
+
+            fetch('/contact', {
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json'
+                },
+                body: formData
+              })
+              .then(function(response) {
+                if (!response.ok) {
+                  return response.json().then(function(err) {
+                    throw new Error(err.description || 'Submission failed');
+                  });
+                }
+                return response.json();
+              })
+            .then(function() {
+              clearSavedQuote();
+              updateQuoteBadge();
+
+              // Clear body field FIRST before reset
+              if (bodyField) bodyField.value = '';
+              quoteForm.reset();
+
+              // Force clear ALL fields
+              quoteForm.querySelectorAll('[data-quote-field]').forEach(function(el) { el.value = ''; });
+
+              // Reset products
+              productsList.innerHTML = '';
+              productIndex = 0;
+              addCurrentPageProduct();
+              updateProductData();
+              hasRestored = false;
+
+              // Re-enable button
+              if (submitBtn) submitBtn.disabled = false;
+              if (spinner) spinner.hidden = true;
+              if (btnText) btnText.style.opacity = '1';
+
+              closeQuoteModal();
+
+              // Toast
+              var toast = document.createElement('div');
+              toast.className = 'hdt-quote-success-toast';
+              toast.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Your quote request has been sent!</span>';
+              document.body.appendChild(toast);
+              setTimeout(function() {
+                toast.style.transition = 'opacity 0.4s ease';
+                toast.style.opacity = '0';
+                setTimeout(function() { toast.remove(); }, 400);
+              }, 4000);
+            })
+            .catch(function(err) {
+              console.error('Quote submit error:', err);
+              if (submitBtn) submitBtn.disabled = false;
+              if (spinner) spinner.hidden = true;
+              if (btnText) btnText.style.opacity = '1';
+
+              // Show error to user
+              var errToast = document.createElement('div');
+              errToast.className = 'hdt-quote-success-toast';
+              errToast.style.background = '#991b1b';
+              errToast.innerHTML = '<span>Something went wrong. Please try again.</span>';
+              document.body.appendChild(errToast);
+              setTimeout(function() {
+                errToast.style.transition = 'opacity 0.4s ease';
+                errToast.style.opacity = '0';
+                setTimeout(function() { errToast.remove(); }, 400);
+              }, 4000);
+            });
+          });
+        }
+
+        // ── CLOSE BUTTON HANDLER ─────────────────────
+        document.addEventListener('click', function(e) {
+          if (e.target.closest('.hdt-quote-modal-close')) {
+            e.preventDefault();
+            e.stopPropagation();
+            var dialog = document.getElementById('modal-quote-' + blockId);
+            if (dialog) {
+              dialog.dispatchEvent(new MouseEvent('click', {
+                bubbles: true, cancelable: true, clientX: 0, clientY: 0
+              }));
+            }
+          }
+        }, true);
+
+        // ── AJAX PRODUCT LOADER ──────────────────────
+        function loadProducts() {
+          if (productsLoaded) return;
+          fetch('/products.json?limit=250')
+            .then(function(resp) { return resp.json(); })
+            .then(function(data) {
+              allProducts = data.products || [];
+              productsLoaded = true;
+              renderProductDropdown(allProducts);
+            })
+            .catch(function(err) {
+              console.error('Error loading products:', err);
+              if (dropdown) dropdown.innerHTML = '<div class="hdt-request-quote__dropdown-empty">Error loading products</div>';
+            });
+        }
+
+        function renderProductDropdown(products) {
+          if (!dropdown) return;
+          if (!products.length) { dropdown.innerHTML = '<div class="hdt-request-quote__dropdown-empty">No products found</div>'; return; }
+          var html = '';
+          products.slice(0, 50).forEach(function(p) {
+            var img = p.images && p.images[0] ? p.images[0].src : '';
+            var sku = p.variants && p.variants[0] ? (p.variants[0].sku || p.id) : p.id;
+            html += '<div class="hdt-request-quote__dropdown-item" data-id="' + p.id + '" data-title="' + p.title.replace(/"/g, '&quot;') + '" data-sku="' + sku + '" data-image="' + img + '" data-url="' + p.handle + '">' +
+              '<div class="hdt-request-quote__dropdown-image">' + (img ? '<img src="' + img.replace(/\.([^.]+)$/, '_100x100.$1') + '" alt="" loading="lazy">' : '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>') + '</div>' +
+              '<div class="hdt-request-quote__dropdown-info"><span class="hdt-request-quote__dropdown-title">' + p.title + '</span><span class="hdt-request-quote__dropdown-sku">SKU: ' + sku + '</span></div></div>';
+          });
+          dropdown.innerHTML = html;
+          dropdown.querySelectorAll('.hdt-request-quote__dropdown-item').forEach(function(item) {
+            item.addEventListener('click', function() { addProduct(item); });
+          });
+        }
+
+        if (searchInput) {
+          var searchTimeout;
+          searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            var self = this;
+            searchTimeout = setTimeout(function() {
+              var q = self.value.toLowerCase().trim();
+              if (!q) { renderProductDropdown(allProducts); return; }
+              renderProductDropdown(allProducts.filter(function(p) {
+                return p.title.toLowerCase().includes(q) || (p.variants && p.variants[0] && p.variants[0].sku && p.variants[0].sku.toLowerCase().includes(q));
+              }));
+            }, 300);
+          });
+        }
+
+        // ── ADD PRODUCT FROM SEARCH ──────────────────
+        function addProduct(item) {
+          var id = item.dataset.id, title = item.dataset.title, sku = item.dataset.sku, image = item.dataset.image, handle = item.dataset.url;
+          var imgHtml = image ? '<img src="' + image.replace(/\.([^.]+)$/, '_100x100.$1') + '" alt="" width="50" height="50" loading="lazy">' : noImageSVG;
+
+          var el = document.createElement('div');
+          el.className = 'hdt-request-quote__product-item';
+          el.dataset.productId = id;
+          el.dataset.index = productIndex;
+          el.innerHTML = buildProductRowHTML(productIndex + 1, 1, imgHtml, title, 'SKU: ' + sku, id, sku, window.location.origin + '/products/' + handle);
+          productsList.appendChild(el);
+          attachRemoveHandler(el);
+          productIndex++;
+
+          if (productSelector) productSelector.classList.remove('is-open');
+          renumberProducts();
+          updateProductData();
+        }
+
+        // ── UPDATE HIDDEN DATA ───────────────────────
+        function updateProductData() {
+          var items = productsList.querySelectorAll('.hdt-request-quote__product-item');
+          var data = [];
+          items.forEach(function(item) {
+            var qty = item.querySelector('.hdt-request-quote__qty-input').value;
+            var title = item.querySelector('input[name*="[title]"]').value;
+            var sku = item.querySelector('input[name*="[sku]"]').value;
+            var url = item.querySelector('input[name*="[url]"]').value;
+            data.push(title + ' (' + sku + ') x ' + qty + ' - ' + url);
+          });
+          if (productDataField) productDataField.value = data.join('\n');
+        }
+
+        if (addBtn && productSelector) {
+          addBtn.addEventListener('click', function() {
+            productSelector.classList.add('is-open');
+            loadProducts();
+            if (searchInput) { searchInput.value = ''; searchInput.focus(); }
+          });
+        }
+        var closeSelectorBtn = productSelector ? productSelector.querySelector('[data-action="close-selector"]') : null;
+        if (closeSelectorBtn) { closeSelectorBtn.addEventListener('click', function() { productSelector.classList.remove('is-open'); }); }
+
+        // Initial product remove handlers
+        productsList.querySelectorAll('.hdt-request-quote__product-item').forEach(function(item) { attachRemoveHandler(item); });
+
+        // Qty change → update hidden data
+        productsList.addEventListener('change', function(e) {
+          if (e.target.classList.contains('hdt-request-quote__qty-input')) updateProductData();
+        });
+
+      })();
+
+      // ── VARIANT CHANGE HANDLERS ──────────────────
+      (function() {
+        var svgHTML = '<path d="M19.7438 3.30699C19.3613 2.89361 18.7662 2.64199 18.1499 2.64199H5.20693L4.80313 1.31201C4.56935 0.539182 3.76174 0 2.82662 0H0.658837C0.297539 0 0 0.251618 0 0.557155C0 0.862692 0.297539 1.11431 0.658837 1.11431H2.82662C3.14541 1.11431 3.4217 1.29404 3.50671 1.56363L6.09955 10.2984C6.33333 11.0712 7.14094 11.6104 8.07606 11.6104H16.5559C17.4911 11.6104 18.3199 11.0712 18.5324 10.2984L20.1264 4.76278C20.2752 4.25954 20.1477 3.72036 19.7438 3.30699ZM18.83 4.51116L17.236 10.0468C17.151 10.3164 16.8747 10.4961 16.5559 10.4961H8.07606C7.75727 10.4961 7.48098 10.3164 7.39597 10.0468L5.54698 3.77428H18.1499C18.3624 3.77428 18.5749 3.86414 18.7025 4.00792C18.83 4.1517 18.8937 4.33143 18.83 4.51116Z" fill="white"/><path d="M8.52279 12.3293C7.31138 12.3293 6.3125 13.1741 6.3125 14.1985C6.3125 15.223 7.31138 16.0677 8.52279 16.0677C9.7342 16.0677 10.7331 15.223 10.7331 14.1985C10.7331 13.1741 9.7342 12.3293 8.52279 12.3293ZM8.52279 14.9354C8.03398 14.9354 7.65143 14.6119 7.65143 14.1985C7.65143 13.7851 8.03398 13.4616 8.52279 13.4616C9.0116 13.4616 9.39416 13.7851 9.39416 14.1985C9.39416 14.5939 8.99035 14.9354 8.52279 14.9354Z" fill="white"/><path d="M15.8333 12.3293C14.6219 12.3293 13.623 13.1741 13.623 14.1985C13.623 15.223 14.6219 16.0677 15.8333 16.0677C17.0447 16.0677 18.0436 15.223 18.0436 14.1985C18.0224 13.1741 17.0447 12.3293 15.8333 12.3293ZM15.8333 14.9354C15.3445 14.9354 14.962 14.6119 14.962 14.1985C14.962 13.7851 15.3445 13.4616 15.8333 13.4616C16.3222 13.4616 16.7047 13.7851 16.7047 14.1985C16.7047 14.5939 16.3009 14.9354 15.8333 14.9354Z" fill="white"/>';
+
+        document.addEventListener('variant:change', function(event) {
+          var variant = event.detail.variant;
+          var form = event.target.closest('form') || document.querySelector('.hdt-main-product-form');
+          var button = form && form.querySelector('.hdt-product-form__submit');
+          var buttonText = button && button.querySelector('.hdt-btn-atc_text');
+          if (!button || !buttonText) return;
+          if (!variant) { button.disabled = true; buttonText.textContent = 'Unavailable'; }
+          else if (!variant.available) { button.disabled = true; buttonText.textContent = 'Sold out'; }
+          else { button.disabled = false; buttonText.textContent = (variant.inventory_management === 'shopify' && variant.inventory_quantity <= 0) ? 'Pre-order' : 'Add to cart'; }
+        });
+
+        document.addEventListener('variant:change', function(event) {
+          var variant = event.detail.variant, form = event.target;
+          if (!form) return;
+          var section = form.closest('.shopify-section') || document;
+          section.querySelectorAll('.hdt-product-form__submit').forEach(function(btn) {
+            var txt = btn.querySelector('.hdt-btn-atc_text'), svg = btn.querySelector('svg:not(.hdt-svg-spinner)'), price = btn.querySelector('hdt-qty-price');
+            var s = (window.themeHDN && window.themeHDN.extras) || { addToCart:'Add to cart', soldOut:'Sold out', preOrder:'Pre-order', unavailable:'Unavailable' };
+            if (svg && !svg.querySelector('path')) svg.innerHTML = svgHTML;
+            if (!variant) { btn.disabled = true; if (txt) txt.textContent = s.unavailable || 'Unavailable'; if (price) price.hidden = true; }
+            else if (!variant.available) { btn.disabled = true; if (txt) txt.textContent = s.soldOut || 'Sold out'; if (price) price.hidden = true; }
+            else { btn.disabled = false; if (price) { price.hidden = false; price.setAttribute('variant-price', variant.price); } if (txt) txt.textContent = (variant.variant_state && variant.variant_state.pre_order) ? (s.preOrder || 'Pre-order') : (s.addToCart || 'Add to cart'); }
+          });
+        });
+      })();
+
+      // Update quote form on variant change
+      document.addEventListener('variant:change', function(event) {
+        var variant = event.detail.variant;
+        if (!variant) return;
+        var blockId = '{{ block.id }}';
+        var pl = document.getElementById('quote-products-list-' + blockId);
+        if (!pl) return;
+        var item = pl.querySelector('.hdt-request-quote__product-item[data-index="0"]');
+        if (!item) return;
+        var sku = variant.sku || '{{ product.id }}';
+        var skuDisp = variant.sku ? 'SKU: ' + variant.sku : 'ID: {{ product.id }}';
+        var skuSpan = item.querySelector('.hdt-request-quote__product-sku'); if (skuSpan) skuSpan.textContent = skuDisp;
+        var skuIn = item.querySelector('input[name="contact[products][0][sku]"]'); if (skuIn) skuIn.value = sku;
+        var vTitle = variant.name || '{{ product.title | escape }}';
+        var tIn = item.querySelector('input[name="contact[products][0][title]"]'); if (tIn) tIn.value = vTitle;
+        var tSpan = item.querySelector('.hdt-request-quote__product-title'); if (tSpan) tSpan.textContent = vTitle;
+        var pdf = document.getElementById('quote-product-data-' + blockId);
+        if (pdf) {
+          var items = pl.querySelectorAll('.hdt-request-quote__product-item'), data = [];
+          items.forEach(function(it) {
+            data.push(it.querySelector('input[name*="[title]"]').value + ' (' + it.querySelector('input[name*="[sku]"]').value + ') x ' + it.querySelector('.hdt-request-quote__qty-input').value + ' - ' + it.querySelector('input[name*="[url]"]').value);
+          });
+          pdf.value = data.join('\n');
+        }
+      });
+    </script>
+    {% comment %} END REQUEST A QUOTE MODAL {% endcomment %}
+    
+  {%- else -%}
+    <div class="hdt-product-form">
+      <div class="hdt-product-form__buttons form">
+        <button type="submit" name="add" class="hdt-product-form__submit hdt-inline-flex hdt-align-center hdt-justify-center hdt-relative hdt-btn hdt-oh hdt-btn-solid hdt-text-lg hdt-font-semibold" disabled="true">{{ 'products.product.sold_out' | t }}</button>
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+{% schema %}
+{
+  "name": "t:sections.main-product.blocks.buy_buttons.name",
+  "tag": null,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "default": true,
+      "label": "t:sections.main-product.blocks.buy_buttons.settings.show_dynamic_checkout.label",
+      "info": "t:sections.main-product.blocks.buy_buttons.settings.show_dynamic_checkout.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gift_card_recipient",
+      "default": true,
+      "label": "t:sections.main-product.blocks.buy_buttons.settings.show_gift_card_recipient.label",
+      "info": "t:sections.main-product.blocks.buy_buttons.settings.show_gift_card_recipient.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "default": true,
+      "label": "t:sections.main-product.blocks.buy_buttons.settings.show_wishlist.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare",
+      "default": false,
+      "label": "t:sections.main-product.blocks.buy_buttons.settings.show_compare.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price_variant",
+      "default": true,
+      "label": "t:sections.main-product.blocks.buy_buttons.settings.show_price_variant.label"
+    },
+    {
+      "type": "header",
+      "content": "Request a Quote"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_request_quote",
+      "default": false,
+      "label": "Show Request a Quote button"
+    },
+    {
+      "type": "text",
+      "id": "quote_button_text",
+      "label": "Button text",
+      "default": "Request a quote"
+    },
+    {
+      "type": "text",
+      "id": "quote_popup_title",
+      "label": "Popup title",
+      "default": "Request a customized quote"
+    },
+    {
+      "type": "textarea",
+      "id": "quote_popup_description",
+      "label": "Popup description",
+      "default": "Interested in larger quantities of one or more products? Then use the quote form below. Your selection will be saved automatically as you continue browsing and can always be found via the icon next to the shopping cart. Once you've submitted your request, we'll get back to you as soon as possible with a suitable offer."
+    },
+    {
+      "type": "checkbox",
+      "id": "quote_show_company",
+      "label": "Show company name field",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "quote_company_label",
+      "label": "Company field label",
+      "default": "Company name"
+    },
+    {
+      "type": "checkbox",
+      "id": "quote_show_phone",
+      "label": "Show phone number field",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "quote_number_label",
+      "label": "Number column label",
+      "default": "Number"
+    },
+    {
+      "type": "text",
+      "id": "quote_article_label",
+      "label": "Article column label",
+      "default": "Article(number)"
+    },
+    {
+      "type": "checkbox",
+      "id": "quote_show_add_more",
+      "label": "Show add more products button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "quote_comments_label",
+      "label": "Comments field label",
+      "default": "Comments"
+    },
+    {
+      "type": "text",
+      "id": "quote_comments_placeholder",
+      "label": "Comments placeholder",
+      "default": "Add any additional details or requirements..."
+    },
+    {
+      "type": "text",
+      "id": "quote_save_button_text",
+      "label": "Save button text",
+      "default": "Save & continue searching"
+    },
+    {
+      "type": "text",
+      "id": "quote_submit_button_text",
+      "label": "Submit button text",
+      "default": "Request a quote"
+    },
+    {
+      "type": "text",
+      "id": "quote_add_product_text",
+      "label": "Add product button text",
+      "default": "Add another product"
+    },
+    {
+      "type": "text",
+      "id": "quote_select_product_title",
+      "label": "Product selector title",
+      "default": "Select a product"
+    },
+    {
+      "type": "text",
+      "id": "quote_search_placeholder",
+      "label": "Search placeholder",
+      "default": "Search products..."
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.main-product.blocks.buy_buttons.name"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,1187 @@
+{% liquid
+  unless product
+    assign product = section.settings.product
+  endunless
+  assign un_no_pick = true
+  if settings.pick_mode == 'no' and product.variants.size > 1
+    assign selected_variant = product.selected_variant
+    unless selected_variant
+      assign un_no_pick = false
+    endunless
+  elsif settings.pick_mode == 'first' and settings.hide_sold_out == false
+    assign selected_variant = product.selected_variant | default: product.variants.first
+  else
+    assign selected_variant = product.selected_or_first_available_variant
+  endif
+  assign product_form_id = 'product-form-' | append: section.id | append: product.id
+  assign selected_variant_featured_media = selected_variant.featured_media
+  assign group_media_obj = product.metafields.theme.group_media_obj.value
+  assign variant_images = product.images | where: 'attached_to_variant?', true | map: 'src'
+  assign desktop_media_layout = block.settings.desktop_media_layout
+  assign mobile_media_layout = block.settings.mobile_media_layout
+  if product.media.size < 1
+    assign desktop_media_layout = 'no_media_size'
+  elsif product.media.size == 1
+    assign desktop_media_layout = 'one_media_size'
+  endif
+  if section.settings.image != blank
+    assign desktop_media_layout = 'no_media_size'
+  endif
+  assign models = product.media | where: 'media_type', 'model'
+  assign first_3d_model = models | first
+
+  comment
+    360 SPIN CONFIGURATION
+  endcomment
+  assign enable_360_spin = block.settings.enable_360_spin
+  assign spin_image_count = 12
+  assign spin_sensitivity = 5
+%}
+
+{% style %}
+  .hdt-group-block--{{ block.id }} {
+    {%- capture width -%}
+    --width-group: {{ block.settings.width }}%; --width-group-md: {{ block.settings.width_md }}%; --width-group-lg: {{ block.settings.width_lg }}%;
+    {%- endcapture -%}
+    {{ width | replace: ' 8%', '8.33333333%' | replace: ' 16%', '16.66666667%' | replace: ' 33%', '33.33333333%' | replace: ' 41%', '41.66666667%' | replace: ' 58%', '58.33333333%' | replace: ' 66%', '66.66666667%' | replace: ' 83%', '83.33333333%' | replace: ' 91%', '91.66666667%' }}
+    --padding-group:0px; --padding-group-md: 0px; --padding-group-lg: 0px;
+    --space-group: 0px; --space-group-md: 0px; --space-group-lg: 0px;
+  }
+{% endstyle %}
+
+{%- comment -%} 360 SPIN STYLES {%- endcomment -%}
+{% if enable_360_spin and product.images.size >= 2 %}
+  <style>
+    /* 360 Thumbnail Styles */
+    .spin360-thumb-slide {
+      position: relative !important;
+      cursor: pointer !important;
+    }
+    .spin360-thumb-slide .spin360-thumb-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: rgba(248, 248, 248, 1);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      aspect-ratio: 1;
+    }
+    .spin360-thumb-slide .spin360-thumb-icon {
+      width: 85%;
+      height: 85%;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      {% comment %} animation: spin360pulse 2s ease-in-out infinite; {% endcomment %}
+    }
+    .spin360-thumb-slide .spin360-thumb-icon svg {
+      width: 100%;
+      height: 100%;
+      color: #fff;
+    }
+    .spin360-thumb-slide .spin360-thumb-text {
+      font-size: 11px;
+      font-weight: 700;
+      color: #0047AB;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    @keyframes spin360pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    /* 360 Main Slide Styles */
+    .spin360-main-slide {
+      position: relative !important;
+    }
+    .spin360-main-slide .spin360-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 100%;
+      background: #fff;
+    }
+    .spin360-main-slide .spin360-inner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      cursor: grab;
+    }
+    .spin360-main-slide .spin360-inner:active,
+    .spin360-main-slide .spin360-inner.dragging {
+      cursor: grabbing;
+    }
+    .spin360-main-slide .spin360-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+    .spin360-main-slide .spin360-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: #0047AB;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 16px;
+      border-radius: 25px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0,71,171,0.3);
+    }
+    .spin360-main-slide .spin360-badge svg {
+      width: 18px;
+      height: 18px;
+      animation: spin360rotate 3s linear infinite;
+    }
+    @keyframes spin360rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spin360-main-slide .spin360-hint {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.3s;
+    }
+    .spin360-main-slide .spin360-hint.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .spin360-main-slide .spin360-loader {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      padding: 16px 28px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .spin360-main-slide .spin360-loader.hidden {
+      display: none;
+    }
+    .spin360-main-slide .spin360-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e5e7eb;
+      border-top-color: #0047AB;
+      border-radius: 50%;
+      animation: spin360spin 0.7s linear infinite;
+    }
+    @keyframes spin360spin {
+      to { transform: rotate(360deg); }
+    }
+    .spin360-main-slide .spin360-progress {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+  </style>
+{% endif %}
+
+<div
+  class="hdt-product-media-wrapps hdt-group-blockss hdt-s-gradient hdt-group-block--{{ block.id }}"
+  {% if block.settings.display_by_block %}
+    color-scheme="{{ block.settings.color_scheme }}"
+  {% endif %}
+  {{ block.shopify_attributes }}
+>
+  {%- if product != blank -%}
+    {%- if block.settings.mobile_prod_top_info -%}
+      <div id="prod-media-top-{{ section.id }}" class="hdt-product-mediatop-mbl" style="display:none;">
+        {% content_for 'block', type: '_product-title', id: 'mob-product-title' %}
+        {% content_for 'block', type: '_product-meta-sku', id: 'mob-product-meta-sku' %}
+        {% content_for 'block', type: '_product_review_rating', id: 'mob-product-review-rating' %}
+
+        <div class="areviews_header_stars"></div>
+
+        <div class="whish mbl-compare-topbtn">
+          {%- liquid
+            render 'btn-wishlist', class: 'hdt-product-form__btn-wishlist hdt-flex hdt-align-center hdt-justify-center hdt-relative hdt-s-text', placement: 'top'
+          %}
+          {%- liquid
+            render 'btn-compare', product_id: product.id, product_handle: product.handle, class: 'hdt-product-form__btn-compare hdt-flex hdt-align-center hdt-justify-center hdt-relative hdt-s-text', placement: 'top'
+          %}
+        </div>
+        {% comment %} <div class="mbl-compare-topbtn">
+          {%- liquid
+            render 'btn-compare', product_id: product.id, product_handle: product.handle, class: 'hdt-product-form__btn-compare hdt-flex hdt-align-center hdt-justify-center hdt-relative hdt-s-text', placement: 'top'
+          %}
+        </div> {% endcomment %}
+      </div>
+      <style>
+        .areviews_main_header_container {display: block !important;}
+
+        @media(max-width:767px){
+          .hdt-product-mediatop-mbl {
+              display: flex !important;
+              align-items: flex-start;
+              flex-direction: column;
+              gap: 0px;
+              {% comment %} margin: 5px 0 60px; {% endcomment %}
+              padding: 14px 0 0;
+              position :relative;
+              border-top: 1px solid #ddd;
+          }
+          .hdt-product-mediatop-mbl .hdt-rating-badge {
+              background-color: transparent !important;
+              padding: 0 !important;
+          }
+            .hdt-product-info__list .hdt-product__title,
+            .hdt-product-info__list .hdt-sku-wrapper.hdt-product__meta-item,
+            .hdt-product-info__list .hdt-product-info__item.hdt-product__rating {display:none;}
+          }
+          .hdt-product-mediatop-mbl .whish {
+              position: absolute;
+              right: 0 !important;
+          }
+          .hdt-product-mediatop-mbl .mbl-compare-topbtn .hdt-product-form__btn-compare {
+              margin-top: 10px;
+              {% comment %} position: absolute;
+              right: 0 !important;
+              top: 45px !important; {% endcomment %}
+          }
+          .hdt-product-mediatop-mbl .hdt-product-form__btn-wishlist,
+          .hdt-product-mediatop-mbl .hdt-product-form__btn-compare {
+            border-radius: 50% !important;
+            min-width: 3.6rem;
+            width: 3.6rem;
+            height: 3.6rem;
+            line-height: 3.6rem;
+          }
+          .hdt-product-mediatop-mbl .hdt-product-form__btn-wishlist svg {
+            width: 14px;
+          }
+          .hdt-product-mediatop-mbl h1.hdt-product__title.hdt-h5 {
+            font-weight: 700;
+            max-width:90%;
+            margin-bottom: 10px;
+          }
+          #shopify-section-{{ section.id }} .hdt-product-info__list .hdt-product__buy-button .hdt-product-form__btn-wishlist, 
+          #shopify-section-{{ section.id }} .hdt-product-info__list .hdt-product__buy-button .hdt-product-form__btn-compare {
+            display:none !important;
+          }
+          #shopify-section-{{ section.id }} .hdt-product-info__list .areviews_main_header_container{display:none;}
+
+        }
+      </style>
+    {% endif %}
+
+    {%- capture start_index -%}
+    {%- unless group_media_obj.size > 0 %}, "startIndex": {% if block.settings.show_first_media or un_no_pick == false %}0{% else %}{{ selected_variant_featured_media.position | default: 1 | minus: 1 }}{% endif %}{% endunless -%}
+    {%- endcapture -%}
+
+    {%- if first_3d_model -%}
+      <link
+        rel="stylesheet"
+        href="https://cdn.shopify.com/shopifycloud/model-viewer-ui/assets/v1.0/model-viewer-ui.css"
+        media="print"
+        onload="this.media='all'; this.onload = null"
+      >
+    {%- endif -%}
+    <hdt-product-media
+      show-thumb
+      section-id="{{ section.id }}"
+      class="hdt-product-media hdt-product-media__layout-{{ desktop_media_layout }} hdt-product-thumb-size__{{ block.settings.media_size }} hdt-mobile-media-layout--{{ mobile_media_layout }}"
+      form="{{ product_form_id }}"
+      {% if block.settings.enable_media_autoplay %}
+        autoplay-media
+      {% endif -%}
+      {% if variant_images.size > 0 and product.images.size > 1 and block.settings.use_select_varaint_change_media %}
+        update-when-variant-change
+      {% endif %}
+      image-zoom="{{ block.settings.image_zoom }}"
+      max-zoom="{{ block.settings.max_zoom_lightbox }}"
+      zoom-options='{"type": "{{ block.settings.image_zoom_type }}","magnify": {{ block.settings.zoom_level }}}'
+      {% if group_media_obj.size > 0 %}
+        can-has-media-group
+      {% endif %}
+    >
+      {%- case desktop_media_layout -%}
+        {%- when 'no_media_size' -%}
+          {%- assign image = section.settings.image | default: settings.placeholder_img -%}
+          {%- if image != blank -%}
+            <div class="hdt-product-media__main hdt-ratio--{{ block.settings.image_ratio }}{% unless block.settings.image_size %} hdt-ratio--contain{% endunless %}">
+              <div
+                class="hdt-ratio hdt-product__media"
+                style="{% if block.settings.image_ratio == 'adapt_image' %}--aspect-ratioapt:{{ image.aspect_ratio }};{% endif %}--mw-media:{{ image.width }}px"
+              >
+                {{
+                  image
+                  | image_url: width: image.width
+                  | image_tag: widths: '246, 493, 600, 713, 823, 990, 1100, 1206, 1346, 1426, 1646, 1946'
+                }}
+              </div>
+            </div>
+          {%- endif -%}
+
+        {%- when 'one_media_size' -%}
+          <div class="hdt-product-media__main hdt-ratio--{{ block.settings.image_ratio }}{% unless block.settings.image_size %} hdt-ratio--contain{% endunless %}">
+            {%- render 'media',
+              media: product.media.first,
+              lazy_load: false,
+              product: product,
+              autoplay: block.settings.enable_media_autoplay,
+              loop: block.settings.enable_video_looping
+            -%}
+          </div>
+
+        {%- when 'thumbnail_bottom', 'thumbnail_left', 'thumbnail_right', 'without_thumbnails' -%}
+          <div class="hdt-product-media__main ab">
+            <hdt-slider
+              id="slider-{{ block.id }}-{{ product.id }}"
+              aria-controls="slider-thumb-{{ block.id }}-{{ product.id }}"
+              autoheight
+              class="hdt-slider hdt-medias-slider hdt-slider-parent hdt-relative hdt-ratio--{{ block.settings.image_ratio }}{% unless block.settings.image_size %} hdt-ratio--contain{% endunless %} {% if block.settings.navUI %} hdt-slider-has-nav hdt-nav-btns-{{ block.settings.nav_des }} hdt-nav-shape_{{ block.settings.nav_shape }} hdt-nav-{{ block.settings.nav_pos }} hdt-nav-{{ block.settings.nav_size }}{% endif %}"
+              config='{ "autoHeight": true{{ start_index }}, "slidesToScroll": 1, "watchDrag": "onlyTypeImage", "navUI": true ,"slides": ".hdt-slider__slide:not([hidden])" }'
+            >
+              <div class="hdt-slider__viewport">
+                <div class="hdt-slider__container">
+                  {%- comment -%} 360 SPIN MAIN SLIDE {%- endcomment -%}
+                  {% if enable_360_spin and product.images.size >= 2 %}
+                    <div
+                      class="hdt-slider__slide hdt-product__media-item spin360-main-slide"
+                      data-media-type="360-spin"
+                      data-media-id="spin360-{{ product.id }}"
+                    >
+                      <div class="spin360-container">
+                        <div class="spin360-inner" id="spin360-canvas-{{ product.id }}">
+                          <div class="spin360-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <circle cx="12" cy="12" r="10"/>
+                              <path d="M12 6v6l4 2"/>
+                            </svg>
+                            360° View
+                          </div>
+                          <img
+                            class="spin360-image"
+                            id="spin360-img-{{ product.id }}"
+                            src="{{ product.images[0] | image_url: width: 1000 }}"
+                            alt="360 View"
+                          >
+                          <div class="spin360-hint" id="spin360-hint-{{ product.id }}">
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              width="16"
+                              height="16"
+                            >
+                              <path d="M5 12h14M5 12l4-4m-4 4l4 4m10-4l-4-4m4 4l-4 4"/>
+                            </svg>
+                            Drag to rotate
+                          </div>
+                          <div class="spin360-loader" id="spin360-loader-{{ product.id }}">
+                            <div class="spin360-spinner"></div>
+                            <span class="spin360-progress" id="spin360-progress-{{ product.id }}">0%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+
+                  {%- liquid
+                    for media in product.media
+                      assign lazy_load = false
+                      if media.position > 1
+                        assign lazy_load = true
+                      endif
+                      render 'media', media: media, selected_variant: selected_variant, un_no_pick: un_no_pick, position: media.position, group_media_obj: group_media_obj, variant_images: variant_images, class: 'hdt-slider__slide', autoplay: block.settings.enable_media_autoplay, loop: block.settings.enable_video_looping, lazy_load: lazy_load, product: product
+                    endfor
+                  -%}
+                </div>
+              </div>
+              {%- if block.settings.navUI -%}
+                <button
+                  aria-controls="slider-{{ block.id }}-{{ product.id }}"
+                  class="hdt-slider__button hdt-slider-nav hdt-inline-flex hdt-align-center hdt-justify-center hdt-slider__button--prev"
+                  type="button"
+                  disabled
+                  name="previous"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="7" height="11" viewBox="0 0 7 11" fill="none">
+                    <path d="M5.5 11L0 5.5L5.5 0L6.47625 0.97625L1.9525 5.5L6.47625 10.0238L5.5 11Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <button
+                  aria-controls="slider-{{ block.id }}-{{ product.id }}"
+                  class="hdt-slider__button hdt-slider-nav hdt-inline-flex hdt-align-center hdt-justify-center hdt-slider__button--next"
+                  type="button"
+                  disabled
+                  name="next"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="7" height="11" viewBox="0 0 7 11" fill="none">
+                    <path d="M1.5 11L7 5.5L1.5 0L0.52375 0.97625L5.0475 5.5L0.52375 10.0238L1.5 11Z" fill="currentColor"/>
+                  </svg>
+                </button>
+              {%- endif -%}
+            </hdt-slider>
+            <div id="prod-media-{{ section.id }}" class="hdt-product-media-icotxt">
+              {% content_for 'block', type: '_prod-media-icotext', id: 'media-icontext' %}
+            </div>
+          </div>
+          <div class="hdt-product-media__thumb hdt-text-center">
+            <hdt-slider-thumb
+              {% if block.settings.enable_thumb_efect %}
+                stagger
+              {% endif %}
+              id="slider-thumb-{{ block.id }}-{{ product.id }}"
+              aria-controls="slider-{{ block.id }}-{{ product.id }}"
+              autoheight
+              class="hdt-slider hdt-ratio--{{ block.settings.image_ratio }}{% unless block.settings.image_size %} hdt-ratio--contain{% endunless %} hdt-slides-5 hdt-slide-spacing-10{% if mobile_media_layout != 'thumbnails' %} hdt-hidden lg:hdt-block{% endif %}"
+              config='{ "active": {% if mobile_media_layout != 'thumbnails' %}false{% else %}true{% endif %}{{ start_index }}, "autoHeight": false, "classNames": false, "dragFree": false, "slidesToScroll": 1, "align": "center", "axis": "x", "slides": ".hdt-slider__slide:not([hidden])"{% if desktop_media_layout == 'thumbnail_left' or desktop_media_layout == 'thumbnail_right' %}, "breakpoints": { "(min-width: 1150px)": { "active": true, "axis": "y", "watchSlides": false } }{% endif %} }'
+            >
+              <div class="hdt-slider__viewport">
+                <div class="hdt-slider__container">
+                  {%- comment -%} 360 SPIN THUMBNAIL {%- endcomment -%}
+                  {% if enable_360_spin and product.images.size >= 2 %}
+                    <div
+                      class="hdt-slider__slide hdt-thumbnail__media spin360-thumb-slide"
+                      data-media-type="360-spin"
+                      data-media-id="spin360-{{ product.id }}"
+                    >
+                      <div class="spin360-thumb-inner">
+                        <div class="spin360-thumb-icon">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="73"
+                            height="73"
+                            viewBox="0 0 73 73"
+                            fill="none"
+                          >
+                            <circle cx="36.5" cy="36.5" r="36.5" fill="black" fill-opacity="0.51"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M23.6999 37.6661C17.549 41.0418 34.1175 43.0921 37.8501 43.0589V41.0003L40.9519 44.0992L37.8501 47.2038V45.2752C30.3489 45.5602 12.693 40.7319 23.3126 36.7253C23.4122 37.038 23.5339 37.334 23.6723 37.6107L23.6999 37.6661ZM49.9832 31.2993C49.9832 30.5772 50.1132 30.0708 50.3733 29.783C50.6334 29.4953 51.0291 29.3514 51.5631 29.3514C51.8177 29.3514 52.0307 29.3846 52.194 29.4455C52.3572 29.5091 52.4928 29.5894 52.5952 29.6917C52.7003 29.7913 52.7806 29.8993 52.8414 30.0099C52.9023 30.1206 52.9494 30.2507 52.9853 30.4001C53.0573 30.6823 53.0905 30.9784 53.0905 31.2883C53.0905 31.9772 52.9743 32.4836 52.7391 32.8018C52.5066 33.12 52.1054 33.2805 51.5327 33.2805C51.2145 33.2805 50.9544 33.2279 50.7579 33.1283C50.5615 33.0259 50.3982 32.8765 50.2737 32.68C50.1824 32.5389 50.1105 32.348 50.0607 32.1073C50.0081 31.861 49.9832 31.5954 49.9832 31.2993ZM27.3246 31.9025L24.8344 31.4598C25.0419 30.6685 25.4376 30.0597 26.0269 29.6364C26.6135 29.2131 27.4464 29 28.5227 29C29.7596 29 30.6505 29.2297 31.2039 29.6917C31.7545 30.1538 32.0285 30.7349 32.0285 31.4321C32.0285 31.8417 31.915 32.2124 31.6937 32.5417C31.4695 32.8737 31.1347 33.1643 30.6837 33.4133C31.049 33.5046 31.3312 33.6097 31.5221 33.7315C31.8375 33.9252 32.081 34.1825 32.2553 34.4979C32.4297 34.8161 32.5182 35.1924 32.5182 35.6324C32.5182 36.1858 32.3743 36.7143 32.0866 37.2234C31.796 37.7297 31.381 38.1199 30.8387 38.3938C30.2963 38.6677 29.5825 38.8033 28.6971 38.8033C27.8365 38.8033 27.1559 38.7009 26.6606 38.4989C26.1625 38.2969 25.753 38.0009 25.4321 37.608C25.1111 37.2178 24.8648 36.7253 24.6933 36.1332L27.3302 35.7818C27.4353 36.313 27.593 36.6838 27.8116 36.8913C28.0274 37.0961 28.3041 37.2012 28.6417 37.2012C28.9931 37.2012 29.2864 37.0712 29.5216 36.8139C29.7568 36.5565 29.873 36.2107 29.873 35.779C29.873 35.3391 29.7596 34.9987 29.5354 34.758C29.3113 34.5173 29.0042 34.3955 28.6168 34.3955C28.4121 34.3955 28.1271 34.4454 27.7674 34.5505L27.9029 32.6662C28.0468 32.6883 28.1603 32.6994 28.2405 32.6994C28.5808 32.6994 28.8658 32.5887 29.0927 32.3701C29.3196 32.1516 29.4358 31.8942 29.4358 31.5926C29.4358 31.3021 29.35 31.0724 29.1785 30.9037C29.0069 30.7321 28.769 30.6463 28.4729 30.6463C28.163 30.6463 27.914 30.7404 27.7203 30.9258C27.5239 31.1084 27.3938 31.4349 27.3246 31.9025ZM40.7942 31.2883L38.1711 31.6092C38.1019 31.244 37.9885 30.9894 37.828 30.84C37.6647 30.6906 37.4655 30.6159 37.2303 30.6159C36.8042 30.6159 36.4722 30.829 36.237 31.2606C36.0654 31.5733 35.9354 32.2346 35.8551 33.25C36.1706 32.9291 36.4943 32.6939 36.8236 32.5417C37.1556 32.3895 37.5402 32.312 37.9746 32.312C38.8213 32.312 39.5352 32.6136 40.119 33.2168C40.7028 33.8228 40.9961 34.5892 40.9961 35.5162C40.9961 36.1415 40.8495 36.7115 40.5534 37.2317C40.2574 37.7491 39.8479 38.142 39.3249 38.4076C38.7992 38.6733 38.1434 38.8061 37.3521 38.8061C36.403 38.8061 35.6421 38.6456 35.0693 38.3191C34.4966 37.9954 34.0373 37.4807 33.6942 36.7724C33.3511 36.064 33.1795 35.126 33.1795 33.9556C33.1795 32.2456 33.5392 30.9922 34.2614 30.1953C34.978 29.3984 35.9769 29 37.2552 29C38.0106 29 38.6055 29.0858 39.0427 29.2601C39.4799 29.4344 39.8451 29.6917 40.1329 30.0238C40.4234 30.3613 40.6447 30.7819 40.7942 31.2883ZM35.9437 35.5162C35.9437 36.0308 36.0737 36.432 36.3311 36.7226C36.5912 37.0131 36.9066 37.1597 37.2829 37.1597C37.6288 37.1597 37.9193 37.0269 38.1517 36.7641C38.3841 36.5012 38.5004 36.1083 38.5004 35.5853C38.5004 35.0513 38.3786 34.6418 38.1379 34.3623C37.8944 34.0829 37.5956 33.9418 37.2359 33.9418C36.8706 33.9418 36.5607 34.0774 36.3117 34.3513C36.0654 34.6224 35.9437 35.0098 35.9437 35.5162ZM41.5578 33.8615C41.5578 32.0602 41.8816 30.7985 42.5318 30.0791C43.1793 29.3597 44.1698 29 45.4952 29C46.1344 29 46.6573 29.0802 47.0668 29.2352C47.4763 29.3929 47.8111 29.5977 48.0685 29.8495C48.3286 30.1012 48.5333 30.3669 48.68 30.6436C48.8294 30.923 48.9483 31.2468 49.0397 31.6175C49.2167 32.3231 49.3053 33.0619 49.3053 33.8311C49.3053 35.5521 49.0148 36.8083 48.4309 37.6052C47.8499 38.4021 46.8482 38.8005 45.4233 38.8005C44.6264 38.8005 43.9817 38.6733 43.4892 38.4187C42.9966 38.1641 42.5954 37.7906 42.28 37.2981C42.0531 36.9494 41.8733 36.4735 41.746 35.8676C41.6215 35.2644 41.5578 34.5948 41.5578 33.8615ZM44.1671 33.8671C44.1671 35.0735 44.2722 35.898 44.488 36.3407C44.7011 36.7834 45.011 37.002 45.4177 37.002C45.6861 37.002 45.9158 36.9079 46.1122 36.7226C46.3087 36.5344 46.4526 36.2356 46.5439 35.8316C46.6379 35.4249 46.6822 34.794 46.6822 33.9362C46.6822 32.6773 46.5771 31.8334 46.3613 31.3962C46.1482 30.9645 45.8272 30.7459 45.4011 30.7459C44.9639 30.7459 44.6513 30.9673 44.4548 31.4072C44.2639 31.8527 44.1671 32.6717 44.1671 33.8671ZM51.0291 31.3021C51.0291 31.7863 51.0706 32.1156 51.1564 32.2927C51.2421 32.4698 51.3667 32.5583 51.5299 32.5583C51.6378 32.5583 51.7291 32.5223 51.8094 32.4449C51.8868 32.3701 51.945 32.2512 51.9837 32.0879C52.0197 31.9247 52.039 31.6729 52.039 31.3298C52.039 30.8262 51.9975 30.4859 51.9118 30.3115C51.826 30.1372 51.6987 30.0514 51.5271 30.0514C51.3528 30.0514 51.2255 30.14 51.1481 30.3171C51.0678 30.4942 51.0291 30.8234 51.0291 31.3021ZM50.2433 37.3645C53.1652 38.8503 52.4679 40.9588 47.2937 42.2398C45.8272 42.6023 44.1698 42.9316 42.3519 43.0672V44.7412C44.3746 44.6001 46.2561 44.1352 47.9024 43.7368C55.6831 41.8525 55.4119 38.4879 50.4923 36.5897C50.4231 36.8637 50.3401 37.121 50.2433 37.3645Z" fill="white"/>
+                          </svg>
+                          {% comment %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <circle cx="12" cy="12" r="10"/>
+                              <path d="M12 6v6l4 2"/>
+                            </svg>
+                          {% endcomment %}
+                        </div>
+                        {% comment %} <span class="spin360-thumb-text">360°</span> {% endcomment %}
+                      </div>
+                    </div>
+                  {% endif %}
+
+                  {%- liquid
+                    for media in product.media
+                      render 'media-thumb', media: media, selected_variant: selected_variant, un_no_pick: un_no_pick, group_media_obj: group_media_obj, variant_images: variant_images, class: 'hdt-slider__slide', autoplay: block.settings.enable_media_autoplay, loop: block.settings.enable_video_looping, lazy_load: lazy_load
+                    endfor
+                  -%}
+                </div>
+              </div>
+            </hdt-slider-thumb>
+            {%- if mobile_media_layout != 'thumbnails' -%}
+              <hdt-slider-counter
+                class="hdt-slider-counter hdt-slider-fraction hdt-inline-flex hdt-align-center lg:hdt-hidden"
+                slider="slider-{{ block.id }}-{{ product.id }}"
+              >
+                <button
+                  disabled
+                  name="previous"
+                  aria-controls="slider-{{ block.id }}-{{ product.id }}"
+                  class="no-js-hidden"
+                >
+                  <svg aria-hidden="true" focusable="false" viewBox="0 0 10 6">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M9.354.646a.5.5 0 00-.708 0L5 4.293 1.354.646a.5.5 0 00-.708.708l4 4a.5.5 0 00.708 0l4-4a.5.5 0 000-.708z" fill="currentColor"></path>
+                  </svg>
+                </button>
+                <span>
+                  <span update-current class="hdt-slider-counter--current">1</span>
+                  <span aria-hidden="true"> / </span>
+                  <span class="sr-only">{{ 'general.slider.of' | t }}</span>
+                  <span update-total class="hdt-slider-counter--total">{{ product.media.size }}</span>
+                </span>
+                <button
+                  disabled
+                  name="next"
+                  aria-controls="slider-{{ block.id }}-{{ product.id }}"
+                  class="no-js-hidden"
+                >
+                  <svg aria-hidden="true" focusable="false" viewBox="0 0 10 6">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M9.354.646a.5.5 0 00-.708 0L5 4.293 1.354.646a.5.5 0 00-.708.708l4 4a.5.5 0 00.708 0l4-4a.5.5 0 000-.708z" fill="currentColor"></path>
+                  </svg>
+                </button>
+              </hdt-slider-counter>
+            {%- endif -%}
+          </div>
+
+        {%- else -%}
+          <div class="hdt-product-media__main">
+            <hdt-slider
+              id="slider-{{ block.id }}-{{ product.id }}"
+              aria-controls="slider-thumb-{{ block.id }}-{{ product.id }}"
+              autoheight
+              class="hdt-slider hdt-ratio--{{ block.settings.image_ratio }}{% unless block.settings.image_size %} hdt-ratio--contain{% endunless %}"
+              config='{ "active": true{{ start_index }}, "autoHeight": true, "slidesToScroll": 1, "watchDrag": "onlyTypeImage", "slides": ".hdt-slider__slide:not([hidden])","navUI": true{{ start_index }}, "breakpoints": { "(min-width: 1150px)": { "active": false } } }'
+            >
+              <div class="hdt-slider__viewport">
+                <div class="hdt-slider__container">
+                  {%- liquid
+                    for media in product.media
+                      assign lazy_load = false
+                      if media.position > 1
+                        assign lazy_load = true
+                      endif
+                      render 'media', media: media, selected_variant: selected_variant, un_no_pick: un_no_pick, position: media.position, group_media_obj: group_media_obj, variant_images: variant_images, class: 'hdt-slider__slide', autoplay: block.settings.enable_media_autoplay, loop: block.settings.enable_video_looping, lazy_load: lazy_load, product: product
+                    endfor
+                  -%}
+                </div>
+              </div>
+            </hdt-slider>
+          </div>
+          <div class="hdt-product-media__thumb hdt-text-center lg:hdt-hidden">
+            {%- if mobile_media_layout == 'thumbnails' -%}
+              <hdt-slider-thumb
+                {% if block.settings.enable_thumb_efect %}
+                  stagger
+                {% endif %}
+                id="slider-thumb-{{ block.id }}-{{ product.id }}"
+                aria-controls="slider-{{ block.id }}-{{ product.id }}"
+                autoheight
+                class="hdt-slider hdt-ratio--{{ block.settings.image_ratio }}{% unless block.settings.image_size %} hdt-ratio--contain{% endunless %} hdt-slides-5 hdt-slide-spacing-10"
+                config='{ "active": true{{ start_index }}, "autoHeight": false, "classNames": false, "containScroll": "trimSnaps", "dragFree": false, "slidesToScroll": 1, "align": "center", "axis": "x", "slides": ".hdt-slider__slide:not([hidden])", "breakpoints": { "(min-width: 1150px)": { "active": false } } }'
+              >
+                <div class="hdt-slider__viewport">
+                  <div class="hdt-slider__container">
+                    {%- liquid
+                      for media in product.media
+                        render 'media-thumb', media: media, selected_variant: selected_variant, un_no_pick: un_no_pick, group_media_obj: group_media_obj, variant_images: variant_images, class: 'hdt-slider__slide', autoplay: block.settings.enable_media_autoplay, loop: block.settings.enable_video_looping, lazy_load: lazy_load
+                      endfor
+                    -%}
+                  </div>
+                </div>
+              </hdt-slider-thumb>
+            {%- else -%}
+              <hdt-slider-counter
+                class="hdt-slider-counter hdt-slider-fraction hdt-inline-flex hdt-align-center"
+                slider="slider-{{ block.id }}-{{ product.id }}"
+              >
+                <button
+                  disabled
+                  name="previous"
+                  aria-controls="slider-{{ block.id }}-{{ product.id }}"
+                  class="no-js-hidden"
+                >
+                  <svg aria-hidden="true" focusable="false" viewBox="0 0 10 6">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M9.354.646a.5.5 0 00-.708 0L5 4.293 1.354.646a.5.5 0 00-.708.708l4 4a.5.5 0 00.708 0l4-4a.5.5 0 000-.708z" fill="currentColor"></path>
+                  </svg>
+                </button>
+                <span>
+                  <span update-current class="hdt-slider-counter--current">1</span>
+                  <span aria-hidden="true"> / </span>
+                  <span class="sr-only">{{ 'general.slider.of' | t }}</span>
+                  <span update-total class="hdt-slider-counter--total">{{ product.media.size }}</span>
+                </span>
+                <button
+                  disabled
+                  name="next"
+                  aria-controls="slider-{{ block.id }}-{{ product.id }}"
+                  class="no-js-hidden"
+                >
+                  <svg aria-hidden="true" focusable="false" viewBox="0 0 10 6">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M9.354.646a.5.5 0 00-.708 0L5 4.293 1.354.646a.5.5 0 00-.708.708l4 4a.5.5 0 00.708 0l4-4a.5.5 0 000-.708z" fill="currentColor"></path>
+                  </svg>
+                </button>
+              </hdt-slider-counter>
+            {%- endif -%}
+          </div>
+      {%- endcase -%}
+    </hdt-product-media>
+    {%- if first_3d_model -%}
+      <script type="application/json" id="ModelJson-{{ block.id }}">
+        {{ models | json }}
+      </script>
+    {% endif -%}
+  {%- else -%}
+    <div class="hdt-product-media-placeholder-wrap">
+      <div class="hdt-product-media-placeholder hdt-relative">
+        {{ 'product-apparel-2' | placeholder_svg_tag: 'hdt-product-media-placeholder-svg' }}
+        <style>
+          .hdt-product-media-placeholder-wrap{flex:1}.hdt-product-media-placeholder{width: 100%;aspect-ratio: 1 / 1;overflow: hidden;}.hdt-product-media-placeholder-svg{position: absolute;width: 100%;height: 100%;}
+        </style>
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} Collapsible Content Area Under Media {%- endcomment -%}
+  <div class="hdt-product-media__collapsible-content">
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+
+{%- comment -%} 360 SPIN JAVASCRIPT {%- endcomment -%}
+{% if enable_360_spin and product.images.size >= 2 %}
+  <script>
+    (function() {
+      'use strict';
+
+      var PRODUCT_ID = '{{ product.id }}';
+      var SENSITIVITY = {{ spin_sensitivity }};
+      var IMAGES = [
+        {% for image in product.images limit: spin_image_count %}
+        "{{ image | image_url: width: 1000 }}"{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ];
+
+      console.log('[360 Spin] Product:', PRODUCT_ID, 'Images:', IMAGES.length);
+
+      var currentFrame = 0;
+      var isDragging = false;
+      var lastX = 0;
+      var velocity = 0;
+      var loadedCount = 0;
+      var isReady = false;
+      var preloaded = [];
+
+      var canvas, spinImg, hint, loader, progress;
+
+      function init() {
+        canvas = document.getElementById('spin360-canvas-' + PRODUCT_ID);
+        spinImg = document.getElementById('spin360-img-' + PRODUCT_ID);
+        hint = document.getElementById('spin360-hint-' + PRODUCT_ID);
+        loader = document.getElementById('spin360-loader-' + PRODUCT_ID);
+        progress = document.getElementById('spin360-progress-' + PRODUCT_ID);
+
+        if (!canvas || !spinImg) {
+          console.log('[360 Spin] Elements not found, retrying...');
+          setTimeout(init, 300);
+          return;
+        }
+
+        console.log('[360 Spin] Initializing...');
+
+        preloadImages();
+        setupEvents();
+
+        console.log('[360 Spin] Ready!');
+      }
+
+      function preloadImages() {
+        IMAGES.forEach(function(url, i) {
+          var img = new Image();
+          img.onload = function() {
+            preloaded[i] = img;
+            loadedCount++;
+
+            var pct = Math.round((loadedCount / IMAGES.length) * 100);
+            if (progress) progress.textContent = pct + '%';
+
+            if (loadedCount === IMAGES.length) {
+              isReady = true;
+              if (loader) loader.classList.add('hidden');
+              console.log('[360 Spin] All images loaded!');
+            }
+          };
+          img.onerror = function() {
+            loadedCount++;
+            console.warn('[360 Spin] Failed to load:', url);
+          };
+          img.src = url;
+        });
+      }
+
+      function setupEvents() {
+        // Mouse events
+        canvas.addEventListener('mousedown', function(e) {
+          if (!isReady) return;
+          isDragging = true;
+          lastX = e.clientX;
+          velocity = 0;
+          canvas.classList.add('dragging');
+          if (hint) hint.classList.add('hidden');
+          e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', function(e) {
+          if (!isDragging) return;
+          var dx = e.clientX - lastX;
+          velocity = dx;
+          updateFrame(dx);
+          lastX = e.clientX;
+        });
+
+        document.addEventListener('mouseup', function() {
+          if (!isDragging) return;
+          isDragging = false;
+          canvas.classList.remove('dragging');
+          if (Math.abs(velocity) > 1) inertia();
+        });
+
+        // Touch events
+        canvas.addEventListener('touchstart', function(e) {
+          if (!isReady) return;
+          isDragging = true;
+          lastX = e.touches[0].clientX;
+          velocity = 0;
+          canvas.classList.add('dragging');
+          if (hint) hint.classList.add('hidden');
+        }, {passive: true});
+
+        canvas.addEventListener('touchmove', function(e) {
+          if (!isDragging) return;
+          var dx = e.touches[0].clientX - lastX;
+          velocity = dx;
+          updateFrame(dx);
+          lastX = e.touches[0].clientX;
+        }, {passive: true});
+
+        canvas.addEventListener('touchend', function() {
+          if (!isDragging) return;
+          isDragging = false;
+          canvas.classList.remove('dragging');
+          if (Math.abs(velocity) > 1) inertia();
+        });
+      }
+
+      function updateFrame(delta) {
+        var change = Math.round(delta / SENSITIVITY);
+        currentFrame = (currentFrame - change + IMAGES.length) % IMAGES.length;
+
+        if (spinImg && IMAGES[currentFrame]) {
+          spinImg.src = IMAGES[currentFrame];
+        }
+      }
+
+      function inertia() {
+        if (Math.abs(velocity) < 0.3) return;
+        updateFrame(velocity);
+        velocity *= 0.9;
+        requestAnimationFrame(inertia);
+      }
+
+      // Start
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          setTimeout(init, 200);
+        });
+      } else {
+        setTimeout(init, 200);
+      }
+    })();
+  </script>
+{% endif %}
+<script>
+(function(){
+  var lastMediaId = '';
+  var sectionId = '{{ section.id }}';
+
+  function sync(){
+    var wrapper = document.querySelector('.hdt-group-block--{{ block.id }}');
+    if(!wrapper) return;
+
+    var mediaEl = wrapper.querySelector('hdt-product-media.starapps')
+                || wrapper.querySelector('hdt-product-media');
+    if(!mediaEl) return;
+
+    var mainSlider = mediaEl.querySelector('hdt-slider');
+    var thumbSlider = mediaEl.querySelector('hdt-slider-thumb');
+    if(!mainSlider || !thumbSlider) return;
+
+    var activeSlide = mainSlider.querySelector('.hdt-slider__slide.is-selected.is-in-view')
+                   || mainSlider.querySelector('.hdt-slider__slide.is-selected');
+    if(!activeSlide) return;
+
+    var mediaId = activeSlide.getAttribute('data-media-id');
+    if(!mediaId || mediaId === lastMediaId) return;
+    lastMediaId = mediaId;
+
+    var currentThumb = thumbSlider.querySelector('.is-thumb-selected');
+    if(currentThumb && currentThumb.getAttribute('data-media-id') === mediaId) return;
+
+    thumbSlider.querySelectorAll('.is-thumb-selected').forEach(function(t){
+      t.classList.remove('is-thumb-selected');
+    });
+
+    var match = thumbSlider.querySelector('[data-media-id="'+mediaId+'"]');
+    if(match){
+      match.classList.add('is-thumb-selected');
+    }
+  }
+
+  setInterval(sync, 150);
+})();
+</script>
+<style>
+@media (min-width: 769px){
+  .hdt-product-media-wrapps .hdt-product-media__collapsible-content {
+    margin-top: 30px;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.main-product.blocks.medias.name",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_group_accordion"
+    },
+    {
+      "type": "_product-description"
+    },
+    {
+      "type": "_custom-liquid"
+    },
+    {
+      "type": "_trust_icontext"
+    },
+    {
+      "type": "_delivery_return"
+    },
+    {
+      "type": "_product-trust-badge"
+    },
+    {
+      "type": "_product_link-text"
+    },
+    {
+      "type": "_product_link_text2"
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "mobile_prod_top_info",
+      "label": "Display Top Info(mobile)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "display_by_block",
+      "label": "Display color by blocks",
+      "default": false
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "visible_if": "{{ block.settings.display_by_block }}"
+    },
+    {
+      "type": "header",
+      "content": "360° Spin View"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_360_spin",
+      "label": "Enable 360° spin thumbnail",
+      "default": false,
+      "info": "Adds an interactive 360° spin view using product images. Requires at least 2 product images."
+    },
+    {
+      "type": "header",
+      "content": "t:sections.main-product.settings.header.content",
+      "info": "t:sections.main-product.settings.header.info"
+    },
+    {
+      "type": "select",
+      "id": "desktop_media_layout",
+      "options": [
+        {
+          "value": "stacked",
+          "label": "t:sections.main-product.settings.desktop_media_layout.options__1.label"
+        },
+        {
+          "value": "column",
+          "label": "t:sections.main-product.settings.desktop_media_layout.options__2.label"
+        },
+        {
+          "value": "2_columns",
+          "label": "t:sections.main-product.settings.desktop_media_layout.options__3.label"
+        },
+        {
+          "value": "thumbnail_bottom",
+          "label": "t:sections.main-product.settings.desktop_media_layout.options__4.label"
+        },
+        {
+          "value": "thumbnail_left",
+          "label": "t:sections.main-product.settings.desktop_media_layout.options__5.label"
+        },
+        {
+          "value": "thumbnail_right",
+          "label": "t:sections.main-product.settings.desktop_media_layout.options__6.label"
+        },
+        {
+          "value": "without_thumbnails",
+          "label": "t:sections.main-product.settings.desktop_media_layout.options__7.label"
+        }
+      ],
+      "default": "thumbnail_left",
+      "label": "t:sections.main-product.settings.desktop_media_layout.label"
+    },
+    {
+      "type": "select",
+      "id": "media_size",
+      "label": "t:sections.main-product.settings.media_size.label",
+      "default": "medium",
+      "options": [
+        {
+          "value": "small",
+          "label": "t:sections.main-product.settings.media_size.options__1.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.main-product.settings.media_size.options__2.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.main-product.settings.media_size.options__3.label"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "mobile_media_layout",
+      "options": [
+        {
+          "value": "fraction",
+          "label": "t:sections.main-product.settings.mobile_media_layout.options__1.label"
+        },
+        {
+          "value": "thumbnails",
+          "label": "t:sections.main-product.settings.mobile_media_layout.options__2.label"
+        }
+      ],
+      "default": "thumbnails",
+      "label": "t:sections.main-product.settings.mobile_media_layout.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_thumb_efect",
+      "default": true,
+      "label": "t:sections.main-product.settings.enable_thumb_efect.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_first_media",
+      "default": false,
+      "label": "t:sections.main-product.settings.show_first_media.label",
+      "info": "t:sections.main-product.settings.show_first_media.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_select_varaint_change_media",
+      "default": true,
+      "label": "t:sections.main-product.settings.use_select_varaint_change_media.label",
+      "info": "t:sections.main-product.settings.use_select_varaint_change_media.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_media_autoplay",
+      "default": false,
+      "label": "t:sections.main-product.settings.enable_media_autoplay.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_video_looping",
+      "default": false,
+      "label": "t:sections.main-product.settings.enable_video_looping.label"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        {
+          "value": "adapt_image",
+          "label": "t:sections.all.images.ratio.adapt_image.label"
+        },
+        {
+          "value": "square",
+          "label": "t:sections.all.images.ratio.square.label"
+        },
+        {
+          "value": "portrait",
+          "label": "t:sections.all.images.ratio.portrait.label"
+        },
+        {
+          "value": "asos",
+          "label": "t:sections.all.images.ratio.asos.label"
+        },
+        {
+          "value": "landscape",
+          "label": "t:sections.all.images.ratio.landscape.label"
+        },
+        {
+          "value": "custom-pr",
+          "label": "t:sections.all.images.ratio.custom.label"
+        }
+      ],
+      "label": "t:sections.all.images.ratio.label",
+      "default": "adapt_image"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_size",
+      "label": "t:sections.all.images.size.cover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:sections.main-product.settings.header_zoom.content",
+      "info": "t:sections.main-product.settings.header_zoom.info"
+    },
+    {
+      "type": "select",
+      "id": "image_zoom",
+      "options": [
+        {
+          "value": "zoom",
+          "label": "t:sections.main-product.settings.image_zoom.options__1.label"
+        },
+        {
+          "value": "lightbox",
+          "label": "t:sections.main-product.settings.image_zoom.options__2.label"
+        },
+        {
+          "value": "no",
+          "label": "t:sections.main-product.settings.image_zoom.options__3.label"
+        },
+        {
+          "value": "zoom_lightbox",
+          "label": "t:sections.main-product.settings.image_zoom.options__4.label"
+        }
+      ],
+      "default": "zoom",
+      "label": "t:sections.main-product.settings.image_zoom.label",
+      "info": "t:sections.main-product.settings.image_zoom.info"
+    },
+    {
+      "type": "select",
+      "id": "image_zoom_type",
+      "options": [
+        {
+          "value": "inner",
+          "label": "t:sections.main-product.settings.image_zoom_type.options__1.label"
+        },
+        {
+          "value": "inner2",
+          "label": "t:sections.main-product.settings.image_zoom_type.options__2.label"
+        },
+        {
+          "value": "external",
+          "label": "t:sections.main-product.settings.image_zoom_type.options__3.label"
+        }
+      ],
+      "default": "external",
+      "label": "t:sections.main-product.settings.image_zoom_type.label"
+    },
+    {
+      "type": "range",
+      "id": "zoom_level",
+      "min": 1.5,
+      "max": 4,
+      "step": 0.5,
+      "unit": "x",
+      "label": "t:sections.main-product.settings.zoom_level.label",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "max_zoom_lightbox",
+      "min": 1,
+      "max": 4,
+      "step": 0.5,
+      "unit": "x",
+      "label": "t:sections.main-product.settings.max_zoom_lightbox.label",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.slider.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "navUI",
+      "label": "t:sections.all.slider.navUI",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "nav_des",
+      "label": "t:sections.all.slider.nav_des.label",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:sections.all.slider.nav_des.options.default"
+        },
+        {
+          "value": "outline",
+          "label": "t:sections.all.slider.nav_des.options.outline"
+        },
+        {
+          "value": "simple",
+          "label": "t:sections.all.slider.nav_des.options.simple"
+        }
+      ],
+      "default": "default",
+      "visible_if": "{{ block.settings.navUI }}"
+    },
+    {
+      "type": "select",
+      "id": "nav_shape",
+      "label": "t:sections.all.slider.nav_shape.label",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:sections.all.slider.nav_shape.options.default"
+        },
+        {
+          "value": "rounded",
+          "label": "t:sections.all.slider.nav_shape.options.rounded"
+        },
+        {
+          "value": "rotate",
+          "label": "t:sections.all.slider.nav_shape.options.rotate"
+        }
+      ],
+      "default": "default",
+      "visible_if": "{{ block.settings.navUI }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.main-product.blocks.medias.name"
+    }
+  ]
+}
+{% endschema %}

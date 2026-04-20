@@ -1,0 +1,429 @@
+{% comment %}
+  Help Hardware Section - Exact match to design
+{% endcomment %}
+
+<section class="help-hardware-section hdt-container">
+  <div class="help-hardware-container">
+    <!-- Left Content -->
+    <div class="help-hardware-left">
+      <h2 class="help-hardware-heading">{{ section.settings.heading }}</h2>
+      <p class="help-hardware-desc">{{ section.settings.description }}</p>
+    </div>
+
+    <!-- Right Contact Options -->
+    <div class="help-hardware-right">
+      {% if section.settings.show_chat %}
+        <div class="help-contact-row">
+         <div class="help-row">
+            <div class="help-contact-icon">
+                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21.4092 0H4.38502C1.96681 0 0 1.96681 0 4.38502V14.8639C0 17.2821 1.96681 19.2489 4.38502 19.2489H5.44903L5.02987 22.8924C4.9009 23.6662 5.25557 24.4078 5.90043 24.7947C6.19061 24.9559 6.51304 25.0526 6.83547 25.0526C7.25462 25.0526 7.67378 24.9237 8.06069 24.6335L13.542 19.2489H21.4092C23.8274 19.2489 25.7942 17.2821 25.7942 14.8639V4.38502C25.7942 1.96681 23.8274 0 21.4092 0ZM24.5367 14.8639C24.5367 16.5728 23.1503 17.9915 21.4092 17.9915H13.3163C13.155 17.9915 12.9616 18.0237 12.8326 18.1527L7.25462 23.6984C6.93219 23.9241 6.64201 23.7952 6.54528 23.7307C6.44855 23.6662 6.19061 23.4727 6.2551 23.0536L6.77098 18.7008C6.77098 18.6686 6.77098 18.6686 6.77098 18.6363C6.77098 18.6041 6.73874 18.5396 6.73874 18.5073C6.73874 18.4751 6.73874 18.4751 6.73874 18.4429C6.7065 18.3784 6.7065 18.3461 6.67425 18.3139C6.64201 18.2816 6.64201 18.2494 6.60977 18.2494C6.57752 18.2172 6.54528 18.1849 6.51304 18.1849C6.4808 18.1527 6.44855 18.1204 6.41631 18.1204C6.38407 18.1204 6.35183 18.0882 6.35183 18.0882C6.31958 18.0882 6.28734 18.0559 6.22285 18.0559C6.19061 18.0559 6.19061 18.0559 6.15837 18.0559H4.38502C2.67615 18.0559 1.25747 16.6695 1.25747 14.9284V4.38502C1.25747 2.67615 2.64391 1.25747 4.38502 1.25747H21.4414C23.1503 1.25747 24.569 2.64391 24.569 4.38502V14.8639H24.5367Z" fill="black"/>
+                    <path d="M6.35183 7.15771C4.99764 7.15771 3.86914 8.25397 3.86914 9.64041C3.86914 10.9946 4.96539 12.1231 6.35183 12.1231C7.73827 12.1231 8.83453 11.0268 8.83453 9.64041C8.83453 8.25397 7.73827 7.15771 6.35183 7.15771ZM6.35183 10.8656C5.67474 10.8656 5.12661 10.3175 5.12661 9.64041C5.12661 8.96331 5.67474 8.41518 6.35183 8.41518C7.02893 8.41518 7.57706 8.96331 7.57706 9.64041C7.6093 10.3175 7.02893 10.8656 6.35183 10.8656Z" fill="black"/>
+                    <path d="M12.8968 7.15771C11.5426 7.15771 10.4141 8.25397 10.4141 9.64041C10.4141 10.9946 11.5103 12.1231 12.8968 12.1231C14.251 12.1231 15.3794 11.0268 15.3794 9.64041C15.3794 8.25397 14.251 7.15771 12.8968 7.15771ZM12.8968 10.8656C12.2197 10.8656 11.6715 10.3175 11.6715 9.64041C11.6715 8.96331 12.2197 8.41518 12.8968 8.41518C13.5739 8.41518 14.122 8.96331 14.122 9.64041C14.122 10.3175 13.5739 10.8656 12.8968 10.8656Z" fill="black"/>
+                    <path d="M19.4427 7.15771C18.0885 7.15771 16.96 8.25397 16.96 9.64041C16.96 10.9946 18.0562 12.1231 19.4427 12.1231C20.8291 12.1231 21.9253 11.0268 21.9253 9.64041C21.8931 8.25397 20.7969 7.15771 19.4427 7.15771ZM19.4427 10.8656C18.7656 10.8656 18.2174 10.3175 18.2174 9.64041C18.2174 8.96331 18.7656 8.41518 19.4427 8.41518C20.1198 8.41518 20.6679 8.96331 20.6679 9.64041C20.6679 10.3175 20.1198 10.8656 19.4427 10.8656Z" fill="black"/>
+                </svg>
+            </div>
+            <span class="help-contact-label">{{ section.settings.chat_label }}</span>
+         </div>
+          <span class="help-contact-value">{{ section.settings.chat_value }}</span>
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_call %}
+        <div class="help-contact-row">
+         <div class="help-row">
+          <div class="help-contact-icon">
+            <svg width="27" height="26" viewBox="0 0 27 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+             <path d="M5.52239 5.79174L7.98989 8.25924C8.37469 8.64404 8.56653 9.14898 8.56653 9.65396C8.56653 10.1578 8.37469 10.6639 7.98989 11.0476L6.49704 12.5404C6.62493 13.1733 6.85756 13.8073 7.18172 14.4148C7.55768 15.1204 8.05826 15.7951 8.65804 16.3949C9.26003 16.9969 9.93478 17.4975 10.6404 17.8734C11.2479 18.1976 11.883 18.4313 12.5147 18.5581L14.0076 17.0653C14.3924 16.6805 14.8973 16.4886 15.4012 16.4886C15.9062 16.4886 16.4111 16.6805 16.7959 17.0653L19.2634 19.5328C19.6482 19.9176 19.8401 20.4225 19.8401 20.9264C19.8401 21.4314 19.6482 21.9363 19.2634 22.32L17.5633 24.0201C16.2921 25.2914 14.1896 25.2781 11.9713 24.578C9.34287 23.75 6.49932 21.944 4.80356 20.2483C3.10784 18.5526 1.30307 15.7102 0.473814 13.0805C-0.225211 10.8622 -0.23842 8.75866 1.03171 7.48853L2.73183 5.78841C3.11662 5.40362 3.62157 5.21177 4.12545 5.21177C4.62932 5.21177 5.13537 5.40362 5.51906 5.78841L5.52239 5.79174ZM21.8334 5.71016C22.3847 5.71016 22.8313 6.15668 22.8313 6.70797C22.8313 7.25926 22.3847 7.70579 21.8334 7.70579C21.2821 7.70579 20.8356 7.25926 20.8356 6.70797C20.8356 6.15668 21.2821 5.71016 21.8334 5.71016ZM18.679 5.71016C19.2303 5.71016 19.6768 6.15668 19.6768 6.70797C19.6768 7.25926 19.2303 7.70579 18.679 7.70579C18.1277 7.70579 17.6812 7.25926 17.6812 6.70797C17.6812 6.15668 18.1277 5.71016 18.679 5.71016ZM15.5245 5.71016C16.0758 5.71016 16.5224 6.15668 16.5224 6.70797C16.5224 7.25926 16.0758 7.70579 15.5245 7.70579C14.9733 7.70579 14.5267 7.25926 14.5267 6.70797C14.5267 6.15668 14.9733 5.71016 15.5245 5.71016ZM17.2809 13.4136C16.8101 13.4136 16.346 13.364 15.8939 13.2681C15.5157 13.1876 15.1497 13.0763 14.8002 12.9373L11.766 14.2461C11.4804 14.3684 11.1474 14.2361 11.0251 13.9506C10.9633 13.8072 10.9655 13.6518 11.0195 13.5173L11.9755 10.805C11.5609 10.2703 11.2257 9.67048 10.9887 9.02658C10.7219 8.30331 10.5752 7.52161 10.5752 6.70681C10.5752 4.85673 11.3272 3.18092 12.54 1.96696C13.7539 0.751947 15.4308 0 17.2821 0H20.0792C21.9304 0 23.6074 0.750846 24.8213 1.96473L24.8511 1.9967C26.0474 3.20841 26.7861 4.87228 26.7861 6.70579C26.7861 8.55696 26.0352 10.2339 24.8214 11.4479C23.6075 12.6618 21.9305 13.4126 20.0793 13.4126H17.2821L17.2809 13.4136ZM16.1232 12.1656C16.4915 12.2427 16.8796 12.2846 17.2809 12.2846H20.0781C21.6183 12.2846 23.0129 11.6606 24.022 10.6518C25.0308 9.64293 25.6549 8.24821 25.6549 6.70785C25.6549 5.17861 25.0408 3.79501 24.0485 2.78935L24.022 2.76399C23.0132 1.75517 21.6185 1.13111 20.0781 1.13111H17.2809C15.7407 1.13111 14.3461 1.75514 13.337 2.76399C12.3282 3.77172 11.7041 5.16644 11.7041 6.7079C11.7041 7.38818 11.8254 8.03866 12.047 8.63957C12.2741 9.25589 12.6082 9.8226 13.0239 10.3132C13.1617 10.4621 13.2146 10.6793 13.1418 10.8843L12.5013 12.7013L14.5729 11.8072C14.7119 11.7476 14.8739 11.7443 15.0228 11.8094C15.3745 11.9659 15.7439 12.0861 16.1231 12.1666L16.1232 12.1656ZM7.19251 9.05741L4.725 6.58991C4.56183 6.42673 4.34571 6.34404 4.12852 6.34404C3.91242 6.34404 3.69634 6.42563 3.53204 6.58991L1.83192 8.29002C0.909102 9.21284 0.970831 10.9075 1.55188 12.7487C2.32697 15.2063 4.01608 17.8657 5.60275 19.4534C7.19042 21.041 9.8498 22.73 12.3074 23.5042C14.1486 24.0842 15.8431 24.147 16.7661 23.2242L18.4662 21.5241C18.6294 21.3609 18.7121 21.1448 18.7121 20.9276C18.7121 20.7115 18.6305 20.4954 18.4662 20.3311L15.9987 17.8636C15.8355 17.7004 15.6183 17.6177 15.4022 17.6177C15.1861 17.6177 14.97 17.6993 14.8057 17.8636L13.1056 19.5637C12.9832 19.6861 12.8068 19.75 12.6227 19.7225C11.7793 19.5946 10.9248 19.2991 10.1111 18.8647C9.30736 18.4358 8.54221 17.8691 7.86415 17.1921C7.18387 16.5118 6.61827 15.7467 6.18939 14.9429C5.7572 14.1325 5.46281 13.2814 5.33382 12.4423C5.30406 12.2681 5.35698 12.0829 5.49149 11.9484L7.1916 10.2483C7.35478 10.0851 7.43747 9.86899 7.43747 9.6518C7.43747 9.4357 7.35588 9.21849 7.1916 9.05532L7.19251 9.05741Z" fill="black"/>
+            </svg>
+          </div>
+          <span class="help-contact-label">{{ section.settings.call_label }}</span>
+         </div>
+          <a href="tel:{{ section.settings.call_link }}" class="help-contact-value">{{ section.settings.call_value }}</a>
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_email %}
+        <div class="help-contact-row">
+         <div class="help-row">
+          <div class="help-contact-icon">
+            <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+             <path d="M26.6 2.79981C26.6 2.57012 26.5439 2.35275 26.4455 2.16134L18.1824 9.48124L26.6002 16.6793L26.6 2.79981ZM15.8567 11.5404C14.7972 12.4796 13.203 12.4796 12.1436 11.5404L10.8762 10.4179L2.04012 17.9744C2.25887 18.1166 2.52 18.2 2.80028 18.2H25.2003C25.4806 18.2 25.7417 18.1166 25.9604 17.9744L17.1243 10.4179L15.8567 11.5404ZM13.0718 10.4931C13.6023 10.962 14.398 10.962 14.9284 10.4931L25.1946 1.40009H2.80549L13.0718 10.4931ZM1.4 16.6797L9.81785 9.48159L1.5547 2.16169C1.45626 2.3531 1.40021 2.57049 1.40021 2.80016L1.4 16.6797ZM28 16.8C28 18.3463 26.7463 19.6 25.2 19.6H2.8C1.2537 19.6 0 18.3463 0 16.8V2.8C0 1.2537 1.2537 0 2.8 0H25.2C26.7463 0 28 1.2537 28 2.8V16.8Z" fill="black"/>
+            </svg>
+          </div>
+          <span class="help-contact-label">{{ section.settings.email_label }}</span>
+          </div>
+          <a href="mailto:{{ section.settings.email_link }}" class="help-contact-value">{{ section.settings.email_value }}</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<style>
+  #shopify-section-{{ section.id }}.help-hardware-wrapper {position:relative; margin-bottom: -1px;}
+  #shopify-section-{{ section.id }}.help-hardware-wrapper:after {
+    content: "";
+    background: {{ section.settings.section_backgroundcolor }};
+    height: 50%;
+    width:100%;
+    position:absolute;
+    left: 0;
+    bottom: 0;
+    z-index:-1;
+  }
+
+  .help-hardware-section {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  #shopify-section-{{ section.id }} .help-hardware-section * {
+    box-sizing: border-box;
+    {% comment %} margin: 0; {% endcomment %}
+  }
+
+  .help-hardware-container {
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+
+    background-color: {{ section.settings.background_color }};
+    max-width: 80%;
+    margin: 0 auto;
+    border-radius: 12px;
+    padding: 40px 50px;
+  }
+
+  /* Left Side */
+  .help-hardware-left {
+    width: 50%;
+    flex-shrink: 0;
+  }
+
+  .help-hardware-heading {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: {{ section.settings.heading_color }};
+    margin: 0 0 10px 0;
+    letter-spacing: -0.01em;
+  }
+
+  .help-hardware-desc {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.55;
+    color: {{ section.settings.text_color }};
+    margin: 0;
+  }
+
+  /* Right Side - Contact Options */
+  .help-hardware-right {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 50%;
+  }
+    .help-row {
+     display: flex;
+     justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+  .help-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    justify-content: space-between;
+  }
+
+  .help-contact-icon {
+    width: 25px;
+    height: 25px;
+    color: {{ section.settings.icon_color }};
+  }
+
+  .help-contact-icon svg {
+    width: 25px;
+    height: 25px;
+  }
+
+  .help-contact-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: {{ section.settings.label_color }};
+  }
+
+  .help-contact-value {
+    font-size: 14px;
+    font-weight: 400;
+    color: {{ section.settings.value_color }};
+    text-decoration: none;
+    margin-left: 30px;
+  }
+
+  .help-contact-value:hover {
+    color: {{ section.settings.heading_color }};
+  }
+  .help-contact-row:not(.help-contact-row:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 30px;
+    left: 0px;
+    right: 0px;
+    height: 1px;
+    background-color: #d3d5da;
+  }
+
+  /* Tablet */
+  @media screen and (max-width: 991px) {
+    .help-hardware-heading {
+      font-size: 18px;
+    }
+    .help-contact-value {
+      margin-left: 20px;
+    }
+    .help-hardware-container {
+       max-width: 95%;
+    }
+  }
+
+  /* Mobile */
+  @media screen and (max-width: 767px) {
+
+    .help-hardware-container {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 25px;
+    }
+
+    .help-hardware-left {
+      width: 100%;
+      text-align: center;
+      padding-bottom: 30px;
+    }
+
+    .help-hardware-heading {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .help-hardware-desc {
+      font-size: 12px;
+    }
+
+    .help-hardware-right {
+      width: 100%;
+      gap: 35px;
+      padding: 0;
+    }
+
+    .help-contact-row {
+      width: 100%;
+      justify-content: flex-start;
+    }
+
+    .help-contact-label {
+      min-width: auto;
+      font-size: 15px;
+    }
+
+    .help-contact-value {
+      font-size: 12px;
+      margin-left: auto;
+    }
+  }
+
+  /* Small Mobile */
+  @media screen and (max-width: 480px) {
+    .help-hardware-section {
+      padding: 25px 15px;
+    }
+
+    .help-hardware-heading {
+      font-size: 24px;
+      text-align: center;
+    }
+
+    .help-hardware-desc {
+      text-align: center;
+      font-size: 14px;
+      line-height: 100%;
+    }
+
+    .help-contact-row {
+      flex-wrap: nowrap;
+      gap: 8px;
+    }
+
+    .help-contact-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .help-contact-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Help Hardware",
+  "tag": "section",
+  "class": "help-hardware-wrapper",
+  "settings": [
+    {
+      "type": "color",
+      "id": "section_backgroundcolor",
+      "label": "Half Background Color",
+      "default": "#0047ab"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Need help choosing the right hardware?"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Lorem ipsum dolor sit amet consectetur. Ultricies mi bibendum ultricies et lacus. Gravida cum non sit id. Tristique tellus eu pretium suspendisse eget diam purus aliquam."
+    },
+    {
+      "type": "header",
+      "content": "Chat"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_chat",
+      "label": "Show Chat",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "chat_label",
+      "label": "Chat Label",
+      "default": "Chat with us"
+    },
+    {
+      "type": "text",
+      "id": "chat_value",
+      "label": "Chat Value",
+      "default": "+12314569755"
+    },
+    {
+      "type": "header",
+      "content": "Call"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_call",
+      "label": "Show Call",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "call_label",
+      "label": "Call Label",
+      "default": "Call us"
+    },
+    {
+      "type": "text",
+      "id": "call_value",
+      "label": "Call Value",
+      "default": "+12314569755"
+    },
+    {
+      "type": "text",
+      "id": "call_link",
+      "label": "Phone Number",
+      "default": "+12314569755"
+    },
+    {
+      "type": "header",
+      "content": "Email"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_email",
+      "label": "Show Email",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "email_label",
+      "label": "Email Label",
+      "default": "Email"
+    },
+    {
+      "type": "text",
+      "id": "email_value",
+      "label": "Email Value",
+      "default": "Example@domain.com"
+    },
+    {
+      "type": "text",
+      "id": "email_link",
+      "label": "Email Address",
+      "default": "Example@domain.com"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#EDF3F2"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Description",
+      "default": "#71717a"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icons",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Contact Labels",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "value_color",
+      "label": "Contact Values",
+      "default": "#71717a"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Help Hardware"
+    }
+  ]
+}
+{% endschema %}

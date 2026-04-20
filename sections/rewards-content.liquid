@@ -1,0 +1,1956 @@
+{% comment %}
+  Rewards & Content Section
+  - Left: Rewards Card with tabs (Personal/Business) - Content switches based on tab
+  - Middle Top: Promo Banner (Christmas Sale)
+  - Middle Bottom: Blog Posts Row
+  - Right: Blog/Tips Intro Card
+  - Fully responsive with mobile slider
+{% endcomment %}
+
+<style>
+  #rewards-content-{{ section.id }} {
+    --section-bg-color: {{ section.settings.section_bg_color }};
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --section-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --section-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+    
+    /* Rewards Card */
+    --rewards-bg: {{ section.settings.rewards_bg_gradient }};
+    --rewards-title-color: {{ section.settings.rewards_title_color }};
+    --rewards-title-size: {{ section.settings.rewards_title_font_size }}px;
+    --rewards-title-size-mobile: {{ section.settings.rewards_title_font_size_mobile }}px;
+    --rewards-subtitle-color: {{ section.settings.rewards_subtitle_color }};
+    --rewards-subtitle-size: {{ section.settings.rewards_subtitle_font_size }}px;
+    --rewards-text-color: {{ section.settings.rewards_text_color }};
+    --rewards-text-size: {{ section.settings.rewards_text_font_size }}px;
+    --rewards-btn-bg: {{ section.settings.rewards_btn_bg }};
+    --rewards-btn-color: {{ section.settings.rewards_btn_color }};
+    
+    /* Promo Card */
+    --promo-bg-color: {{ section.settings.promo_bg_color }};
+    --promo-title-color: {{ section.settings.promo_title_color }};
+    --promo-title-size: {{ section.settings.promo_title_font_size }}px;
+    --promo-title-size-mobile: {{ section.settings.promo_title_font_size_mobile }}px;
+    --promo-text-color: {{ section.settings.promo_text_color }};
+    --promo-text-size: {{ section.settings.promo_text_font_size }}px;
+    --promo-link-color: {{ section.settings.promo_link_color }};
+    
+    /* Blog Intro Card */
+    --blog-intro-bg: {{ section.settings.blog_intro_bg }};
+    --blog-intro-title-color: {{ section.settings.blog_intro_title_color }};
+    --blog-intro-title-size: {{ section.settings.blog_intro_title_font_size }}px;
+    --blog-intro-text-color: {{ section.settings.blog_intro_text_color }};
+    --blog-intro-text-size: {{ section.settings.blog_intro_text_font_size }}px;
+    --blog-intro-link-color: {{ section.settings.blog_intro_link_color }};
+    
+    /* Tips Section */
+    --tips-title-color: {{ section.settings.tips_title_color }};
+    --tips-title-size: {{ section.settings.tips_title_font_size }}px;
+    --tips-title-size-mobile: {{ section.settings.tips_title_font_size_mobile }}px;
+    
+    /* Blog Card */
+    --blog-card-bg: {{ section.settings.blog_card_bg }};
+    --blog-card-title-color: {{ section.settings.blog_card_title_color }};
+    --blog-card-title-size: {{ section.settings.blog_card_title_font_size }}px;
+    --blog-card-title-size-mobile: {{ section.settings.blog_card_title_font_size_mobile }}px;
+  }
+
+  #rewards-content-{{ section.id }} .rewards-content-wrapper {
+    padding-top: var(--section-padding-top);
+    padding-bottom: var(--section-padding-bottom);
+    {% if section.settings.section_bg_image != blank %}
+    background-image: url('{{ section.settings.section_bg_image | image_url: width: 1920 }}');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    {% endif %}
+  }
+
+  @media (max-width: 768px) {
+    #rewards-content-{{ section.id }} .rewards-content-wrapper {
+      padding-top: var(--section-padding-top-mobile);
+      padding-bottom: var(--section-padding-bottom-mobile);
+    }
+  }
+  /* ==========================================================================
+   Rewards & Content Section - CSS
+   ========================================================================== */
+
+/* Base Styles */
+.rewards-content-section {
+  width: 100%;
+}
+
+.rewards-content-wrapper {
+  position: relative;
+}
+
+/* ==========================================================================
+   Main Grid Layout
+   ========================================================================== */
+.rewards-content-grid {
+  display: grid;
+  grid-template-columns: 440px 1fr;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* ==========================================================================
+   Left Column - Rewards Card
+   ========================================================================== */
+.rewards-card-column {
+  position: sticky;
+  top: 20px;
+}
+
+.rewards-card {
+  border-radius: 16px;
+  padding: 30px 20px;
+  position: relative;
+  overflow: hidden;
+  min-height: 650px;
+  display: flex;
+  flex-direction: column;
+      border: 1px solid #0047AB;
+}
+
+/* Rewards Card Background Image */
+.rewards-card-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+}
+
+.rewards-card-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rewards-card-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--rewards-bg);
+  opacity: 0.85;
+}
+
+.rewards-card > *:not(.rewards-card-bg) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Decorative Elements - Repositioned */
+.rewards-decorations {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.deco-coin {
+  position: absolute;
+  object-fit: contain;
+}
+
+/* Coin 1 - Top Left Corner (partially outside) */
+.deco-coin.coin-1 {
+  width: {{ section.settings.coin_1_size }}px;
+  height: {{ section.settings.coin_1_size }}px;
+  top: {{ section.settings.coin_1_top }}px;
+  left: {{ section.settings.coin_1_left }}px;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Coin 2 - Right Side Middle */
+.deco-coin.coin-2 {
+  width: {{ section.settings.coin_2_size }}px;
+  height: {{ section.settings.coin_2_size }}px;
+  top: {{ section.settings.coin_2_top }}px;
+  right: {{ section.settings.coin_2_right }}px;
+  animation: float 3s ease-in-out infinite 0.5s;
+}
+
+.default-coin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.default-coin.coin-1 {
+  font-size: {{ section.settings.coin_1_size | times: 0.7 }}px;
+}
+
+.default-coin.coin-2 {
+  font-size: {{ section.settings.coin_2_size | times: 0.7 }}px;
+}
+
+.deco-star {
+  position: absolute;
+  top: 0px;
+  right: 50%;
+  transform: translateX(50%);
+  {% comment %} color: #60a5fa;
+  opacity: 0.8; {% endcomment %}
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Rewards Header */
+.rewards-header {
+  text-align: center;
+  margin-top: 60px;
+  margin-bottom: 20px;
+}
+
+.rewards-logo {
+  max-width: 80px;
+  margin-bottom: 10px;
+}
+
+.rewards-main-title {
+  margin-top: 30px;
+  margin-bottom: 50px;
+}
+
+.rewards-main-title .title-small {
+  display: block;
+  font-size: calc(var(--rewards-title-size, 24px) * 0.6);
+  font-weight: 400;
+  opacity: 0.9;
+  color:  #000;
+}
+
+.rewards-main-title .title-large {
+  display: block;
+  font-size: var(--rewards-title-size, 40px);
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--rewards-title-color, #ffffff);
+}
+
+/* Tabs */
+.rewards-tabs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.tab-btn {
+  padding: 10px 24px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.tab-btn.active {
+  background-color: #ffffff;
+  color: #1e5799;
+  font-weight: 700;
+}
+
+.tab-btn:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Rewards Content - Tab Panels */
+.rewards-content {
+  flex: 1;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.rewards-subtitle {
+  font-size: var(--rewards-subtitle-size, 24px);
+  font-weight: 700;
+  color: var(--rewards-subtitle-color, #ffffff);
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.rewards-description {
+  font-size: var(--rewards-text-size, 14px);
+  color: var(--rewards-text-color, #e0e7ff);
+  text-align: center;
+  margin: 0 0 24px;
+  line-height: 1.6;
+  padding:0 8%;
+}
+
+/* Benefits List */
+.rewards-benefits {
+  list-style: none;
+  padding: 0 15%;
+  margin: 0 0 24px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: var(--rewards-text-size, 14px);
+  color: var(--rewards-text-color, #e0e7ff);
+  line-height: 1.4;
+}
+
+.benefit-item .check-icon {
+  flex-shrink: 0;
+  color: #ffffff;
+  margin-top: 2px;
+}
+
+/* CTA Button */
+.rewards-btn-wrapper {
+  margin-top: auto;
+}
+
+.rewards-btn-panel {
+  display: none;
+}
+
+.rewards-btn-panel.active {
+  display: block;
+}
+
+.rewards-btn {
+  display: block;
+  width: 100%;
+  padding: 16px 24px;
+  background-color: var(--rewards-btn-bg, #ffffff);
+  color: var(--rewards-btn-color, #1e5799);
+  text-align: center;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.rewards-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ==========================================================================
+   Content Columns (Middle + Right)
+   ========================================================================== */
+.content-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: var(--section-bg-color);
+  padding: 20px;
+  border-radius: 20px;
+}
+
+/* Top Row - Promo + Blog Intro */
+.content-top-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 20px;
+}
+
+/* Promo Card */
+#shopify-section-{{ section.id }} .promo-card {
+  background-color: var(--promo-bg-color, #ffffff);
+  border-radius: 12px;
+  padding: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0px;
+}
+
+.promo-content {
+  flex: 1;
+}
+
+.promo-title {
+  font-size: var(--promo-title-size, 24px);
+  font-weight: 500;
+  color: var(--promo-title-color, #000000);
+  margin: 0 0 12px;
+  line-height: 1.3;
+}
+
+.promo-text {
+  font-size: var(--promo-text-size, 14px);
+  color: var(--promo-text-color, #666666);
+  margin: 0 0 16px;
+  line-height: 1.6;
+}
+
+.promo-link {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--promo-link-color, #0066cc);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.promo-link:hover {
+  text-decoration: underline;
+}
+
+.promo-image {
+  flex-shrink: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.promo-image img {
+  max-width: 100px;
+  height: auto;
+}
+
+/* Blog Intro Card */
+.blog-intro-card {
+  background-color: var(--blog-intro-bg, #ffffff);
+  border-radius: 12px;
+  padding: 28px;
+}
+
+.blog-intro-title {
+  font-size: var(--blog-intro-title-size, 20px);
+  font-weight: 500;
+  color: var(--blog-intro-title-color, #000000);
+  margin: 0 0 12px;
+  line-height: 1.3;
+}
+
+.blog-intro-text {
+  font-size: var(--blog-intro-text-size, 14px);
+  color: var(--blog-intro-text-color, #666666);
+  margin: 0 0 25px;
+  line-height: 1.6;
+}
+
+.blog-intro-link {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--blog-intro-link-color, #0066cc);
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.blog-intro-link:hover {
+  text-decoration: underline;
+}
+.middle-bordr {
+    display: block;
+    width: max-content;
+    height: 100%;
+}
+
+.middle-bordr:after {
+    content: "";
+    width: 2px;
+    height: 50%;
+    background: #5080c5;
+    display: block;
+    vertical-align: middle;
+    margin: auto;
+}
+
+/* ==========================================================================
+   Bottom Row - Tips/Blog Section
+   ========================================================================== */
+.content-bottom-row {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.tips-title {
+  font-size: var(--tips-title-size, 18px);
+  font-weight: 500;
+  color: var(--tips-title-color, #000000);
+  margin: 0 0 20px;
+}
+
+/* Blog Posts Grid */
+.blog-posts-grid.desktop-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.blog-posts-mobile-slider {
+  display: none;
+}
+
+/* Blog Post Card */
+.blog-post-card {
+  text-decoration: none;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+{% comment %} .blog-post-card:hover {
+  transform: translateY(-4px);
+} {% endcomment %}
+
+.post-image {
+  aspect-ratio: 6/4;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background-color: #f5f5f5;
+}
+
+.post-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.blog-post-card:hover .post-title {
+  text-decoration: underline;
+}
+
+{% comment %} .blog-post-card:hover .post-image img {
+  transform: scale(1.05);
+} {% endcomment %}
+
+.post-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e0e0e0;
+}
+
+.post-placeholder svg {
+  width: 40%;
+  height: 40%;
+  opacity: 0.4;
+}
+
+.post-title {
+  font-size: var(--blog-card-title-size, 14px);
+  color: var(--blog-card-title-color, #333333);
+  margin: 0;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* ==========================================================================
+   Mobile Slider Styles
+   ========================================================================== */
+.blog-posts-mobile-slider .swiper {
+  width: 100%;
+  padding-bottom: 40px;
+}
+
+.blog-posts-mobile-slider .swiper-slide {
+  height: auto;
+}
+
+.blog-posts-mobile-slider .swiper-pagination {
+  bottom: 0 !important;
+}
+
+.blog-posts-mobile-slider .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: #ccc;
+  opacity: 1;
+}
+
+.blog-posts-mobile-slider .swiper-pagination-bullet-active {
+  background: #000;
+  width: 24px;
+  border-radius: 4px;
+}
+
+{% if section.settings.hide_reward_box %}
+  .rewards-card-column {
+    display: none !important;
+  }
+  .content-columns {
+    grid-column: span 2 !important;
+  }
+{% endif %}  
+
+
+/* ==========================================================================
+   Responsive Styles
+   ========================================================================== */
+
+/* Large Desktop */
+@media (min-width: 1200px) {
+  .rewards-content-grid {
+    gap: 30px;
+  }
+  .rewards-description {
+  line-height: normal;
+}
+.rewards-benefits {
+  padding: 0 12%;
+}
+  .content-top-row {
+    gap: 24px;
+  }
+  
+  .blog-posts-grid.desktop-grid {
+    gap: 24px;
+  }
+}
+
+/* Medium Desktop */
+@media (max-width: 1199px) and (min-width: 992px) {
+  .rewards-content-grid {
+    grid-template-columns: 380px 1fr;
+    gap: 20px;
+  }
+  
+  .rewards-card {
+    padding: 24px 20px;
+  }
+  
+  .content-top-row {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .promo-image img {
+    max-width: 100px;
+  }
+}
+
+/* Tablet Landscape */
+@media (max-width: 991px) and (min-width: 769px) {
+  .rewards-content-grid {
+    grid-template-columns: 320px 1fr;
+    gap: 16px;
+  }
+  
+  .rewards-card {
+    padding: 20px 20px;
+    min-height: 450px;
+  }
+  
+  .rewards-main-title .title-large {
+    font-size: 32px;
+  }
+  
+  .content-top-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  #shopify-section-{{ section.id }} .promo-card {
+    padding: 24px;
+  }
+  
+  .blog-intro-card {
+    padding: 24px;
+  }
+  
+  .blog-posts-grid.desktop-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+  a.promo-link.mobile-link {
+    display: none !important;
+  }
+/* Tablet Portrait */
+@media (max-width: 768px) {
+  .rewards-content-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .rewards-description {
+    max-width: 90%;
+    margin: 0 auto 24px;
+    padding: 0;
+  }
+  .rewards-benefits {
+    padding: 0 10%;
+  }
+  .content-columns {
+    border-radius: 12px;
+  }
+  
+  .rewards-card-column {
+    position: relative;
+    top: 0;
+  }
+  
+  .rewards-card {
+    min-height: auto;
+    padding: 28px 24px;
+  }
+  
+  .rewards-main-title .title-small {
+    font-size: 18px;
+  }
+  
+  .rewards-main-title .title-large {
+    font-size: var(--rewards-title-size-mobile, 32px);
+  }
+  
+  .content-top-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  {% comment %} .promo-card {
+    flex-direction: column;
+    text-align: center;
+  } {% endcomment %}
+  
+  {% comment %} .promo-image {
+    order: -1;
+  } {% endcomment %}
+  
+  .promo-title {
+    font-size: var(--promo-title-size-mobile, 20px);
+  }
+  
+  .blog-intro-card {
+    padding: 24px;
+  }
+  
+  .content-bottom-row {
+    padding: 20px;
+    {% comment %} display: none; {% endcomment %}
+  }
+  
+  .tips-title {
+    font-size: var(--tips-title-size-mobile, 16px);
+  }
+  
+  .blog-posts-grid.desktop-grid {
+    {% comment %} display: none; {% endcomment %}
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  .blog-posts-mobile-slider {
+    display: block;
+  }
+  
+  .post-title {
+    font-size: var(--blog-card-title-size-mobile, 13px);
+  }
+  
+  /* Mobile coin adjustments */
+  .deco-coin.coin-1 {
+    width: {{ section.settings.coin_1_size | times: 0.7 }}px;
+    height: {{ section.settings.coin_1_size | times: 0.7 }}px;
+  }
+  
+  .deco-coin.coin-2 {
+    width: {{ section.settings.coin_2_size | times: 0.7 }}px;
+    height: {{ section.settings.coin_2_size | times: 0.7 }}px;
+    top: 100px;
+    right: -35px;
+  }
+  
+  .promo-image {
+    height: max-content;
+    justify-content: space-between;
+    width: auto;
+    align-items: center;
+  }
+}
+@media (min-width: 500px) and (max-width: 768px) {
+  .rewards-card-bg img {
+    object-position: 100% 36%;
+  }
+  .deco-coin.coin-1 {
+    width: 80px;
+    height: 80px;
+  }
+  .deco-coin.coin-2 {
+    width: 120px;
+    height: 120px;
+    right: 0px;
+  }
+  .rewards-description {
+    max-width: 60%;
+  }
+  .rewards-benefits {
+    padding: 0px 23%;
+  }
+  .rewards-main-title .title-large {
+    font-size: 42px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 500px) {
+  .rewards-card {
+    padding: 24px 20px;
+  }
+  
+  .rewards-header {
+    margin-top: 50px;
+  }
+  
+  .deco-coin.coin-1 {
+    width: {{ section.settings.coin_1_size | times: 0.9 }}px;
+    height: {{ section.settings.coin_1_size | times: 0.9 }}px;
+  }
+  
+  .deco-coin.coin-2 {
+    width: {{ section.settings.coin_2_size | times: 1 }}px;
+    height: {{ section.settings.coin_2_size | times: 1 }}px;
+  }
+  
+  .default-coin.coin-1 {
+    font-size: {{ section.settings.coin_1_size | times: 0.4 }}px;
+  }
+  
+  .default-coin.coin-2 {
+    font-size: {{ section.settings.coin_2_size | times: 0.4 }}px;
+  }
+  
+  .rewards-tabs {
+    gap: 8px;
+  }
+  
+  .tab-btn {
+    padding: 8px 18px;
+    font-size: 13px;
+  }
+  
+  .rewards-subtitle {
+    font-size: 24px;
+  }
+  
+  .rewards-btn {
+    padding: 17px 20px;
+    font-size: 13px;
+  }
+  
+  #shopify-section-{{ section.id }} .promo-card,
+  .blog-intro-card {
+    padding: 20px;
+    flex-direction: column;
+  }
+  .promo-image {width:100%;}
+  
+  .content-bottom-row {
+    padding: 16px;
+  }
+  .promo-card a.promo-link {
+    display: none;
+  }
+  a.promo-link.mobile-link {
+    display: block !important;
+    margin-top: 50px;
+  }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+{% comment %} .tab-btn:focus {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+} {% endcomment %}
+
+.rewards-btn:focus,
+.promo-link:focus,
+.blog-intro-link:focus,
+.blog-post-card:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .deco-coin {
+    animation: none;
+  }
+  
+  .rewards-btn,
+  .blog-post-card,
+  .tab-btn,
+  .post-image img {
+    transition: none;
+  }
+  
+  .rewards-btn:hover,
+  .blog-post-card:hover {
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+@media print {
+  .rewards-content-grid {
+    display: block;
+  }
+  
+  .rewards-card {
+    page-break-inside: avoid;
+  }
+  
+  .blog-posts-mobile-slider {
+    display: none;
+  }
+  
+  .blog-posts-grid.desktop-grid {
+    display: grid !important;
+  }
+}
+
+/* ==========================================================================
+   High Contrast Mode
+   ========================================================================== */
+@media (forced-colors: active) {
+  .rewards-card {
+    border: 2px solid currentColor;
+  }
+  
+  .tab-btn {
+    border: 1px solid currentColor;
+  }
+  
+  #shopify-section-{{ section.id }} .promo-card,
+  .blog-intro-card,
+  .content-bottom-row {
+    border: 1px solid currentColor;
+  }
+}
+
+
+</style>
+
+<section id="rewards-content-{{ section.id }}" class="rewards-content-section">
+  <div class="rewards-content-wrapper">
+    <div class="hdt-container">
+      <div class="rewards-content-grid">
+        
+        {% comment %} Left Column - Rewards Card {% endcomment %}
+        <div class="rewards-card-column">
+          <div class="rewards-card" style="background: var(--rewards-bg);">
+            
+            {% comment %} Background Image (optional) {% endcomment %}
+            {% if section.settings.rewards_bg_image != blank %}
+              <div class="rewards-card-bg">
+                <img src="{{ section.settings.rewards_bg_image | image_url: width: 800 }}" alt="" loading="lazy">
+                {% if section.settings.rewards_bg_overlay %}
+                  <div class="rewards-card-bg-overlay"></div>
+                {% endif %}
+              </div>
+            {% endif %}
+            
+            {% comment %} Decorative Elements {% endcomment %}
+            <div class="rewards-decorations">
+              {% if section.settings.coin_image_1 != blank %}
+                <img src="{{ section.settings.coin_image_1 | image_url: width: 150 }}" alt="" class="deco-coin coin-1">
+              {% else %}
+                <div class="deco-coin coin-1 default-coin">💰</div>
+              {% endif %}
+              {% if section.settings.coin_image_2 != blank %}
+                <img src="{{ section.settings.coin_image_2 | image_url: width: 150 }}" alt="" class="deco-coin coin-2">
+              {% else %}
+                <div class="deco-coin coin-2 default-coin">💵</div>
+              {% endif %}
+              {% if section.settings.show_star_decoration %}
+                <div class="deco-star">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="68" height="68" viewBox="0 0 68 68" fill="none">
+<path d="M33.6577 10C34.4393 10 35.08 10.6331 35.1331 11.4129C35.8926 22.5522 44.8061 31.4508 55.9519 32.1863C56.7331 32.2379 57.3682 32.8743 57.3682 33.6572C57.3682 34.4401 56.7331 35.0766 55.9519 35.1282C44.7897 35.8649 35.8659 44.7897 35.1291 55.9519C35.0776 56.7331 34.4406 57.3682 33.6577 57.3682C32.8748 57.3682 32.2379 56.7331 32.1863 55.9519C31.4506 44.8062 22.552 35.8919 11.4129 35.1322C10.6331 35.079 10 34.4393 10 33.6577C10 32.8761 10.6331 32.2364 11.4129 32.1832C22.5357 31.4247 31.4239 22.5358 32.1823 11.4129C32.2354 10.6331 32.8761 10 33.6577 10Z" fill="#0047AB"/>
+<path d="M35.6716 4.33396V2.13255C35.6716 2.02455 35.6266 1.92145 35.5473 1.84813L33.8132 0.244478C33.6642 0.106661 33.4341 0.107235 33.2858 0.245794L31.5702 1.84829C31.4918 1.92155 31.4473 2.02407 31.4473 2.1314V4.33396C31.4473 4.54791 31.6207 4.72136 31.8347 4.72136H35.2842C35.4982 4.72136 35.6716 4.54791 35.6716 4.33396Z" fill="#0047AB"/>
+<path d="M35.6716 63.0347V65.2361C35.6716 65.3441 35.6266 65.4472 35.5473 65.5205L33.8132 67.1242C33.6642 67.262 33.4341 67.2614 33.2858 67.1229L31.5702 65.5204C31.4918 65.4471 31.4473 65.3446 31.4473 65.2373V63.0347C31.4473 62.8207 31.6207 62.6473 31.8347 62.6473H35.2842C35.4982 62.6473 35.6716 62.8207 35.6716 63.0347Z" fill="#0047AB"/>
+<path d="M63.0352 35.9348L65.2366 35.9348C65.3446 35.9348 65.4477 35.8897 65.521 35.8105L67.1247 34.0764C67.2625 33.9274 67.2619 33.6973 67.1233 33.5489L65.5208 31.8334C65.4476 31.755 65.3451 31.7104 65.2377 31.7104L63.0352 31.7104C62.8212 31.7104 62.6478 31.8839 62.6478 32.0979V35.5474C62.6478 35.7614 62.8212 35.9348 63.0352 35.9348Z" fill="#0047AB"/>
+<path d="M4.33396 35.9348L2.13255 35.9348C2.02455 35.9348 1.92145 35.8897 1.84813 35.8105L0.244478 34.0764C0.106661 33.9274 0.107235 33.6973 0.245794 33.5489L1.84829 31.8334C1.92155 31.755 2.02407 31.7104 2.1314 31.7104L4.33396 31.7104C4.54791 31.7104 4.72136 31.8839 4.72136 32.0979V35.5474C4.72136 35.7614 4.54791 35.9348 4.33396 35.9348Z" fill="#0047AB"/>
+</svg>
+                </div>
+              {% endif %}
+            </div>
+
+            {% comment %} Logo/Title {% endcomment %}
+            <div class="rewards-header">
+              {% if section.settings.rewards_logo != blank %}
+                <img src="{{ section.settings.rewards_logo | image_url: width: 200 }}" alt="" class="rewards-logo">
+              {% endif %}
+              <h2 class="rewards-main-title">
+                <span class="title-small">{{ section.settings.rewards_title_small }}</span>
+                <span class="title-large">{{ section.settings.rewards_title_large }}</span>
+              </h2>
+            </div>
+
+            {% comment %} Tabs {% endcomment %}
+            <div class="rewards-tabs">
+              <button class="tab-btn active" data-tab="personal" aria-controls="panel-personal-{{ section.id }}" aria-selected="true">{{ section.settings.tab_1_text }}</button>
+              <div class="middle-bordr"></div>
+              <button class="tab-btn" data-tab="business" aria-controls="panel-business-{{ section.id }}" aria-selected="false">{{ section.settings.tab_2_text }}</button>
+            </div>
+
+            {% comment %} Content - Tab Panels {% endcomment %}
+            <div class="rewards-content">
+              {% comment %} Personal Tab Content {% endcomment %}
+              <div class="tab-panel active" id="panel-personal-{{ section.id }}" data-panel="personal">
+                <h3 class="rewards-subtitle">{{ section.settings.rewards_subtitle }}</h3>
+                <p class="rewards-description">{{ section.settings.rewards_description }}</p>
+                
+                <ul class="rewards-benefits">
+                  {% for block in section.blocks %}
+                    {% if block.type == 'benefit' %}
+                      <li class="benefit-item" {{ block.shopify_attributes }}>
+                        <svg class="check-icon" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                          <circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.5"/>
+                          <path d="M5.5 9l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>{{ block.settings.benefit_text }}</span>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              </div>
+
+              {% comment %} Business Tab Content {% endcomment %}
+              <div class="tab-panel" id="panel-business-{{ section.id }}" data-panel="business">
+                <h3 class="rewards-subtitle">{{ section.settings.rewards_subtitle_business }}</h3>
+                <p class="rewards-description">{{ section.settings.rewards_description_business }}</p>
+                
+                <ul class="rewards-benefits">
+                  {% for block in section.blocks %}
+                    {% if block.type == 'benefit_business' %}
+                      <li class="benefit-item" {{ block.shopify_attributes }}>
+                        <svg class="check-icon" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                          <circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.5"/>
+                          <path d="M5.5 9l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>{{ block.settings.benefit_text }}</span>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+
+            {% comment %} CTA Buttons - Switch with tabs {% endcomment %}
+            <div class="rewards-btn-wrapper">
+              <div class="rewards-btn-panel active" data-btn-panel="personal">
+                <a href="{{ section.settings.rewards_btn_link }}" class="rewards-btn">
+                  {{ section.settings.rewards_btn_text }}
+                </a>
+              </div>
+              <div class="rewards-btn-panel" data-btn-panel="business">
+                <a href="{{ section.settings.rewards_btn_link_business }}" class="rewards-btn">
+                  {{ section.settings.rewards_btn_text_business }}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% comment %} Middle & Right Columns {% endcomment %}
+        <div class="content-columns">
+          {% comment %} Top Row - Promo + Blog Intro {% endcomment %}
+          <div class="content-top-row">
+            {% comment %} Promo Card {% endcomment %}
+            <div class="promo-card">
+              <div class="promo-content">
+                <h3 class="promo-title">{{ section.settings.promo_title }}</h3>
+                <p class="promo-text">{{ section.settings.promo_description }}</p>
+                <a href="{{ section.settings.promo_link_url }}" class="promo-link">{{ section.settings.promo_link_text }}</a>
+              </div>
+              {% if section.settings.promo_image != blank %}
+                <div class="promo-image">
+                  <a href="{{ section.settings.promo_link_url }}" class="promo-link mobile-link">{{ section.settings.promo_link_text }}</a>
+                  <img src="{{ section.settings.promo_image | image_url: width: 200 }}" alt="" loading="lazy">
+                </div>
+              {% endif %}
+            </div>
+
+            {% comment %} Blog Intro Card {% endcomment %}
+            <div class="blog-intro-card">
+              <h3 class="blog-intro-title">{{ section.settings.blog_intro_title }}</h3>
+              <p class="blog-intro-text">{{ section.settings.blog_intro_description }}</p>
+              <a href="{{ section.settings.blog_intro_link_url }}" class="blog-intro-link">{{ section.settings.blog_intro_link_text }}</a>
+            </div>
+          </div>
+
+          {% comment %} Bottom Row - Tips/Blog Posts {% endcomment %}
+          <div class="content-bottom-row">
+            <div class="tips-section">
+              <h4 class="tips-title">{{ section.settings.tips_title }}</h4>
+              
+              {% comment %} Blog Posts Grid - Desktop {% endcomment %}
+              <div class="blog-posts-grid desktop-grid">
+                {% if section.settings.blog != blank %}
+                  {% for article in blogs[section.settings.blog].articles limit: section.settings.posts_count %}
+                    <a href="{{ article.url }}" class="blog-post-card">
+                      <div class="post-image">
+                        {% if article.metafields.custom.featured_image != blank %}
+    <img src="{{ article.metafields.custom.featured_image | image_url: width: 400 }}" alt="{{ article.title }}" loading="lazy">
+  {% elsif article.image %}
+                          <img src="{{ article.image | image_url: width: 400 }}" alt="{{ article.title }}" loading="lazy">
+                        {% else %}
+                          <div class="post-placeholder">
+                            {{ 'image' | placeholder_svg_tag }}
+                          </div>
+                        {% endif %}
+                      </div>
+                      <p class="post-title">{{ article.title | truncate: 60 }}</p>
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  {% for i in (1..4) %}
+                    <div class="blog-post-card">
+                      <div class="post-image">
+                        <div class="post-placeholder">
+                          {{ 'image' | placeholder_svg_tag }}
+                        </div>
+                      </div>
+                      <p class="post-title">Lorem ipsum dolor sit amet consectetur.</p>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+              {% comment %} Blog Posts Slider - Mobile {% endcomment %}
+              {% if section.settings.enable_mobile_slider %}
+                <div class="blog-posts-mobile-slider mobile-slider">
+                  <div class="swiper blog-swiper-{{ section.id }}">
+                    <div class="swiper-wrapper">
+                      {% if section.settings.blog != blank %}
+                        {% for article in blogs[section.settings.blog].articles limit: section.settings.posts_count %}
+                          <div class="swiper-slide">
+                            <a href="{{ article.url }}" class="blog-post-card">
+                              <div class="post-image">
+                                {% if article.metafields.custom.featured_image != blank %}
+    <img src="{{ article.metafields.custom.featured_image | image_url: width: 400 }}" alt="{{ article.title }}" loading="lazy">
+  {% elsif article.image %}
+                                  <img src="{{ article.image | image_url: width: 400 }}" alt="{{ article.title }}" loading="lazy">
+                                {% else %}
+                                  <div class="post-placeholder">
+                                    {{ 'image' | placeholder_svg_tag }}
+                                  </div>
+                                {% endif %}
+                              </div>
+                              <p class="post-title">{{ article.title | truncate: 60 }}</p>
+                            </a>
+                          </div>
+                        {% endfor %}
+                      {% else %}
+                        {% for i in (1..4) %}
+                          <div class="swiper-slide">
+                            <div class="blog-post-card">
+                              <div class="post-image">
+                                <div class="post-placeholder">
+                                  {{ 'image' | placeholder_svg_tag }}
+                                </div>
+                              </div>
+                              <p class="post-title">Lorem ipsum dolor sit amet consectetur.</p>
+                            </div>
+                          </div>
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                    {% if section.settings.show_mobile_pagination %}
+                      <div class="swiper-pagination blog-pagination-{{ section.id }}"></div>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const section = document.getElementById('rewards-content-{{ section.id }}');
+    
+    // Tabs functionality - switches content and button
+    const tabs = section.querySelectorAll('.tab-btn');
+    const tabPanels = section.querySelectorAll('.tab-panel');
+    const btnPanels = section.querySelectorAll('.rewards-btn-panel');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const targetTab = this.dataset.tab;
+        
+        // Update tab states
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        this.classList.add('active');
+        this.setAttribute('aria-selected', 'true');
+        
+        // Update content panels
+        tabPanels.forEach(panel => {
+          panel.classList.remove('active');
+          if (panel.dataset.panel === targetTab) {
+            panel.classList.add('active');
+          }
+        });
+        
+        // Update button panels
+        btnPanels.forEach(btnPanel => {
+          btnPanel.classList.remove('active');
+          if (btnPanel.dataset.btnPanel === targetTab) {
+            btnPanel.classList.add('active');
+          }
+        });
+      });
+    });
+
+    {% if section.settings.enable_mobile_slider %}
+    // Mobile Slider
+    const blogSwiper{{ section.id | replace: '-', '_' }} = new Swiper('.blog-swiper-{{ section.id }}', {
+      slidesPerView: 1.3,
+      spaceBetween: 16,
+      centeredSlides: false,
+      loop: {{ section.settings.mobile_slider_loop }},
+      autoplay: {% if section.settings.mobile_slider_autoplay %}{ delay: {{ section.settings.mobile_slider_autoplay_speed }}, disableOnInteraction: false }{% else %}false{% endif %},
+      pagination: {
+        el: '.blog-pagination-{{ section.id }}',
+        clickable: true,
+      },
+      breakpoints: {
+        400: {
+          slidesPerView: 1.5,
+          spaceBetween: 16,
+        },
+        550: {
+          slidesPerView: 2.2,
+          spaceBetween: 16,
+        }
+      }
+    });
+    {% endif %}
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Rewards & Content",
+  "tag": "section",
+  "class": "rewards-content-section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Background"
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Background Color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "image_picker",
+      "id": "section_bg_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Mobile Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "═══ REWARDS CARD ═══"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_reward_box",
+      "label": "Hide Reward Card",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "rewards_bg_gradient",
+      "label": "Background Gradient",
+      "default": "linear-gradient(180deg, #1e5799 0%, #2989d8 50%, #207cca 100%)"
+    },
+    {
+      "type": "image_picker",
+      "id": "rewards_bg_image",
+      "label": "Rewards Card Background Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "rewards_bg_overlay",
+      "label": "Show Gradient Overlay on Background Image",
+      "default": true,
+      "info": "Applies the gradient as an overlay on top of the background image"
+    },
+    {
+      "type": "image_picker",
+      "id": "rewards_logo",
+      "label": "Rewards Logo"
+    },
+    {
+      "type": "header",
+      "content": "Decorative Coin 1 (Top Left)"
+    },
+    {
+      "type": "image_picker",
+      "id": "coin_image_1",
+      "label": "Coin Image 1"
+    },
+    {
+      "type": "range",
+      "id": "coin_1_size",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Coin 1 Size",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "coin_1_top",
+      "min": -50,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Coin 1 Top Position",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "coin_1_left",
+      "min": -50,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Coin 1 Left Position",
+      "default": -10
+    },
+    {
+      "type": "header",
+      "content": "Decorative Coin 2 (Right Side)"
+    },
+    {
+      "type": "image_picker",
+      "id": "coin_image_2",
+      "label": "Coin Image 2"
+    },
+    {
+      "type": "range",
+      "id": "coin_2_size",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Coin 2 Size",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "coin_2_top",
+      "min": 0,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "label": "Coin 2 Top Position",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "coin_2_right",
+      "min": -50,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Coin 2 Right Position",
+      "default": -15
+    },
+    {
+      "type": "checkbox",
+      "id": "show_star_decoration",
+      "label": "Show Star Decoration",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Rewards Title"
+    },
+    {
+      "type": "text",
+      "id": "rewards_title_small",
+      "label": "Title Small Text",
+      "default": "My Gezu's"
+    },
+    {
+      "type": "text",
+      "id": "rewards_title_large",
+      "label": "Title Large Text",
+      "default": "Rewards"
+    },
+    {
+      "type": "range",
+      "id": "rewards_title_font_size",
+      "min": 24,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Title Font Size (Desktop)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "rewards_title_font_size_mobile",
+      "min": 20,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Title Font Size (Mobile)",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "rewards_title_color",
+      "label": "Title Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Tab Labels"
+    },
+    {
+      "type": "text",
+      "id": "tab_1_text",
+      "label": "Tab 1 Text (Personal)",
+      "default": "Personal"
+    },
+    {
+      "type": "text",
+      "id": "tab_2_text",
+      "label": "Tab 2 Text (Business)",
+      "default": "Business"
+    },
+    {
+      "type": "header",
+      "content": "═ Personal Tab Content ═"
+    },
+    {
+      "type": "text",
+      "id": "rewards_subtitle",
+      "label": "Subtitle (Personal)",
+      "default": "Build More. Spend Less."
+    },
+    {
+      "type": "textarea",
+      "id": "rewards_description",
+      "label": "Description (Personal)",
+      "default": "Become a GeZu Member and unlock special deals, early offers, and pro-level guidance."
+    },
+    {
+      "type": "text",
+      "id": "rewards_btn_text",
+      "label": "Button Text (Personal)",
+      "default": "Sign in or create your account"
+    },
+    {
+      "type": "url",
+      "id": "rewards_btn_link",
+      "label": "Button Link (Personal)"
+    },
+    {
+      "type": "header",
+      "content": "═ Business Tab Content ═"
+    },
+    {
+      "type": "text",
+      "id": "rewards_subtitle_business",
+      "label": "Subtitle (Business)",
+      "default": "Scale Your Business."
+    },
+    {
+      "type": "textarea",
+      "id": "rewards_description_business",
+      "label": "Description (Business)",
+      "default": "Join our Business Program for volume discounts, dedicated support, and priority ordering."
+    },
+    {
+      "type": "text",
+      "id": "rewards_btn_text_business",
+      "label": "Button Text (Business)",
+      "default": "Apply for Business Account"
+    },
+    {
+      "type": "url",
+      "id": "rewards_btn_link_business",
+      "label": "Button Link (Business)"
+    },
+    {
+      "type": "header",
+      "content": "Rewards Card Styling"
+    },
+    {
+      "type": "range",
+      "id": "rewards_subtitle_font_size",
+      "min": 18,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle Font Size",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "rewards_subtitle_color",
+      "label": "Subtitle Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "rewards_text_font_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Font Size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "rewards_text_color",
+      "label": "Text Color",
+      "default": "#e0e7ff"
+    },
+    {
+      "type": "color",
+      "id": "rewards_btn_bg",
+      "label": "Button Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "rewards_btn_color",
+      "label": "Button Text Color",
+      "default": "#1e5799"
+    },
+    {
+      "type": "header",
+      "content": "═══ PROMO CARD ═══"
+    },
+    {
+      "type": "color",
+      "id": "promo_bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "promo_title",
+      "label": "Promo Title",
+      "default": "Christmas Sale coming soon 2025"
+    },
+    {
+      "type": "range",
+      "id": "promo_title_font_size",
+      "min": 18,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "Promo Title Font Size (Desktop)",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "promo_title_font_size_mobile",
+      "min": 16,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Promo Title Font Size (Mobile)",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "promo_title_color",
+      "label": "Promo Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "textarea",
+      "id": "promo_description",
+      "label": "Promo Description",
+      "default": "Members unlock early access to our Christmas Sale, special prices, and limited-time hardware bundles. Sign up for free and never miss a deal."
+    },
+    {
+      "type": "range",
+      "id": "promo_text_font_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Promo Text Font Size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "promo_text_color",
+      "label": "Promo Text Color",
+      "default": "#666666"
+    },
+    {
+      "type": "text",
+      "id": "promo_link_text",
+      "label": "Promo Link Text",
+      "default": "Join Now"
+    },
+    {
+      "type": "url",
+      "id": "promo_link_url",
+      "label": "Promo Link URL"
+    },
+    {
+      "type": "color",
+      "id": "promo_link_color",
+      "label": "Promo Link Color",
+      "default": "#0066cc"
+    },
+    {
+      "type": "image_picker",
+      "id": "promo_image",
+      "label": "Promo Image"
+    },
+    {
+      "type": "header",
+      "content": "═══ BLOG INTRO CARD ═══"
+    },
+    {
+      "type": "color",
+      "id": "blog_intro_bg",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "blog_intro_title",
+      "label": "Title",
+      "default": "Explore Ideas, Tips & Inspiration"
+    },
+    {
+      "type": "range",
+      "id": "blog_intro_title_font_size",
+      "min": 16,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Title Font Size",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "blog_intro_title_color",
+      "label": "Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "textarea",
+      "id": "blog_intro_description",
+      "label": "Description",
+      "default": "Stay updated with practical tips, how-tos, and expert advice for every DIY or construction project. Our blogs help you make confident decisions and get better results with every build."
+    },
+    {
+      "type": "range",
+      "id": "blog_intro_text_font_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Font Size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "blog_intro_text_color",
+      "label": "Text Color",
+      "default": "#666666"
+    },
+    {
+      "type": "text",
+      "id": "blog_intro_link_text",
+      "label": "Link Text",
+      "default": "Visit our blogs"
+    },
+    {
+      "type": "url",
+      "id": "blog_intro_link_url",
+      "label": "Link URL"
+    },
+    {
+      "type": "color",
+      "id": "blog_intro_link_color",
+      "label": "Link Color",
+      "default": "#0066cc"
+    },
+    {
+      "type": "header",
+      "content": "═══ TIPS/BLOG SECTION ═══"
+    },
+    {
+      "type": "text",
+      "id": "tips_title",
+      "label": "Tips Section Title",
+      "default": "Tips for your next projects"
+    },
+    {
+      "type": "range",
+      "id": "tips_title_font_size",
+      "min": 14,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Tips Title Font Size (Desktop)",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "tips_title_font_size_mobile",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tips Title Font Size (Mobile)",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "tips_title_color",
+      "label": "Tips Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Select Blog"
+    },
+    {
+      "type": "range",
+      "id": "posts_count",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "Number of Posts",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "blog_card_bg",
+      "label": "Blog Card Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "blog_card_title_font_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Blog Card Title Font Size (Desktop)",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "blog_card_title_font_size_mobile",
+      "min": 11,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Blog Card Title Font Size (Mobile)",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "blog_card_title_color",
+      "label": "Blog Card Title Color",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Mobile Slider Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_mobile_slider",
+      "label": "Enable Mobile Slider for Blog Posts",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mobile_pagination",
+      "label": "Show Pagination Dots (Mobile)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_slider_loop",
+      "label": "Loop Slider (Mobile)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_slider_autoplay",
+      "label": "Autoplay Slider (Mobile)",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "mobile_slider_autoplay_speed",
+      "min": 2000,
+      "max": 9000,
+      "step": 500,
+      "unit": "ms",
+      "label": "Autoplay Speed (Mobile)",
+      "default": 5000
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit (Personal)",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "text",
+          "id": "benefit_text",
+          "label": "Benefit Text",
+          "default": "Exclusive Discounts"
+        }
+      ]
+    },
+    {
+      "type": "benefit_business",
+      "name": "Benefit (Business)",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "text",
+          "id": "benefit_text",
+          "label": "Benefit Text",
+          "default": "Volume Discounts"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Rewards & Content",
+      "blocks": [
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_text": "Exclusive Discounts"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_text": "Early Access to seasonal sales, offers"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_text": "Expert Tips & Guides from industry professionals"
+          }
+        },
+        {
+          "type": "benefit_business",
+          "settings": {
+            "benefit_text": "Volume Discounts up to 25%"
+          }
+        },
+        {
+          "type": "benefit_business",
+          "settings": {
+            "benefit_text": "Dedicated Account Manager"
+          }
+        },
+        {
+          "type": "benefit_business",
+          "settings": {
+            "benefit_text": "Priority Ordering & Delivery"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

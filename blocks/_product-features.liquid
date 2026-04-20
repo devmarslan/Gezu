@@ -1,0 +1,410 @@
+{%- liquid
+  unless product 
+    assign product = section.settings.product
+    if product == null
+      assign product = null | default: title: "Example product title", price: 1999, compare_at_price: 2500, available: true, vendor: "Ecomus"
+    endif
+  endunless
+
+  # Check metafield first, fallback to block settings
+  assign metafield_obj = product.metafields[block.settings.metafield_namespace][block.settings.metafield_key]
+  assign features_content = blank
+  
+  if metafield_obj != blank and metafield_obj.type == 'rich_text_field'
+    # Rich text metafields need special handling - capture the rendered output
+    capture rendered_metafield
+      echo metafield_obj | metafield_tag
+    endcapture
+    # Extract inner HTML (metafield_tag wraps in a div)
+    assign features_content = rendered_metafield | remove: '<div class="metafield-rich_text_field">' | remove: '</div>'
+  elsif metafield_obj != blank
+    assign features_content = metafield_obj
+  endif
+  
+  if features_content == blank
+    assign features_content = block.settings.features_list
+  endif
+
+  # Separate description (paragraphs) from list items
+  assign has_list = false
+  assign description_part = ''
+  assign list_part = ''
+
+  if features_content contains '<ul>'
+    assign has_list = true
+    assign content_split = features_content | split: '<ul>'
+    assign description_part = content_split[0]
+    assign list_part = content_split[1] | split: '</ul>' | first
+  elsif features_content contains '<ol>'
+    assign has_list = true
+    assign content_split = features_content | split: '<ol>'
+    assign description_part = content_split[0]
+    assign list_part = content_split[1] | split: '</ol>' | first
+  else
+    assign description_part = features_content
+  endif
+-%}
+
+<style>
+  .hdt-product-features-{{ block.id }} {
+    {%- if block.settings.show_background %}
+      background-color: {{ block.settings.bg_color }};
+      padding: {{ block.settings.padding_y }}px {{ block.settings.padding_x }}px;
+      border-radius: {{ block.settings.border_radius }}px;
+    {%- endif %}
+    {%- if block.settings.show_border %}
+      border: {{ block.settings.border_width }}px solid {{ block.settings.border_color }};
+    {%- endif %}
+    margin-top: 20px;
+  }
+
+  .hdt-product-features-{{ block.id }} .hdt-features-description {
+    color: {{ block.settings.description_color }};
+    font-weight: {{ block.settings.description_font_weight }};
+    line-height: {{ block.settings.description_line_height }};
+    margin-bottom: {{ block.settings.description_margin_bottom }}px;
+  }
+
+  .hdt-product-features-{{ block.id }} .hdt-features-description p {
+    margin: 0;
+  }
+
+  .hdt-product-features-{{ block.id }} .hdt-features-list {
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.list_gap }}px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .hdt-product-features-{{ block.id }} .hdt-feature-item {
+    display: flex;
+    align-items: {{ block.settings.icon_vertical_align }};
+    gap: {{ block.settings.icon_text_gap }}px;
+  }
+
+  .hdt-product-features-{{ block.id }} .hdt-feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: {{ block.settings.icon_size }}px;
+    height: {{ block.settings.icon_size }}px;
+  }
+
+  .hdt-product-features-{{ block.id }} .hdt-feature-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .hdt-product-features-{{ block.id }} .hdt-feature-text {
+    color: {{ block.settings.feature_text_color }};
+    font-weight: {{ block.settings.feature_font_weight }};
+    line-height: 1.4;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hdt-product-features-{{ block.id }} {
+      background-color: transparent;
+      padding: 10px 0px;
+      border-radius: 0px;
+      border: none;
+    }
+  }
+</style>
+
+<div class="hdt-product-info__item hdt-product__features" data-type="{{ block.type }}" {{ block.shopify_attributes }}>
+  <div class="hdt-product-features-{{ block.id }}">
+
+    {%- comment -%} Description Part (no tick icons) {%- endcomment -%}
+    {%- assign description_stripped = description_part | strip_html | strip -%}
+    {%- if description_stripped != blank -%}
+      <div class="hdt-features-description hdt-{{ block.settings.description_font_size }}">
+        {{ description_part }}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} List Items (with tick icons) {%- endcomment -%}
+    {%- if has_list and list_part != blank -%}
+      {%- assign features_array = list_part | split: '</li>' -%}
+      
+      <ul class="hdt-features-list">
+        {%- for feature in features_array -%}
+          {%- assign feature_trimmed = feature | strip_html | strip -%}
+          {%- if feature_trimmed != blank -%}
+            <li class="hdt-feature-item">
+              <span class="hdt-feature-icon">
+                {% comment %} <svg viewBox="0 0 24 24" fill="none" stroke="{{ block.settings.icon_color }}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg> {% endcomment %}
+                <svg viewBox="0 0 24 24" fill="{{ block.settings.icon_color }}" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </span>
+              <span class="hdt-feature-text hdt-{{ block.settings.feature_font_size }}">{{ feature_trimmed }}</span>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Product Features",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Metafield Settings"
+    },
+    {
+      "type": "text",
+      "id": "metafield_namespace",
+      "label": "Metafield Namespace",
+      "default": "custom",
+      "info": "e.g., 'custom'"
+    },
+    {
+      "type": "text",
+      "id": "metafield_key",
+      "label": "Metafield Key",
+      "default": "product_features",
+      "info": "e.g., 'product_features' (Rich text type)"
+    },
+    {
+      "type": "header",
+      "content": "Fallback Features"
+    },
+    {
+      "type": "richtext",
+      "id": "features_list",
+      "label": "Features List",
+      "default": "<p>The Adjustable Post Support A12 transforms ordinary posts into solid, stable structures.</p><ul><li>Easy Installation</li><li>Certified Quality</li><li>Fast Shipping</li></ul>",
+      "info": "Paragraphs show as description. Bullet list shows with tick icons."
+    },
+    {
+      "type": "header",
+      "content": "Description Styling"
+    },
+    {
+      "type": "select",
+      "id": "description_font_size",
+      "label": "Description Font Size",
+      "options": [
+        { "value": "text-xs", "label": "Extra Small" },
+        { "value": "text-sm", "label": "Small" },
+        { "value": "base", "label": "Base" },
+        { "value": "text-lg", "label": "Large" },
+        { "value": "h6", "label": "H6" },
+        { "value": "h5", "label": "H5" }
+      ],
+      "default": "base"
+    },
+    {
+      "type": "select",
+      "id": "description_font_weight",
+      "label": "Description Font Weight",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description Color",
+      "default": "#333333"
+    },
+    {
+      "type": "range",
+      "id": "description_line_height",
+      "label": "Description Line Height",
+      "min": 1,
+      "max": 2.5,
+      "step": 0.1,
+      "default": 1.6
+    },
+    {
+      "type": "range",
+      "id": "description_margin_bottom",
+      "label": "Description Bottom Margin",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Icon Settings"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Icon Size",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Tick Icon Color",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "List Text Styling"
+    },
+    {
+      "type": "select",
+      "id": "feature_font_size",
+      "label": "Font Size",
+      "options": [
+        { "value": "text-xs", "label": "Extra Small" },
+        { "value": "text-sm", "label": "Small" },
+        { "value": "base", "label": "Base" },
+        { "value": "text-lg", "label": "Large" },
+        { "value": "h6", "label": "H6" },
+        { "value": "h5", "label": "H5" }
+      ],
+      "default": "base"
+    },
+    {
+      "type": "select",
+      "id": "feature_font_weight",
+      "label": "Font Weight",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "feature_text_color",
+      "label": "Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "list_gap",
+      "label": "Gap Between Features",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "icon_text_gap",
+      "label": "Gap Between Icon & Text",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "icon_vertical_align",
+      "label": "Icon Vertical Alignment",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Background & Border"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_background",
+      "label": "Show Background",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#F5F5F5"
+    },
+    {
+      "type": "range",
+      "id": "padding_x",
+      "label": "Horizontal Padding",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "label": "Vertical Padding",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border Radius",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 8,
+      "unit": "px"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border",
+      "label": "Show Border",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#E5E5E5"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Border Width",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 1,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Features"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,1544 @@
+{% comment %}
+  Compare Popup - Detailed Product Comparison
+  With Variant Selector and Technical Details from Variant Metafields
+  
+  Usage: {% render 'compare-popup-detailed' %}
+{% endcomment %}
+
+<style>
+  /* Compare Popup Button */
+  .compare-popup-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: rgb(var(--color-accent, 0 102 204));
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .compare-popup-btn:hover {
+    opacity: 0.9;
+  }
+  
+  .compare-popup-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Compare Popup Modal - Full Screen */
+  #comparePopupModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999999999;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0;
+    background: #f3f4f6;
+    overflow-y: auto;
+  }
+  
+  #comparePopupModal.is-open {
+    display: block;
+  }
+  
+  #comparePopupModal .compare-overlay {
+    display: none;
+  }
+  
+  #comparePopupModal .compare-modal {
+    position: relative;
+    background: #f3f4f6;
+    border-radius: 0;
+    max-width: 100%;
+    width: 100%;
+    min-height: 100vh;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    box-shadow: none;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Modal Header - Sticky */
+  .compare-modal__header {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px 0px 0;
+    flex-shrink: 0;
+    background: #f3f4f6;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  
+  .m-compare-modal__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 0px 0px 24px;
+  }
+  
+  .compare-modal__actions-difference {
+    padding: 20px 0px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  
+  .compare-modal__title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .compare-modal__title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    color: #1a1a1a;
+  }
+  
+  .compare-modal__subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+  }
+  
+  .compare-modal__actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  
+  /* Toggle Switch */
+  .compare-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color:#121212;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .compare-toggle__switch {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    background: #ccc;
+    border-radius: 26px;
+    transition: background 0.3s;
+  }
+  
+  .compare-toggle__switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  
+  .compare-toggle input {
+    display: none;
+  }
+  
+  .compare-toggle input:checked + .compare-toggle__switch {
+    background: #094983;
+  }
+  
+  .compare-toggle input:checked + .compare-toggle__switch::after {
+    transform: translateX(22px);
+  }
+  
+  /* Unit Switcher for Technical Details */
+  .compare-unit-switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #e5e5e5;
+  }
+  
+  .compare-unit-switcher__label {
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+    margin-right: 4px;
+  }
+  
+  .compare-unit-btn {
+    background: transparent;
+    border: none;
+    padding: 4px 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #9ca3af;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .compare-unit-btn:hover {
+    color: #374151;
+    background: #f3f4f6;
+  }
+  
+  .compare-unit-btn.active {
+    color: #1f2937;
+    background: #e5e7eb;
+  }
+  
+  /* Close Button */
+  .compare-modal__close {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s;
+  }
+  
+  .compare-modal__close:hover {
+    background: #f0f0f0;
+    color: #000;
+  }
+  
+  .compare-modal__close svg {
+    width: 24px;
+    height: 24px;
+  }
+  
+  /* Modal Body */
+  .compare-modal__body {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 30px 0px 70px;
+  }
+  
+  div#compareContent {
+    overflow: auto;
+    scrollbar-width: thin;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+  
+  /* Compare Grid Layout */
+  .compare-grid {
+    display: flex;
+    gap: 10px;
+    min-width: max-content;
+  }
+  
+  .compare-column {
+    min-width: 280px;
+    max-width: 320px;
+    flex: 1;
+    border: 1px solid #e5e5e5;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 8px;
+  }
+  
+  .compare-column:last-child {
+    border-right: 1px solid #e5e5e5;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 1px 5px 12px 0px #00152a0f;
+  }
+  
+  .compare-column:only-child {
+    border-radius: 8px;
+  }
+  
+  .compare-column.empty-column {
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 600px;
+    border-radius:8px;
+  }
+  
+  /* Pinned/Sticky Column */
+  .compare-column.is-pinned {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: #fff;
+    box-shadow: 4px 0 12px rgba(0,0,0,0.15);
+  }
+  
+  .compare-column.is-pinned .compare-card__pin {
+    background: #094983;
+    color: #fff;
+    border-color: #094983;
+  }
+  
+  /* Product Card Header */
+  .compare-card {
+    padding: 20px;
+    border-bottom: 1px solid #e5e5e5;
+    box-shadow: 1px 5px 12px 0px #00152a0f;
+  }
+  
+  .compare-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  
+  .compare-card__pin {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: #0047ab;
+    border: 1px solid #0047ab;
+    border-radius: 20px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .compare-card__pin:hover,
+  .compare-card__pin.is-pinned {
+    background: #094983;
+    color: #fff;
+  }
+  
+  .compare-card__remove {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+  }
+  
+  .compare-card__remove:hover {
+    color: #333;
+  }
+  
+  .compare-card__remove svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .compare-card__image {
+    display: block;
+    width: 100%;
+    max-width: 180px;
+    margin: 0 auto 16px;
+    aspect-ratio: 1;
+    object-fit: contain;
+  }
+  
+  .compare-card__sku {
+    font-size: 13px;
+    color: #888;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  
+  .compare-card__title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+    text-align: center;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    text-decoration: none;
+    display: block;
+    min-height: 42px;
+  }
+  
+  .compare-card__title:hover {
+    color: #0047ab;
+  }
+  
+  .compare-card__price {
+    text-align: center;
+    margin-bottom: 5px;
+    min-height: 45px;
+  }
+  
+  .compare-card__price-main {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1;
+  }
+  
+  .compare-card__price-secondary {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+  }
+  
+  .compare-card__rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    min-height: 24px;
+  }
+
+  .compare-card__rating .areviews_product_item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .compare-card__rating .star-ratings {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .compare-card__rating .star-ratings .stars {
+    display: flex;
+  }
+
+  .compare-card__rating .star-ratings .rating {
+    font-size: 13px;
+  }
+  
+  .compare-card__stars {
+    display: flex;
+    gap: 2px;
+    color: #f5a623;
+  }
+  
+  .compare-card__stars svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .compare-card__reviews {
+    font-size: 13px;
+    color: #666;
+  }
+  
+  /* Variant Selector */
+  .compare-variant-selector {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+  }
+  
+  .compare-variant-selector__label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+    display: block;
+    font-weight: 500;
+  }
+  
+  .compare-variant-selector__select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    background: #fff;
+    color: #333;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    transition: border-color 0.2s;
+  }
+  
+  .compare-variant-selector__select:hover {
+    border-color: #ccc;
+  }
+  
+  .compare-variant-selector__select:focus {
+    outline: none;
+    border-color: #0047ab;
+  }
+  
+  .compare-variant-selector__select option:disabled {
+    color: #999;
+  }
+  
+  /* Spec Rows */
+  .compare-specs-header {
+    padding: 14px 20px;
+    background: #0047ab;
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  
+  .compare-spec-row {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    min-height: 50px;
+    justify-content: center;
+  }
+  
+  .compare-spec-label {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 4px;
+    line-height: normal;
+  }
+  
+  .compare-spec-value {
+    font-size: 14px;
+    color: #1a1a1a;
+    font-weight: 500;
+  }
+  
+  /* Technical Details Values with Units */
+  .compare-tech-value {
+    display: none;
+  }
+  
+  .compare-tech-value.active {
+    display: inline;
+  }
+  
+  /* No Technical Details Message */
+  .compare-no-tech-details {
+    padding: 20px;
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    font-style: italic;
+  }
+  
+  /* Add to Cart */
+  .compare-atc {
+    padding: 20px;
+    margin-top: auto;
+  }
+  
+  .compare-atc-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 20px;
+    background: #0047ab;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .compare-atc-btn:hover {
+    background:#094983;
+  }
+  
+  .compare-atc-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .compare-atc-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* Empty Slot */
+  .compare-empty-slot {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  
+  .compare-empty-slot__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: #0047ab;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .compare-empty-slot__btn:hover {
+    background: #094983;
+  }
+  
+  /* Loading & Empty States */
+  .compare-loading,
+  .compare-empty-state {
+    padding: 100px 20px;
+    text-align: center;
+  }
+  
+  .compare-loading svg {
+    animation: compare-spin 1s linear infinite;
+  }
+  
+  @keyframes compare-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .compare-modal__header {
+      padding: 20px 24px;
+    }
+    
+    .compare-modal__body {
+      padding: 20px 24px 40px;
+    }
+    
+    .compare-column {
+      min-width: 240px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .compare-modal__header {
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 16px 20px;
+    }
+    
+    .compare-modal__title {
+      font-size: 20px;
+    }
+    
+    .compare-modal__body {
+      padding: 16px 16px 40px;
+    }
+    
+    .compare-column {
+      min-width: 200px;
+    }
+    
+    .compare-card__image {
+      max-width: 120px;
+    }
+    
+    .compare-card__price-main {
+      font-size: 20px;
+    }
+    
+    .compare-toggle span {
+      display: none;
+    }
+    
+    .compare-modal__actions-difference {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .compare-unit-switcher__label {
+      display: none;
+    }
+  }
+</style>
+
+<!-- Compare Popup Modal -->
+<div id="comparePopupModal">
+  <div class="compare-overlay" data-compare-close></div>
+  <div class="compare-modal">
+    <!-- Header -->
+    <div class="compare-modal__header">
+      <div class="m-compare-modal__actions">
+        <div class="compare-modal__title-wrap">
+          <h2 class="compare-modal__title">{{ 'compare_popup.title' | t | default: 'Product Comparison' }}</h2>
+          <p class="compare-modal__subtitle" id="compareCount">Compare 0 Products</p>
+        </div>
+        <div class="compare-modal__actions">
+          <button class="compare-modal__close" data-compare-close aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="compare-modal__actions-difference">
+        <label class="compare-toggle">
+          <span>{{ 'compare_popup.show_differences' | t | default: 'Show only differences' }}</span>
+          <input type="checkbox" id="compareDiffToggle">
+          <span class="compare-toggle__switch"></span>
+        </label>
+        
+        <!-- Unit Switcher for Technical Details -->
+        <div class="compare-unit-switcher" id="compareUnitSwitcher">
+          <span class="compare-unit-switcher__label">Unit:</span>
+          <button type="button" class="compare-unit-btn active" data-unit="mm">MM</button>
+          <button type="button" class="compare-unit-btn" data-unit="cm">CM</button>
+          <button type="button" class="compare-unit-btn" data-unit="in">IN</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Body -->
+    <div class="compare-modal__body">
+      <div id="compareContent">
+        <div class="compare-loading">
+          <svg width="40" height="40" viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="18" fill="none" stroke="#0066cc" stroke-width="3" stroke-dasharray="80" stroke-linecap="round"/>
+          </svg>
+          <p style="margin-top: 16px; color: #666;">Loading products...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  
+  const ComparePopup = {
+    modal: null,
+    content: null,
+    countEl: null,
+    diffToggle: null,
+    unitSwitcher: null,
+    products: [],
+    productMetafields: {},
+    selectedVariants: {},
+    pinnedProductId: null,
+    activeUnit: 'mm',
+    specs: [
+      { key: 'vendor', label: 'Brand' },
+      { key: 'product_type', label: 'Category' },
+      { key: 'sku', label: 'SKU' }
+    ],
+    
+    init() {
+      this.modal = document.getElementById('comparePopupModal');
+      this.content = document.getElementById('compareContent');
+      this.countEl = document.getElementById('compareCount');
+      this.diffToggle = document.getElementById('compareDiffToggle');
+      this.unitSwitcher = document.getElementById('compareUnitSwitcher');
+      
+      if (!this.modal) return;
+      
+      this.modal.querySelectorAll('[data-compare-close]').forEach(btn => {
+        btn.addEventListener('click', () => this.close());
+      });
+      
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.modal.classList.contains('is-open')) {
+          this.close();
+        }
+      });
+      
+      if (this.diffToggle) {
+        this.diffToggle.addEventListener('change', () => this.toggleDifferences());
+      }
+      
+      if (this.unitSwitcher) {
+        this.unitSwitcher.querySelectorAll('.compare-unit-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const unit = e.currentTarget.dataset.unit;
+            this.switchUnit(unit);
+          });
+        });
+      }
+      
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('#openComparePopup') || e.target.closest('[data-open-compare-popup]')) {
+          e.preventDefault();
+          this.open();
+        }
+      });
+      
+      console.log('ComparePopup initialized with Variant Selector & Technical Details');
+    },
+    
+    switchUnit(unit) {
+      this.activeUnit = unit;
+      
+      this.unitSwitcher.querySelectorAll('.compare-unit-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.unit === unit);
+      });
+      
+      this.content.querySelectorAll('.compare-tech-value').forEach(val => {
+        val.classList.toggle('active', val.dataset.unit === unit);
+      });
+    },
+    
+    async open() {
+      const drawer = document.getElementById('drawerCompare');
+      if (drawer) {
+        drawer.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', keyCode: 27, bubbles: true }));
+        drawer.removeAttribute('open');
+        if (drawer.tagName === 'DIALOG') {
+          try { drawer.close(); } catch(e) {}
+        }
+        drawer.style.display = 'none';
+      }
+      
+      const hdtDrawer = document.querySelector('hdt-drawer');
+      if (hdtDrawer) {
+        hdtDrawer.style.display = 'none';
+        hdtDrawer.classList.add('hdt-hidden');
+      }
+      
+      const backdrop = document.querySelector('.hdt-dialog-backdrop, .hdt-drawer-overlay, [data-drawer-overlay]');
+      if (backdrop) backdrop.click();
+      
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      document.body.classList.remove('overflow-hidden', 'no-scroll');
+      document.documentElement.classList.remove('overflow-hidden', 'no-scroll');
+      
+      document.body.style.overflow = 'hidden';
+      this.modal.classList.add('is-open');
+      await this.loadProducts();
+    },
+    
+    close() {
+      document.body.style.overflow = '';
+      this.modal.classList.remove('is-open');
+    },
+    
+    getCompareHandles() {
+      const keys = ['hdtCompare', 'compare-products', 'shopify-compare', 'compare_items'];
+      
+      for (const key of keys) {
+        try {
+          const stored = localStorage.getItem(key);
+          if (stored) {
+            const data = JSON.parse(stored);
+            if (Array.isArray(data) && data.length > 0) {
+              if (typeof data[0] === 'string') return data;
+              if (data[0].handle) return data.map(item => item.handle);
+            } else if (data.items && Array.isArray(data.items)) {
+              return data.items;
+            } else if (data.handles && Array.isArray(data.handles)) {
+              return data.handles;
+            }
+          }
+        } catch (e) {}
+      }
+      
+      const handles = [];
+      document.querySelectorAll('offcanvas-compare [data-handle], .hdt-compare-offcanvas [data-handle]').forEach(el => {
+        const handle = el.getAttribute('data-handle');
+        if (handle && !handles.includes(handle)) handles.push(handle);
+      });
+      
+      return handles;
+    },
+    
+    async loadProducts() {
+      const handles = this.getCompareHandles();
+      console.log('Compare handles found:', handles);
+      
+      if (!handles || handles.length === 0) {
+        this.renderEmpty();
+        return;
+      }
+      
+      this.content.innerHTML = '<div class="compare-loading"><svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="none" stroke="#0066cc" stroke-width="3" stroke-dasharray="80" stroke-linecap="round"/></svg><p style="margin-top: 16px; color: #666;">Loading products...</p></div>';
+      
+      this.products = [];
+      this.productMetafields = {};
+      this.selectedVariants = {};
+      
+      for (const handle of handles) {
+        try {
+          const response = await fetch('/products/' + handle + '.js');
+          if (response.ok) {
+            const product = await response.json();
+            this.products.push(product);
+            
+            const firstVariant = product.variants && product.variants[0];
+            if (firstVariant) {
+              this.selectedVariants[product.id] = firstVariant.id;
+            }
+            
+            await this.fetchProductMetafields(handle, product);
+          }
+        } catch (e) {
+          console.error('Failed to fetch product:', handle, e);
+        }
+      }
+      
+      this.updateCount();
+      this.render();
+    },
+    
+    async fetchProductMetafields(handle, product) {
+      try {
+        const response = await fetch('/products/' + handle + '?section_id=compare-metafields-data');
+        
+        if (response.ok) {
+          const html = await response.text();
+          console.log('Metafields HTML for', handle, ':', html.substring(0, 500));
+          
+          let match = html.match(/data-variant-metafields='([^']+)'/);
+          if (match) {
+            try {
+              const decoded = match[1]
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'")
+                .replace(/&amp;/g, '&');
+              const parsed = JSON.parse(decoded);
+              if (Object.keys(parsed).length > 0) {
+                this.productMetafields[product.id] = parsed;
+                return;
+              }
+            } catch(e) {}
+          }
+          
+          match = html.match(/data-variant-metafields="([^"]+)"/);
+          if (match) {
+            try {
+              const decoded = match[1]
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'")
+                .replace(/&amp;/g, '&');
+              const parsed = JSON.parse(decoded);
+              if (Object.keys(parsed).length > 0) {
+                this.productMetafields[product.id] = parsed;
+                return;
+              }
+            } catch(e) {}
+          }
+          
+          match = html.match(/data-metafields="([^"]+)"/);
+          if (match) {
+            try {
+              const decoded = match[1]
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'")
+                .replace(/&amp;/g, '&');
+              const parsed = JSON.parse(decoded);
+              if (Object.keys(parsed).length > 0) {
+                this.productMetafields[product.id] = parsed;
+                return;
+              }
+            } catch(e) {}
+          }
+          
+          match = html.match(new RegExp('<script[^>]*type="application/json"[^>]*>([^<]+)</' + 'script>'));
+          if (match) {
+            try {
+              const parsed = JSON.parse(match[1]);
+              if (Object.keys(parsed).length > 0) {
+                this.productMetafields[product.id] = parsed;
+                return;
+              }
+            } catch(e) {}
+          }
+        }
+      } catch (e) {
+        console.log('Metafields fetch failed for', handle, e);
+      }
+      
+      if (!this.productMetafields[product.id] && window.compareMetafieldsData && window.compareMetafieldsData[product.id]) {
+        this.productMetafields[product.id] = window.compareMetafieldsData[product.id];
+      }
+      
+      if (!this.productMetafields[product.id]) {
+        this.productMetafields[product.id] = {};
+      }
+    },
+    
+    updateCount() {
+      if (this.countEl) {
+        this.countEl.textContent = 'Compare ' + this.products.length + ' Products';
+      }
+    },
+    
+    formatMoney(cents) {
+      const amount = (cents / 100).toFixed(2);
+      const symbol = window.Shopify && window.Shopify.currency ? window.Shopify.currency.active : 'EUR';
+      return symbol + ' ' + amount;
+    },
+    
+    getSpecValue(product, spec, variant) {
+      switch (spec.key) {
+        case 'vendor': return product.vendor || '-';
+        case 'product_type': return product.product_type || '-';
+        case 'sku': return (variant && variant.sku) || '-';
+        case 'weight':
+          return variant && variant.weight ? variant.weight + ' ' + (variant.weight_unit || 'g') : '-';
+        default: return product[spec.key] || '-';
+      }
+    },
+    
+    parseTechnicalDetails(detailsArray) {
+      if (!detailsArray || !Array.isArray(detailsArray)) return [];
+      
+      const parsed = [];
+      detailsArray.forEach(detail => {
+        const detailClean = (typeof detail === 'string') ? detail.trim() : '';
+        if (detailClean !== '') {
+          const parts = detailClean.split('|');
+          const label = parts[0] ? parts[0].trim() : '';
+          const valuesString = parts[1] ? parts[1].trim() : '';
+          const values = valuesString.split(',');
+          
+          parsed.push({
+            label: label,
+            mm: values[0] ? values[0].trim() : '-',
+            cm: values[1] ? values[1].trim() : '-',
+            in: values[2] ? values[2].trim() : '-'
+          });
+        }
+      });
+      
+      return parsed;
+    },
+    
+    getTechnicalDetailsForVariant(productId, variantId) {
+      const metafields = this.productMetafields[productId];
+      if (metafields && metafields[variantId]) {
+        return this.parseTechnicalDetails(metafields[variantId]);
+      }
+      return [];
+    },
+    
+    getSelectedTechnicalDetails(product) {
+      const selectedVariantId = this.selectedVariants[product.id];
+      return this.getTechnicalDetailsForVariant(product.id, selectedVariantId);
+    },
+    
+    collectAllTechnicalLabels() {
+      const labelsSet = new Set();
+      
+      this.products.forEach(product => {
+        const details = this.getSelectedTechnicalDetails(product);
+        details.forEach(d => {
+          if (d.label) labelsSet.add(d.label);
+        });
+      });
+      
+      return Array.from(labelsSet);
+    },
+    
+    getTechValueForLabel(product, label) {
+      const details = this.getSelectedTechnicalDetails(product);
+      const found = details.find(d => d.label === label);
+      return found || { mm: '-', cm: '-', in: '-' };
+    },
+    
+    getSelectedVariant(product) {
+      const selectedId = this.selectedVariants[product.id];
+      return product.variants.find(v => v.id === selectedId) || product.variants[0];
+    },
+    
+    hasAnyTechnicalDetails() {
+      for (const product of this.products) {
+        const details = this.getSelectedTechnicalDetails(product);
+        if (details.length > 0) return true;
+      }
+      return false;
+    },
+    
+    collectAllSpecs() {
+      this.specs = [
+        { key: 'vendor', label: 'Brand' },
+        { key: 'product_type', label: 'Category' },
+        { key: 'sku', label: 'SKU' }
+      ];
+      this.specs.push({ key: 'weight', label: 'Weight' });
+    },
+    
+    initReviewWidgets() {
+      var self = this;
+      
+      function triggerInit() {
+        if (typeof window.areviews !== 'undefined') {
+          if (typeof window.areviews.init === 'function') window.areviews.init();
+          if (typeof window.areviews.widgets === 'function') window.areviews.widgets();
+        }
+        if (typeof window.AReviewsWidgets !== 'undefined' && typeof window.AReviewsWidgets.init === 'function') {
+          window.AReviewsWidgets.init();
+        }
+        if (typeof window.areviews_init === 'function') {
+          window.areviews_init();
+        }
+        document.dispatchEvent(new CustomEvent('areviews:refresh'));
+        document.dispatchEvent(new CustomEvent('areviews:init'));
+      }
+      
+      triggerInit();
+      
+      var attempts = 0;
+      var retryInterval = setInterval(function() {
+        attempts++;
+        var widgets = self.content.querySelectorAll('.areviews_product_item');
+        var allLoaded = widgets.length > 0;
+        widgets.forEach(function(el) {
+          if (el.children.length === 0) allLoaded = false;
+        });
+        
+        if (allLoaded || attempts >= 5) {
+          clearInterval(retryInterval);
+        } else {
+          triggerInit();
+        }
+      }, 100);
+    },
+    
+    render() {
+      if (this.products.length === 0) {
+        this.renderEmpty();
+        return;
+      }
+      
+      this.collectAllSpecs();
+      const techLabels = this.collectAllTechnicalLabels();
+      const hasTechDetails = this.hasAnyTechnicalDetails();
+      
+      let html = '<div class="compare-grid">';
+      
+      const pinnedProduct = this.pinnedProductId ? this.products.find(p => p.id === this.pinnedProductId) : null;
+      const otherProducts = this.pinnedProductId ? this.products.filter(p => p.id !== this.pinnedProductId) : this.products;
+      const orderedProducts = pinnedProduct ? [pinnedProduct, ...otherProducts] : otherProducts;
+      
+      orderedProducts.forEach((product) => {
+        const selectedVariant = this.getSelectedVariant(product);
+        const variantImage = selectedVariant.featured_image ? selectedVariant.featured_image.src : null;
+        const img = variantImage || product.featured_image || (product.images && product.images[0]) || '';
+        const sku = selectedVariant.sku || product.id;
+        const available = selectedVariant.available !== false;
+        const isPinned = this.pinnedProductId === product.id;
+        const hasMultipleVariants = product.variants && product.variants.length > 1;
+        
+        html += '<div class="compare-column' + (isPinned ? ' is-pinned' : '') + '" data-column-id="' + product.id + '">';
+        
+        html += '<div class="compare-card">';
+        html += '<div class="compare-card__header">';
+        html += '<button class="compare-card__pin' + (isPinned ? ' is-pinned' : '') + '" data-pin="' + product.id + '"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg><span>' + (isPinned ? 'Fixed' : 'Secure') + '</span></button>';
+        html += '<button class="compare-card__remove" data-remove="' + product.handle + '" data-product-id="' + product.id + '"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>';
+        html += '</div>';
+        
+        html += '<a href="/products/' + product.handle + '?variant=' + selectedVariant.id + '">';
+        html += '<img class="compare-card__image" data-product-image="' + product.id + '" src="' + (img ? img.replace(/(\.[^.]+)$/, '_300x300$1') : '') + '" alt="' + product.title + '" loading="lazy">';
+        html += '</a>';
+        
+        html += '<p class="compare-card__sku" data-product-sku="' + product.id + '">Productcode: ' + sku + '</p>';
+        html += '<a href="/products/' + product.handle + '" class="compare-card__title">' + product.title + '</a>';
+        
+        html += '<div class="compare-card__price">';
+        html += '<div class="compare-card__price-main" data-product-price="' + product.id + '">' + this.formatMoney(selectedVariant.price) + '</div>';
+        if (selectedVariant.compare_at_price && selectedVariant.compare_at_price > selectedVariant.price) {
+          html += '<div class="compare-card__price-secondary" data-product-compare-price="' + product.id + '">Was ' + this.formatMoney(selectedVariant.compare_at_price) + '</div>';
+        } else {
+          html += '<div class="compare-card__price-secondary" data-product-compare-price="' + product.id + '" style="display:none;"></div>';
+        }
+        html += '</div>';
+        
+        // Rating - AReviews widget (same as product card)
+        html += '<div class="compare-card__rating">';
+        html += '<div class="areviews_product_item areviews_stars' + product.id + '" data-product-id="' + product.id + '"></div>';
+        html += '</div>';
+        
+        if (hasMultipleVariants) {
+          html += '<div class="compare-variant-selector">';
+          html += '<label class="compare-variant-selector__label">Select Variant:</label>';
+          html += '<select class="compare-variant-selector__select" data-variant-select="' + product.id + '">';
+          
+          product.variants.forEach(variant => {
+            const selected = variant.id === selectedVariant.id ? ' selected' : '';
+            const disabled = !variant.available ? ' disabled' : '';
+            const stockText = !variant.available ? ' (Out of Stock)' : '';
+            html += '<option value="' + variant.id + '"' + selected + disabled + '>' + variant.title + stockText + '</option>';
+          });
+          
+          html += '</select>';
+          html += '</div>';
+        }
+        
+        html += '</div>';
+        
+        html += '<div class="compare-specs-header">Technical specification</div>';
+        
+        this.specs.forEach(spec => {
+          const value = this.getSpecValue(product, spec, selectedVariant);
+          
+          html += '<div class="compare-spec-row" data-spec="' + spec.key + '">';
+          html += '<div><div class="compare-spec-label">' + spec.label + '</div>';
+          html += '<div class="compare-spec-value" data-spec-value="' + product.id + '-' + spec.key + '">' + value + '</div></div>';
+          html += '</div>';
+        });
+        
+        html += '<div class="compare-specs-header">Technical Details</div>';
+        html += '<div class="compare-tech-details-container" data-tech-container="' + product.id + '">';
+        
+        const productTechDetails = this.getSelectedTechnicalDetails(product);
+        
+        if (techLabels.length > 0) {
+          techLabels.forEach(label => {
+            const techValue = this.getTechValueForLabel(product, label);
+            
+            html += '<div class="compare-spec-row" data-spec="tech_' + label.replace(/\s+/g, '_') + '">';
+            html += '<div><div class="compare-spec-label">' + label + '</div>';
+            html += '<div class="compare-spec-value">';
+            html += '<span class="compare-tech-value' + (this.activeUnit === 'mm' ? ' active' : '') + '" data-unit="mm">' + techValue.mm + '</span>';
+            html += '<span class="compare-tech-value' + (this.activeUnit === 'cm' ? ' active' : '') + '" data-unit="cm">' + techValue.cm + '</span>';
+            html += '<span class="compare-tech-value' + (this.activeUnit === 'in' ? ' active' : '') + '" data-unit="in">' + techValue.in + '</span>';
+            html += '</div></div>';
+            html += '</div>';
+          });
+        } else {
+          html += '<div class="compare-no-tech-details">No technical details available for this variant</div>';
+        }
+        
+        html += '</div>';
+        
+        html += '<div class="compare-atc">';
+        html += '<button class="compare-atc-btn" data-add-cart="' + selectedVariant.id + '" data-product-id="' + product.id + '"' + (!available ? ' disabled' : '') + '>';
+        html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="m1 1 4 4v11h14l3-8H6"/></svg>';
+        html += '<span>' + (available ? 'Add to Cart' : 'Sold out') + '</span>';
+        html += '</button></div>';
+        
+        html += '</div>';
+      });
+      
+      if (this.products.length < 6) {
+        html += '<div class="compare-column empty-column">';
+        html += '<div class="compare-empty-slot">';
+        html += '<button class="compare-empty-slot__btn" data-compare-close>Add a Product</button>';
+        html += '</div></div>';
+      }
+      
+      html += '</div>';
+      
+      this.content.innerHTML = html;
+      this.bindEvents();
+      this.markDifferences();
+      this.initReviewWidgets();
+    },
+    
+    updateProductColumn(productId) {
+      const product = this.products.find(p => p.id === productId);
+      if (!product) return;
+      
+      const selectedVariant = this.getSelectedVariant(product);
+      const column = this.content.querySelector('[data-column-id="' + productId + '"]');
+      if (!column) return;
+      
+      const imgEl = column.querySelector('[data-product-image="' + productId + '"]');
+      if (imgEl) {
+        const variantImage = selectedVariant.featured_image ? selectedVariant.featured_image.src : null;
+        const newImg = variantImage || product.featured_image || (product.images && product.images[0]) || '';
+        if (newImg) {
+          imgEl.src = newImg.replace(/(\.[^.]+)$/, '_300x300$1');
+        }
+      }
+      
+      const skuEl = column.querySelector('[data-product-sku="' + productId + '"]');
+      if (skuEl) {
+        skuEl.textContent = 'Productcode: ' + (selectedVariant.sku || productId);
+      }
+      
+      const priceEl = column.querySelector('[data-product-price="' + productId + '"]');
+      if (priceEl) {
+        priceEl.textContent = this.formatMoney(selectedVariant.price);
+      }
+      
+      const comparePriceEl = column.querySelector('[data-product-compare-price="' + productId + '"]');
+      if (comparePriceEl) {
+        if (selectedVariant.compare_at_price && selectedVariant.compare_at_price > selectedVariant.price) {
+          comparePriceEl.textContent = 'Was ' + this.formatMoney(selectedVariant.compare_at_price);
+          comparePriceEl.style.display = '';
+        } else {
+          comparePriceEl.style.display = 'none';
+        }
+      }
+      
+      const skuSpecEl = column.querySelector('[data-spec-value="' + productId + '-sku"]');
+      if (skuSpecEl) {
+        skuSpecEl.textContent = selectedVariant.sku || '-';
+      }
+      
+      const weightSpecEl = column.querySelector('[data-spec-value="' + productId + '-weight"]');
+      if (weightSpecEl) {
+        weightSpecEl.textContent = selectedVariant.weight ? selectedVariant.weight + ' ' + (selectedVariant.weight_unit || 'g') : '-';
+      }
+      
+      const atcBtn = column.querySelector('[data-add-cart]');
+      if (atcBtn) {
+        atcBtn.dataset.addCart = selectedVariant.id;
+        atcBtn.disabled = !selectedVariant.available;
+        const btnSpan = atcBtn.querySelector('span');
+        if (btnSpan) {
+          btnSpan.textContent = selectedVariant.available ? 'Add to Cart' : 'Sold out';
+        }
+      }
+      
+      this.updateAllTechnicalDetailsSections();
+      this.markDifferences();
+      this.initReviewWidgets();
+    },
+    
+    updateAllTechnicalDetailsSections() {
+      const allLabels = this.collectAllTechnicalLabels();
+      
+      this.products.forEach(product => {
+        const column = this.content.querySelector('[data-column-id="' + product.id + '"]');
+        if (!column) return;
+        
+        const container = column.querySelector('[data-tech-container="' + product.id + '"]');
+        if (!container) return;
+        
+        let html = '';
+        
+        if (allLabels.length > 0) {
+          allLabels.forEach(label => {
+            const techValue = this.getTechValueForLabel(product, label);
+            
+            html += '<div class="compare-spec-row" data-spec="tech_' + label.replace(/\s+/g, '_') + '">';
+            html += '<div><div class="compare-spec-label">' + label + '</div>';
+            html += '<div class="compare-spec-value">';
+            html += '<span class="compare-tech-value' + (this.activeUnit === 'mm' ? ' active' : '') + '" data-unit="mm">' + techValue.mm + '</span>';
+            html += '<span class="compare-tech-value' + (this.activeUnit === 'cm' ? ' active' : '') + '" data-unit="cm">' + techValue.cm + '</span>';
+            html += '<span class="compare-tech-value' + (this.activeUnit === 'in' ? ' active' : '') + '" data-unit="in">' + techValue.in + '</span>';
+            html += '</div></div>';
+            html += '</div>';
+          });
+        } else {
+          html = '<div class="compare-no-tech-details">No technical details available for this variant</div>';
+        }
+        
+        container.innerHTML = html;
+      });
+    },
+    
+    updateTechnicalDetailsSection(productId, column) {
+      this.updateAllTechnicalDetailsSections();
+    },
+    
+    renderEmpty() {
+      this.content.innerHTML = '<div class="compare-empty-state"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="margin-bottom: 20px;"><path d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5M15 15l5.25 5.25"/></svg><h3 style="font-size: 18px; margin-bottom: 8px; color: #333;">No products to compare</h3><p style="color: #666; margin-bottom: 20px;">Add products to compare by clicking the compare icon.</p><button class="compare-atc-btn" data-compare-close style="display: inline-flex; max-width: 200px;">Continue Shopping</button></div>';
+    },
+    
+    markDifferences() {
+      if (this.products.length < 2) return;
+      
+      this.specs.forEach(spec => {
+        const values = this.products.map(p => {
+          const variant = this.getSelectedVariant(p);
+          return this.getSpecValue(p, spec, variant);
+        });
+        
+        const uniqueValues = new Set(values.filter(v => v && v !== '-'));
+        const isDifferent = uniqueValues.size > 1;
+        
+        document.querySelectorAll('[data-spec="' + spec.key + '"]').forEach(row => {
+          row.classList.toggle('is-different', isDifferent);
+        });
+      });
+      
+      const techLabels = this.collectAllTechnicalLabels();
+      techLabels.forEach(label => {
+        const values = this.products.map(p => {
+          const techValue = this.getTechValueForLabel(p, label);
+          return techValue.mm + '|' + techValue.cm + '|' + techValue.in;
+        });
+        
+        const uniqueValues = new Set(values.filter(v => v && v !== '-|-|-'));
+        const isDifferent = uniqueValues.size > 1;
+        
+        const specKey = 'tech_' + label.replace(/\s+/g, '_');
+        document.querySelectorAll('[data-spec="' + specKey + '"]').forEach(row => {
+          row.classList.toggle('is-different', isDifferent);
+        });
+      });
+    },
+    
+    toggleDifferences() {
+      const showOnlyDiff = this.diffToggle && this.diffToggle.checked;
+      
+      document.querySelectorAll('.compare-spec-row').forEach(row => {
+        if (showOnlyDiff) {
+          row.style.display = row.classList.contains('is-different') ? '' : 'none';
+        } else {
+          row.style.display = '';
+        }
+      });
+    },
+    
+    bindEvents() {
+      this.content.querySelectorAll('[data-pin]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const productId = parseInt(e.currentTarget.dataset.pin);
+          this.togglePin(productId);
+        });
+      });
+      
+      this.content.querySelectorAll('[data-remove]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const handle = e.currentTarget.dataset.remove;
+          this.removeProduct(handle);
+        });
+      });
+      
+      this.content.querySelectorAll('[data-add-cart]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const variantId = e.currentTarget.dataset.addCart;
+          this.addToCart(variantId, e.currentTarget);
+        });
+      });
+      
+      this.content.querySelectorAll('[data-variant-select]').forEach(select => {
+        select.addEventListener('change', (e) => {
+          const productId = parseInt(e.currentTarget.dataset.variantSelect);
+          const variantId = parseInt(e.currentTarget.value);
+          this.onVariantChange(productId, variantId);
+        });
+      });
+      
+      this.content.querySelectorAll('[data-compare-close]').forEach(btn => {
+        btn.addEventListener('click', () => this.close());
+      });
+    },
+    
+    onVariantChange(productId, variantId) {
+      console.log('Variant changed:', productId, '->', variantId);
+      this.selectedVariants[productId] = variantId;
+      this.updateProductColumn(productId);
+    },
+    
+    togglePin(productId) {
+      this.pinnedProductId = this.pinnedProductId === productId ? null : productId;
+      this.render();
+    },
+    
+    removeProduct(handle) {
+      const product = this.products.find(p => p.handle === handle);
+      const productId = product ? product.id : null;
+      
+      if (productId && this.pinnedProductId === productId) {
+        this.pinnedProductId = null;
+      }
+      
+      this.products = this.products.filter(p => p.handle !== handle);
+      
+      if (productId) {
+        delete this.productMetafields[productId];
+        delete this.selectedVariants[productId];
+      }
+      
+      const hdtCompareBtn = document.querySelector('hdt-compare[data-handle="' + handle + '"][action="remove"], hdt-compare[data-id="' + productId + '"][action="remove"]');
+      if (hdtCompareBtn) {
+        hdtCompareBtn.click();
+      } else {
+        const keys = ['hdtCompare', 'compare-products'];
+        keys.forEach(key => {
+          try {
+            const stored = localStorage.getItem(key);
+            if (stored) {
+              let data = JSON.parse(stored);
+              if (Array.isArray(data)) {
+                data = data.filter(h => h !== handle);
+                localStorage.setItem(key, JSON.stringify(data));
+              }
+            }
+          } catch (e) {}
+        });
+      }
+      
+      document.dispatchEvent(new CustomEvent('compare:updated'));
+      this.updateCount();
+      this.render();
+    },
+    
+    async addToCart(variantId, button) {
+      const originalHTML = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" style="animation: compare-spin 1s linear infinite;"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="50" stroke-linecap="round"/></svg>';
+      
+      try {
+        const response = await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: parseInt(variantId), quantity: 1 })
+        });
+        
+        if (response.ok) {
+          button.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>Added!</span>';
+          document.dispatchEvent(new CustomEvent('cart:updated'));
+          
+          setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.disabled = false;
+          }, 2000);
+        } else {
+          throw new Error('Failed');
+        }
+      } catch (e) {
+        button.innerHTML = '<span>Error</span>';
+        setTimeout(() => {
+          button.innerHTML = originalHTML;
+          button.disabled = false;
+        }, 2000);
+      }
+    }
+  };
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => ComparePopup.init());
+  } else {
+    ComparePopup.init();
+  }
+  
+  window.ComparePopup = ComparePopup;
+})();
+</script>

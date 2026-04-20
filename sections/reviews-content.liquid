@@ -1,0 +1,367 @@
+{% comment %}
+  Reviews Content
+  - Centered star/sparkle icon on top
+  - Multiple paragraphs of text below
+  - Fully responsive
+{% endcomment %}
+
+<section id="text-content-{{ section.id }}" class="text-content-section">
+  <div class="text-content-wrapper">
+    <div class="text-content-container">
+      
+      {% comment %} Star Icon {% endcomment %}
+      {% if section.settings.show_icon %}
+        <div class="text-content-icon">
+          {% if section.settings.custom_icon != blank %}
+            <img 
+              src="{{ section.settings.custom_icon | image_url: width: 100 }}" 
+              alt="Icon"
+              width="{{ section.settings.icon_size }}"
+              height="{{ section.settings.icon_size }}"
+              loading="lazy"
+            >
+          {% else %}
+            <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L12 22M2 12L22 12M4.93 4.93L19.07 19.07M19.07 4.93L4.93 19.07" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% comment %} Text Paragraphs {% endcomment %}
+      <div class="text-content-paragraphs">
+        {% for block in section.blocks %}
+          {% if block.type == 'paragraph' %}
+            <div class="text-paragraph" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  #text-content-{{ section.id }} {
+    --section-bg: {{ section.settings.background_color }};
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --section-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --section-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+    --text-color: {{ section.settings.text_color }};
+    --text-size: {{ section.settings.text_font_size }}px;
+    --text-size-mobile: {{ section.settings.text_font_size_mobile }}px;
+    --line-height: {{ section.settings.line_height }};
+    --paragraph-gap: {{ section.settings.paragraph_gap }}px;
+    --icon-color: {{ section.settings.icon_color }};
+    --icon-margin-bottom: {{ section.settings.icon_margin_bottom }}px;
+    --content-max-width: {{ section.settings.content_max_width }}px;
+    position: relative;
+  }
+
+  #text-content-{{ section.id }} .text-content-icon::after {
+    content: '';
+    position: absolute;
+    top: 45px;
+    left: 10px;
+    right: 0px;
+    height: 1px;
+    background-color: #e0e0e0;
+  }
+
+  #text-content-{{ section.id }} * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  #text-content-{{ section.id }} .text-content-wrapper {
+    background-color: var(--section-bg);
+    padding-top: var(--section-padding-top);
+    padding-bottom: var(--section-padding-bottom);
+  }
+
+  #text-content-{{ section.id }} .text-content-container {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* Star Icon */
+  #text-content-{{ section.id }} .text-content-icon {
+    text-align: center;
+    margin-bottom: var(--icon-margin-bottom);
+    color: var(--icon-color);
+  }
+
+  #text-content-{{ section.id }} .text-content-icon svg {
+    display: inline-block;
+  }
+
+  #text-content-{{ section.id }} .text-content-icon img {
+    display: inline-block;
+    z-index: 1;
+    position: relative;
+  }
+
+  /* Text Paragraphs */
+  #text-content-{{ section.id }} .text-content-paragraphs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--paragraph-gap);
+  }
+
+  #text-content-{{ section.id }} .text-paragraph {
+    font-size: var(--text-size);
+    font-weight: 400;
+    line-height: var(--line-height);
+    color: var(--text-color);
+    text-align: left;
+    margin: 0;
+  }
+
+  /* Tablet */
+  @media screen and (max-width: 991px) {
+    #text-content-{{ section.id }} .text-content-container {
+      padding: 0 30px;
+    }
+  }
+
+  /* Mobile */
+  @media screen and (max-width: 767px) {
+
+    {% comment %} #text-content-{{ section.id }} .text-content-icon::after { 
+     top: 55px;
+    }  {% endcomment %}
+    #text-content-{{ section.id }} .text-content-wrapper {
+      padding-top: var(--section-padding-top-mobile);
+      padding-bottom: var(--section-padding-bottom-mobile);
+    }
+
+    #text-content-{{ section.id }} .text-content-container {
+      padding: 0 20px;
+    }
+
+    #text-content-{{ section.id }} .text-paragraph {
+      font-size: var(--text-size-mobile);
+    }
+
+    #text-content-{{ section.id }} .text-content-paragraphs {
+      gap: calc(var(--paragraph-gap) * 0.8);
+    }
+  }
+
+  /* Small Mobile */
+  @media screen and (max-width: 480px) {
+    #text-content-{{ section.id }} .text-content-container {
+      padding: 0 15px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Reviews Content",
+  "tag": "section",
+  "class": "text-content-section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 800,
+      "max": 1400,
+      "step": 20,
+      "unit": "px",
+      "label": "Content Max Width",
+      "default": 1000
+    },
+    {
+      "type": "header",
+      "content": "Desktop Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Mobile Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Icon Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icon",
+      "label": "Show Icon",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "custom_icon",
+      "label": "Custom Icon",
+      "info": "Leave empty to use default star icon"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 16,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon Size",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon Color",
+      "default": "#9ca3af"
+    },
+    {
+      "type": "range",
+      "id": "icon_margin_bottom",
+      "min": 10,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon Bottom Margin",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Text Settings"
+    },
+    {
+      "type": "range",
+      "id": "text_font_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Font Size (Desktop)",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "text_font_size_mobile",
+      "min": 11,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Font Size (Mobile)",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "line_height",
+      "min": 1.3,
+      "max": 2,
+      "step": 0.1,
+      "label": "Line Height",
+      "default": 1.7
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#6b7280"
+    },
+    {
+      "type": "range",
+      "id": "paragraph_gap",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap Between Paragraphs",
+      "default": 20
+    }
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "name": "Paragraph",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Paragraph Text",
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Reviews Content",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "settings": {
+            "text": ""
+          }
+        },
+        {
+          "type": "paragraph",
+          "settings": {
+            "text": ""
+          }
+        },
+        {
+          "type": "paragraph",
+          "settings": {
+            "text": ""
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

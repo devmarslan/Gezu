@@ -1,0 +1,1724 @@
+{% comment %}
+  Complete Package Section
+  - Shows package cards with main image + 4 accessory products
+  - Plus buttons with customizable positions and click-to-toggle tooltips
+  - Quick View button in tooltip using theme's native btn-quick-view snippet
+  - "Complete the package" button adds all products to cart
+  - Responsive slider for mobile/desktop
+  - Integrates with Ecomus theme cart drawer
+{% endcomment %}
+
+{% style %}
+  #complete-package-{{ section.id }} {
+    --cp-bg-color: {{ section.settings.background_color }};
+    --cp-heading-color: {{ section.settings.heading_color }};
+    --cp-heading-size: {{ section.settings.heading_font_size }}px;
+    --cp-heading-size-mobile: {{ section.settings.heading_font_size_mobile }}px;
+    --cp-card-bg: {{ section.settings.card_background_color }};
+    --cp-card-radius: {{ section.settings.card_border_radius }}px;
+    --cp-btn-bg: {{ section.settings.button_background_color }};
+    --cp-btn-text: {{ section.settings.button_text_color }};
+    --cp-btn-size: {{ section.settings.button_font_size }}px;
+    --cp-btn-size-mobile: {{ section.settings.button_font_size_mobile }}px;
+    --cp-btn-radius: {{ section.settings.button_border_radius }}px;
+    --cp-plus-bg: {{ section.settings.plus_button_color }};
+    --cp-plus-text: {{ section.settings.plus_icon_color }};
+    --cp-plus-size: {{ section.settings.plus_button_size }}px;
+    --cp-plus-size-mobile: {{ section.settings.plus_button_size_mobile }}px;
+    --cp-tooltip-bg: {{ section.settings.tooltip_background }};
+    --cp-tooltip-text: {{ section.settings.tooltip_text_color }};
+    --cp-price-color: {{ section.settings.price_color }};
+    --cp-padding-top: {{ section.settings.padding_top }}px;
+    --cp-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --cp-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --cp-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+    --cp-slides-desktop: {{ section.settings.slides_per_view_desktop }};
+    --cp-slides-tablet: {{ section.settings.slides_per_view_tablet }};
+    --cp-slides-mobile: {{ section.settings.slides_per_view_mobile }};
+    --cp-gap: {{ section.settings.card_gap }}px;
+    --cp-card-height: {{ section.settings.card_height }}px;
+    --cp-card-height-mobile: {{ section.settings.card_height_mobile }}px;
+  }
+{% endstyle %}
+
+<section id="complete-package-{{ section.id }}" class="complete-package-section" 
+  {% if section.settings.background_image != blank %}
+    style="background-image: url('{{ section.settings.background_image | image_url: width: 1920 }}');"
+  {% endif %}
+  data-section-id="{{ section.id }}"
+  data-open-drawer="{{ section.settings.open_cart_drawer }}">
+  
+  <div class="complete-package-container hdt-container">
+    {% if section.settings.heading != blank %}
+      <h2 class="complete-package-heading">{{ section.settings.heading }}</h2>
+    {% endif %}
+    
+    {% if section.settings.subheading != blank %}
+      <p class="complete-package-subheading" style="color: {{ section.settings.subheading_color }}; font-size: {{ section.settings.subheading_font_size }}px;">
+        {{ section.settings.subheading }}
+      </p>
+    {% endif %}
+
+    <div class="complete-package-slider-wrapper">
+      <div class="complete-package-slider" id="cp-slider-{{ section.id }}">
+        {% for block in section.blocks %}
+          {% if block.type == 'package_card' %}
+            <div class="complete-package-card" {{ block.shopify_attributes }} data-block-id="{{ block.id }}">
+              <div class="cp-card-inner">
+                <div class="cp-products-area">
+                  
+                  {% comment %} Main Product Image {% endcomment %}
+                  {% if block.settings.main_image != blank or block.settings.main_product != blank %}
+                    <div class="cp-main-image">
+                      {% if block.settings.main_image != blank %}
+                        <img src="{{ block.settings.main_image | image_url: width: 600 }}" alt="{{ block.settings.main_image.alt | default: 'Package main image' }}" loading="lazy">
+                      {% elsif block.settings.main_product != blank %}
+                        {% assign main_product = block.settings.main_product %}
+                        {% if main_product.featured_image != blank %}
+                          <img src="{{ main_product.featured_image | image_url: width: 600 }}" alt="{{ main_product.title | escape }}" loading="lazy">
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                  {% endif %}
+
+                  {% comment %} ===== PRODUCT 1 ===== {% endcomment %}
+                  {% if block.settings.product_1 != blank %}
+                    {% assign product_1 = block.settings.product_1 %}
+                    {% assign pos_1 = block.settings.product_1_position %}
+                    <div class="cp-product-item cp-position-{{ pos_1 }}" 
+                         data-variant-id="{{ product_1.selected_or_first_available_variant.id }}" 
+                         data-product-title="{{ product_1.title }}" 
+                         data-product-price="{{ product_1.price | money }}"
+                         {% if pos_1 == 'custom' %}
+                         style="{% if block.settings.product_1_top > 0 %}top: {{ block.settings.product_1_top }}%;{% endif %}{% if block.settings.product_1_left > 0 %}left: {{ block.settings.product_1_left }}%;{% endif %}{% if block.settings.product_1_right > 0 %}right: {{ block.settings.product_1_right }}%;{% endif %}{% if block.settings.product_1_bottom > 0 %}bottom: {{ block.settings.product_1_bottom }}%;{% endif %}"
+                         {% endif %}>
+                      <div class="cp-product-image">
+                        {% if product_1.featured_image != blank %}
+                          <img src="{{ product_1.featured_image | image_url: width: 200 }}" alt="{{ product_1.title | escape }}" loading="lazy">
+                        {% else %}
+                          {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                        {% endif %}
+                      </div>
+                      {% comment %} DIV instead of BUTTON so we can nest theme's quick view button inside {% endcomment %}
+                      <div class="cp-plus-btn cp-plus-{{ block.settings.product_1_icon_position }}" role="button" tabindex="0" aria-label="View {{ product_1.title }}" data-cp-hotspot>
+                        <span class="cp-plus-icon">+</span>
+                        <div class="cp-tooltip cp-tooltip-{{ block.settings.product_1_tooltip_position | default: 'top' }}">
+                          <span class="cp-tooltip-title">{{ product_1.title }}</span>
+                          <span class="cp-tooltip-price">{{ product_1.price | money }}</span>
+                          {% if block.settings.product_1_badge != blank %}
+                            <span class="cp-tooltip-badge">{{ block.settings.product_1_badge }}</span>
+                          {% endif %}
+                          <div class="cp-tooltip-qv">
+                            {% render 'btn-quick-view', class: 'hdt-pr_btn', product: product_1, section_id: section.id, disable_sr_only: true %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+
+                  {% comment %} ===== PRODUCT 2 ===== {% endcomment %}
+                  {% if block.settings.product_2 != blank %}
+                    {% assign product_2 = block.settings.product_2 %}
+                    {% assign pos_2 = block.settings.product_2_position %}
+                    <div class="cp-product-item cp-position-{{ pos_2 }}" 
+                         data-variant-id="{{ product_2.selected_or_first_available_variant.id }}" 
+                         data-product-title="{{ product_2.title }}" 
+                         data-product-price="{{ product_2.price | money }}"
+                         {% if pos_2 == 'custom' %}
+                         style="{% if block.settings.product_2_top > 0 %}top: {{ block.settings.product_2_top }}%;{% endif %}{% if block.settings.product_2_left > 0 %}left: {{ block.settings.product_2_left }}%;{% endif %}{% if block.settings.product_2_right > 0 %}right: {{ block.settings.product_2_right }}%;{% endif %}{% if block.settings.product_2_bottom > 0 %}bottom: {{ block.settings.product_2_bottom }}%;{% endif %}"
+                         {% endif %}>
+                      <div class="cp-product-image">
+                        {% if product_2.featured_image != blank %}
+                          <img src="{{ product_2.featured_image | image_url: width: 200 }}" alt="{{ product_2.title | escape }}" loading="lazy">
+                        {% else %}
+                          {{ 'product-2' | placeholder_svg_tag: 'placeholder-svg' }}
+                        {% endif %}
+                      </div>
+                      <div class="cp-plus-btn cp-plus-{{ block.settings.product_2_icon_position }}" role="button" tabindex="0" aria-label="View {{ product_2.title }}" data-cp-hotspot>
+                        <span class="cp-plus-icon">+</span>
+                        <div class="cp-tooltip cp-tooltip-{{ block.settings.product_2_tooltip_position | default: 'top' }}">
+                          <span class="cp-tooltip-title">{{ product_2.title }}</span>
+                          <span class="cp-tooltip-price">{{ product_2.price | money }}</span>
+                          {% if block.settings.product_2_badge != blank %}
+                            <span class="cp-tooltip-badge">{{ block.settings.product_2_badge }}</span>
+                          {% endif %}
+                          <div class="cp-tooltip-qv">
+                            {% render 'btn-quick-view', class: 'hdt-pr_btn', product: product_2, section_id: section.id, disable_sr_only: true %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+
+                  {% comment %} ===== PRODUCT 3 ===== {% endcomment %}
+                  {% if block.settings.product_3 != blank %}
+                    {% assign product_3 = block.settings.product_3 %}
+                    {% assign pos_3 = block.settings.product_3_position %}
+                    <div class="cp-product-item cp-position-{{ pos_3 }}" 
+                         data-variant-id="{{ product_3.selected_or_first_available_variant.id }}" 
+                         data-product-title="{{ product_3.title }}" 
+                         data-product-price="{{ product_3.price | money }}"
+                         {% if pos_3 == 'custom' %}
+                         style="{% if block.settings.product_3_top > 0 %}top: {{ block.settings.product_3_top }}%;{% endif %}{% if block.settings.product_3_left > 0 %}left: {{ block.settings.product_3_left }}%;{% endif %}{% if block.settings.product_3_right > 0 %}right: {{ block.settings.product_3_right }}%;{% endif %}{% if block.settings.product_3_bottom > 0 %}bottom: {{ block.settings.product_3_bottom }}%;{% endif %}"
+                         {% endif %}>
+                      <div class="cp-product-image">
+                        {% if product_3.featured_image != blank %}
+                          <img src="{{ product_3.featured_image | image_url: width: 200 }}" alt="{{ product_3.title | escape }}" loading="lazy">
+                        {% else %}
+                          {{ 'product-3' | placeholder_svg_tag: 'placeholder-svg' }}
+                        {% endif %}
+                      </div>
+                      <div class="cp-plus-btn cp-plus-{{ block.settings.product_3_icon_position }}" role="button" tabindex="0" aria-label="View {{ product_3.title }}" data-cp-hotspot>
+                        <span class="cp-plus-icon">+</span>
+                        <div class="cp-tooltip cp-tooltip-{{ block.settings.product_3_tooltip_position | default: 'top' }}">
+                          <span class="cp-tooltip-title">{{ product_3.title }}</span>
+                          <span class="cp-tooltip-price">{{ product_3.price | money }}</span>
+                          {% if block.settings.product_3_badge != blank %}
+                            <span class="cp-tooltip-badge">{{ block.settings.product_3_badge }}</span>
+                          {% endif %}
+                          <div class="cp-tooltip-qv">
+                            {% render 'btn-quick-view', class: 'hdt-pr_btn', product: product_3, section_id: section.id, disable_sr_only: true %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+
+                  {% comment %} ===== PRODUCT 4 ===== {% endcomment %}
+                  {% if block.settings.product_4 != blank %}
+                    {% assign product_4 = block.settings.product_4 %}
+                    {% assign pos_4 = block.settings.product_4_position %}
+                    <div class="cp-product-item cp-position-{{ pos_4 }}" 
+                         data-variant-id="{{ product_4.selected_or_first_available_variant.id }}" 
+                         data-product-title="{{ product_4.title }}" 
+                         data-product-price="{{ product_4.price | money }}"
+                         {% if pos_4 == 'custom' %}
+                         style="{% if block.settings.product_4_top > 0 %}top: {{ block.settings.product_4_top }}%;{% endif %}{% if block.settings.product_4_left > 0 %}left: {{ block.settings.product_4_left }}%;{% endif %}{% if block.settings.product_4_right > 0 %}right: {{ block.settings.product_4_right }}%;{% endif %}{% if block.settings.product_4_bottom > 0 %}bottom: {{ block.settings.product_4_bottom }}%;{% endif %}"
+                         {% endif %}>
+                      <div class="cp-product-image">
+                        {% if product_4.featured_image != blank %}
+                          <img src="{{ product_4.featured_image | image_url: width: 200 }}" alt="{{ product_4.title | escape }}" loading="lazy">
+                        {% else %}
+                          {{ 'product-4' | placeholder_svg_tag: 'placeholder-svg' }}
+                        {% endif %}
+                      </div>
+                      <div class="cp-plus-btn cp-plus-{{ block.settings.product_4_icon_position }}" role="button" tabindex="0" aria-label="View {{ product_4.title }}" data-cp-hotspot>
+                        <span class="cp-plus-icon">+</span>
+                        <div class="cp-tooltip cp-tooltip-{{ block.settings.product_4_tooltip_position | default: 'top' }}">
+                          <span class="cp-tooltip-title">{{ product_4.title }}</span>
+                          <span class="cp-tooltip-price">{{ product_4.price | money }}</span>
+                          {% if block.settings.product_4_badge != blank %}
+                            <span class="cp-tooltip-badge">{{ block.settings.product_4_badge }}</span>
+                          {% endif %}
+                          <div class="cp-tooltip-qv">
+                            {% render 'btn-quick-view', class: 'hdt-pr_btn', product: product_4, section_id: section.id, disable_sr_only: true %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+
+                </div>
+
+                <button type="button" class="cp-add-all-btn" data-block-id="{{ block.id }}">
+                  {{ block.settings.button_text | default: section.settings.default_button_text }}
+                </button>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {% comment %} Navigation Arrows {% endcomment %}
+      <button type="button" class="cp-nav-btn cp-nav-prev" aria-label="Previous packages" id="cp-prev-{{ section.id }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button type="button" class="cp-nav-btn cp-nav-next" aria-label="Next packages" id="cp-next-{{ section.id }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ======================== BASE ======================== */
+  .complete-package-section {
+    background-color: var(--cp-bg-color, #f5f5f5);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding-top: var(--cp-padding-top);
+    padding-bottom: var(--cp-padding-bottom);
+    position: relative;
+    overflow: visible;
+  }
+  .complete-package-container {
+    margin: 0 auto;
+    overflow: visible;
+  }
+  .complete-package-heading {
+    font-size: var(--cp-heading-size);
+    color: var(--cp-heading-color, #1a1a1a);
+    margin: 0 0 10px 0;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+  .complete-package-subheading {
+    margin: 0 0 30px 0;
+    line-height: 1.5;
+  }
+
+  /* ======================== SLIDER ======================== */
+  .complete-package-slider-wrapper {
+    position: relative;
+    overflow: visible;
+    padding-top: 60px;
+    margin-top: -60px;
+  }
+  .complete-package-slider {
+    display: flex;
+    gap: var(--cp-gap, 20px);
+    overflow-x: auto;
+    overflow-y: visible;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x mandatory;
+    padding: 60px 0 10px 0;
+    margin-top: -60px;
+  }
+  .complete-package-slider::-webkit-scrollbar { display: none; }
+
+  /* ======================== CARD ======================== */
+  .complete-package-card {
+    flex: 0 0 calc((100% - (var(--cp-slides-desktop) - 1) * var(--cp-gap)) / var(--cp-slides-desktop));
+    min-width: calc((100% - (var(--cp-slides-desktop) - 1) * var(--cp-gap)) / var(--cp-slides-desktop));
+    scroll-snap-align: start;
+    overflow: visible;
+  }
+  .cp-card-inner {
+    background-color: var(--cp-card-bg, #ffffff);
+    border-radius: var(--cp-card-radius, 12px);
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.3s ease;
+    overflow: visible;
+    position: relative;
+  }
+  .cp-card-inner:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  /* ======================== PRODUCTS AREA ======================== */
+  .cp-products-area {
+    position: relative;
+    height: var(--cp-card-height, 280px);
+    margin-bottom: 5px;
+    overflow: visible;
+  }
+  .cp-main-image {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cp-main-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  /* ======================== PRODUCT ITEM ======================== */
+  .cp-product-item {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+  }
+  .cp-product-item:hover,
+  .cp-product-item.cp-active {
+    z-index: 19;
+  }
+
+  /* Preset Positions */
+  .cp-product-item.cp-position-top-left { top: 0; left: 0; }
+  .cp-product-item.cp-position-top-right { top: 0; right: 0; }
+  .cp-product-item.cp-position-top-center { top: 0; left: 50%; transform: translateX(-50%); }
+  .cp-product-item.cp-position-bottom-left { bottom: 0; left: 0; }
+  .cp-product-item.cp-position-bottom-right { bottom: 0; right: 0; }
+  .cp-product-item.cp-position-bottom-center { bottom: 0; left: 50%; transform: translateX(-50%); }
+  .cp-product-item.cp-position-center-left { top: 50%; left: 0; transform: translateY(-50%); }
+  .cp-product-item.cp-position-center-right { top: 50%; right: 0; transform: translateY(-50%); }
+
+  .cp-product-image {
+    width: 80px; height: 80px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .cp-product-image img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .cp-product-image .placeholder-svg { width: 50px; height: 50px; fill: #ccc; }
+
+  /* ======================== PLUS BUTTON (DIV, not button) ======================== */
+  .cp-plus-btn {
+    position: absolute;
+    width: var(--cp-plus-size, 28px);
+    height: var(--cp-plus-size, 28px);
+    border-radius: 50%;
+    background-color: var(--cp-plus-bg, #0047AB);
+    color: var(--cp-plus-text, #ffffff);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--cp-plus-size, 28px) * 0.65);
+    font-weight: 600;
+    line-height: 1;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    z-index: 10;
+    -webkit-user-select: none;
+    user-select: none;
+    outline: none;
+  }
+  {% comment %} .cp-plus-btn:hover {
+    transform: scale(1.1);
+    z-index: 1000;
+  } {% endcomment %}
+  .cp-plus-btn.cp-hotspot-active {
+    z-index: 1000;
+  }
+
+  /* Plus Icon Positions */
+  .cp-plus-btn.cp-plus-top-left { top: -5px; left: -5px; right: auto; bottom: auto; }
+  .cp-plus-btn.cp-plus-top-right { top: -5px; right: -5px; left: auto; bottom: auto; }
+  .cp-plus-btn.cp-plus-top-center { top: -5px; left: 50%; transform: translateX(-50%); right: auto; bottom: auto; }
+  .cp-plus-btn.cp-plus-bottom-left { bottom: -5px; left: -5px; top: auto; right: auto; }
+  .cp-plus-btn.cp-plus-bottom-right { bottom: -5px; right: -5px; top: auto; left: auto; }
+  .cp-plus-btn.cp-plus-bottom-center { bottom: -5px; left: 50%; transform: translateX(-50%); top: auto; right: auto; }
+  .cp-plus-btn.cp-plus-center-left { top: 50%; left: -5px; transform: translateY(-50%); right: auto; bottom: auto; }
+  .cp-plus-btn.cp-plus-center-right { top: 50%; right: -5px; transform: translateY(-50%); left: auto; bottom: auto; }
+  .cp-plus-btn.cp-plus-center { top: 50%; left: 50%; transform: translate(-50%, -50%); right: auto; bottom: auto; }
+
+  .cp-plus-btn:hover.cp-plus-top-center,
+  .cp-plus-btn:hover.cp-plus-bottom-center { transform: translateX(-50%) scale(1.1); }
+  .cp-plus-btn:hover.cp-plus-center-left,
+  .cp-plus-btn:hover.cp-plus-center-right { transform: translateY(-50%) scale(1.1); }
+  .cp-plus-btn:hover.cp-plus-center { transform: translate(-50%, -50%) scale(1.1); }
+
+  .cp-plus-icon {
+    display: block;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  /* ======================== TOOLTIP ======================== */
+  .cp-tooltip {
+    position: absolute;
+    background-color: var(--cp-tooltip-bg, #1a1a1a);
+    color: var(--cp-tooltip-text, #ffffff);
+    padding: 10px 14px;
+    width: 200px;
+    text-align: left;
+    border-radius: 8px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+  }
+
+  /* Show tooltip on CLICK (active class) — like Lookbook hotspots */
+  .cp-plus-btn.cp-hotspot-active .cp-tooltip {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  /* Tooltip Position Variants */
+  .cp-tooltip.cp-tooltip-top {
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .cp-tooltip.cp-tooltip-top::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: var(--cp-tooltip-bg, #1a1a1a);
+  }
+  .cp-tooltip.cp-tooltip-bottom {
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .cp-tooltip.cp-tooltip-bottom::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-bottom-color: var(--cp-tooltip-bg, #1a1a1a);
+  }
+  .cp-tooltip.cp-tooltip-left {
+    right: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    left: auto;
+  }
+  .cp-tooltip.cp-tooltip-left::after {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 8px solid transparent;
+    border-left-color: var(--cp-tooltip-bg, #1a1a1a);
+  }
+  .cp-tooltip.cp-tooltip-right {
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    right: auto;
+  }
+  .cp-tooltip.cp-tooltip-right::after {
+    content: '';
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 8px solid transparent;
+    border-right-color: var(--cp-tooltip-bg, #1a1a1a);
+  }
+
+  .cp-tooltip-title {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .cp-tooltip-price {
+    font-size: 12px;
+    color: var(--cp-price-color, #888);
+  }
+  .cp-tooltip-badge {
+    display: inline-block;
+    background: #ffd700;
+    color: #1a1a1a;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  /* ======================== QUICK VIEW IN TOOLTIP ======================== */
+  .cp-tooltip-qv {
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  #complete-package-{{ section.id }} .cp-tooltip-qv wrapp-hdt-open-modal-btn {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+  }
+
+  #complete-package-{{ section.id }} .cp-tooltip-qv .hdt-card-product__btn-quick-view {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: var(--cp-btn-bg, #0047AB) !important;
+    color: var(--cp-btn-text, #fff) !important;
+    border: none !important;
+    border-radius: 5px !important;
+    height: 34px !important;
+    font-weight: 600 !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    gap: 6px;
+    aspect-ratio: unset !important;
+    box-shadow: none !important;
+    padding: 0 12px !important;
+    margin: 0 !important;
+  }
+
+  #complete-package-{{ section.id }} .cp-tooltip-qv .hdt-card-product__btn-quick-view:hover {
+    filter: brightness(1.15);
+  }
+
+  /* Hide the SVG icon, show only the text label */
+  #complete-package-{{ section.id }} .cp-tooltip-qv .hdt-card-product__btn-quick-view svg {
+    display: none !important;
+  }
+
+  #complete-package-{{ section.id }} .cp-tooltip-qv .hdt-card-product__btn-quick-view span {
+    display: block !important;
+    font-size: 11px !important;
+    line-height: 1;
+  }
+
+  /* ======================== ADD ALL BUTTON ======================== */
+  .cp-add-all-btn {
+    width: 100%;
+    padding: 14px 20px;
+    background-color: var(--cp-btn-bg, #0047AB);
+    color: var(--cp-btn-text, #ffffff);
+    border: none;
+    border-radius: var(--cp-btn-radius, 8px);
+    font-size: var(--cp-btn-size, 14px);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .cp-add-all-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+  .cp-add-all-btn:active { transform: translateY(0); }
+  .cp-add-all-btn.is-loading {
+    opacity: 0.7;
+    pointer-events: none;
+    position: relative;
+  }
+  .cp-add-all-btn.is-loading::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: cp-spin 0.8s linear infinite;
+    right: 15px; top: 50%;
+    transform: translateY(-50%);
+  }
+  @keyframes cp-spin {
+    to { transform: translateY(-50%) rotate(360deg); }
+  }
+
+  /* ======================== NAV BUTTONS ======================== */
+  .cp-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 19;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  .cp-nav-btn:hover {
+    background-color: #f5f5f5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  .cp-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .cp-nav-prev { left: -22px; }
+  .cp-nav-next { right: -22px; }
+  .cp-nav-btn svg { width: 20px; height: 20px; color: #333; }
+
+  /* ======================== PAGINATION ======================== */
+  .cp-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .cp-pagination-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background-color: #ddd;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    padding: 0;
+  }
+  .cp-pagination-dot.is-active {
+    background-color: var(--cp-btn-bg, #0047AB);
+    transform: scale(1.2);
+  }
+  .cp-pagination-dot:hover {
+    background-color: var(--cp-btn-bg, #0047AB);
+    opacity: 0.7;
+  }
+
+  /* ======================== TAXIFY FIX ======================== */
+  .complete-package-section .taxify-price-container { display: none !important; }
+  .complete-package-section .taxify-original-hidden { visibility: visible !important; }
+
+  /* ======================== TABLET ======================== */
+  @media (max-width: 1024px) {
+    .complete-package-card {
+      flex: 0 0 calc((100% - (var(--cp-slides-tablet) - 1) * var(--cp-gap)) / var(--cp-slides-tablet));
+      min-width: calc((100% - (var(--cp-slides-tablet) - 1) * var(--cp-gap)) / var(--cp-slides-tablet));
+    }
+    .cp-nav-prev { left: 10px; }
+    .cp-nav-next { right: 10px; }
+  }
+
+  /* ======================== MOBILE ======================== */
+  @media (max-width: 749px) {
+    .complete-package-section {
+      padding-top: var(--cp-padding-top-mobile);
+      padding-bottom: var(--cp-padding-bottom-mobile);
+    }
+    .complete-package-heading {
+      font-size: var(--cp-heading-size-mobile);
+      text-align: center;
+    }
+    .complete-package-card {
+      flex: 0 0 calc((70% - (var(--cp-slides-mobile) - 1) * var(--cp-gap)) / var(--cp-slides-mobile));
+      min-width: calc((70% - (var(--cp-slides-mobile) - 1) * var(--cp-gap)) / var(--cp-slides-mobile));
+    }
+    .cp-products-area { height: var(--cp-card-height-mobile, 220px); }
+    .cp-product-image { width: 60px; height: 60px; }
+    .cp-main-image { max-width: 100%; }
+    .cp-plus-btn {
+      width: var(--cp-plus-size-mobile, 24px);
+      height: var(--cp-plus-size-mobile, 24px);
+      font-size: calc(var(--cp-plus-size-mobile, 24px) * 0.65);
+    }
+    .cp-add-all-btn {
+      font-size: var(--cp-btn-size-mobile, 13px);
+      padding: 12px 16px;
+    }
+    .cp-nav-btn { width: 36px; height: 36px; }
+    .cp-nav-prev { left: 5px; }
+    .cp-nav-next { right: 5px; }
+    .cp-tooltip {
+      font-size: 11px;
+      padding: 8px 10px;
+      width: 170px;
+    }
+    .cp-tooltip-title { font-size: 11px; }
+    .cp-tooltip-price { font-size: 10px; }
+    .complete-package-slider-wrapper { padding-top: 70px; margin-top: -70px; }
+    .complete-package-slider { padding: 70px 10px 10px 10px; margin-top: -70px; }
+
+    #complete-package-{{ section.id }} .cp-tooltip-qv .hdt-card-product__btn-quick-view {
+      height: 30px !important;
+      font-size: 10px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .complete-package-container { padding: 0 15px; }
+    .cp-card-inner { padding: 15px; }
+    .cp-product-image { width: 50px; height: 50px; }
+    .cp-main-image { max-width: 100%; }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const section = document.getElementById('complete-package-{{ section.id }}');
+  if (!section) return;
+
+  const sectionId = '{{ section.id }}';
+  const slider = document.getElementById('cp-slider-' + sectionId);
+  const prevBtn = document.getElementById('cp-prev-' + sectionId);
+  const nextBtn = document.getElementById('cp-next-' + sectionId);
+  
+  if (!slider) return;
+  
+  const cards = slider.querySelectorAll('.complete-package-card');
+  const allHotspots = section.querySelectorAll('[data-cp-hotspot]');
+
+  /* ============================================
+     CLICK-TO-TOGGLE HOTSPOTS (like Lookbook)
+     ============================================ */
+  allHotspots.forEach(function(hotspot) {
+    hotspot.addEventListener('click', function(e) {
+      /* Don't toggle if clicking Quick View button inside tooltip */
+      if (e.target.closest('.cp-tooltip-qv') || 
+          e.target.closest('.hdt-card-product__btn-quick-view') ||
+          e.target.closest('wrapp-hdt-open-modal-btn')) {
+        return;
+      }
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      var wasActive = this.classList.contains('cp-hotspot-active');
+
+      /* Close all other hotspots */
+      allHotspots.forEach(function(h) {
+        h.classList.remove('cp-hotspot-active');
+        var parentItem = h.closest('.cp-product-item');
+        if (parentItem) parentItem.classList.remove('cp-active');
+      });
+
+      /* Toggle current */
+      if (!wasActive) {
+        this.classList.add('cp-hotspot-active');
+        var parentItem = this.closest('.cp-product-item');
+        if (parentItem) parentItem.classList.add('cp-active');
+      }
+    });
+  });
+
+  /* Close tooltips when clicking outside */
+  document.addEventListener('click', function(e) {
+    /* Don't close if clicking Quick View elements */
+    if (e.target.closest('.cp-tooltip-qv') || 
+        e.target.closest('.hdt-card-product__btn-quick-view') ||
+        e.target.closest('wrapp-hdt-open-modal-btn')) {
+      return;
+    }
+    if (!e.target.closest('[data-cp-hotspot]')) {
+      allHotspots.forEach(function(h) {
+        h.classList.remove('cp-hotspot-active');
+        var parentItem = h.closest('.cp-product-item');
+        if (parentItem) parentItem.classList.remove('cp-active');
+      });
+    }
+  });
+
+  /* Prevent tooltip content clicks from closing (except QV which should work) */
+  section.querySelectorAll('.cp-tooltip').forEach(function(tooltip) {
+    tooltip.addEventListener('click', function(e) {
+      if (e.target.closest('.cp-tooltip-qv') || 
+          e.target.closest('.hdt-card-product__btn-quick-view') ||
+          e.target.closest('wrapp-hdt-open-modal-btn')) {
+        return;
+      }
+      e.stopPropagation();
+    });
+  });
+
+  /* Close on Escape */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      allHotspots.forEach(function(h) {
+        h.classList.remove('cp-hotspot-active');
+        var parentItem = h.closest('.cp-product-item');
+        if (parentItem) parentItem.classList.remove('cp-active');
+      });
+    }
+  });
+
+  /* ============================================
+     TOOLTIP POSITIONING FIX
+     ============================================ */
+  function repositionTooltip(btn) {
+    var tooltip = btn.querySelector('.cp-tooltip');
+    if (!tooltip) return;
+    
+    /* Reset */
+    tooltip.style.left = '';
+    tooltip.style.right = '';
+    tooltip.style.top = '';
+    tooltip.style.bottom = '';
+    tooltip.style.transform = '';
+    
+    var btnRect = btn.getBoundingClientRect();
+    var viewportWidth = window.innerWidth;
+    var viewportHeight = window.innerHeight;
+    
+    var isTop = tooltip.classList.contains('cp-tooltip-top');
+    var isBottom = tooltip.classList.contains('cp-tooltip-bottom');
+    var isLeft = tooltip.classList.contains('cp-tooltip-left');
+    var isRight = tooltip.classList.contains('cp-tooltip-right');
+    
+    if (isTop || isBottom) {
+      var centerX = btnRect.left + (btnRect.width / 2);
+      var halfW = tooltip.offsetWidth / 2;
+      if (centerX - halfW < 10) {
+        var offset = halfW - centerX + 10;
+        tooltip.style.transform = 'translateX(calc(-50% + ' + offset + 'px))';
+      } else if (centerX + halfW > viewportWidth - 10) {
+        var offset = (centerX + halfW) - viewportWidth + 10;
+        tooltip.style.transform = 'translateX(calc(-50% - ' + offset + 'px))';
+      }
+    }
+    if (isTop && btnRect.top < tooltip.offsetHeight + 20) {
+      tooltip.style.bottom = 'auto';
+      tooltip.style.top = 'calc(100% + 10px)';
+    }
+    if (isBottom && btnRect.bottom + tooltip.offsetHeight + 20 > viewportHeight) {
+      tooltip.style.top = 'auto';
+      tooltip.style.bottom = 'calc(100% + 10px)';
+    }
+    if (isLeft && btnRect.left < tooltip.offsetWidth + 20) {
+      tooltip.style.right = 'auto';
+      tooltip.style.left = 'calc(100% + 10px)';
+    }
+    if (isRight && btnRect.right + tooltip.offsetWidth + 20 > viewportWidth) {
+      tooltip.style.left = 'auto';
+      tooltip.style.right = 'calc(100% + 10px)';
+    }
+  }
+
+  allHotspots.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      repositionTooltip(btn);
+    });
+  });
+
+  /* ============================================
+     SLIDER FUNCTIONALITY
+     ============================================ */
+  var currentIndex = 0;
+  var slidesPerView = getSlidesPerView();
+
+  function getSlidesPerView() {
+    var w = window.innerWidth;
+    if (w <= 749) return {{ section.settings.slides_per_view_mobile }};
+    if (w <= 1024) return {{ section.settings.slides_per_view_tablet }};
+    return {{ section.settings.slides_per_view_desktop }};
+  }
+
+  function getTotalSlides() {
+    return Math.max(0, cards.length - slidesPerView + 1);
+  }
+
+  function updateSlider() {
+    var gap = {{ section.settings.card_gap }};
+    var card = slider.querySelector('.complete-package-card');
+    var cardWidth = card ? card.offsetWidth : 0;
+    slider.scrollTo({ left: currentIndex * (cardWidth + gap), behavior: 'smooth' });
+    updateNavButtons();
+  }
+
+  function updateNavButtons() {
+    if (!prevBtn || !nextBtn) return;
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex >= getTotalSlides() - 1;
+  }
+
+  if (prevBtn) prevBtn.addEventListener('click', function() { if (currentIndex > 0) { currentIndex--; updateSlider(); } });
+  if (nextBtn) nextBtn.addEventListener('click', function() { if (currentIndex < getTotalSlides() - 1) { currentIndex++; updateSlider(); } });
+
+  /* Touch/Swipe */
+  var touchStartX = 0;
+  slider.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+  slider.addEventListener('touchend', function(e) {
+    var diff = touchStartX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0 && currentIndex < getTotalSlides() - 1) { currentIndex++; updateSlider(); }
+      else if (diff < 0 && currentIndex > 0) { currentIndex--; updateSlider(); }
+    }
+  }, { passive: true });
+
+  /* Resize */
+  var resizeTimeout;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function() {
+      slidesPerView = getSlidesPerView();
+      currentIndex = Math.min(currentIndex, Math.max(0, getTotalSlides() - 1));
+      updateSlider();
+    }, 150);
+  });
+
+  /* ============================================
+     CART FUNCTIONS
+     ============================================ */
+  function formatMoney(cents) {
+    return '{{ cart.currency.symbol | default: "£" }}' + (parseInt(cents) / 100).toFixed(2);
+  }
+
+  function updateCartUI(cart) {
+    if (!cart) return;
+    var isEmpty = cart.item_count === 0;
+    var emptyState = document.getElementById('cart-empty-state');
+    var itemsContainer = document.getElementById('cart-drawer-items');
+    var bottomSection = document.getElementById('cart-drawer-bottom');
+    var warningSection = document.getElementById('cart-warning');
+    var recommendations = document.getElementById('cart-recommendations');
+    if (emptyState) emptyState.style.display = isEmpty ? 'block' : 'none';
+    if (itemsContainer) itemsContainer.style.display = isEmpty ? 'none' : 'block';
+    if (bottomSection) bottomSection.style.display = isEmpty ? 'none' : 'block';
+    if (warningSection) warningSection.style.display = isEmpty ? 'none' : 'flex';
+    if (recommendations) recommendations.style.display = isEmpty ? 'none' : 'block';
+
+    document.querySelectorAll('[data-cart-count]').forEach(function(el) { el.textContent = cart.item_count; });
+    document.querySelectorAll('.hdt-count-box, hdt-cart-count').forEach(function(el) { el.textContent = cart.item_count; });
+    document.querySelectorAll('[data-cart-subtotal]').forEach(function(el) { el.textContent = formatMoney(cart.items_subtotal_price); });
+    document.querySelectorAll('[data-cart-total]').forEach(function(el) { el.textContent = formatMoney(cart.total_price); });
+    document.querySelectorAll('[data-cart-total-excl]').forEach(function(el) { el.textContent = formatMoney(Math.round(cart.total_price * 0.83)); });
+
+    var shippingThreshold = 10000;
+    var remaining = Math.max(0, shippingThreshold - cart.total_price);
+    var progress = Math.min(100, (cart.total_price / shippingThreshold) * 100);
+    var progressBar = document.querySelector('[data-shipping-progress]');
+    var remainingEl = document.querySelector('[data-shipping-remaining]');
+    if (progressBar) progressBar.style.width = progress + '%';
+    if (remainingEl) remainingEl.textContent = formatMoney(remaining);
+  }
+
+  function refreshCartDrawer() {
+    return Promise.all([
+      fetch('/?section_id=cart-drawer'),
+      fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+    ]).then(function(responses) {
+      return Promise.all([responses[0].text(), responses[1].json()]);
+    }).then(function(data) {
+      var html = data[0];
+      var cart = data[1];
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(html, 'text/html');
+      var newItems = doc.getElementById('cart-drawer-items');
+      var currentItems = document.getElementById('cart-drawer-items');
+      if (newItems && currentItems) currentItems.innerHTML = newItems.innerHTML;
+      var newShipping = doc.getElementById('cart-shipping-bar');
+      var currentShipping = document.getElementById('cart-shipping-bar');
+      if (newShipping && currentShipping) currentShipping.innerHTML = newShipping.innerHTML;
+      updateCartUI(cart);
+      return cart;
+    }).catch(function(err) {
+      console.error('Error refreshing cart:', err);
+      return null;
+    });
+  }
+
+  function openCartDrawer() {
+    var trigger = document.querySelector('[href="/cart"][class*="hdt-"]') || 
+                  document.querySelector('a[href="/cart"]:not([class*="empty"])');
+    if (trigger) { trigger.click(); return; }
+    var dialog = document.getElementById('CartDrawer');
+    if (dialog) { dialog.setAttribute('open', ''); document.body.style.overflow = 'hidden'; }
+  }
+
+  function addPackageToCart(card) {
+    var btn = card.querySelector('.cp-add-all-btn');
+    if (!btn || btn.disabled) return;
+    var productItems = card.querySelectorAll('.cp-product-item[data-variant-id]');
+    var items = [];
+    productItems.forEach(function(item) {
+      var vid = item.getAttribute('data-variant-id');
+      if (vid && vid !== '' && vid !== 'null') {
+        items.push({ id: parseInt(vid, 10), quantity: 1 });
+      }
+    });
+    if (items.length === 0) return;
+
+    var originalText = btn.textContent;
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+    btn.textContent = 'Adding...';
+
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ items: items })
+    }).then(function(res) {
+      if (!res.ok) {
+        /* Fallback: add one by one */
+        var chain = Promise.resolve();
+        items.forEach(function(item) {
+          chain = chain.then(function() {
+            return fetch('/cart/add.js', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+              body: JSON.stringify({ items: [item] })
+            });
+          });
+        });
+        return chain;
+      }
+    }).then(function() {
+      return refreshCartDrawer();
+    }).then(function() {
+      openCartDrawer();
+      btn.textContent = 'Added!';
+      btn.classList.remove('is-loading');
+      setTimeout(function() { btn.disabled = false; btn.textContent = originalText; }, 2000);
+    }).catch(function(err) {
+      console.error('Add to cart error:', err);
+      btn.disabled = false;
+      btn.classList.remove('is-loading');
+      btn.textContent = originalText;
+      alert('Could not add to cart. Please try again.');
+    });
+  }
+
+  /* Event delegation for add-all buttons */
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.cp-add-all-btn');
+    if (btn && section.contains(btn)) {
+      e.preventDefault();
+      e.stopPropagation();
+      var card = btn.closest('.complete-package-card');
+      if (card) addPackageToCart(card);
+    }
+  }, true);
+
+  /* Initialize */
+  updateNavButtons();
+});
+</script>
+
+{% schema %}
+{
+  "name": "Complete Package",
+  "tag": "section",
+  "class": "complete-package-wrapper",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Complete Package"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "text",
+      "id": "default_button_text",
+      "label": "Default Button Text",
+      "default": "Complete the package"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_cart_drawer",
+      "label": "Open cart drawer after adding",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Heading Typography"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading Font Size (Desktop)",
+      "min": 18,
+      "max": 60,
+      "step": 1,
+      "default": 32,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size_mobile",
+      "label": "Heading Font Size (Mobile)",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "default": 24,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Subheading Typography"
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Subheading Color",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "subheading_font_size",
+      "label": "Subheading Font Size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Card Styling"
+    },
+    {
+      "type": "color",
+      "id": "card_background_color",
+      "label": "Card Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "Card Border Radius",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 12,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Gap Between Cards",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_height",
+      "label": "Card Height (Desktop)",
+      "min": 200,
+      "max": 500,
+      "step": 10,
+      "default": 280,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_height_mobile",
+      "label": "Card Height (Mobile)",
+      "min": 150,
+      "max": 400,
+      "step": 10,
+      "default": 220,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Button Styling"
+    },
+    {
+      "type": "color",
+      "id": "button_background_color",
+      "label": "Button Background Color",
+      "default": "#0047AB"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Button Font Size (Desktop)",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size_mobile",
+      "label": "Button Font Size (Mobile)",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "default": 13,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Button Border Radius",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 8,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Plus Button Styling"
+    },
+    {
+      "type": "color",
+      "id": "plus_button_color",
+      "label": "Plus Button Background",
+      "default": "#0047AB"
+    },
+    {
+      "type": "color",
+      "id": "plus_icon_color",
+      "label": "Plus Icon Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "plus_button_size",
+      "label": "Plus Button Size (Desktop)",
+      "min": 20,
+      "max": 50,
+      "step": 2,
+      "default": 28,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "plus_button_size_mobile",
+      "label": "Plus Button Size (Mobile)",
+      "min": 18,
+      "max": 40,
+      "step": 2,
+      "default": 24,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Tooltip Styling"
+    },
+    {
+      "type": "color",
+      "id": "tooltip_background",
+      "label": "Tooltip Background",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "tooltip_text_color",
+      "label": "Tooltip Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Price Color in Tooltip",
+      "default": "#888888"
+    },
+    {
+      "type": "header",
+      "content": "Slider Settings"
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_desktop",
+      "label": "Slides Per View (Desktop)",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_tablet",
+      "label": "Slides Per View (Tablet)",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_mobile",
+      "label": "Slides Per View (Mobile)",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top (Desktop)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 50,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom (Desktop)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 50,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding Top (Mobile)",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "default": 30,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding Bottom (Mobile)",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "default": 30,
+      "unit": "px"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "package_card",
+      "name": "Package Card",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Main Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "main_image",
+          "label": "Main Image",
+          "info": "Custom main image for the card center"
+        },
+        {
+          "type": "product",
+          "id": "main_product",
+          "label": "Or Select Main Product",
+          "info": "Product image will be used if no custom image is set"
+        },
+        {
+          "type": "header",
+          "content": "Product 1"
+        },
+        {
+          "type": "product",
+          "id": "product_1",
+          "label": "Product 1"
+        },
+        {
+          "type": "select",
+          "id": "product_1_position",
+          "label": "Product 1 Position",
+          "options": [
+            { "value": "top-left", "label": "Top Left" },
+            { "value": "top-center", "label": "Top Center" },
+            { "value": "top-right", "label": "Top Right" },
+            { "value": "center-left", "label": "Center Left" },
+            { "value": "center-right", "label": "Center Right" },
+            { "value": "bottom-left", "label": "Bottom Left" },
+            { "value": "bottom-center", "label": "Bottom Center" },
+            { "value": "bottom-right", "label": "Bottom Right" },
+            { "value": "custom", "label": "Custom Position" }
+          ],
+          "default": "top-left"
+        },
+        {
+          "type": "range",
+          "id": "product_1_top",
+          "label": "Product 1 - Top (%)",
+          "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%",
+          "info": "Only for Custom Position"
+        },
+        {
+          "type": "range",
+          "id": "product_1_left",
+          "label": "Product 1 - Left (%)",
+          "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%"
+        },
+        {
+          "type": "range",
+          "id": "product_1_right",
+          "label": "Product 1 - Right (%)",
+          "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%"
+        },
+        {
+          "type": "range",
+          "id": "product_1_bottom",
+          "label": "Product 1 - Bottom (%)",
+          "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%"
+        },
+        {
+          "type": "select",
+          "id": "product_1_icon_position",
+          "label": "Plus Icon Position",
+          "options": [
+            { "value": "top-left", "label": "Top Left" },
+            { "value": "top-center", "label": "Top Center" },
+            { "value": "top-right", "label": "Top Right" },
+            { "value": "center-left", "label": "Center Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "center-right", "label": "Center Right" },
+            { "value": "bottom-left", "label": "Bottom Left" },
+            { "value": "bottom-center", "label": "Bottom Center" },
+            { "value": "bottom-right", "label": "Bottom Right" }
+          ],
+          "default": "top-right"
+        },
+        {
+          "type": "select",
+          "id": "product_1_tooltip_position",
+          "label": "Tooltip Position",
+          "options": [
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "top"
+        },
+        {
+          "type": "text",
+          "id": "product_1_badge",
+          "label": "Product 1 Badge (Optional)"
+        },
+        {
+          "type": "header",
+          "content": "Product 2"
+        },
+        {
+          "type": "product",
+          "id": "product_2",
+          "label": "Product 2"
+        },
+        {
+          "type": "select",
+          "id": "product_2_position",
+          "label": "Product 2 Position",
+          "options": [
+            { "value": "top-left", "label": "Top Left" },
+            { "value": "top-center", "label": "Top Center" },
+            { "value": "top-right", "label": "Top Right" },
+            { "value": "center-left", "label": "Center Left" },
+            { "value": "center-right", "label": "Center Right" },
+            { "value": "bottom-left", "label": "Bottom Left" },
+            { "value": "bottom-center", "label": "Bottom Center" },
+            { "value": "bottom-right", "label": "Bottom Right" },
+            { "value": "custom", "label": "Custom Position" }
+          ],
+          "default": "top-right"
+        },
+        { "type": "range", "id": "product_2_top", "label": "Product 2 - Top (%)", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%" },
+        { "type": "range", "id": "product_2_left", "label": "Product 2 - Left (%)", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%" },
+        { "type": "range", "id": "product_2_right", "label": "Product 2 - Right (%)", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%" },
+        { "type": "range", "id": "product_2_bottom", "label": "Product 2 - Bottom (%)", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%" },
+        {
+          "type": "select",
+          "id": "product_2_icon_position",
+          "label": "Plus Icon Position",
+          "options": [
+            { "value": "top-left", "label": "Top Left" },
+            { "value": "top-center", "label": "Top Center" },
+            { "value": "top-right", "label": "Top Right" },
+            { "value": "center-left", "label": "Center Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "center-right", "label": "Center Right" },
+            { "value": "bottom-left", "label": "Bottom Left" },
+            { "value": "bottom-center", "label": "Bottom Center" },
+            { "value": "bottom-right", "label": "Bottom Right" }
+          ],
+          "default": "top-right"
+        },
+        {
+          "type": "select",
+          "id": "product_2_tooltip_position",
+          "label": "Tooltip Position",
+          "options": [
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "top"
+        },
+        { "type": "text", "id": "product_2_badge", "label": "Product 2 Badge (Optional)" },
+        {
+          "type": "header",
+          "content": "Product 3"
+        },
+        {
+          "type": "product",
+          "id": "product_3",
+          "label": "Product 3"
+        },
+        {
+          "type": "select",
+          "id": "product_3_position",
+          "label": "Product 3 Position",
+          "options": [
+            { "value": "top-left", "label": "Top Left" },
+            { "value": "top-center", "label": "Top Center" },
+            { "value": "top-right", "label": "Top Right" },
+            { "value": "center-left", "label": "Center Left" },
+            { "value": "center-right", "label": "Center Right" },
+            { "value": "bottom-left", "label": "Bottom Left" },
+            { "value": "bottom-center", "label": "Bottom Center" },
+            { "value": "bottom-right", "label": "Bottom Right" },
+            { "value": "custom", "label": "Custom Position" }
+          ],
+          "default": "bottom-left"
+        },
+        { "type": "range", "id": "product_3_top", "label": "Product 3 - Top (%)", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%" },
+        { "type": "range", "id": "product_3_left", "label": "Product 3 - Left (%)", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%" },
+        { "type": "range", "id": "product_3_right", "label": "Product 3 - Right (%)", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%" },
+        { "type": "range", "id": "product_3_bottom", "label": "Product 3 - Bottom (%)", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%" },
+        {
+          "type": "select",
+          "id": "product_3_icon_position",
+          "label": "Plus Icon Position",
+          "options": [
+            { "value": "top-left", "label": "Top Left" },
+            { "value": "top-center", "label": "Top Center" },
+            { "value": "top-right", "label": "Top Right" },
+            { "value": "center-left", "label": "Center Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "center-right", "label": "Center Right" },
+            { "value": "bottom-left", "label": "Bottom Left" },
+            { "value": "bottom-center", "label": "Bottom Center" },
+            { "value": "bottom-right", "label": "Bottom Right" }
+          ],
+          "default": "top-right"
+        },
+        {
+          "type": "select",
+          "id": "product_3_tooltip_position",
+          "label": "Tooltip Position",
+          "options": [
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "top"
+        },
+        { "type": "text", "id": "product_3_badge", "label": "Product 3 Badge (Optional)" },
+        {
+          "type": "header",
+          "content": "Product 4"
+        },
+        {
+          "type": "product",
+          "id": "product_4",
+          "label": "Product 4"
+        },
+        {
+          "type": "select",
+          "id": "product_4_position",
+          "label": "Product 4 Position",
+          "options": [
+            { "value": "top-left", "label": "Top Left" },
+            { "value": "top-center", "label": "Top Center" },
+            { "value": "top-right", "label": "Top Right" },
+            { "value": "center-left", "label": "Center Left" },
+            { "value": "center-right", "label": "Center Right" },
+            { "value": "bottom-left", "label": "Bottom Left" },
+            { "value": "bottom-center", "label": "Bottom Center" },
+            { "value": "bottom-right", "label": "Bottom Right" },
+            { "value": "custom", "label": "Custom Position" }
+          ],
+          "default": "bottom-right"
+        },
+        { "type": "range", "id": "product_4_top", "label": "Product 4 - Top (%)", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%" },
+        { "type": "range", "id": "product_4_left", "label": "Product 4 - Left (%)", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%" },
+        { "type": "range", "id": "product_4_right", "label": "Product 4 - Right (%)", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%" },
+        { "type": "range", "id": "product_4_bottom", "label": "Product 4 - Bottom (%)", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "%" },
+        {
+          "type": "select",
+          "id": "product_4_icon_position",
+          "label": "Plus Icon Position",
+          "options": [
+            { "value": "top-left", "label": "Top Left" },
+            { "value": "top-center", "label": "Top Center" },
+            { "value": "top-right", "label": "Top Right" },
+            { "value": "center-left", "label": "Center Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "center-right", "label": "Center Right" },
+            { "value": "bottom-left", "label": "Bottom Left" },
+            { "value": "bottom-center", "label": "Bottom Center" },
+            { "value": "bottom-right", "label": "Bottom Right" }
+          ],
+          "default": "top-right"
+        },
+        {
+          "type": "select",
+          "id": "product_4_tooltip_position",
+          "label": "Tooltip Position",
+          "options": [
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "top"
+        },
+        { "type": "text", "id": "product_4_badge", "label": "Product 4 Badge (Optional)" },
+        {
+          "type": "header",
+          "content": "Button Settings"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button Text",
+          "default": "Complete the package"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Complete Package",
+      "blocks": [
+        { "type": "package_card" },
+        { "type": "package_card" },
+        { "type": "package_card" },
+        { "type": "package_card" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,82 @@
+{% content_for 'blocks' %}
+<style>
+{% if block.settings.accordoins_border_style %}
+.hdt-product-accordion__item summary {
+    background-color: transparent !important;
+    {% comment %} border-bottom: 1px solid #eae6e6; {% endcomment %}
+    border-radius: 0 !important;
+}
+.hdt-product-accordion__content {
+    border: none !important;
+    padding: 2rem !important;
+        margin-top: 0 !important;
+}
+.hdt-product-accordion__item {
+    border-bottom: 1px solid rgb(199 199 199);
+}
+hdt-accordion.hdt-contents .hdt-product-accordion__item:not(hdt-accordion.hdt-contents+hdt-accordion.hdt-contents .hdt-product-accordion__item) {
+    border-top: 1px solid rgb(199 199 199);
+    margin: 0;
+}
+{% endif %}
+
+{% if block.settings.hide_prod_info_accordoins %}
+@media (min-width: 769px){
+  #shopify-section-{{ section.id }} .hdt-product-info__list .shopify-block.hdt-product-accordion {
+      display: none;
+  }
+}
+@media (max-width: 768px){
+  #shopify-section-{{ section.id }} .hdt-product-media-wrapps .shopify-block.hdt-product-accordion {
+      display: none;
+  }
+}
+{% endif %}
+</style>
+
+{% schema %}
+  {
+    "name": "t:sections.main-product-tabs.blocks.group_accordion.name",
+    "class": "hdt-product-accordion",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "accordoins_border_style",
+        "label": "Accordoins Border style",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "hide_prod_info_accordoins",
+        "label": "Hide Product Info Accordoins(desktop)",
+        "default": false
+      },
+      
+    ],
+    "blocks": [
+      {
+        "type": "_accordion_description"
+      },
+      {
+        "type": "_technical-details"
+      },
+      {
+        "type": "_accordion_review"
+      },
+      {
+        "type": "_accordion_add"
+      },
+      {
+        "type": "_accordion_html"
+      },
+      {
+        "type": "_accordion_customliquid"
+      }
+    ],
+    "presets": [
+      {
+        "name": "t:sections.main-product-tabs.blocks.group_accordion.name"
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,368 @@
+/* floating-newsletter-button.css */
+
+.floating-newsletter-btn-section {
+  position: fixed;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.floating-newsletter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: var(--btn-bg, #2563eb);
+  color: var(--btn-text, #ffffff);
+  border: none;
+  border-radius: 15px 15px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  position: fixed;
+  transform-origin: center center;
+}
+
+.floating-newsletter-btn:hover {
+  background-color: var(--btn-bg-hover, #1d4ed8);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.floating-newsletter-btn:active {
+  transform: scale(0.98);
+}
+
+/* Icon styling */
+.floating-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.floating-newsletter-btn:hover .floating-btn__icon {
+  transform: translateY(-2px);
+}
+
+.floating-btn__text {
+  line-height: 1.2;
+  transition: opacity 0.3s ease;
+}
+
+/* Close button styling */
+.floating-btn__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin-left: 4px;
+  border: 1px solid #0047AB;
+  color: inherit;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: auto;
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  top: -6px;
+  right: -6px;
+}
+
+.floating-btn__close:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.floating-btn__close svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ================================
+   MINIMIZED STATE - Vertical Tab
+   ================================ */
+.floating-newsletter-btn.is-minimized {
+  left: 14px !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: 10% !important;
+  transform: translateY(-50%) rotate(-90deg) translateX(-50%) !important;
+  transform-origin: left center;
+  border-radius: 0 0 15px 15px;
+  padding: 12px 20px;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.floating-newsletter-btn.is-minimized:hover {
+  transform: translateY(-50%) rotate(-90deg) translateX(-50%) translateY(-3px) !important;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Hide close button and arrow when minimized */
+.floating-newsletter-btn.is-minimized .floating-btn__close {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.floating-newsletter-btn.is-minimized .floating-btn__icon {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+/* ================================
+   DESKTOP POSITIONS (750px+)
+   ================================ */
+@media screen and (min-width: 750px) {
+  /* Top Left */
+  .floating-btn--top-left {
+    top: 20px;
+    left: 20px;
+    bottom: auto;
+    right: auto;
+  }
+
+  /* Top Right */
+  .floating-btn--top-right {
+    top: 20px;
+    right: 20px;
+    bottom: auto;
+    left: auto;
+  }
+
+  /* Center Left */
+  .floating-btn--center-left {
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    bottom: auto;
+    right: auto;
+  }
+  .floating-btn--center-left:hover {
+    transform: translateY(-50%) translateX(3px);
+  }
+
+  /* Center Right */
+  .floating-btn--center-right {
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    bottom: auto;
+    left: auto;
+  }
+  .floating-btn--center-right:hover {
+    transform: translateY(-50%) translateX(-3px);
+  }
+
+  /* Bottom Left */
+  .floating-btn--bottom-left {
+    bottom: 22%;
+    left: 20px;
+    top: auto;
+    right: auto;
+  }
+
+  /* Bottom Right */
+  .floating-btn--bottom-right {
+    bottom: 20px;
+    right: 20px;
+    top: auto;
+    left: auto;
+  }
+}
+
+/* ================================
+   MOBILE POSITIONS (below 750px)
+   ================================ */
+@media screen and (max-width: 749px) {
+  .floating-newsletter-btn {
+    padding: 10px 16px;
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .floating-btn__icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Minimized state adjustments for mobile */
+  .floating-newsletter-btn.is-minimized {
+    padding: 10px 16px;
+    font-size: 12px;
+    bottom: 18% !important;
+  }
+
+  /* Top Left - Mobile */
+  .floating-btn--mobile-top-left {
+    top: 15px;
+    left: 15px;
+    bottom: auto;
+    right: auto;
+    transform: none;
+  }
+
+  /* Top Right - Mobile */
+  .floating-btn--mobile-top-right {
+    top: 15px;
+    right: 15px;
+    bottom: auto;
+    left: auto;
+    transform: none;
+  }
+
+  /* Top Center - Mobile */
+  .floating-btn--mobile-top-center {
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: auto;
+    right: auto;
+  }
+
+  /* Center Left - Mobile */
+  .floating-btn--mobile-center-left {
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    bottom: auto;
+    right: auto;
+  }
+
+  /* Center Right - Mobile */
+  .floating-btn--mobile-center-right {
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    bottom: auto;
+    left: auto;
+  }
+
+  /* Bottom Left - Mobile */
+  .floating-btn--mobile-bottom-left {
+    bottom: 125px;
+    left: 15px;
+    top: auto;
+    right: auto;
+    transform: none;
+  }
+
+  /* Bottom Right - Mobile */
+  .floating-btn--mobile-bottom-right {
+    bottom: 15px;
+    right: 15px;
+    top: auto;
+    left: auto;
+    transform: none;
+  }
+
+  /* Bottom Center - Mobile */
+  .floating-btn--mobile-bottom-center {
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    top: auto;
+    right: auto;
+  }
+}
+
+/* ================================
+   ANIMATIONS
+   ================================ */
+@keyframes floatBtnFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.floating-newsletter-btn {
+  /* animation: floatBtnFadeIn 0.5s ease forwards;
+  animation-delay: 0.5s; */
+  opacity: 1;
+}
+
+/* Disable fade-in animation when minimized */
+.floating-newsletter-btn.is-minimized {
+  animation: none;
+  opacity: 1;
+}
+
+/* Override animation for centered positions */
+@media screen and (min-width: 750px) {
+  .floating-btn--center-left,
+  .floating-btn--center-right {
+    /* animation: floatBtnFadeIn 0.5s ease forwards;
+    animation-delay: 1s; */
+    opacity: 1;
+  }
+  
+  .floating-btn--center-left.is-minimized,
+  .floating-btn--center-right.is-minimized {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .floating-btn--mobile-top-center,
+  .floating-btn--mobile-bottom-center {
+    animation: floatBtnFadeIn 0.5s ease forwards;
+    animation-delay: 1s;
+    opacity: 0;
+  }
+  
+  .floating-btn--mobile-center-left,
+  .floating-btn--mobile-center-right {
+    animation: floatBtnFadeIn 0.5s ease forwards;
+    animation-delay: 1s;
+    opacity: 0;
+  }
+  
+  .floating-btn--mobile-top-center.is-minimized,
+  .floating-btn--mobile-bottom-center.is-minimized,
+  .floating-btn--mobile-center-left.is-minimized,
+  .floating-btn--mobile-center-right.is-minimized {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* Pulse animation for attention - only when not minimized */
+@keyframes floatBtnPulse {
+  0%, 100% {
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(37, 99, 235, 0.5);
+  }
+}
+
+.floating-newsletter-btn:not(:hover):not(.is-minimized) {
+  animation: floatBtnFadeIn 0.5s ease forwards, floatBtnPulse 2s ease-in-out infinite;
+  animation-delay: 1s, 2s;
+}
+
+/* Subtle pulse for minimized state */
+@keyframes floatBtnPulseMinimized {
+  0%, 100% {
+    box-shadow: 4px 0 15px rgba(37, 99, 235, 0.3);
+  }
+  50% {
+    box-shadow: 4px 0 20px rgba(37, 99, 235, 0.4);
+  }
+}
+
+.floating-newsletter-btn.is-minimized:not(:hover) {
+  animation: floatBtnPulseMinimized 3s ease-in-out infinite;
+}

@@ -1,0 +1,1000 @@
+{%- comment -%}
+  Mega Menu - Walmart Style
+  - Opens on hover
+  - 4 columns: Categories > Subcategories > Sub-subcategories > Products/Promo
+  - Smooth animations for columns
+  - Proper height handling
+{%- endcomment -%}
+
+<div class="hdt-list-categories md hdt-relative">
+  <!-- Trigger Button -->
+  <a href="#" class="hdt-categories-title hdt-flex hdt-align-center hdt-text-base hdt-font-medium hdt-radius-lg" id="hdt-mega-trigger">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M4.83416 0H1.61897C0.726277 0 0 0.726277 0 1.61897V4.83416C0 5.72685 0.726277 6.45312 1.61897 6.45312H4.83416C5.72685 6.45312 6.45312 5.72685 6.45312 4.83416V1.61897C6.45312 0.726277 5.72685 0 4.83416 0ZM5.35938 4.83416C5.35938 5.12375 5.12375 5.35938 4.83416 5.35938H1.61897C1.32937 5.35938 1.09375 5.12375 1.09375 4.83416V1.61897C1.09375 1.32937 1.32937 1.09375 1.61897 1.09375H4.83416C5.12375 1.09375 5.35938 1.32937 5.35938 1.61897V4.83416ZM12.3594 0H9.1875C8.28286 0 7.54688 0.735984 7.54688 1.64062V4.8125C7.54688 5.71714 8.28286 6.45312 9.1875 6.45312H12.3594C13.264 6.45312 14 5.71714 14 4.8125V1.64062C14 0.735984 13.264 0 12.3594 0ZM12.9062 4.8125C12.9062 5.11405 12.6609 5.35938 12.3594 5.35938H9.1875C8.88595 5.35938 8.64062 5.11405 8.64062 4.8125V1.64062C8.64062 1.33908 8.88595 1.09375 9.1875 1.09375H12.3594C12.6609 1.09375 12.9062 1.33908 12.9062 1.64062V4.8125ZM4.83416 7.54688H1.61897C0.726277 7.54688 0 8.27315 0 9.16584V12.381C0 13.2737 0.726277 14 1.61897 14H4.83416C5.72685 14 6.45312 13.2737 6.45312 12.381V9.16584C6.45312 8.27315 5.72685 7.54688 4.83416 7.54688ZM5.35938 12.381C5.35938 12.6706 5.12375 12.9062 4.83416 12.9062H1.61897C1.32937 12.9062 1.09375 12.6706 1.09375 12.381V9.16584C1.09375 8.87625 1.32937 8.64062 1.61897 8.64062H4.83416C5.12375 8.64062 5.35938 8.87625 5.35938 9.16584V12.381ZM12.3594 7.54688H9.1875C8.28286 7.54688 7.54688 8.28286 7.54688 9.1875V12.3594C7.54688 13.264 8.28286 14 9.1875 14H12.3594C13.264 14 14 13.264 14 12.3594V9.1875C14 8.28286 13.264 7.54688 12.3594 7.54688ZM12.9062 12.3594C12.9062 12.6609 12.6609 12.9062 12.3594 12.9062H9.1875C8.88595 12.9062 8.64062 12.6609 8.64062 12.3594V9.1875C8.64062 8.88595 8.88595 8.64062 9.1875 8.64062H12.3594C12.6609 8.64062 12.9062 8.88595 12.9062 9.1875V12.3594Z" fill="currentColor"/>
+    </svg>
+    {{ section.settings.title_categories | default: 'All Categories' }}
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" class="arw-svg">
+      <path d="M18 9L12 15L6 9" stroke="currentColor" stroke-width="2"/>
+    </svg>
+  </a>
+
+  {%- if section.settings.menu_categories != blank -%}
+  <!-- Mega Menu Dropdown -->
+  <div class="hdt-mega-dropdown" id="hdt-mega-dropdown">
+    <div class="hdt-mega-inner">
+      <!-- Column 1: Main Categories -->
+      <div class="hdt-mega-col hdt-mega-col-1">
+        <a href="{{ routes.collections_url }}" class="hdt-mega-header">
+          <span>Shop All Departments</span>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H1M9 1V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <ul class="hdt-mega-list" id="hdt-list-1">
+          {%- for link in section.settings.menu_categories.links -%}
+          <li class="hdt-mega-item" data-index="{{ forloop.index0 }}" data-has-children="{% if link.links != blank %}true{% else %}false{% endif %}">
+            <a href="{{ link.url }}" class="hdt-mega-link">
+              <span>{{ link.title }}</span>
+              {% if link.links != blank %}
+              <svg width="6" height="10" viewBox="0 0 6 10" fill="none"><path d="M1 1L5 5L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              {% endif %}
+            </a>
+          </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      <!-- Column 2: Subcategories -->
+      <div class="hdt-mega-col hdt-mega-col-2" id="hdt-col-2">
+        <a href="#" class="hdt-mega-header" id="hdt-header-2">
+          <span>Shop All</span>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H1M9 1V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <ul class="hdt-mega-list" id="hdt-list-2"></ul>
+      </div>
+
+      <!-- Column 3: Sub-subcategories -->
+      <div class="hdt-mega-col hdt-mega-col-3" id="hdt-col-3">
+        <a href="#" class="hdt-mega-header" id="hdt-header-3">
+          <span>Shop All</span>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H1M9 1V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <ul class="hdt-mega-list" id="hdt-list-3"></ul>
+      </div>
+
+      <!-- Column 4: Promo/Products (Always Visible) -->
+      <div class="hdt-mega-col hdt-mega-col-promo" id="hdt-col-promo">
+        <div class="hdt-promo-wrapper" id="hdt-promo-wrapper">
+          
+          {%- comment -%} Products Section {%- endcomment -%}
+          {% if section.settings.show_products %}
+          <div class="hdt-products-section" id="hdt-products-section">
+            <div class="hdt-products-header">Featured Products</div>
+            <div class="hdt-products-grid" id="hdt-products-grid">
+              <!-- Products will be loaded via JS -->
+            </div>
+          </div>
+          {% endif %}
+
+          {%- comment -%} Promo Banners Section {%- endcomment -%}
+          {% if section.settings.show_promo_banners %}
+          <div class="hdt-banners-section" id="hdt-banners-section">
+            {% if section.settings.promo_image_1 != blank %}
+            <a href="{{ section.settings.promo_link_1 | default: '#' }}" class="hdt-promo-card">
+              <div class="hdt-promo-img">
+                {{ section.settings.promo_image_1 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {% if section.settings.promo_text_1 != blank %}
+                <div class="hdt-promo-text">{{ section.settings.promo_text_1 }}</div>
+                {% endif %}
+              </div>
+            </a>
+            {% endif %}
+            
+            {% if section.settings.promo_image_2 != blank %}
+            <a href="{{ section.settings.promo_link_2 | default: '#' }}" class="hdt-promo-card">
+              <div class="hdt-promo-img">
+                {{ section.settings.promo_image_2 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {% if section.settings.promo_text_2 != blank %}
+                <div class="hdt-promo-text">{{ section.settings.promo_text_2 }}</div>
+                {% endif %}
+              </div>
+            </a>
+            {% endif %}
+            
+            {% if section.settings.promo_image_3 != blank %}
+            <a href="{{ section.settings.promo_link_3 | default: '#' }}" class="hdt-promo-card">
+              <div class="hdt-promo-img">
+                {{ section.settings.promo_image_3 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {% if section.settings.promo_text_3 != blank %}
+                <div class="hdt-promo-text">{{ section.settings.promo_text_3 }}</div>
+                {% endif %}
+              </div>
+            </a>
+            {% endif %}
+
+            {% if section.settings.promo_image_4 != blank %}
+            <a href="{{ section.settings.promo_link_4 | default: '#' }}" class="hdt-promo-card">
+              <div class="hdt-promo-img">
+                {{ section.settings.promo_image_4 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {% if section.settings.promo_text_4 != blank %}
+                <div class="hdt-promo-text">{{ section.settings.promo_text_4 }}</div>
+                {% endif %}
+              </div>
+            </a>
+            {% endif %}
+
+            {% if section.settings.promo_image_5 != blank %}
+            <a href="{{ section.settings.promo_link_5 | default: '#' }}" class="hdt-promo-card">
+              <div class="hdt-promo-img">
+                {{ section.settings.promo_image_5 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {% if section.settings.promo_text_5 != blank %}
+                <div class="hdt-promo-text">{{ section.settings.promo_text_5 }}</div>
+                {% endif %}
+              </div>
+            </a>
+            {% endif %}
+
+            {% if section.settings.promo_image_6 != blank %}
+            <a href="{{ section.settings.promo_link_6 | default: '#' }}" class="hdt-promo-card">
+              <div class="hdt-promo-img">
+                {{ section.settings.promo_image_6 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {% if section.settings.promo_text_6 != blank %}
+                <div class="hdt-promo-text">{{ section.settings.promo_text_6 }}</div>
+                {% endif %}
+              </div>
+            </a>
+            {% endif %}
+
+            {% if section.settings.promo_image_7 != blank %}
+            <a href="{{ section.settings.promo_link_7 | default: '#' }}" class="hdt-promo-card">
+              <div class="hdt-promo-img">
+                {{ section.settings.promo_image_7 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {% if section.settings.promo_text_7 != blank %}
+                <div class="hdt-promo-text">{{ section.settings.promo_text_7 }}</div>
+                {% endif %}
+              </div>
+            </a>
+            {% endif %}
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+  {%- endif -%}
+
+  <!-- Hidden Data for JavaScript -->
+  <script type="application/json" id="hdt-mega-menu-data">
+    {
+      "showProducts": {{ section.settings.show_products | json }},
+      "showPromoBanners": {{ section.settings.show_promo_banners | json }},
+      "productsCount": {{ section.settings.products_count | default: 4 }},
+      "categories": [
+        {%- for link in section.settings.menu_categories.links -%}
+        {
+          "title": {{ link.title | json }},
+          "url": {{ link.url | json }},
+          "hasChildren": {% if link.links != blank %}true{% else %}false{% endif %},
+          "isCollection": {% if link.type == 'collection_link' %}true{% else %}false{% endif %},
+          "products": [
+            {%- if link.type == 'collection_link' -%}
+              {%- for product in link.object.products limit: section.settings.products_count -%}
+              {
+                "title": {{ product.title | json }},
+                "url": {{ product.url | json }},
+                "price": {{ product.price | money | json }},
+                "image": {{ product.featured_image | image_url: width: 150 | json }}
+              }{% unless forloop.last %},{% endunless %}
+              {%- endfor -%}
+            {%- endif -%}
+          ],
+          "children": [
+            {%- for child in link.links -%}
+            {
+              "title": {{ child.title | json }},
+              "url": {{ child.url | json }},
+              "hasChildren": {% if child.links != blank %}true{% else %}false{% endif %},
+              "isCollection": {% if child.type == 'collection_link' %}true{% else %}false{% endif %},
+              "products": [
+                {%- if child.type == 'collection_link' -%}
+                  {%- for product in child.object.products limit: section.settings.products_count -%}
+                  {
+                    "title": {{ product.title | json }},
+                    "url": {{ product.url | json }},
+                    "price": {{ product.price | money | json }},
+                    "image": {{ product.featured_image | image_url: width: 150 | json }}
+                  }{% unless forloop.last %},{% endunless %}
+                  {%- endfor -%}
+                {%- endif -%}
+              ],
+              "children": [
+                {%- for grandchild in child.links -%}
+                {
+                  "title": {{ grandchild.title | json }},
+                  "url": {{ grandchild.url | json }},
+                  "isCollection": {% if grandchild.type == 'collection_link' %}true{% else %}false{% endif %},
+                  "products": [
+                    {%- if grandchild.type == 'collection_link' -%}
+                      {%- for product in grandchild.object.products limit: section.settings.products_count -%}
+                      {
+                        "title": {{ product.title | json }},
+                        "url": {{ product.url | json }},
+                        "price": {{ product.price | money | json }},
+                        "image": {{ product.featured_image | image_url: width: 150 | json }}
+                      }{% unless forloop.last %},{% endunless %}
+                      {%- endfor -%}
+                    {%- endif -%}
+                  ]
+                }{% unless forloop.last %},{% endunless %}
+                {%- endfor -%}
+              ]
+            }{% unless forloop.last %},{% endunless %}
+            {%- endfor -%}
+          ]
+        }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      ]
+    }
+  </script>
+</div>
+
+<style>
+/* =============================================
+   MEGA MENU - WALMART STYLE
+   Fixed Column Animations & Height
+   ============================================= */
+
+/* Trigger Button */
+.hdt-list-categories.md {
+  position: relative;
+}
+
+.hdt-categories-title {
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+}
+
+.hdt-categories-title .arw-svg {
+  transition: transform 0.2s ease;
+  width: 20px;
+  height: 20px;
+}
+
+.hdt-categories-title.is-open .arw-svg {
+  transform: rotate(180deg);
+}
+
+/* =============================================
+   DROPDOWN CONTAINER
+   ============================================= */
+.hdt-mega-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e0e0e0;
+  border-radius: 0 0 8px 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+}
+
+.hdt-mega-dropdown.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* =============================================
+   MEGA INNER - Flex Container
+   ============================================= */
+.hdt-mega-inner {
+  display: flex;
+  align-items: stretch;
+}
+
+/* =============================================
+   COLUMNS - Base Styles
+   ============================================= */
+.hdt-mega-col {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-right: 1px solid #e0e0e0;
+  flex-shrink: 0;
+  min-height: 400px;
+  max-height: 70vh;
+}
+
+.hdt-mega-col:last-child {
+  border-right: none;
+}
+
+/* Column 1 - Always visible */
+.hdt-mega-col-1 {
+  width: 240px;
+}
+
+/* Column 2 - Animated */
+.hdt-mega-col-2 {
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  border-right-width: 0;
+  transition: width 0.3s ease, opacity 0.25s ease, min-width 0.3s ease, border-right-width 0.3s ease;
+}
+
+.hdt-mega-col-2.is-visible {
+  width: 240px;
+  min-width: 240px;
+  opacity: 1;
+  border-right-width: 1px;
+}
+
+/* Column 3 - Animated */
+.hdt-mega-col-3 {
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  border-right-width: 0;
+  transition: width 0.3s ease, opacity 0.25s ease, min-width 0.3s ease, border-right-width 0.3s ease;
+}
+
+.hdt-mega-col-3.is-visible {
+  width: 240px;
+  min-width: 240px;
+  opacity: 1;
+  border-right-width: 1px;
+}
+
+/* Promo Column - Always visible */
+.hdt-mega-col-promo {
+  width: 280px;
+  min-width: 280px;
+  background: #fff;
+  border-right: none;
+}
+
+/* =============================================
+   COLUMN HEADER
+   ============================================= */
+.hdt-mega-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 15px 12px;
+  border-bottom: 1px solid #e0e0e0;
+  color: #000;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  flex-shrink: 0;
+  min-height: 48px;
+  box-sizing: border-box;
+}
+
+.hdt-mega-header span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hdt-mega-header:hover {
+  text-decoration: underline;
+  color: #0071dc;
+}
+
+.hdt-mega-header svg {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+}
+
+/* =============================================
+   MENU LIST
+   ============================================= */
+.hdt-mega-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* =============================================
+   MENU ITEM
+   ============================================= */
+.hdt-mega-item {
+  position: relative;
+}
+
+.hdt-mega-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  white-space: nowrap;
+}
+
+.hdt-mega-link span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hdt-mega-link svg {
+  flex-shrink: 0;
+  color: #999;
+  margin-left: 8px;
+  width: 5px;
+  height: 9px;
+  transition: transform 0.2s ease, color 0.15s ease;
+}
+
+/* Hover & Active States */
+.hdt-mega-link:hover,
+.hdt-mega-item.is-active > .hdt-mega-link {
+  background: #e6f2ff;
+  color: #0071dc;
+  border-left-color: #0071dc;
+}
+
+.hdt-mega-link:hover svg,
+.hdt-mega-item.is-active > .hdt-mega-link svg {
+  color: #0071dc;
+}
+
+/* =============================================
+   PROMO COLUMN STYLES
+   ============================================= */
+.hdt-promo-wrapper {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Products Section */
+.hdt-products-section {
+  margin-bottom: 8px;
+}
+
+.hdt-products-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 10px;
+}
+
+.hdt-products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.hdt-product-item {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.hdt-product-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.hdt-product-item a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.hdt-product-item-img {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.hdt-product-item-img img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.hdt-product-item-info {
+  padding: 8px;
+}
+
+.hdt-product-item-title {
+  display: block;
+  font-size: 11px;
+  color: #333;
+  line-height: 1.3;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.hdt-product-item-price {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(0, 71, 171, 1);
+}
+
+/* Banners Section */
+.hdt-banners-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hdt-promo-card {
+  display: block;
+  text-decoration: none;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hdt-promo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hdt-promo-img {
+  width: 100%;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+  background: #f5f5f5;
+  position: relative;
+}
+
+.hdt-promo-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hdt-promo-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 12px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* No products message */
+.hdt-no-products {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  padding: 20px 10px;
+}
+
+/* =============================================
+   SCROLLBAR STYLING
+   ============================================= */
+.hdt-mega-list::-webkit-scrollbar,
+.hdt-promo-wrapper::-webkit-scrollbar {
+  width: 5px;
+}
+
+.hdt-mega-list::-webkit-scrollbar-track,
+.hdt-promo-wrapper::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.hdt-mega-list::-webkit-scrollbar-thumb,
+.hdt-promo-wrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.hdt-mega-list::-webkit-scrollbar-thumb:hover,
+.hdt-promo-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 1200px) {
+  .hdt-mega-col-1,
+  .hdt-mega-col-2.is-visible,
+  .hdt-mega-col-3.is-visible {
+    width: 200px;
+    min-width: 200px;
+  }
+  
+  .hdt-mega-col-promo {
+    width: 240px;
+    min-width: 240px;
+  }
+}
+
+@media (max-width: 991px) {
+  .hdt-mega-dropdown {
+    max-width: 100vw;
+    overflow-x: auto;
+  }
+  
+  .hdt-mega-inner {
+    flex-wrap: nowrap;
+  }
+  
+  .hdt-mega-col-1 {
+    width: 180px;
+    min-width: 180px;
+  }
+  
+  .hdt-mega-col-2.is-visible,
+  .hdt-mega-col-3.is-visible {
+    width: 180px;
+    min-width: 180px;
+  }
+  
+  .hdt-mega-col-promo {
+    width: 200px;
+    min-width: 200px;
+  }
+}
+</style>
+
+<script>
+(function() {
+  'use strict';
+
+  class MegaMenuWalmart {
+    constructor() {
+      this.trigger = document.getElementById('hdt-mega-trigger');
+      this.dropdown = document.getElementById('hdt-mega-dropdown');
+      this.list1 = document.getElementById('hdt-list-1');
+      this.list2 = document.getElementById('hdt-list-2');
+      this.list3 = document.getElementById('hdt-list-3');
+      this.col2 = document.getElementById('hdt-col-2');
+      this.col3 = document.getElementById('hdt-col-3');
+      this.header2 = document.getElementById('hdt-header-2');
+      this.header3 = document.getElementById('hdt-header-3');
+      this.menuContainer = document.querySelector('.hdt-list-categories.md');
+      this.productsGrid = document.getElementById('hdt-products-grid');
+      this.productsSection = document.getElementById('hdt-products-section');
+      
+      this.data = null;
+      this.isOpen = false;
+      this.closeTimeout = null;
+      this.currentLevel1Index = -1;
+      this.currentLevel2Index = -1;
+      
+      this.init();
+    }
+
+    init() {
+      if (!this.trigger || !this.dropdown) return;
+      
+      // Load data
+      const dataEl = document.getElementById('hdt-mega-menu-data');
+      if (dataEl) {
+        try {
+          this.data = JSON.parse(dataEl.textContent);
+        } catch (e) {
+          console.error('Failed to parse menu data:', e);
+          return;
+        }
+      }
+
+      // Open on hover trigger
+      this.trigger.addEventListener('mouseenter', () => {
+        this.clearCloseTimeout();
+        this.open();
+      });
+
+      // Keep open when hovering dropdown
+      this.dropdown.addEventListener('mouseenter', () => {
+        this.clearCloseTimeout();
+      });
+
+      // Close when leaving trigger (with delay)
+      this.trigger.addEventListener('mouseleave', () => {
+        this.startCloseTimeout();
+      });
+
+      // Close when leaving dropdown (with delay)
+      this.dropdown.addEventListener('mouseleave', () => {
+        this.startCloseTimeout();
+      });
+
+      // Also support click to toggle
+      this.trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (this.isOpen) {
+          this.close();
+        } else {
+          this.open();
+        }
+      });
+
+      // Close on click outside
+      document.addEventListener('click', (e) => {
+        if (this.isOpen && !this.menuContainer.contains(e.target)) {
+          this.close();
+        }
+      });
+
+      // Close on Escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.isOpen) {
+          this.close();
+        }
+      });
+
+      // Bind hover events for level 1
+      this.bindLevel1Events();
+    }
+
+    clearCloseTimeout() {
+      if (this.closeTimeout) {
+        clearTimeout(this.closeTimeout);
+        this.closeTimeout = null;
+      }
+    }
+
+    startCloseTimeout() {
+      this.clearCloseTimeout();
+      this.closeTimeout = setTimeout(() => {
+        this.close();
+      }, 250);
+    }
+
+    open() {
+      this.isOpen = true;
+      this.dropdown.classList.add('is-open');
+      this.trigger.classList.add('is-open');
+    }
+
+    close() {
+      this.isOpen = false;
+      this.dropdown.classList.remove('is-open');
+      this.trigger.classList.remove('is-open');
+      
+      // Reset columns
+      this.col2.classList.remove('is-visible');
+      this.col3.classList.remove('is-visible');
+      
+      // Reset active states
+      this.list1.querySelectorAll('.hdt-mega-item').forEach(i => i.classList.remove('is-active'));
+      this.currentLevel1Index = -1;
+      this.currentLevel2Index = -1;
+    }
+
+    bindLevel1Events() {
+      if (!this.list1) return;
+      
+      const items = this.list1.querySelectorAll('.hdt-mega-item');
+      items.forEach((item, index) => {
+        item.addEventListener('mouseenter', () => {
+          this.activateLevel1(item, index);
+        });
+      });
+    }
+
+    activateLevel1(item, index) {
+      // Skip if same item
+      if (this.currentLevel1Index === index) return;
+      this.currentLevel1Index = index;
+      
+      // Remove active from all level 1 items
+      this.list1.querySelectorAll('.hdt-mega-item').forEach(i => i.classList.remove('is-active'));
+      item.classList.add('is-active');
+
+      // Get category data
+      const category = this.data.categories[index];
+      if (!category) return;
+
+      // Check if has children
+      if (category.hasChildren && category.children && category.children.length > 0) {
+        // Render level 2 content
+        this.renderLevel2(category);
+        
+        // Show column 2 with animation
+        this.col2.classList.add('is-visible');
+      } else {
+        // Hide columns 2 and 3
+        this.col2.classList.remove('is-visible');
+        this.col3.classList.remove('is-visible');
+        this.currentLevel2Index = -1;
+      }
+
+      // Update products if enabled
+      if (this.data.showProducts) {
+        if (category.products && category.products.length > 0) {
+          this.renderProducts(category.products);
+        } else {
+          this.renderProducts([]);
+        }
+      }
+    }
+
+    renderLevel2(category) {
+      // Update header
+      this.header2.href = category.url;
+      this.header2.querySelector('span').textContent = 'Shop All ' + category.title;
+
+      // Render items
+      let html = '';
+      category.children.forEach((child, idx) => {
+        const hasArrow = child.hasChildren && child.children && child.children.length > 0;
+        const arrow = hasArrow ? 
+          '<svg width="6" height="10" viewBox="0 0 6 10" fill="none"><path d="M1 1L5 5L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
+        
+        html += `
+          <li class="hdt-mega-item" data-index="${idx}" data-has-children="${hasArrow}">
+            <a href="${child.url}" class="hdt-mega-link">
+              <span>${child.title}</span>
+              ${arrow}
+            </a>
+          </li>
+        `;
+      });
+
+      this.list2.innerHTML = html;
+      
+      // Reset level 2 index
+      this.currentLevel2Index = -1;
+      
+      // Hide column 3 initially
+      this.col3.classList.remove('is-visible');
+
+      // Bind hover events for level 2
+      const items = this.list2.querySelectorAll('.hdt-mega-item');
+      items.forEach((item, idx) => {
+        item.addEventListener('mouseenter', () => {
+          this.activateLevel2(item, idx, category.children[idx]);
+        });
+      });
+    }
+
+    activateLevel2(item, index, childData) {
+      // Skip if same item
+      if (this.currentLevel2Index === index) return;
+      this.currentLevel2Index = index;
+      
+      // Remove active from all level 2 items
+      this.list2.querySelectorAll('.hdt-mega-item').forEach(i => i.classList.remove('is-active'));
+      item.classList.add('is-active');
+
+      // Check if has children for level 3
+      if (childData.hasChildren && childData.children && childData.children.length > 0) {
+        // Render level 3 content
+        this.renderLevel3(childData);
+        
+        // Show column 3 with animation
+        this.col3.classList.add('is-visible');
+      } else {
+        // Hide column 3
+        this.col3.classList.remove('is-visible');
+      }
+
+      // Update products if enabled
+      if (this.data.showProducts) {
+        if (childData.products && childData.products.length > 0) {
+          this.renderProducts(childData.products);
+        } else {
+          this.renderProducts([]);
+        }
+      }
+    }
+
+    renderLevel3(childData) {
+      // Update header
+      this.header3.href = childData.url;
+      this.header3.querySelector('span').textContent = 'Shop All ' + childData.title;
+
+      // Render items
+      let html = '';
+      childData.children.forEach((grandchild, idx) => {
+        html += `
+          <li class="hdt-mega-item" data-index="${idx}">
+            <a href="${grandchild.url}" class="hdt-mega-link">
+              <span>${grandchild.title}</span>
+            </a>
+          </li>
+        `;
+      });
+
+      this.list3.innerHTML = html;
+
+      // Bind hover for level 3 items to show their products
+      const items = this.list3.querySelectorAll('.hdt-mega-item');
+      items.forEach((item, idx) => {
+        item.addEventListener('mouseenter', () => {
+          // Remove active from siblings
+          this.list3.querySelectorAll('.hdt-mega-item').forEach(i => i.classList.remove('is-active'));
+          item.classList.add('is-active');
+          
+          // Show products for this grandchild
+          const grandchild = childData.children[idx];
+          if (this.data.showProducts && grandchild && grandchild.products && grandchild.products.length > 0) {
+            this.renderProducts(grandchild.products);
+          }
+        });
+      });
+    }
+
+    renderProducts(products) {
+      if (!this.productsGrid) return;
+
+      if (!products || products.length === 0) {
+        this.productsGrid.innerHTML = '<div class="hdt-no-products">No products available</div>';
+        return;
+      }
+
+      let html = '';
+      products.forEach(product => {
+        const truncatedTitle = product.title.length > 45 ? product.title.substring(0, 42) + '...' : product.title;
+        html += `
+          <div class="hdt-product-item">
+            <a href="${product.url}">
+              <div class="hdt-product-item-img">
+                <img src="${product.image}" alt="${product.title}" loading="lazy">
+              </div>
+              <div class="hdt-product-item-info">
+                <span class="hdt-product-item-title">${truncatedTitle}</span>
+                <span class="hdt-product-item-price">${product.price}</span>
+              </div>
+            </a>
+          </div>
+        `;
+      });
+
+      this.productsGrid.innerHTML = html;
+    }
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => new MegaMenuWalmart());
+  } else {
+    new MegaMenuWalmart();
+  }
+})();
+</script>

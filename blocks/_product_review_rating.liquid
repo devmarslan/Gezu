@@ -1,0 +1,381 @@
+{%- liquid
+  unless product 
+    assign product = section.settings.product
+    if product == null
+      assign product = null | default: title: "Example product title", price: 1999, compare_at_price: 2500, available: true, vendor: "Ecomus"
+    endif
+  endunless
+
+  assign rating_value = block.settings.rating_value | default: 4.4
+  assign reviews_count = block.settings.reviews_count | default: 100
+  assign rating_text = block.settings.rating_text | default: rating_value
+  assign reviews_text = block.settings.reviews_text
+  if reviews_text == blank
+    assign reviews_text = reviews_count | append: ' reviews'
+  endif
+  
+  assign full_stars = rating_value | floor
+  assign decimal_part = rating_value | modulo: 1
+  assign partial_star_index = full_stars | plus: 1
+-%}
+
+<div class="hdt-product-info__item hdt-product__rating" data-type="{{ block.type }}" {{ block.shopify_attributes }}>
+  <div class="hdt-rating-wrapper" style="display: flex; align-items: center; gap: {{ block.settings.elements_gap }}px; flex-wrap: wrap;">
+    
+    {%- if block.settings.show_stars or block.settings.show_rating_text -%}
+      <div 
+        class="hdt-rating-badge" 
+        style="
+          display: flex; 
+          align-items: center; 
+          gap: {{ block.settings.badge_inner_gap }}px;
+          {%- if block.settings.show_badge_bg -%}
+            background-color: {{ block.settings.badge_bg_color }};
+            padding: {{ block.settings.badge_padding_y }}px {{ block.settings.badge_padding_x }}px;
+            border-radius: {{ block.settings.badge_border_radius }}px;
+          {%- endif -%}
+        "
+      >
+        {%- if block.settings.show_stars -%}
+          <div class="hdt-rating-stars" style="display: flex; align-items: center; gap: 2px;">
+            {%- if block.settings.star_image != blank -%}
+              {%- for i in (1..5) -%}
+                {%- if i <= full_stars -%}
+                  <img 
+                    src="{{ block.settings.star_image | image_url: width: 100 }}" 
+                    alt="Star" 
+                    width="{{ block.settings.star_size }}" 
+                    height="{{ block.settings.star_size }}"
+                    style="width: {{ block.settings.star_size }}px; height: {{ block.settings.star_size }}px;"
+                    loading="lazy"
+                  >
+                {%- elsif i == partial_star_index and decimal_part > 0 -%}
+                  {%- assign partial_width = decimal_part | times: 100 -%}
+                  <span class="hdt-star-partial" style="position: relative; display: inline-block; width: {{ block.settings.star_size }}px; height: {{ block.settings.star_size }}px;">
+                    <img 
+                      src="{{ block.settings.star_image | image_url: width: 100 }}" 
+                      alt="Star" 
+                      width="{{ block.settings.star_size }}" 
+                      height="{{ block.settings.star_size }}"
+                      style="width: {{ block.settings.star_size }}px; height: {{ block.settings.star_size }}px; filter: grayscale(100%) opacity(0.3); position: absolute; top: 0; left: 0;"
+                      loading="lazy"
+                    >
+                    <span style="position: absolute; top: 0; left: 0; width: {{ partial_width }}%; height: 100%; overflow: hidden;">
+                      <img 
+                        src="{{ block.settings.star_image | image_url: width: 100 }}" 
+                        alt="Star" 
+                        width="{{ block.settings.star_size }}" 
+                        height="{{ block.settings.star_size }}"
+                        style="width: {{ block.settings.star_size }}px; height: {{ block.settings.star_size }}px;"
+                        loading="lazy"
+                      >
+                    </span>
+                  </span>
+                {%- else -%}
+                  <img 
+                    src="{{ block.settings.star_image | image_url: width: 100 }}" 
+                    alt="Star" 
+                    width="{{ block.settings.star_size }}" 
+                    height="{{ block.settings.star_size }}"
+                    style="width: {{ block.settings.star_size }}px; height: {{ block.settings.star_size }}px; filter: grayscale(100%) opacity(0.3);"
+                    loading="lazy"
+                  >
+                {%- endif -%}
+              {%- endfor -%}
+            {%- else -%}
+              {%- for i in (1..5) -%}
+                {%- if i <= full_stars -%}
+                  <svg width="{{ block.settings.star_size }}" height="{{ block.settings.star_size }}" viewBox="0 0 24 24" fill="{{ block.settings.star_color }}" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                  </svg>
+                {%- elsif i == partial_star_index and decimal_part > 0 -%}
+                  {%- assign partial_percent = decimal_part | times: 100 -%}
+                  <svg width="{{ block.settings.star_size }}" height="{{ block.settings.star_size }}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="star-gradient-{{ block.id }}-{{ i }}">
+                        <stop offset="{{ partial_percent }}%" stop-color="{{ block.settings.star_color }}"/>
+                        <stop offset="{{ partial_percent }}%" stop-color="{{ block.settings.star_empty_color }}"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="url(#star-gradient-{{ block.id }}-{{ i }})"/>
+                  </svg>
+                {%- else -%}
+                  <svg width="{{ block.settings.star_size }}" height="{{ block.settings.star_size }}" viewBox="0 0 24 24" fill="{{ block.settings.star_empty_color }}" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                  </svg>
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if block.settings.show_rating_text -%}
+          <span 
+            class="hdt-rating-value hdt-{{ block.settings.rating_font_size }}"
+            style="color: {{ block.settings.rating_text_color }}; font-weight: {{ block.settings.rating_font_weight }};"
+          >
+            {{ rating_text }}
+          </span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if block.settings.show_reviews_text -%}
+      <span 
+        class="hdt-reviews-count hdt-{{ block.settings.reviews_font_size }}"
+        style="color: {{ block.settings.reviews_text_color }}; font-weight: {{ block.settings.reviews_font_weight }};"
+      >
+        {%- if block.settings.reviews_link != blank -%}
+          <a href="{{ block.settings.reviews_link }}" style="color: inherit; text-decoration: none;">({{ reviews_text }})</a>
+        {%- else -%}
+          ({{ reviews_text }})
+        {%- endif -%}
+      </span>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Product Rating",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Rating Values"
+    },
+    {
+      "type": "range",
+      "id": "rating_value",
+      "label": "Rating Value",
+      "min": 0,
+      "max": 5,
+      "step": 0.1,
+      "default": 4.4
+    },
+    {
+      "type": "number",
+      "id": "reviews_count",
+      "label": "Reviews Count",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Badge Background"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge_bg",
+      "label": "Show Background",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "badge_bg_color",
+      "label": "Background Color",
+      "default": "#F5F5F5"
+    },
+    {
+      "type": "range",
+      "id": "badge_padding_x",
+      "label": "Horizontal Padding",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 12,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "badge_padding_y",
+      "label": "Vertical Padding",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 8,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "badge_border_radius",
+      "label": "Border Radius",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "badge_inner_gap",
+      "label": "Gap (Stars & Rating)",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 8,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Stars Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stars",
+      "label": "Show Stars",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "star_image",
+      "label": "Custom Star Image",
+      "info": "Leave empty to use default SVG stars"
+    },
+    {
+      "type": "range",
+      "id": "star_size",
+      "label": "Star Size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "default": 18,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Star Color (Filled)",
+      "default": "#E8A83A"
+    },
+    {
+      "type": "color",
+      "id": "star_empty_color",
+      "label": "Star Color (Empty)",
+      "default": "#D3D3D3"
+    },
+    {
+      "type": "header",
+      "content": "Rating Text Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating_text",
+      "label": "Show Rating Text",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "rating_text",
+      "label": "Custom Rating Text",
+      "info": "Leave empty to use rating value"
+    },
+    {
+      "type": "select",
+      "id": "rating_font_size",
+      "label": "Rating Font Size",
+      "options": [
+        { "value": "text-xs", "label": "Extra Small" },
+        { "value": "text-sm", "label": "Small" },
+        { "value": "base", "label": "Base" },
+        { "value": "text-lg", "label": "Large" },
+        { "value": "h6", "label": "H6" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h4", "label": "H4" }
+      ],
+      "default": "base"
+    },
+    {
+      "type": "select",
+      "id": "rating_font_weight",
+      "label": "Rating Font Weight",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "color",
+      "id": "rating_text_color",
+      "label": "Rating Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Reviews Text Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reviews_text",
+      "label": "Show Reviews Text",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "reviews_text",
+      "label": "Custom Reviews Text",
+      "info": "Leave empty for default (e.g., '100 reviews')"
+    },
+    {
+      "type": "select",
+      "id": "reviews_font_size",
+      "label": "Reviews Font Size",
+      "options": [
+        { "value": "text-xs", "label": "Extra Small" },
+        { "value": "text-sm", "label": "Small" },
+        { "value": "base", "label": "Base" },
+        { "value": "text-lg", "label": "Large" },
+        { "value": "h6", "label": "H6" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h4", "label": "H4" }
+      ],
+      "default": "base"
+    },
+    {
+      "type": "select",
+      "id": "reviews_font_weight",
+      "label": "Reviews Font Weight",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "reviews_text_color",
+      "label": "Reviews Text Color",
+      "default": "#1a56db"
+    },
+    {
+      "type": "url",
+      "id": "reviews_link",
+      "label": "Reviews Link",
+      "info": "Optional: Link to reviews section"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "elements_gap",
+      "label": "Gap Between Badge & Reviews",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 12,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Rating"
+    }
+  ]
+}
+{% endschema %}

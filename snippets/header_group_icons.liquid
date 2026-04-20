@@ -1,0 +1,191 @@
+{%- if has_text -%}
+	<div class="hdt-site-top_nav hdt-site-top_nav_has_text hdt-flex hdt-align-center hdt-justify-end">
+		{%- if section.settings.show_currency_language -%}
+		<div class="lg:hdt-custom-col-6 lg:hdt-block hdt-hidden">
+            {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
+              <div class="hdt-header-language_currencies hdt-flex hdt-align-center">
+                {%- if localization.available_countries.size > 1 -%}
+                  {%- render 'hdt_currency' -%}
+                {%- endif -%}
+                {%- if localization.available_languages.size > 1 -%}
+                  {%- render 'hdt_language' -%}
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+		</div>
+		{%- endif -%}
+		{%- if settings.compare_mode != "0" -%}
+			{%- if section.settings.enabled_compare -%}
+				<div class="hdt-site-nav_icon hdt-site-nav_compare lg:hdt-inline-flex hdt-align-center hdt-hidden">
+					<hdt-compare-a class="hdt-contents">
+						<a href="{{ routes.search_url }}/?view=compare" class="hdt-inline-flex hdt-align-center hdt-relative hdt-has-count-box">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+								<path d="M6.59 5.17L1.41 0L0 1.41L5.17 6.58L6.59 5.17ZM10.5 0L12.54 2.04L0 14.59L1.41 16L13.96 3.46L16 5.5V0H10.5ZM10.83 9.41L9.42 10.82L12.55 13.95L10.5 16H16V10.5L13.96 12.54L10.83 9.41Z"/>
+							</svg>
+							<span class="hdt-icon-text hdt-text-lg hdt-font-medium">{{ 'general.compare.compare_text' | t }}</span>
+						</a>
+					</hdt-compare-a>
+				</div>
+			{%- endif -%}
+		{%- endif -%}
+		{%- if settings.wishlist_mode != '0' -%}
+			{%- if section.settings.enabled_wishlist -%}
+				<div class="hdt-site-nav_icon hdt-site-nav_wishlist lg:hdt-inline-flex hdt-align-center hdt-hidden">
+					<hdt-wishlist-a class="hdt-contents">
+						<a href="{{ routes.search_url }}/?view=wishlist" class="hdt-inline-flex hdt-align-center hdt-relative hdt-has-count-box">
+							{% comment %} <svg xmlns="http://www.w3.org/2000/svg" width="20" height="18" viewBox="0 0 20 18" fill="currentColor">
+							  <path d="M9.90736 15.2534L9.80926 15.3515L9.70136 15.2534C5.04196 11.0256 1.96185 8.22997 1.96185 5.3951C1.96185 3.43324 3.43324 1.96185 5.3951 1.96185C6.90572 1.96185 8.37711 2.94278 8.897 4.27684H10.7215C11.2414 2.94278 12.7128 1.96185 14.2234 1.96185C16.1853 1.96185 17.6567 3.43324 17.6567 5.3951C17.6567 8.22997 14.5766 11.0256 9.90736 15.2534ZM14.2234 0C12.5166 0 10.8785 0.79455 9.80926 2.04033C8.74005 0.79455 7.10191 0 5.3951 0C2.37384 0 0 2.36403 0 5.3951C0 9.09319 3.33515 12.1243 8.38692 16.7052L9.80926 18L11.2316 16.7052C16.2834 12.1243 19.6185 9.09319 19.6185 5.3951C19.6185 2.36403 17.2447 0 14.2234 0Z"/>
+							</svg> {% endcomment %}
+							<svg xmlns="http://www.w3.org/2000/svg" width="17" height="19" viewBox="0 0 17 19" fill="none">
+							<path d="M15.8333 0H0.633333C0.465363 0 0.304272 0.0667261 0.185499 0.185499C0.0667261 0.304272 0 0.465363 0 0.633333V18.3667C4.51103e-05 18.487 0.034376 18.6048 0.0989722 18.7064C0.163568 18.8079 0.255756 18.889 0.36474 18.94C0.473725 18.991 0.594994 19.01 0.714348 18.9946C0.833701 18.9792 0.946199 18.9301 1.03867 18.8531L8.23333 12.8579L15.428 18.8531C15.5418 18.9479 15.6852 18.9999 15.8333 19C15.9261 18.9998 16.0177 18.9795 16.1019 18.9405C16.2109 18.8894 16.3032 18.8083 16.3678 18.7067C16.4324 18.605 16.4667 18.4871 16.4667 18.3667V0.633333C16.4667 0.465363 16.3999 0.304272 16.2812 0.185499C16.1624 0.0667261 16.0013 0 15.8333 0ZM15.2 17.0151L8.63867 11.5469C8.52486 11.4521 8.38144 11.4002 8.23333 11.4002C8.08523 11.4002 7.9418 11.4521 7.828 11.5469L1.26667 17.0151V1.26667H15.2V17.0151Z" fill="black"/>
+							</svg>
+							<span class="hdt-icon-text hdt-text-lg hdt-font-medium">{{ 'general.wishlist.wishlist_text' | t }}</span>
+						</a>
+					</hdt-wishlist-a>
+				</div>
+			{%- endif -%}
+		{%- endif -%}
+		{%- if section.settings.enabled_user -%}
+			<div class="hdt-site-nav_icon hdt-site-nav_user lg:hdt-inline-flex hdt-align-center hdt-hidden">
+				<a class="hdt-inline-flex hdt-align-center hdt-relative" data-no-instant href="{{ routes.account_url }}"{% unless customer or request.page_type contains 'customers'  or settings.login_sidebar == false %} aria-controls="login-form-popup"{% endunless %}>
+					{% comment %} <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 64 64" fill="currentColor"><path d="M56,64V57.48A8.43,8.43,0,0,0,47.56,49H16.44A8.43,8.43,0,0,0,8,57.48V64H.9V57.48A15.53,15.53,0,0,1,16.44,41.94H47.56A15.53,15.53,0,0,1,63.1,57.48V64Zm-23.47-27a18.66,18.66,0,0,1-13.11-5.43,18.54,18.54,0,0,1,0-26.22A18.53,18.53,0,0,1,51.07,18.51,18.52,18.52,0,0,1,32.54,37.05Zm0-30a11.44,11.44,0,1,0,8.09,3.35A11.36,11.36,0,0,0,32.54,7.07Z"/></svg> {% endcomment %}
+				    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 20 22" fill="none">
+					<path d="M10 11C12.2091 11 14 9.20914 14 7C14 4.79086 12.2091 3 10 3C7.79086 3 6 4.79086 6 7C6 9.20914 7.79086 11 10 11Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+					<path d="M2.5 19.5V17.5C2.5 16.4391 2.92143 15.4217 3.67157 14.6716C4.42172 13.9214 5.43913 13.5 6.5 13.5H13.5C14.5609 13.5 15.5783 13.9214 16.3284 14.6716C17.0786 15.4217 17.5 16.4391 17.5 17.5V19.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+					<span class="hdt-icon-text hdt-text-lg hdt-font-medium">{% if customer %}{{ 'customer.account.title' | t }}{% else %}{{ 'customer.account.login' | t }}{% endif %}</span>
+				</a>
+			</div>
+		{%- endif -%}
+		{%- if section.settings.show_nav_search -%}
+		<div class="hdt-site-nav_icon hdt-site-nav_search lg:hdt-hidden hdt-inline-flex hdt-align-center">
+			<a href="{{ routes.search_url }}" class="hdt-inline-flex hdt-align-center hdt-relative" aria-controls="drawer-search-form">
+				{% comment %} <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="currentColor"><path d="M17.7241 16.1932L13.6436 12.1127C14.626 10.8049 15.1563 9.21299 15.1546 7.57728C15.1546 3.39919 11.7554 0 7.57728 0C3.39919 0 0 3.39919 0 7.57728C0 11.7554 3.39919 15.1546 7.57728 15.1546C9.21299 15.1563 10.8049 14.626 12.1127 13.6436L16.1932 17.7241C16.3998 17.9088 16.6692 18.0073 16.9461 17.9996C17.2231 17.9918 17.4865 17.8783 17.6824 17.6824C17.8783 17.4865 17.9918 17.2231 17.9996 16.9461C18.0073 16.6692 17.9088 16.3998 17.7241 16.1932ZM2.16494 7.57728C2.16494 6.50682 2.48237 5.4604 3.07708 4.57034C3.6718 3.68029 4.51709 2.98657 5.50607 2.57693C6.49504 2.16728 7.58328 2.0601 8.63318 2.26893C9.68307 2.47777 10.6475 2.99325 11.4044 3.75018C12.1613 4.5071 12.6768 5.47149 12.8856 6.52138C13.0945 7.57128 12.9873 8.65952 12.5776 9.64849C12.168 10.6375 11.4743 11.4828 10.5842 12.0775C9.69416 12.6722 8.64774 12.9896 7.57728 12.9896C6.14237 12.9879 4.76672 12.4171 3.75208 11.4025C2.73744 10.3878 2.16666 9.01219 2.16494 7.57728Z"/></svg> {% endcomment %}
+			    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 18" fill="none">
+					<mask id="mask0_946_4019" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="20" height="18">
+						<path d="M19.7546 0H0V17.9986H19.7546V0Z" fill="white"/>
+					</mask>
+					<g mask="url(#mask0_946_4019)">
+						<path d="M15.3543 13.6484L17.7656 16.0585C17.878 16.1749 17.9403 16.3308 17.9389 16.4927C17.9374 16.6546 17.8725 16.8094 17.7581 16.9239C17.6436 17.0383 17.4888 17.1032 17.3269 17.1046C17.165 17.106 17.0091 17.0438 16.8927 16.9314L14.4814 14.5201C12.9057 15.8701 10.8683 16.5574 8.79679 16.4376C6.72528 16.3179 4.78066 15.4004 3.37099 13.8778C1.96132 12.3552 1.19617 10.3458 1.23611 8.27124C1.27604 6.19666 2.11795 4.21818 3.58518 2.75095C5.0524 1.28373 7.03088 0.441813 9.10547 0.401879C11.18 0.361945 13.1895 1.12709 14.7121 2.53677C16.2347 3.94644 17.1521 5.89106 17.2718 7.96257C17.3916 10.0341 16.7043 12.0714 15.3543 13.6472V13.6484ZM9.26002 15.2164C11.061 15.2164 12.7882 14.501 14.0617 13.2275C15.3352 11.954 16.0506 10.2268 16.0506 8.4258C16.0506 6.62481 15.3352 4.89758 14.0617 3.62409C12.7882 2.35059 11.061 1.63515 9.26002 1.63515C7.45903 1.63515 5.7318 2.35059 4.45831 3.62409C3.18482 4.89758 2.46938 6.62481 2.46938 8.4258C2.46938 10.2268 3.18482 11.954 4.45831 13.2275C5.7318 14.501 7.45903 15.2164 9.26002 15.2164Z" fill="currentColor"/>
+					</g>
+				</svg>
+			</a>
+		</div>
+	    {% endif %}
+		
+		<div class="hdt-site-nav_icon hdt-site-nav_cart hdt-inline-flex hdt-align-center">
+			<a class="hdt-inline-flex hdt-align-center hdt-relative hdt-has-count-box" href="{{ routes.cart_url }}"{% if request.page_type != 'cart' %} aria-controls="CartDrawer"{% endif %}>
+				{% comment %} <svg class="lg:hdt-block hdt-hidden" xmlns="http://www.w3.org/2000/svg" width="26" height="29" viewBox="0 0 26 29" fill="currentColor">
+				  <path d="M24.5556 29H1.44444C1.06135 29 0.693954 28.8472 0.423068 28.5753C0.152182 28.3034 0 27.9346 0 27.55V1.45C0 1.06544 0.152182 0.696623 0.423068 0.424695C0.693954 0.152767 1.06135 0 1.44444 0H24.5556C24.9386 0 25.306 0.152767 25.5769 0.424695C25.8478 0.696623 26 1.06544 26 1.45V27.55C26 27.9346 25.8478 28.3034 25.5769 28.5753C25.306 28.8472 24.9386 29 24.5556 29ZM23.1111 26.1V2.9H2.88889V26.1H23.1111ZM8.66667 5.8V8.7C8.66667 9.85369 9.12321 10.9601 9.93587 11.7759C10.7485 12.5917 11.8507 13.05 13 13.05C14.1493 13.05 15.2515 12.5917 16.0641 11.7759C16.8768 10.9601 17.3333 9.85369 17.3333 8.7V5.8H20.2222V8.7C20.2222 10.6228 19.4613 12.4669 18.1069 13.8265C16.7525 15.1862 14.9155 15.95 13 15.95C11.0845 15.95 9.24755 15.1862 7.89312 13.8265C6.53869 12.4669 5.77778 10.6228 5.77778 8.7V5.8H8.66667Z"/>
+				</svg>
+				<svg class="lg:hdt-hidden hdt-block" xmlns="http://www.w3.org/2000/svg" width="17" height="18" viewBox="0 0 17 18" fill="currentColor">
+					<path d="M15.3 18H0.9C0.661305 18 0.432387 17.9052 0.263604 17.7364C0.0948211 17.5676 0 17.3387 0 17.1V0.9C0 0.661305 0.0948211 0.432387 0.263604 0.263604C0.432387 0.0948211 0.661305 0 0.9 0H15.3C15.5387 0 15.7676 0.0948211 15.9364 0.263604C16.1052 0.432387 16.2 0.661305 16.2 0.9V17.1C16.2 17.3387 16.1052 17.5676 15.9364 17.7364C15.7676 17.9052 15.5387 18 15.3 18ZM14.4 16.2V1.8H1.8V16.2H14.4ZM5.4 3.6V5.4C5.4 6.11608 5.68446 6.80284 6.19081 7.30919C6.69716 7.81554 7.38392 8.1 8.1 8.1C8.81608 8.1 9.50284 7.81554 10.0092 7.30919C10.5155 6.80284 10.8 6.11608 10.8 5.4V3.6H12.6V5.4C12.6 6.59347 12.1259 7.73807 11.282 8.58198C10.4381 9.42589 9.29347 9.9 8.1 9.9C6.90653 9.9 5.76193 9.42589 4.91802 8.58198C4.07411 7.73807 3.6 6.59347 3.6 5.4V3.6H5.4Z"/>
+				</svg> {% endcomment %}
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 22" fill="none">
+				<path d="M17.5 6.5H2.5C2.22386 6.5 2 6.72386 2 7V19.5C2 20.6046 2.89543 21.5 4 21.5H16C17.1046 21.5 18 20.6046 18 19.5V7C18 6.72386 17.7761 6.5 17.5 6.5Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+				<path d="M7 6.5V4.5C7 3.70435 7.31607 2.94129 7.87868 2.37868C8.44129 1.81607 9.20435 1.5 10 1.5C10.7956 1.5 11.5587 1.81607 12.1213 2.37868C12.6839 2.94129 13 3.70435 13 4.5V6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+				<hdt-cart-count class="hdt-count-box hdt-absolute">{{ cart.item_count }}</hdt-cart-count>
+				<span class="hdt-icon-text hdt-text-lg hdt-font-medium">Cart</span>
+			</a>
+		</div>
+		{% if section.settings.show_hdr_mblmenu %}
+		<button aria-controls="menu_mobile" class="hdt-push-menu-btn hdt-menu-bar hdt-flex hdt-justify-center hdt-align-center mbl_rightmenu" style="display:none;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="0 0 24 16" fill="none">
+                <path d="M2.00056 2.28571H16.8577C17.1608 2.28571 17.4515 2.16531 17.6658 1.95098C17.8802 1.73665 18.0006 1.44596 18.0006 1.14286C18.0006 0.839753 17.8802 0.549063 17.6658 0.334735C17.4515 0.120408 17.1608 0 16.8577 0H2.00056C1.69745 0 1.40676 0.120408 1.19244 0.334735C0.978109 0.549063 0.857702 0.839753 0.857702 1.14286C0.857702 1.44596 0.978109 1.73665 1.19244 1.95098C1.40676 2.16531 1.69745 2.28571 2.00056 2.28571ZM0.857702 8C0.857702 7.6969 0.978109 7.40621 1.19244 7.19188C1.40676 6.97755 1.69745 6.85714 2.00056 6.85714H22.572C22.8751 6.85714 23.1658 6.97755 23.3801 7.19188C23.5944 7.40621 23.7148 7.6969 23.7148 8C23.7148 8.30311 23.5944 8.59379 23.3801 8.80812C23.1658 9.02245 22.8751 9.14286 22.572 9.14286H2.00056C1.69745 9.14286 1.40676 9.02245 1.19244 8.80812C0.978109 8.59379 0.857702 8.30311 0.857702 8ZM0.857702 14.8571C0.857702 14.554 0.978109 14.2633 1.19244 14.049C1.40676 13.8347 1.69745 13.7143 2.00056 13.7143H12.2863C12.5894 13.7143 12.8801 13.8347 13.0944 14.049C13.3087 14.2633 13.4291 14.554 13.4291 14.8571C13.4291 15.1602 13.3087 15.4509 13.0944 15.6653C12.8801 15.8796 12.5894 16 12.2863 16H2.00056C1.69745 16 1.40676 15.8796 1.19244 15.6653C0.978109 15.4509 0.857702 15.1602 0.857702 14.8571Z" fill="currentColor"/>
+              </svg>
+			  <span class="hdt-icon-text hdt-text-lg hdt-font-medium">Menu</span>
+        </button>
+	    {% endif %}
+	</div>
+{%- else -%}
+	<div class="hdt-site-top_nav hdt-flex hdt-align-center hdt-justify-end">
+		{%- if section.settings.show_currency_language -%}
+		<div class="hdt-top-bar__item hdt-top-bar__cur hdt-text-center">
+			{%- if block.settings.show_currency -%}
+				{%- unless localization.available_countries.size <= 1 and settings.currency_type == "1" -%}
+				{%- render 'hdt_currency' -%}
+				{%- endunless -%}
+			{%- endif -%}
+			{%- if block.settings.show_language and localization.available_languages.size > 1 -%}
+				{%- render 'hdt_language' -%}
+			{%- endif -%}
+		</div>
+		{%- endif -%}
+		{%- if section.settings.show_nav_search -%}
+		<div class="hdt-site-nav_icon hdt-site-nav_search hdt-inline-flex hdt-align-center">
+			<a href="{{ routes.search_url }}" class="hdt-inline-flex hdt-align-center hdt-relative" aria-controls="drawer-search-form">
+				{% comment %} <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.7241 16.1932L13.6436 12.1127C14.626 10.8049 15.1563 9.21299 15.1546 7.57728C15.1546 3.39919 11.7554 0 7.57728 0C3.39919 0 0 3.39919 0 7.57728C0 11.7554 3.39919 15.1546 7.57728 15.1546C9.21299 15.1563 10.8049 14.626 12.1127 13.6436L16.1932 17.7241C16.3998 17.9088 16.6692 18.0073 16.9461 17.9996C17.2231 17.9918 17.4865 17.8783 17.6824 17.6824C17.8783 17.4865 17.9918 17.2231 17.9996 16.9461C18.0073 16.6692 17.9088 16.3998 17.7241 16.1932ZM2.16494 7.57728C2.16494 6.50682 2.48237 5.4604 3.07708 4.57034C3.6718 3.68029 4.51709 2.98657 5.50607 2.57693C6.49504 2.16728 7.58328 2.0601 8.63318 2.26893C9.68307 2.47777 10.6475 2.99325 11.4044 3.75018C12.1613 4.5071 12.6768 5.47149 12.8856 6.52138C13.0945 7.57128 12.9873 8.65952 12.5776 9.64849C12.168 10.6375 11.4743 11.4828 10.5842 12.0775C9.69416 12.6722 8.64774 12.9896 7.57728 12.9896C6.14237 12.9879 4.76672 12.4171 3.75208 11.4025C2.73744 10.3878 2.16666 9.01219 2.16494 7.57728Z" fill="currentColor"/></svg> {% endcomment %}
+			    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 18" fill="none">
+					<mask id="mask0_946_4019" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="20" height="18">
+						<path d="M19.7546 0H0V17.9986H19.7546V0Z" fill="white"/>
+					</mask>
+					<g mask="url(#mask0_946_4019)">
+						<path d="M15.3543 13.6484L17.7656 16.0585C17.878 16.1749 17.9403 16.3308 17.9389 16.4927C17.9374 16.6546 17.8725 16.8094 17.7581 16.9239C17.6436 17.0383 17.4888 17.1032 17.3269 17.1046C17.165 17.106 17.0091 17.0438 16.8927 16.9314L14.4814 14.5201C12.9057 15.8701 10.8683 16.5574 8.79679 16.4376C6.72528 16.3179 4.78066 15.4004 3.37099 13.8778C1.96132 12.3552 1.19617 10.3458 1.23611 8.27124C1.27604 6.19666 2.11795 4.21818 3.58518 2.75095C5.0524 1.28373 7.03088 0.441813 9.10547 0.401879C11.18 0.361945 13.1895 1.12709 14.7121 2.53677C16.2347 3.94644 17.1521 5.89106 17.2718 7.96257C17.3916 10.0341 16.7043 12.0714 15.3543 13.6472V13.6484ZM9.26002 15.2164C11.061 15.2164 12.7882 14.501 14.0617 13.2275C15.3352 11.954 16.0506 10.2268 16.0506 8.4258C16.0506 6.62481 15.3352 4.89758 14.0617 3.62409C12.7882 2.35059 11.061 1.63515 9.26002 1.63515C7.45903 1.63515 5.7318 2.35059 4.45831 3.62409C3.18482 4.89758 2.46938 6.62481 2.46938 8.4258C2.46938 10.2268 3.18482 11.954 4.45831 13.2275C5.7318 14.501 7.45903 15.2164 9.26002 15.2164Z" fill="currentColor"/>
+					</g>
+				</svg>
+			</a>
+		</div>
+	    {% endif %}
+		{%- if section.settings.enabled_user -%}
+			<div class="hdt-site-nav_icon hdt-site-nav_user lg:hdt-inline-flex md:hdt-inline-flex hdt-align-center hdt-hidden">
+				<a class="hdt-inline-flex hdt-align-center hdt-relative" data-no-instant href="{{ routes.account_url }}"{% unless customer or request.page_type contains 'customers' or settings.login_sidebar == false %} aria-controls="login-form-popup"{% endunless %}>
+					{% comment %} <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 64 64" fill="currentColor"><path d="M56,64V57.48A8.43,8.43,0,0,0,47.56,49H16.44A8.43,8.43,0,0,0,8,57.48V64H.9V57.48A15.53,15.53,0,0,1,16.44,41.94H47.56A15.53,15.53,0,0,1,63.1,57.48V64Zm-23.47-27a18.66,18.66,0,0,1-13.11-5.43,18.54,18.54,0,0,1,0-26.22A18.53,18.53,0,0,1,51.07,18.51,18.52,18.52,0,0,1,32.54,37.05Zm0-30a11.44,11.44,0,1,0,8.09,3.35A11.36,11.36,0,0,0,32.54,7.07Z"/></svg> {% endcomment %}
+				   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 20 22" fill="none">
+					<path d="M10 11C12.2091 11 14 9.20914 14 7C14 4.79086 12.2091 3 10 3C7.79086 3 6 4.79086 6 7C6 9.20914 7.79086 11 10 11Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+					<path d="M2.5 19.5V17.5C2.5 16.4391 2.92143 15.4217 3.67157 14.6716C4.42172 13.9214 5.43913 13.5 6.5 13.5H13.5C14.5609 13.5 15.5783 13.9214 16.3284 14.6716C17.0786 15.4217 17.5 16.4391 17.5 17.5V19.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				</a>
+			</div>
+		{%- endif -%}
+		{%- if settings.compare_mode != "0" -%}
+			{%- if section.settings.enabled_compare -%}
+				<div class="hdt-site-nav_icon hdt-site-nav_compare lg:hdt-inline-flex md:hdt-inline-flex hdt-align-center hdt-hidden">
+					<hdt-compare-a class="hdt-contents">
+						<a href="{{ routes.search_url }}/?view=compare" class="hdt-inline-flex hdt-align-center hdt-relative hdt-has-count-box">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+							  <path d="M7.41375 5.81625L1.58625 0L0 1.58625L5.81625 7.4025L7.41375 5.81625ZM11.8125 0L14.1075 2.295L0 16.4137L1.58625 18L15.705 3.8925L18 6.1875V0H11.8125ZM12.1838 10.5863L10.5975 12.1725L14.1187 15.6938L11.8125 18H18V11.8125L15.705 14.1075L12.1838 10.5863Z" fill="currentColor"/>
+							</svg>
+						</a>
+					</hdt-compare-a>
+				</div>
+			{%- endif -%}
+		{%- endif -%}
+		{%- if settings.wishlist_mode != '0' -%}
+			{%- if section.settings.enabled_wishlist -%}
+				<div class="hdt-site-nav_icon hdt-site-nav_wishlist lg:hdt-inline-flex md:hdt-inline-flex hdt-align-center hdt-hidden">
+					<hdt-wishlist-a class="hdt-contents">
+						<a href="{{ routes.search_url }}/?view=wishlist" class="hdt-inline-flex hdt-align-center hdt-relative hdt-has-count-box">
+							{% comment %} <svg xmlns="http://www.w3.org/2000/svg" width="20" height="18" viewBox="0 0 20 18" fill="currentColor">
+							  <path d="M9.90736 15.2534L9.80926 15.3515L9.70136 15.2534C5.04196 11.0256 1.96185 8.22997 1.96185 5.3951C1.96185 3.43324 3.43324 1.96185 5.3951 1.96185C6.90572 1.96185 8.37711 2.94278 8.897 4.27684H10.7215C11.2414 2.94278 12.7128 1.96185 14.2234 1.96185C16.1853 1.96185 17.6567 3.43324 17.6567 5.3951C17.6567 8.22997 14.5766 11.0256 9.90736 15.2534ZM14.2234 0C12.5166 0 10.8785 0.79455 9.80926 2.04033C8.74005 0.79455 7.10191 0 5.3951 0C2.37384 0 0 2.36403 0 5.3951C0 9.09319 3.33515 12.1243 8.38692 16.7052L9.80926 18L11.2316 16.7052C16.2834 12.1243 19.6185 9.09319 19.6185 5.3951C19.6185 2.36403 17.2447 0 14.2234 0Z"/>
+							</svg> {% endcomment %}
+							<svg xmlns="http://www.w3.org/2000/svg" width="17" height="19" viewBox="0 0 17 19" fill="none">
+							<path d="M15.8333 0H0.633333C0.465363 0 0.304272 0.0667261 0.185499 0.185499C0.0667261 0.304272 0 0.465363 0 0.633333V18.3667C4.51103e-05 18.487 0.034376 18.6048 0.0989722 18.7064C0.163568 18.8079 0.255756 18.889 0.36474 18.94C0.473725 18.991 0.594994 19.01 0.714348 18.9946C0.833701 18.9792 0.946199 18.9301 1.03867 18.8531L8.23333 12.8579L15.428 18.8531C15.5418 18.9479 15.6852 18.9999 15.8333 19C15.9261 18.9998 16.0177 18.9795 16.1019 18.9405C16.2109 18.8894 16.3032 18.8083 16.3678 18.7067C16.4324 18.605 16.4667 18.4871 16.4667 18.3667V0.633333C16.4667 0.465363 16.3999 0.304272 16.2812 0.185499C16.1624 0.0667261 16.0013 0 15.8333 0ZM15.2 17.0151L8.63867 11.5469C8.52486 11.4521 8.38144 11.4002 8.23333 11.4002C8.08523 11.4002 7.9418 11.4521 7.828 11.5469L1.26667 17.0151V1.26667H15.2V17.0151Z" fill="black"/>
+							</svg>
+							<hdt-wishlist-count class="hdt-count-box hdt-absolute">0</hdt-wishlist-count>
+						</a>
+					</hdt-wishlist-a>
+				</div>
+			{%- endif -%}
+		{%- endif -%}
+		<div class="hdt-site-nav_icon hdt-site-nav_cart hdt-inline-flex hdt-align-center">
+			<a class="hdt-inline-flex hdt-align-center hdt-relative hdt-has-count-box" href="{{ routes.cart_url }}"{% if request.page_type != 'cart' %} aria-controls="CartDrawer"{% endif %}>
+				{% comment %} <svg xmlns="http://www.w3.org/2000/svg" width="17" height="18" viewBox="0 0 17 18" fill="currentColor">
+					<path d="M15.3 18H0.9C0.661305 18 0.432387 17.9052 0.263604 17.7364C0.0948211 17.5676 0 17.3387 0 17.1V0.9C0 0.661305 0.0948211 0.432387 0.263604 0.263604C0.432387 0.0948211 0.661305 0 0.9 0H15.3C15.5387 0 15.7676 0.0948211 15.9364 0.263604C16.1052 0.432387 16.2 0.661305 16.2 0.9V17.1C16.2 17.3387 16.1052 17.5676 15.9364 17.7364C15.7676 17.9052 15.5387 18 15.3 18ZM14.4 16.2V1.8H1.8V16.2H14.4ZM5.4 3.6V5.4C5.4 6.11608 5.68446 6.80284 6.19081 7.30919C6.69716 7.81554 7.38392 8.1 8.1 8.1C8.81608 8.1 9.50284 7.81554 10.0092 7.30919C10.5155 6.80284 10.8 6.11608 10.8 5.4V3.6H12.6V5.4C12.6 6.59347 12.1259 7.73807 11.282 8.58198C10.4381 9.42589 9.29347 9.9 8.1 9.9C6.90653 9.9 5.76193 9.42589 4.91802 8.58198C4.07411 7.73807 3.6 6.59347 3.6 5.4V3.6H5.4Z"/>
+				</svg> {% endcomment %}
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 22" fill="none">
+				<path d="M17.5 6.5H2.5C2.22386 6.5 2 6.72386 2 7V19.5C2 20.6046 2.89543 21.5 4 21.5H16C17.1046 21.5 18 20.6046 18 19.5V7C18 6.72386 17.7761 6.5 17.5 6.5Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+				<path d="M7 6.5V4.5C7 3.70435 7.31607 2.94129 7.87868 2.37868C8.44129 1.81607 9.20435 1.5 10 1.5C10.7956 1.5 11.5587 1.81607 12.1213 2.37868C12.6839 2.94129 13 3.70435 13 4.5V6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+				<hdt-cart-count class="hdt-count-box hdt-absolute">{{ cart.item_count }}</hdt-cart-count>
+			</a>
+		</div>
+		{% if section.settings.show_hdr_mblmenu %}
+		<button aria-controls="menu_mobile" class="hdt-push-menu-btn hdt-menu-bar hdt-flex hdt-justify-center hdt-align-center mbl_rightmenu" style="display:none;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="0 0 24 16" fill="none">
+                <path d="M2.00056 2.28571H16.8577C17.1608 2.28571 17.4515 2.16531 17.6658 1.95098C17.8802 1.73665 18.0006 1.44596 18.0006 1.14286C18.0006 0.839753 17.8802 0.549063 17.6658 0.334735C17.4515 0.120408 17.1608 0 16.8577 0H2.00056C1.69745 0 1.40676 0.120408 1.19244 0.334735C0.978109 0.549063 0.857702 0.839753 0.857702 1.14286C0.857702 1.44596 0.978109 1.73665 1.19244 1.95098C1.40676 2.16531 1.69745 2.28571 2.00056 2.28571ZM0.857702 8C0.857702 7.6969 0.978109 7.40621 1.19244 7.19188C1.40676 6.97755 1.69745 6.85714 2.00056 6.85714H22.572C22.8751 6.85714 23.1658 6.97755 23.3801 7.19188C23.5944 7.40621 23.7148 7.6969 23.7148 8C23.7148 8.30311 23.5944 8.59379 23.3801 8.80812C23.1658 9.02245 22.8751 9.14286 22.572 9.14286H2.00056C1.69745 9.14286 1.40676 9.02245 1.19244 8.80812C0.978109 8.59379 0.857702 8.30311 0.857702 8ZM0.857702 14.8571C0.857702 14.554 0.978109 14.2633 1.19244 14.049C1.40676 13.8347 1.69745 13.7143 2.00056 13.7143H12.2863C12.5894 13.7143 12.8801 13.8347 13.0944 14.049C13.3087 14.2633 13.4291 14.554 13.4291 14.8571C13.4291 15.1602 13.3087 15.4509 13.0944 15.6653C12.8801 15.8796 12.5894 16 12.2863 16H2.00056C1.69745 16 1.40676 15.8796 1.19244 15.6653C0.978109 15.4509 0.857702 15.1602 0.857702 14.8571Z" fill="currentColor"/>
+              </svg>
+        </button>
+	    {% endif %}
+	</div>
+{%- endif -%}

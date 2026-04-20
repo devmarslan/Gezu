@@ -1,0 +1,1550 @@
+{% comment %} {% comment %}
+  Shoppable Solutions Section
+  - Desktop: Section title, content area (heading + description) aligned right, then full-width image with hotspots
+  - Mobile: Section title, heading, description, then image with hotspots
+  - Clickable hotspot markers positioned on products
+  - Product popup with configurable position (desktop & mobile)
+  - Fully responsive with mobile-specific images and hotspot positions
+{% endcomment %}
+
+{{ 'section-shoppable-solutions.css' | asset_url | stylesheet_tag }}
+
+<style>
+  #shoppable-solutions-{{ section.id }} {
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --section-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --section-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+    --hotspot-color: {{ section.settings.hotspot_color }};
+    --hotspot-bg: {{ section.settings.hotspot_bg }};
+    --hotspot-size: {{ section.settings.hotspot_size }}px;
+    --hotspot-size-mobile: {{ section.settings.hotspot_size_mobile }}px;
+    --popup-bg: {{ section.settings.popup_bg }};
+    --popup-title-color: {{ section.settings.popup_title_color }};
+    --popup-title-size: {{ section.settings.popup_title_font_size }}px;
+    --popup-price-color: {{ section.settings.popup_price_color }};
+    --popup-price-size: {{ section.settings.popup_price_font_size }}px;
+    --popup-compare-color: {{ section.settings.popup_compare_price_color }};
+    --popup-discount-color: {{ section.settings.popup_discount_color }};
+    --popup-btn-bg: {{ section.settings.popup_btn_bg }};
+    --popup-btn-color: {{ section.settings.popup_btn_color }};
+    --section-bg: {{ section.settings.section_bg_color }};
+    --content-bg: {{ section.settings.content_bg_color }};
+  }
+</style>
+
+<section id="shoppable-solutions-{{ section.id }}" class="shoppable-solutions-section">
+  <div class="solutions-wrapper hdt-container">
+    {% if section.settings.full_width %}
+      <div class="solutions-container full-width">
+    {% else %}
+      <div class="page-width">
+        <div class="solutions-container">
+    {% endif %}
+
+    {% comment %} Section Title - Above everything {% endcomment %}
+    {% if section.settings.section_title != blank %}
+      <div class="solutions-section-title">
+        <h2 style="font-size: {{ section.settings.section_title_font_size }}px; color: {{ section.settings.section_title_color }};">
+          {{ section.settings.section_title }}
+        </h2>
+      </div>
+    {% endif %}
+
+    <div class="solutions-layout">
+      {% comment %} Content Area - Above Image {% endcomment %}
+      <div class="solutions-content-area">
+        <div class="solutions-content-box">
+        {% if section.settings.heading != blank %}
+          <h3 class="solutions-heading" style="font-size: {{ section.settings.heading_font_size }}px; color: {{ section.settings.heading_color }};">
+            {{ section.settings.heading }}
+          </h3>
+        {% endif %}
+        
+        {% if section.settings.description != blank %}
+          <div class="solutions-description" style="font-size: {{ section.settings.description_font_size }}px; color: {{ section.settings.description_color }};">
+            {{ section.settings.description }}
+          </div>
+        {% endif %}
+
+        {% if section.settings.button_text != blank %}
+          <a href="{{ section.settings.button_link }}" class="solutions-button" style="background-color: {{ section.settings.button_bg }}; color: {{ section.settings.button_color }};">
+            {{ section.settings.button_text }}
+          </a>
+        {% endif %}
+      </div>
+      </div>
+
+      {% comment %} Image with Hotspots {% endcomment %}
+      <div class="solutions-image-wrapper">
+        <div class="solutions-image-container" {% if section.settings.image_mobile != blank %}data-has-mobile-image="true"{% endif %}>
+          {% if section.settings.image != blank %}
+            <img 
+              src="{{ section.settings.image | image_url: width: 1920 }}" 
+              alt="{{ section.settings.heading | default: 'Solutions image' }}"
+              class="solutions-image solutions-image-desktop"
+              loading="lazy"
+              width="1920"
+              height="auto"
+            >
+          {% endif %}
+
+          {% if section.settings.image_mobile != blank %}
+            <img 
+              src="{{ section.settings.image_mobile | image_url: width: 800 }}" 
+              alt="{{ section.settings.heading | default: 'Solutions image' }}"
+              class="solutions-image solutions-image-mobile"
+              loading="lazy"
+              width="800"
+              height="auto"
+            >
+          {% endif %}
+
+          {% comment %} Hotspots {% endcomment %}
+          {% for block in section.blocks %}
+            {% if block.type == 'hotspot' %}
+              {% assign product = block.settings.product %}
+              {% assign mobile_x = block.settings.position_x_mobile | default: block.settings.position_x %}
+              {% assign mobile_y = block.settings.position_y_mobile | default: block.settings.position_y %}
+              <div 
+                class="hotspot" 
+                style="--desktop-x: {{ block.settings.position_x }}%; --desktop-y: {{ block.settings.position_y }}%; --mobile-x: {{ mobile_x }}%; --mobile-y: {{ mobile_y }}%;"
+                data-hotspot-id="{{ block.id }}"
+                {{ block.shopify_attributes }}
+              >
+                <button class="hotspot-button" aria-label="View product details">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path class="icon-horizontal" d="M0 7h14" stroke="currentColor" stroke-width="2"/>
+                    <path class="icon-vertical" d="M7 0v14" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                </button>
+
+                {% comment %} Product Popup {% endcomment %}
+                <div class="hotspot-popup" data-position="{{ block.settings.popup_position }}" data-mobile-position="{{ block.settings.popup_position_mobile | default: 'top' }}">
+                  <div class="popup-inner">
+                    {% if product != blank %}
+                      <div class="popup-image">
+                        {% if product.featured_image %}
+                          <img src="{{ product.featured_image | image_url: width: 200 }}" alt="{{ product.title }}" loading="lazy">
+                        {% endif %}
+                      </div>
+                      <div class="popup-content">
+                        <h4 class="popup-title">{{ product.title }}</h4>
+                        <div class="popup-price">
+                          <span class="current-price">{{ product.price | money }}</span>
+                          {% if product.compare_at_price > product.price %}
+                            <span class="compare-price">{{ product.compare_at_price | money }}</span>
+                            <span class="discount-badge">
+                              {% assign discount = product.compare_at_price | minus: product.price | times: 100.0 | divided_by: product.compare_at_price | round %}
+                              {{ discount }}% OFF
+                            </span>
+                          {% endif %}
+                        </div>
+                        <form action="/cart/add" method="post" class="popup-form">
+                          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                          <input type="hidden" name="quantity" value="1">
+                          <button type="submit" class="popup-add-btn" {% unless product.available %}disabled{% endunless %}>
+                            {% if product.available %}
+                              {{ section.settings.add_to_cart_text }}
+                            {% else %}
+                              {{ section.settings.sold_out_text }}
+                            {% endif %}
+                          </button>
+                        </form>
+                      </div>
+                    {% else %}
+                      <div class="popup-image">
+                        {% if block.settings.custom_image != blank %}
+                          <img src="{{ block.settings.custom_image | image_url: width: 200 }}" alt="{{ block.settings.custom_title }}" loading="lazy">
+                        {% endif %}
+                      </div>
+                      <div class="popup-content">
+                        <h4 class="popup-title">{{ block.settings.custom_title | default: 'Product Title' }}</h4>
+                        <div class="popup-price">
+                          <span class="current-price">{{ block.settings.custom_price | default: '£50.00' }}</span>
+                          {% if block.settings.custom_compare_price != blank %}
+                            <span class="compare-price">{{ block.settings.custom_compare_price }}</span>
+                            <span class="discount-badge">{{ block.settings.custom_discount | default: '20% OFF' }}</span>
+                          {% endif %}
+                        </div>
+                        <a href="{{ block.settings.custom_link }}" class="popup-add-btn">
+                          {{ section.settings.add_to_cart_text }}
+                        </a>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="popup-arrow"></div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    {% if section.settings.full_width %}
+      </div>
+    {% else %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const section = document.getElementById('shoppable-solutions-{{ section.id }}');
+    if (!section) return;
+
+    const hotspots = section.querySelectorAll('.hotspot');
+    
+    hotspots.forEach(hotspot => {
+      const button = hotspot.querySelector('.hotspot-button');
+      
+      button.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        // Close all other popups
+        hotspots.forEach(h => {
+          if (h !== hotspot) {
+            h.classList.remove('active');
+          }
+        });
+        
+        // Toggle current popup
+        hotspot.classList.toggle('active');
+      });
+    });
+    
+    // Close popup when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.hotspot')) {
+        hotspots.forEach(h => h.classList.remove('active'));
+      }
+    });
+    
+    // Close popup on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        hotspots.forEach(h => h.classList.remove('active'));
+      }
+    });
+
+    // Prevent popup clicks from closing
+    section.querySelectorAll('.hotspot-popup').forEach(popup => {
+      popup.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Shoppable Solutions",
+  "tag": "section",
+  "class": "shoppable-solutions-section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Section Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Mobile Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Section Title"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title",
+      "default": "See our Solutions"
+    },
+    {
+      "type": "range",
+      "id": "section_title_font_size",
+      "min": 20,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Section Title Font Size",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "section_title_color",
+      "label": "Section Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Image Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (Desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image (Mobile)",
+      "info": "Optional. Uses desktop image if not set."
+    },
+    {
+      "type": "header",
+      "content": "Content Settings"
+    },
+    {
+      "type": "color",
+      "id": "content_bg_color",
+      "label": "Content Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "House and Garden"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "min": 18,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading Font Size",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#000000"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>With over 20 years in the hardware industry, we know what it takes to create products that last and help you build with confidence.</p>"
+    },
+    {
+      "type": "range",
+      "id": "description_font_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Description Font Size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description Color",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Button Settings"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button Background",
+      "default": "#0066cc"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Hotspot Settings"
+    },
+    {
+      "type": "color",
+      "id": "hotspot_bg",
+      "label": "Hotspot Background",
+      "default": "#0066cc"
+    },
+    {
+      "type": "color",
+      "id": "hotspot_color",
+      "label": "Hotspot Icon Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "hotspot_size",
+      "min": 30,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Hotspot Size (Desktop)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "hotspot_size_mobile",
+      "min": 24,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Hotspot Size (Mobile)",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Popup Settings"
+    },
+    {
+      "type": "color",
+      "id": "popup_bg",
+      "label": "Popup Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "popup_title_color",
+      "label": "Product Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "popup_title_font_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Product Title Font Size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "popup_price_color",
+      "label": "Price Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "popup_price_font_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Price Font Size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "popup_compare_price_color",
+      "label": "Compare Price Color",
+      "default": "#999999"
+    },
+    {
+      "type": "color",
+      "id": "popup_discount_color",
+      "label": "Discount Badge Color",
+      "default": "#e53935"
+    },
+    {
+      "type": "color",
+      "id": "popup_btn_bg",
+      "label": "Popup Button Background",
+      "default": "#0066cc"
+    },
+    {
+      "type": "color",
+      "id": "popup_btn_color",
+      "label": "Popup Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_text",
+      "label": "Add to Cart Text",
+      "default": "Add to cart +"
+    },
+    {
+      "type": "text",
+      "id": "sold_out_text",
+      "label": "Sold Out Text",
+      "default": "Sold out"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "name": "Product Hotspot",
+      "limit": 20,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Desktop Position"
+        },
+        {
+          "type": "range",
+          "id": "position_x",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Horizontal Position (Left to Right)",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "position_y",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Vertical Position (Top to Bottom)",
+          "default": 50
+        },
+        {
+          "type": "header",
+          "content": "Mobile Position"
+        },
+        {
+          "type": "range",
+          "id": "position_x_mobile",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Horizontal Position Mobile",
+          "default": 50,
+          "info": "Adjust hotspot position for mobile view"
+        },
+        {
+          "type": "range",
+          "id": "position_y_mobile",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Vertical Position Mobile",
+          "default": 50,
+          "info": "Adjust hotspot position for mobile view"
+        },
+        {
+          "type": "header",
+          "content": "Popup Position"
+        },
+        {
+          "type": "select",
+          "id": "popup_position",
+          "label": "Popup Position (Desktop)",
+          "options": [
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "top"
+        },
+        {
+          "type": "select",
+          "id": "popup_position_mobile",
+          "label": "Popup Position (Mobile)",
+          "options": [
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "top"
+        },
+        {
+          "type": "header",
+          "content": "Product"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Select Product"
+        },
+        {
+          "type": "header",
+          "content": "Custom Content (if no product selected)"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_image",
+          "label": "Custom Product Image"
+        },
+        {
+          "type": "text",
+          "id": "custom_title",
+          "label": "Custom Title",
+          "default": "Product Name"
+        },
+        {
+          "type": "text",
+          "id": "custom_price",
+          "label": "Custom Price",
+          "default": "£50.00"
+        },
+        {
+          "type": "text",
+          "id": "custom_compare_price",
+          "label": "Custom Compare Price"
+        },
+        {
+          "type": "text",
+          "id": "custom_discount",
+          "label": "Custom Discount Text",
+          "default": "20% OFF"
+        },
+        {
+          "type": "url",
+          "id": "custom_link",
+          "label": "Custom Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shoppable Solutions",
+      "blocks": [
+        {
+          "type": "hotspot",
+          "settings": {
+            "position_x": 25,
+            "position_y": 40,
+            "popup_position": "right"
+          }
+        },
+        {
+          "type": "hotspot",
+          "settings": {
+            "position_x": 50,
+            "position_y": 60,
+            "popup_position": "top"
+          }
+        },
+        {
+          "type": "hotspot",
+          "settings": {
+            "position_x": 75,
+            "position_y": 35,
+            "popup_position": "left"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %} {% endcomment %}
+
+
+
+
+
+{{ 'section-shoppable-solutions.css' | asset_url | stylesheet_tag }} 
+
+<style>
+  #shoppable-solutions-{{ section.id }} {
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --section-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --section-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+    --hotspot-color: {{ section.settings.hotspot_color }};
+    --hotspot-bg: {{ section.settings.hotspot_bg }};
+    --hotspot-size: {{ section.settings.hotspot_size }}px;
+    --hotspot-size-mobile: {{ section.settings.hotspot_size_mobile }}px;
+    --popup-bg: {{ section.settings.popup_bg }};
+    --popup-title-color: {{ section.settings.popup_title_color }};
+    --popup-title-size: {{ section.settings.popup_title_font_size }}px;
+    --popup-price-color: {{ section.settings.popup_price_color }};
+    --popup-price-size: {{ section.settings.popup_price_font_size }}px;
+    --popup-compare-color: {{ section.settings.popup_compare_price_color }};
+    --popup-discount-color: {{ section.settings.popup_discount_color }};
+    --popup-btn-bg: {{ section.settings.popup_btn_bg }};
+    --popup-btn-color: {{ section.settings.popup_btn_color }};
+    --section-bg: {{ section.settings.section_bg_color }};
+    --content-bg: {{ section.settings.content_bg_color }};
+  }
+
+  #shoppable-solutions-{{ section.id }} .solutions-image {
+    transition: opacity 0.3s ease;
+  }
+
+  #shoppable-solutions-{{ section.id }} .solutions-image.fade-out {
+    opacity: 0;
+  }
+</style>
+
+<section id="shoppable-solutions-{{ section.id }}" class="shoppable-solutions-section">
+  <div class="solutions-wrapper hdt-container">
+    {% if section.settings.full_width %}
+      <div class="solutions-container full-width">
+    {% else %}
+      <div class="page-width">
+        <div class="solutions-container">
+    {% endif %}
+
+    {% comment %} Section Title - Above everything {% endcomment %}
+    {% if section.settings.section_title != blank %}
+      <div class="solutions-section-title">
+        <h2 style="font-size: {{ section.settings.section_title_font_size }}px; color: {{ section.settings.section_title_color }};">
+          {{ section.settings.section_title }}
+        </h2>
+      </div>
+    {% endif %}
+
+    <div class="solutions-layout">
+      {% comment %} Content Area - Above Image {% endcomment %}
+      <div class="solutions-content-area">
+        <div class="solutions-content-box">
+        {% if section.settings.heading != blank %}
+          <h3 class="solutions-heading" style="font-size: {{ section.settings.heading_font_size }}px; color: {{ section.settings.heading_color }};">
+            {{ section.settings.heading }}
+          </h3>
+        {% endif %}
+        
+        {% if section.settings.description != blank %}
+          <div class="solutions-description" style="font-size: {{ section.settings.description_font_size }}px; color: {{ section.settings.description_color }};">
+            {{ section.settings.description }}
+          </div>
+        {% endif %}
+
+        {% if section.settings.button_text != blank %}
+          <a href="{{ section.settings.button_link }}" class="solutions-button" style="background-color: {{ section.settings.button_bg }}; color: {{ section.settings.button_color }};">
+            {{ section.settings.button_text }}
+          </a>
+        {% endif %}
+      </div>
+      </div>
+
+      {% comment %} Image with Hotspots {% endcomment %}
+      <div class="solutions-image-wrapper">
+        <div class="solutions-image-container" {% if section.settings.image_mobile != blank %}data-has-mobile-image="true"{% endif %}>
+          {% if section.settings.image != blank %}
+            <img 
+              src="{{ section.settings.image | image_url: width: 1920 }}" 
+              alt="{{ section.settings.heading | default: 'Solutions image' }}"
+              class="solutions-image solutions-image-desktop"
+              data-default-src="{{ section.settings.image | image_url: width: 1920 }}"
+              loading="lazy"
+              width="1920"
+              height="auto"
+            >
+          {% endif %}
+
+          {% if section.settings.image_mobile != blank %}
+            <img 
+              src="{{ section.settings.image_mobile | image_url: width: 800 }}" 
+              alt="{{ section.settings.heading | default: 'Solutions image' }}"
+              class="solutions-image solutions-image-mobile"
+              data-default-src="{{ section.settings.image_mobile | image_url: width: 800 }}"
+              loading="lazy"
+              width="800"
+              height="auto"
+            >
+          {% endif %}
+
+          {% comment %} Hotspots {% endcomment %}
+          {% for block in section.blocks %}
+            {% if block.type == 'hotspot' %}
+              {% assign product = block.settings.product %}
+              {% assign mobile_x = block.settings.position_x_mobile | default: block.settings.position_x %}
+              {% assign mobile_y = block.settings.position_y_mobile | default: block.settings.position_y %}
+              
+              {% comment %} Prepare hotspot image data {% endcomment %}
+              {% assign hotspot_desktop_image = '' %}
+              {% assign hotspot_mobile_image = '' %}
+              
+              {% if block.settings.hotspot_image != blank %}
+                {% assign hotspot_desktop_image = block.settings.hotspot_image | image_url: width: 1920 %}
+              {% endif %}
+              
+              {% if block.settings.hotspot_image_mobile != blank %}
+                {% assign hotspot_mobile_image = block.settings.hotspot_image_mobile | image_url: width: 800 %}
+              {% elsif block.settings.hotspot_image != blank %}
+                {% comment %} Fallback to desktop image for mobile if mobile not set {% endcomment %}
+                {% assign hotspot_mobile_image = block.settings.hotspot_image | image_url: width: 800 %}
+              {% endif %}
+              
+              <div 
+                class="hotspot" 
+                style="--desktop-x: {{ block.settings.position_x }}%; --desktop-y: {{ block.settings.position_y }}%; --mobile-x: {{ mobile_x }}%; --mobile-y: {{ mobile_y }}%;"
+                data-hotspot-id="{{ block.id }}"
+                {% if hotspot_desktop_image != '' %}data-desktop-image="{{ hotspot_desktop_image }}"{% endif %}
+                {% if hotspot_mobile_image != '' %}data-mobile-image="{{ hotspot_mobile_image }}"{% endif %}
+                {{ block.shopify_attributes }}
+              >
+                <button class="hotspot-button" aria-label="View product details">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path class="icon-horizontal" d="M0 7h14" stroke="currentColor" stroke-width="2"/>
+                    <path class="icon-vertical" d="M7 0v14" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                </button>
+
+                {% comment %} Product Popup {% endcomment %}
+                <div class="hotspot-popup" data-position="{{ block.settings.popup_position }}" data-mobile-position="{{ block.settings.popup_position_mobile | default: 'top' }}">
+                  <div class="popup-inner">
+                    {% if product != blank %}
+                      <div class="popup-image">
+                        {% if product.featured_image %}
+                          <img src="{{ product.featured_image | image_url: width: 200 }}" alt="{{ product.title }}" loading="lazy">
+                        {% endif %}
+                      </div>
+                      <div class="popup-content">
+                        <h4 class="popup-title">{{ product.title }}</h4>
+                        <div class="popup-price">
+                          <span class="current-price">{{ product.price | money }}</span>
+                          {% if product.compare_at_price > product.price %}
+                            <span class="compare-price">{{ product.compare_at_price | money }}</span>
+                            <span class="discount-badge">
+                              {% assign discount = product.compare_at_price | minus: product.price | times: 100.0 | divided_by: product.compare_at_price | round %}
+                              {{ discount }}% OFF
+                            </span>
+                          {% endif %}
+                        </div>
+                        <form action="/cart/add" method="post" class="popup-form">
+                          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                          <input type="hidden" name="quantity" value="1">
+                          <button type="submit" class="popup-add-btn" {% unless product.available %}disabled{% endunless %}>
+                            {% if product.available %}
+                              {{ section.settings.add_to_cart_text }}
+                            {% else %}
+                              {{ section.settings.sold_out_text }}
+                            {% endif %}
+                          </button>
+                        </form>
+                      </div>
+                    {% else %}
+                      <div class="popup-image">
+                        {% if block.settings.custom_image != blank %}
+                          <img src="{{ block.settings.custom_image | image_url: width: 200 }}" alt="{{ block.settings.custom_title }}" loading="lazy">
+                        {% endif %}
+                      </div>
+                      <div class="popup-content">
+                        <h4 class="popup-title">{{ block.settings.custom_title | default: 'Product Title' }}</h4>
+                        <div class="popup-price">
+                          <span class="current-price">{{ block.settings.custom_price | default: '£50.00' }}</span>
+                          {% if block.settings.custom_compare_price != blank %}
+                            <span class="compare-price">{{ block.settings.custom_compare_price }}</span>
+                            <span class="discount-badge">{{ block.settings.custom_discount | default: '20% OFF' }}</span>
+                          {% endif %}
+                        </div>
+                        <a href="{{ block.settings.custom_link }}" class="popup-add-btn">
+                          {{ section.settings.add_to_cart_text }}
+                        </a>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="popup-arrow"></div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    {% if section.settings.full_width %}
+      </div>
+    {% else %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const section = document.getElementById('shoppable-solutions-{{ section.id }}');
+    if (!section) return;
+
+    const hotspots = section.querySelectorAll('.hotspot');
+    const desktopImage = section.querySelector('.solutions-image-desktop');
+    const mobileImage = section.querySelector('.solutions-image-mobile');
+    
+    // Store default images
+    const defaultDesktopSrc = desktopImage ? desktopImage.dataset.defaultSrc : null;
+    const defaultMobileSrc = mobileImage ? mobileImage.dataset.defaultSrc : null;
+    
+    // Function to check if mobile view
+    function isMobileView() {
+      return window.innerWidth <= 749;
+    }
+    
+    // Function to update main image with fade effect
+    function updateMainImage(desktopSrc, mobileSrc) {
+      const targetImage = isMobileView() ? mobileImage : desktopImage;
+      const newSrc = isMobileView() ? (mobileSrc || desktopSrc) : desktopSrc;
+      
+      if (!targetImage || !newSrc) return;
+      
+      // Add fade out
+      targetImage.classList.add('fade-out');
+      
+      setTimeout(() => {
+        targetImage.src = newSrc;
+        // Remove fade out after image loads
+        targetImage.onload = function() {
+          targetImage.classList.remove('fade-out');
+        };
+        // Fallback remove fade if onload doesn't fire (cached image)
+        setTimeout(() => {
+          targetImage.classList.remove('fade-out');
+        }, 100);
+      }, 300);
+    }
+    
+    // Function to reset to default image
+    function resetToDefaultImage() {
+      if (desktopImage && defaultDesktopSrc) {
+        desktopImage.classList.add('fade-out');
+        setTimeout(() => {
+          desktopImage.src = defaultDesktopSrc;
+          setTimeout(() => desktopImage.classList.remove('fade-out'), 100);
+        }, 300);
+      }
+      
+      if (mobileImage && defaultMobileSrc) {
+        mobileImage.classList.add('fade-out');
+        setTimeout(() => {
+          mobileImage.src = defaultMobileSrc;
+          setTimeout(() => mobileImage.classList.remove('fade-out'), 100);
+        }, 300);
+      }
+    }
+    
+    hotspots.forEach(hotspot => {
+      const button = hotspot.querySelector('.hotspot-button');
+      const hotspotDesktopImage = hotspot.dataset.desktopImage;
+      const hotspotMobileImage = hotspot.dataset.mobileImage;
+      
+      button.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        const wasActive = hotspot.classList.contains('active');
+        
+        // Close all other popups
+        hotspots.forEach(h => {
+          if (h !== hotspot) {
+            h.classList.remove('active');
+          }
+        });
+        
+        // Toggle current popup
+        hotspot.classList.toggle('active');
+        
+        // Update image based on state
+        if (!wasActive) {
+          // Opening this hotspot
+          if (hotspotDesktopImage || hotspotMobileImage) {
+            // Has image - update to hotspot image
+            updateMainImage(hotspotDesktopImage, hotspotMobileImage);
+          } else {
+            // No image - reset to default
+            resetToDefaultImage();
+          }
+        } else {
+          // Closing this hotspot - reset to default
+          resetToDefaultImage();
+        }
+      });
+    });
+    
+    // Close popup when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.hotspot')) {
+        const anyWasActive = Array.from(hotspots).some(h => h.classList.contains('active'));
+        hotspots.forEach(h => h.classList.remove('active'));
+        
+        // Reset to default image if any hotspot was active
+        if (anyWasActive) {
+          resetToDefaultImage();
+        }
+      }
+    });
+    
+    // Close popup on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const anyWasActive = Array.from(hotspots).some(h => h.classList.contains('active'));
+        hotspots.forEach(h => h.classList.remove('active'));
+        
+        // Reset to default image if any hotspot was active
+        if (anyWasActive) {
+          resetToDefaultImage();
+        }
+      }
+    });
+
+    // Prevent popup clicks from closing
+    section.querySelectorAll('.hotspot-popup').forEach(popup => {
+      popup.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Shoppable Solutions",
+  "tag": "section",
+  "class": "shoppable-solutions-section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Section Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Mobile Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Section Title"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title",
+      "default": "See our Solutions"
+    },
+    {
+      "type": "range",
+      "id": "section_title_font_size",
+      "min": 20,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Section Title Font Size",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "section_title_color",
+      "label": "Section Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Image Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (Desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image (Mobile)",
+      "info": "Optional. Uses desktop image if not set."
+    },
+    {
+      "type": "header",
+      "content": "Content Settings"
+    },
+    {
+      "type": "color",
+      "id": "content_bg_color",
+      "label": "Content Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "House and Garden"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "min": 18,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading Font Size",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#000000"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>With over 20 years in the hardware industry, we know what it takes to create products that last and help you build with confidence.</p>"
+    },
+    {
+      "type": "range",
+      "id": "description_font_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Description Font Size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description Color",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Button Settings"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button Background",
+      "default": "#0066cc"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Hotspot Settings"
+    },
+    {
+      "type": "color",
+      "id": "hotspot_bg",
+      "label": "Hotspot Background",
+      "default": "#0066cc"
+    },
+    {
+      "type": "color",
+      "id": "hotspot_color",
+      "label": "Hotspot Icon Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "hotspot_size",
+      "min": 30,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Hotspot Size (Desktop)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "hotspot_size_mobile",
+      "min": 24,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Hotspot Size (Mobile)",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Popup Settings"
+    },
+    {
+      "type": "color",
+      "id": "popup_bg",
+      "label": "Popup Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "popup_title_color",
+      "label": "Product Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "popup_title_font_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Product Title Font Size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "popup_price_color",
+      "label": "Price Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "popup_price_font_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Price Font Size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "popup_compare_price_color",
+      "label": "Compare Price Color",
+      "default": "#999999"
+    },
+    {
+      "type": "color",
+      "id": "popup_discount_color",
+      "label": "Discount Badge Color",
+      "default": "#e53935"
+    },
+    {
+      "type": "color",
+      "id": "popup_btn_bg",
+      "label": "Popup Button Background",
+      "default": "#0066cc"
+    },
+    {
+      "type": "color",
+      "id": "popup_btn_color",
+      "label": "Popup Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_text",
+      "label": "Add to Cart Text",
+      "default": "Add to cart +"
+    },
+    {
+      "type": "text",
+      "id": "sold_out_text",
+      "label": "Sold Out Text",
+      "default": "Sold out"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "name": "Product Hotspot",
+      "limit": 20,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Desktop Position"
+        },
+        {
+          "type": "range",
+          "id": "position_x",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Horizontal Position (Left to Right)",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "position_y",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Vertical Position (Top to Bottom)",
+          "default": 50
+        },
+        {
+          "type": "header",
+          "content": "Mobile Position"
+        },
+        {
+          "type": "range",
+          "id": "position_x_mobile",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Horizontal Position Mobile",
+          "default": 50,
+          "info": "Adjust hotspot position for mobile view"
+        },
+        {
+          "type": "range",
+          "id": "position_y_mobile",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Vertical Position Mobile",
+          "default": 50,
+          "info": "Adjust hotspot position for mobile view"
+        },
+        {
+          "type": "header",
+          "content": "Hotspot Image (Updates Main Image)"
+        },
+        {
+          "type": "image_picker",
+          "id": "hotspot_image",
+          "label": "Hotspot Image (Desktop)",
+          "info": "This image will replace the main image when hotspot is clicked. Leave empty to keep default image."
+        },
+        {
+          "type": "image_picker",
+          "id": "hotspot_image_mobile",
+          "label": "Hotspot Image (Mobile)",
+          "info": "Optional mobile-specific image. Uses desktop hotspot image if not set."
+        },
+        {
+          "type": "header",
+          "content": "Popup Position"
+        },
+        {
+          "type": "select",
+          "id": "popup_position",
+          "label": "Popup Position (Desktop)",
+          "options": [
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "top"
+        },
+        {
+          "type": "select",
+          "id": "popup_position_mobile",
+          "label": "Popup Position (Mobile)",
+          "options": [
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "top"
+        },
+        {
+          "type": "header",
+          "content": "Product"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Select Product"
+        },
+        {
+          "type": "header",
+          "content": "Custom Content (if no product selected)"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_image",
+          "label": "Custom Product Image"
+        },
+        {
+          "type": "text",
+          "id": "custom_title",
+          "label": "Custom Title",
+          "default": "Product Name"
+        },
+        {
+          "type": "text",
+          "id": "custom_price",
+          "label": "Custom Price",
+          "default": "£50.00"
+        },
+        {
+          "type": "text",
+          "id": "custom_compare_price",
+          "label": "Custom Compare Price"
+        },
+        {
+          "type": "text",
+          "id": "custom_discount",
+          "label": "Custom Discount Text",
+          "default": "20% OFF"
+        },
+        {
+          "type": "url",
+          "id": "custom_link",
+          "label": "Custom Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shoppable Solutions",
+      "blocks": [
+        {
+          "type": "hotspot",
+          "settings": {
+            "position_x": 25,
+            "position_y": 40,
+            "popup_position": "right"
+          }
+        },
+        {
+          "type": "hotspot",
+          "settings": {
+            "position_x": 50,
+            "position_y": 60,
+            "popup_position": "top"
+          }
+        },
+        {
+          "type": "hotspot",
+          "settings": {
+            "position_x": 75,
+            "position_y": 35,
+            "popup_position": "left"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,2499 @@
+{% comment %}
+  Interactive Solutions Hotspot Section with Slideshow
+  Features:
+  - 5 slide slideshow with navigation
+  - Each slide has its own title, description, and button
+  - Main image with clickable hotspot markers per slide
+  - Hover to show label and highlight overlay image
+  - Click to open popup modal with detailed view
+  - Popup has product hotspots with hover product details
+  - Product tooltip with PRODUCT LIST SLIDER - shows multiple products
+  - Each hotspot can be assigned to a specific slide
+  - Auto-play option with customizable interval
+{% endcomment %}
+
+{%- style -%}
+  .solutions-section {
+    padding: 60px 0 60px;
+        overflow: hidden;
+  }
+  @media (min-width: 1200px) {
+    .solutions-section {
+      padding: 80px 0 90px;
+    }
+  }
+  .solutions-container {
+    margin: 0 auto;
+  }
+  @media (min-width: 1200px) {
+    .solutions-container {
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+    }
+  }
+  .solutions-description-flex {
+    max-width: 30%;
+  }
+  .solutions-content {
+    max-width: 350px;
+    flex-shrink: 0;
+  }
+  .solutions-overline {
+    display: inline-block;
+    position: relative;
+    padding-bottom: 0px;
+    margin-bottom: 0;
+  }
+  .solutions-title {
+    font-size: 24px;
+    font-weight: 500;
+    color: #000;
+    line-height: 1.2;
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+  @media (min-width: 768px) {
+    .solutions-title {
+      font-size: 32px;
+    }
+  }
+  .solutions-title-text {
+    font-size: 24px;
+    font-weight: 400;
+    color: #000;
+    display: block;
+    margin-bottom: 10px;
+  }
+  .solutions-description {
+    font-size: 16px;
+    font-weight: 400;
+    color: #000;
+    line-height: 1.2;
+  }
+  @media (min-width: 768px) {
+    .solutions-description {
+      font-size: 14px;
+    }
+  }
+  .main-hotspot-flex {
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .solutions-mobile-cta {
+    display: grid;
+    gap: 20px;
+    margin-top: 32px;
+    display: none;
+  }
+  @media (min-width: 1200px) {
+    .solutions-mobile-cta {
+      display: none;
+    }
+  }
+  .solutions-cta-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 25px;
+    background: transparent;
+    border: 1px solid #444;
+    color: #f5f5f5;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  .solutions-cta-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 25px;
+    width: 36px;
+    height: 4px;
+    background: {{ section.settings.accent_color }};
+  }
+  .solutions-cta-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: {{ section.settings.accent_color }};
+  }
+  .solutions-cta-btn svg path {
+    stroke: {{ section.settings.accent_color }};
+  }
+  .solutions-slide-content {
+    display: none;
+  }
+  .solutions-slide-content.active {
+    display: block;
+  }
+  .solutions-slideshow-wrapper {
+    position: relative;
+    flex: 1;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .solutions-image-wrapper {
+    position: relative;
+    width: 100%;
+  }
+  .solutions-slide {
+    display: none;
+    position: relative;
+    width: 100%;
+  }
+  .solutions-slide.active {
+    display: block;
+  }
+  .solutions-main-image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .solutions-overlay-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  .solutions-overlay-image.active {
+    opacity: 1;
+  }
+  .solutions-slideshow-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 19;
+  }
+  .solutions-nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgb(0 0 0 / 22%);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+    z-index: 25;
+  }
+  .solutions-nav-arrow:hover {
+    background: {{ section.settings.accent_color }};
+  }
+  .solutions-nav-arrow:hover svg path {
+    stroke: #fff;
+  }
+  .solutions-nav-arrow svg {
+    width: 20px;
+    height: 20px;
+  }
+  .solutions-nav-arrow svg path {
+    stroke: #fff;
+    transition: stroke 0.3s ease;
+  }
+  .solutions-nav-prev {
+    left: 20px;
+  }
+  .solutions-nav-next {
+    right: 20px;
+  }
+  .solutions-nav-dots {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    pointer-events: auto;
+    z-index: 25;
+  }
+  .solutions-nav-dot {
+    width: 12px;
+    height: 12px;
+    background: rgba(255,255,255,0.6);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .solutions-nav-dot:hover {
+    background: rgba(255,255,255,0.9);
+  }
+  .solutions-nav-dot.active {
+    background: {{ section.settings.accent_color }};
+    transform: scale(1.2);
+  }
+  .solutions-slide-counter {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    font-size: 14px;
+    color: #fff;
+    background: rgba(0,0,0,0.5);
+    padding: 5px 12px;
+    pointer-events: auto;
+    z-index: 25;
+  }
+  .solutions-slide-counter .current {
+    font-weight: 700;
+    color: {{ section.settings.accent_color }};
+  }
+  .solutions-hotspot {
+    position: absolute;
+    z-index: 10;
+    width: 30px;
+    height: 30px;
+    /* display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+    box-shadow: 4px 4px 0 {{ section.settings.accent_color }};
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease; */
+
+    border-radius: 50%;
+    background-color: #0066cc;
+    border: 3px solid rgba(255, 255, 255, .8);
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .3s ease;
+    box-shadow: 0 4px 15px #0000004d;
+  }
+  .solutions-hotspot:hover {
+    background: {{ section.settings.accent_color }};
+    transform: scale(1.1);
+  }
+  .solutions-hotspot:hover svg path {
+    stroke: #fff;
+  }
+  .solutions-hotspot svg {
+    width: 16px;
+    height: 16px;
+  }
+  .solutions-hotspot svg path {
+    stroke: currentColor;
+    transition: stroke 0.3s ease;
+  }
+  .solutions-hotspot-label {
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #2a2a2a;
+    color: #f5f5f5;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 16px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+  }
+  .solutions-hotspot-label::before {
+    content: '';
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: #2a2a2a;
+  }
+  .solutions-hotspot:hover .solutions-hotspot-label {
+    opacity: 1;
+    visibility: visible;
+  }
+  .solutions-hotspot[data-label-position="left"] .solutions-hotspot-label {
+    left: auto;
+    right: calc(100% + 12px);
+  }
+  .solutions-hotspot[data-label-position="left"] .solutions-hotspot-label::before {
+    right: auto;
+    left: 100%;
+    border-right-color: transparent;
+    border-left-color: #2a2a2a;
+  }
+  .solutions-hotspot[data-label-position="top"] .solutions-hotspot-label {
+    left: 50%;
+    top: auto;
+    bottom: calc(100% + 12px);
+    transform: translateX(-50%);
+  }
+  .solutions-hotspot[data-label-position="top"] .solutions-hotspot-label::before {
+    right: auto;
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%);
+    border-right-color: transparent;
+    border-top-color: #2a2a2a;
+  }
+  .solutions-hotspot[data-label-position="bottom"] .solutions-hotspot-label {
+    left: 50%;
+    top: calc(100% + 12px);
+    transform: translateX(-50%);
+  }
+  .solutions-hotspot[data-label-position="bottom"] .solutions-hotspot-label::before {
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: 100%;
+    transform: translateX(-50%);
+    border-right-color: transparent;
+    border-bottom-color: #2a2a2a;
+  }
+  .solutions-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+  }
+  .solutions-popup-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  .solutions-popup {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 60%;
+    height: 100%;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(100%);
+    transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.4s ease;
+  }
+  .solutions-popup.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+  }
+  .solutions-popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 30px 4px;
+    background: #fff;
+    flex-shrink: 0;
+  }
+  .solutions-popup-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #0047ab;
+    letter-spacing: 0.05em;
+    margin: 0;
+    position: relative;
+    padding-bottom: 12px;
+  }
+  .solutions-popup-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background: {{ section.settings.accent_color }};
+  }
+  .solutions-popup-close {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.3s ease;
+  }
+  .solutions-popup-close:hover {
+    color: #f5f5f5;
+  }
+  .solutions-popup-close svg {
+    width: 24px;
+    height: 24px;
+  }
+  .solutions-popup-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .solutions-popup-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 70%;
+    padding: 0px;
+  }
+  .solutions-popup-main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .solutions-popup-overlay-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  .solutions-popup-overlay-image.active {
+    opacity: 1;
+  }
+  .solutions-product-hotspot {
+    position: absolute;
+    z-index: 10;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: {{ section.settings.accent_color }};
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, .8);
+    color: #ffffff;
+    transition: all .3s ease;
+    box-shadow: 0 4px 15px #0000004d;
+  }
+  .solutions-product-hotspot svg {
+    width: 16px;
+    height: 16px;
+    z-index: 1;
+    position: relative;
+  }
+  .solutions-product-hotspot svg path {
+    stroke: #fff;
+    transition: stroke 0.3s ease;
+  }
+  .solutions-product-hotspot:hover {
+    transform: scale(1.1);
+    z-index: 100;
+  }
+  
+  /* Product Tooltip Styles - NOW A SLIDER */
+  .solutions-product-tooltip {
+    position: absolute;
+    right: calc(100% + 15px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    padding: 0;
+    width: 230px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 200;
+    text-decoration: none;
+    display: block;
+    pointer-events: none;
+
+    border-radius: 12px;
+    box-shadow: 0 8px 30px #0003;
+  }
+  .solutions-product-tooltip::before {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 10px solid transparent;
+    border-left-color: #2a2a2a;
+  }
+  .solutions-product-hotspot:hover .solutions-product-tooltip {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    background: #fff;
+  }
+  .solutions-product-hotspot.tooltip-active .solutions-product-tooltip {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .solutions-product-hotspot[data-tooltip-position="right"] .solutions-product-tooltip {
+    right: auto;
+    left: calc(100% + 15px);
+  }
+  .solutions-product-hotspot[data-tooltip-position="right"] .solutions-product-tooltip::before {
+    left: auto;
+    right: 100%;
+    border-left-color: transparent;
+    border-right-color: #2a2a2a;
+  }
+  .solutions-product-hotspot[data-tooltip-position="top"] .solutions-product-tooltip {
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: calc(100% + 15px);
+    transform: translateX(-50%);
+  }
+  .solutions-product-hotspot[data-tooltip-position="top"] .solutions-product-tooltip::before {
+    left: 50%;
+    right: auto;
+    top: 100%;
+    bottom: auto;
+    transform: translateX(-50%);
+    border-left-color: transparent;
+    border-top-color: #2a2a2a;
+  }
+  .solutions-product-hotspot[data-tooltip-position="bottom"] .solutions-product-tooltip {
+    right: auto;
+    left: 50%;
+    top: calc(100% + 15px);
+    bottom: auto;
+    transform: translateX(-50%);
+  }
+  .solutions-product-hotspot[data-tooltip-position="bottom"] .solutions-product-tooltip::before {
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: 100%;
+    transform: translateX(-50%);
+    border-left-color: transparent;
+    border-bottom-color: #2a2a2a;
+  }
+
+  /* Product List Slider Container */
+  .solutions-product-list-slider {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+  .solutions-product-list-track {
+    display: flex;
+    transition: transform 0.3s ease;
+  }
+  .solutions-product-list-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    padding: 15px 35px;
+    box-sizing: border-box;
+  }
+
+  /* Product List Slider Navigation */
+  .solutions-product-list-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 25px;
+    height: 30px;
+    background: {{ section.settings.accent_color }};
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.3s ease;
+  }
+  .solutions-product-list-nav svg {
+    width: 14px;
+    height: 14px;
+  }
+  .solutions-product-list-nav svg path {
+    stroke: #fff;
+  }
+  .solutions-product-list-prev {
+    left: 5px;
+  }
+  .solutions-product-list-next {
+    right: 5px;
+  }
+
+  /* Product List Counter/Dots */
+  .solutions-product-list-counter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 15px;
+    background: #222;
+    display: none;
+  }
+  .solutions-product-list-dot {
+    width: 8px;
+    height: 8px;
+    background: rgba(255,255,255,0.3);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+  .solutions-product-list-dot:hover {
+    background: rgba(255,255,255,0.6);
+  }
+  .solutions-product-list-dot.active {
+    background: {{ section.settings.accent_color }};
+    transform: scale(1.2);
+  }
+  
+  /* Product Image in Tooltip */
+  .solutions-product-image-wrap {
+    width: 100%;
+    position: relative;
+    background: #fff;
+    border: 1px solid #ddd;
+    margin-bottom: 12px;
+    overflow: hidden;
+    border-radius: 4px;
+  }
+  .solutions-product-slider {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+  }
+  .solutions-product-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .solutions-product-slide.active {
+    opacity: 1;
+  }
+  .solutions-product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  /* Product Image Slider Navigation Arrows */
+  .solutions-product-slider-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 24px;
+    background: rgba(0,0,0,0.5);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .solutions-product-image-wrap:hover .solutions-product-slider-nav {
+    opacity: 1;
+  }
+  .solutions-product-slider-nav:hover {
+    background: rgba(0,0,0,0.8);
+  }
+  .solutions-product-slider-nav svg {
+    width: 14px;
+    height: 14px;
+  }
+  .solutions-product-slider-nav svg path {
+    stroke: #fff;
+  }
+  .solutions-product-slider-prev {
+    left: 5px;
+  }
+  .solutions-product-slider-next {
+    right: 5px;
+  }
+  
+  /* Quick View Button */
+  .solutions-quick-view-btn {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: {{ section.settings.accent_color }};
+    color: #fff;
+    border: none;
+    padding: 6px 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease, background 0.3s ease;
+    white-space: nowrap;
+    z-index: 5;
+    border-radius: 4px;
+  }
+  .solutions-product-image-wrap:hover .solutions-quick-view-btn {
+    opacity: 1;
+    visibility: visible;
+  }
+  .solutions-quick-view-btn svg {
+    display: none;
+}
+  
+  /* Product Info in Tooltip */
+  .solutions-product-info {
+    text-decoration: none;
+    display: block;
+  }
+  .solutions-product-code {
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+    margin: 0 0 5px;
+    line-height: 20px;
+  }
+  .solutions-product-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: #999;
+    margin: 0;
+    line-height: normal;
+  }
+  .solutions-product-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: {{ section.settings.accent_color }};
+    margin: 4px 0 0;
+  }
+  .solutions-product-info:hover .solutions-product-code {
+    color: #000;
+  }
+  
+  .solutions-product-tooltip:hover {
+    background: #333;
+  }
+  .solutions-product-tooltip:hover::before {
+    border-left-color: #333;
+  }
+  .solutions-product-hotspot[data-tooltip-position="right"] .solutions-product-tooltip:hover::before {
+    border-left-color: transparent;
+    border-right-color: #333;
+  }
+  .solutions-product-hotspot[data-tooltip-position="top"] .solutions-product-tooltip:hover::before {
+    border-left-color: transparent;
+    border-top-color: #333;
+  }
+  .solutions-product-hotspot[data-tooltip-position="bottom"] .solutions-product-tooltip:hover::before {
+    border-left-color: transparent;
+    border-bottom-color: #333;
+  }
+  
+  /* Quick View Modal */
+  .solutions-quickview-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  .solutions-quickview-modal.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  .solutions-quickview-content {
+    background: #fff;
+    max-width: 900px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: auto;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .solutions-quickview-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 36px;
+    height: 36px;
+    background: #f5f5f5;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.3s ease;
+  }
+  .solutions-quickview-close:hover {
+    background: {{ section.settings.accent_color }};
+  }
+  .solutions-quickview-close svg {
+    width: 18px;
+    height: 18px;
+  }
+  .solutions-quickview-images {
+    width: 50%;
+    padding: 30px;
+    background: #f5f5f5;
+  }
+  .solutions-quickview-main-image {
+    width: 100%;
+    aspect-ratio: 1/1;
+    position: relative;
+    margin-bottom: 15px;
+  }
+  .solutions-quickview-main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .solutions-quickview-thumbnails {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .solutions-quickview-thumb {
+    width: 60px;
+    height: 60px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 0;
+    background: #fff;
+    transition: border-color 0.3s ease;
+  }
+  .solutions-quickview-thumb.active {
+    border-color: {{ section.settings.accent_color }};
+  }
+  .solutions-quickview-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .solutions-quickview-info {
+    width: 50%;
+    padding: 40px 30px;
+  }
+  .solutions-quickview-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 10px;
+  }
+  .solutions-quickview-type {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 20px;
+  }
+  .solutions-quickview-price {
+    font-size: 22px;
+    font-weight: 700;
+    color: {{ section.settings.accent_color }};
+    margin: 0 0 20px;
+  }
+  .solutions-quickview-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #666;
+    margin: 0 0 25px;
+  }
+  .solutions-quickview-btn {
+    display: inline-block;
+    background: {{ section.settings.accent_color }};
+    color: #1a1a1a;
+    padding: 14px 30px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.3s ease;
+  }
+  .solutions-quickview-btn:hover {
+    background: #1a1a1a;
+    color: #fff;
+  }
+  .solutions-flex {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  
+  @media (max-width: 768px) {
+    .solutions-quickview-images,
+    .solutions-quickview-info {
+      width: 100%;
+    }
+    .solutions-quickview-info {
+      padding: 25px 20px;
+    }
+  }
+  
+  body.solutions-popup-open {
+    overflow: hidden;
+  }
+  @media (max-width: 991px) {
+    .solutions-popup {
+      width: 100%;
+    }
+    .solutions-flex {
+      flex-direction: column;
+    }
+    .solutions-content {
+      margin: 0 auto;
+    }
+    .solutions-overline {
+      width: 100%;
+    }
+    .solutions-title {
+      text-align: center;
+    }
+    .solutions-description-flex {
+      text-align: center;
+      margin-top: 30px;
+      max-width: 100%;
+    }
+    .solutions-title-text {
+      font-size: 18px;
+      font-weight: 500;
+    }
+    .main-hotspot-flex {
+      gap: 50px;
+    }
+    .solutions-popup-main-image {
+      object-fit: contain;
+    }
+    .solutions-popup-image-wrapper {
+      height: auto;
+    }
+    .solutions-hotspot {
+      width: 20px;
+      height: 20px;
+      box-shadow: 1px 1px 0 {{ section.settings.accent_color }};
+      border: 1px solid rgba(255, 255, 255, .8);
+    }
+    .solutions-product-hotspot {
+      width: 20px;
+      height: 20px;
+      border: 1px solid rgba(255, 255, 255, .8);
+    }
+    .solutions-product-tooltip {
+      padding: 0;
+      width: 200px;
+    }
+    .solutions-product-list-slide {
+      padding: 20px 20px 10px;
+    }
+    .solutions-product-code {
+      font-size: 13px;
+      line-height: normal;
+    }
+    .solutions-product-name {
+      font-size: 10px;
+    }
+    .solutions-nav-arrow {
+      width: 40px;
+      height: 40px;
+    }
+    .solutions-nav-prev {
+      left: 10px;
+    }
+    .solutions-nav-next {
+      right: 10px;
+    }
+    .solutions-nav-dot {
+      width: 10px;
+      height: 10px;
+    }
+    .solutions-quick-view-btn {
+      font-size: 9px;
+      padding: 6px 10px;
+    }
+    .solutions-product-list-nav {
+      width: 22px;
+      height: 22px;
+    }
+    .solutions-product-list-nav svg {
+      width: 10px;
+      height: 10px;
+    }
+    .solutions-product-hotspot.tooltip-active .solutions-product-slider-nav {
+      opacity: 1;
+    }
+    .solutions-product-hotspot.tooltip-active .solutions-quick-view-btn {
+      opacity: 1;
+      visibility: visible;
+    }
+    .solutions-product-hotspot.tooltip-active .solutions-product-list-nav {
+      opacity: 1;
+    }
+  }
+{%- endstyle -%}
+
+<section class="solutions-section" data-section-id="{{ section.id }}">
+  <div class="solutions-container hdt-container">
+    <div class="solutions-content">
+      {% comment %} <div class="solutions-overline">
+        <h2 class="solutions-title">{{ section.settings.title }}</h2>
+      </div> {% endcomment %}
+      <div class="solutions-mobile-cta">
+        {% for i in (1..5) %}
+          {% assign slide_cta_url_key = 'slide_' | append: i | append: '_cta_url' %}
+          {% assign slide_cta_text_key = 'slide_' | append: i | append: '_cta_text' %}
+          {% assign slide_cta_url = section.settings[slide_cta_url_key] %}
+          {% assign slide_cta_text = section.settings[slide_cta_text_key] %}
+          {% assign slide_image_key = 'slide_' | append: i | append: '_image' %}
+          {% assign slide_image = section.settings[slide_image_key] %}
+          {% if slide_image != blank or i == 1 %}
+            {% if slide_cta_text != blank %}
+              <a href="{{ slide_cta_url | default: '#' }}" class="solutions-cta-btn{% if i == 1 %} active{% endif %}" data-slide-cta="{{ i }}" style="{% unless i == 1 %}display: none;{% endunless %}">
+                {{ slide_cta_text }}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                  <path fill="none" stroke-width="1.5" d="M13.81 8H1.92m7.566-4.594L14.08 8l-4.594 4.594"></path>
+                </svg>
+              </a>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="main-hotspot-flex">
+      <div class="solutions-flex">
+        <div class="solutions-overline">
+          <h2 class="solutions-title">{{ section.settings.title }}</h2>
+        </div>
+        {% for i in (1..5) %}
+          {% assign slide_desc_title_key = 'slide_' | append: i | append: '_description_title' %}
+          {% assign slide_desc_key = 'slide_' | append: i | append: '_description' %}
+          {% assign slide_desc_title = section.settings[slide_desc_title_key] %}
+          {% assign slide_desc = section.settings[slide_desc_key] %}
+          {% assign slide_image_key = 'slide_' | append: i | append: '_image' %}
+          {% assign slide_image = section.settings[slide_image_key] %}
+          {% if slide_image != blank or i == 1 %}
+            <div class="solutions-description-flex solutions-slide-content{% if i == 1 %} active{% endif %}" data-slide-content="{{ i }}">
+              {% if slide_desc_title != blank %}
+                <span class="solutions-title-text">{{ slide_desc_title }}</span>
+              {% endif %}
+              {% if slide_desc != blank %}
+                <div class="solutions-description">{{ slide_desc }}</div>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="solutions-slideshow-wrapper">
+        <div class="solutions-image-wrapper">
+          {% for i in (1..5) %}
+            {% assign slide_image_key = 'slide_' | append: i | append: '_image' %}
+            {% assign slide_image = section.settings[slide_image_key] %}
+            {% if slide_image != blank or i == 1 %}
+              <div class="solutions-slide{% if i == 1 %} active{% endif %}" data-slide="{{ i }}">
+                {% if slide_image != blank %}
+                  <img src="{{ slide_image | image_url: width: 1920 }}" alt="{{ slide_image.alt | default: section.settings.title }}" class="solutions-main-image" width="1400" height="700" loading="{% if i == 1 %}eager{% else %}lazy{% endif %}">
+                {% else %}
+                  {{ 'lifestyle-1' | placeholder_svg_tag: 'solutions-main-image' }}
+                {% endif %}
+
+                {% for block in section.blocks %}
+                  {% assign block_slide = block.settings.assigned_slide | plus: 0 %}
+                  {% if block.type == 'hotspot' and block_slide == i and block.settings.overlay_image != blank %}
+                    <img src="{{ block.settings.overlay_image | image_url: width: 1920 }}" alt="{{ block.settings.label }}" class="solutions-overlay-image" data-hotspot-overlay="{{ block.id }}" loading="lazy">
+                  {% endif %}
+                {% endfor %}
+
+                {% for block in section.blocks %}
+                  {% assign block_slide = block.settings.assigned_slide | plus: 0 %}
+                  {% if block.type == 'hotspot' and block_slide == i %}
+                    <div class="solutions-hotspot" style="top: {{ block.settings.position_y }}%; left: {{ block.settings.position_x }}%;" data-hotspot-id="{{ block.id }}" data-label-position="{{ block.settings.label_position }}" {{ block.shopify_attributes }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                        <path fill="none" stroke="currentColor" stroke-linecap="square" stroke-width="1.5" d="M13.969 8H2.03M8 13.968V2.031"></path>
+                      </svg>
+                      <span class="solutions-hotspot-label">{{ block.settings.label }}</span>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endfor %}
+          
+          {% if section.settings.show_navigation %}
+            <div class="solutions-slideshow-nav">
+              {% if section.settings.show_arrows %}
+                <button class="solutions-nav-arrow solutions-nav-prev" aria-label="Previous slide">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                    <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6"/>
+                  </svg>
+                </button>
+                <button class="solutions-nav-arrow solutions-nav-next" aria-label="Next slide">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                    <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/>
+                  </svg>
+                </button>
+              {% endif %}
+              
+              {% if section.settings.show_dots %}
+                <div class="solutions-nav-dots">
+                  {% for i in (1..5) %}
+                    {% assign slide_image_key = 'slide_' | append: i | append: '_image' %}
+                    {% assign slide_image = section.settings[slide_image_key] %}
+                    {% if slide_image != blank or i == 1 %}
+                      <button class="solutions-nav-dot{% if i == 1 %} active{% endif %}" data-slide-dot="{{ i }}" aria-label="Go to slide {{ i }}"></button>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+              
+              {% if section.settings.show_counter %}
+                <div class="solutions-slide-counter">
+                  <span class="current">1</span> / <span class="total">
+                    {%- assign slide_count = 0 -%}
+                    {%- for i in (1..5) -%}
+                      {%- assign slide_image_key = 'slide_' | append: i | append: '_image' -%}
+                      {%- assign slide_image = section.settings[slide_image_key] -%}
+                      {%- if slide_image != blank or i == 1 -%}
+                        {%- assign slide_count = slide_count | plus: 1 -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                    {{ slide_count }}
+                  </span>
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% for block in section.blocks %}
+    {% if block.type == 'hotspot' %}
+      <div class="solutions-popup-overlay" data-popup-overlay="{{ block.id }}"></div>
+      <div class="solutions-popup" data-popup="{{ block.id }}">
+        <div class="solutions-popup-header">
+          <h3 class="solutions-popup-title">{{ block.settings.label }}</h3>
+          <button class="solutions-popup-close" data-popup-close="{{ block.id }}" aria-label="Close popup">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="solutions-popup-body">
+          <div class="solutions-popup-image-wrapper">
+            {% if block.settings.popup_image != blank %}
+              <img src="{{ block.settings.popup_image | image_url: width: 1920 }}" alt="{{ block.settings.label }}" class="solutions-popup-main-image" loading="lazy">
+            {% else %}
+              {{ 'lifestyle-2' | placeholder_svg_tag: 'solutions-popup-main-image' }}
+            {% endif %}
+
+            {% comment %} Overlay images for each product hotspot {% endcomment %}
+            {% for j in (1..10) %}
+              {% assign overlay_key = 'hotspot_' | append: j | append: '_overlay' %}
+              {% assign overlay_image = block.settings[overlay_key] %}
+              {% if overlay_image != blank %}
+                <img src="{{ overlay_image | image_url: width: 1920 }}" alt="Product overlay" class="solutions-popup-overlay-image" data-product-overlay="{{ block.id }}-hotspot-{{ j }}" loading="lazy">
+              {% endif %}
+            {% endfor %}
+            
+            {% for j in (1..10) %}
+              {% assign x_key = 'hotspot_' | append: j | append: '_x' %}
+              {% assign y_key = 'hotspot_' | append: j | append: '_y' %}
+              {% assign tooltip_key = 'hotspot_' | append: j | append: '_tooltip_position' %}
+              {% assign product_list_key = 'hotspot_' | append: j | append: '_products' %}
+              {% assign pos_x = block.settings[x_key] %}
+              {% assign pos_y = block.settings[y_key] %}
+              {% assign tooltip_position = block.settings[tooltip_key] %}
+              {% assign product_list = block.settings[product_list_key] %}
+              
+              {% if product_list != blank and product_list.size > 0 %}
+                <div class="solutions-product-hotspot" 
+                     style="top: {{ pos_y }}%; left: {{ pos_x }}%;" 
+                     data-product-hotspot="{{ block.id }}-hotspot-{{ j }}" 
+                     data-tooltip-position="{{ tooltip_position }}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                    <path fill="none" stroke-linecap="square" stroke-width="1.5" d="M13.969 8H2.03M8 13.968V2.031"></path>
+                  </svg>
+                  
+                  <div class="solutions-product-tooltip">
+                    <div class="solutions-product-list-slider" data-product-list-slider="{{ block.id }}-hotspot-{{ j }}">
+                      <div class="solutions-product-list-track" data-product-list-track>
+                        {% for product in product_list limit: 10 %}
+                          <div class="solutions-product-list-slide{% if forloop.first %} active{% endif %}" data-product-list-index="{{ forloop.index0 }}">
+                            <div class="solutions-product-image-wrap">
+                              <div class="solutions-product-slider" data-product-slider="{{ block.id }}-hotspot-{{ j }}-product-{{ forloop.index }}">
+                                {% for img in product.images limit: 5 %}
+                                  <div class="solutions-product-slide{% if forloop.first %} active{% endif %}" data-slide-index="{{ forloop.index0 }}">
+                                    <img src="{{ img | image_url: width: 400 }}" alt="{{ product.title }}" class="solutions-product-image" loading="lazy">
+                                  </div>
+                                {% else %}
+                                  {% if product.featured_image != blank %}
+                                    <div class="solutions-product-slide active" data-slide-index="0">
+                                      <img src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title }}" class="solutions-product-image" loading="lazy">
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+                              </div>
+                              {% if product.images.size > 1 %}
+                                <button class="solutions-product-slider-nav solutions-product-slider-prev" data-slider-prev="{{ block.id }}-hotspot-{{ j }}-product-{{ forloop.index }}" aria-label="Previous image">
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                                    <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6"/>
+                                  </svg>
+                                </button>
+                                <button class="solutions-product-slider-nav solutions-product-slider-next" data-slider-next="{{ block.id }}-hotspot-{{ j }}-product-{{ forloop.index }}" aria-label="Next image">
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                                    <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/>
+                                  </svg>
+                                </button>
+                              {% endif %}
+                              <div class="solutions-quick-view-btn" style="pointer-events:auto;">
+                                {% render 'btn-quick-view', class: 'hdt-pr_btn', product: product, section_id: section.id, disable_sr_only: true %}
+                              </div>
+                            </div>
+                            <a href="{{ product.url }}" class="solutions-product-info">
+                              <p class="solutions-product-code">{{ product.title | truncate: 25, '' }}</p>
+                              {% comment %} <p class="solutions-product-name">{{ product.product_type | default: 'Product' }}</p> {% endcomment %}
+                              <p class="solutions-product-price">{{ product.price | money }}</p>
+                            </a>
+                          </div>
+                        {% endfor %}
+                      </div>
+                      
+                      {% if product_list.size > 1 %}
+                        <button class="solutions-product-list-nav solutions-product-list-prev" data-list-prev="{{ block.id }}-hotspot-{{ j }}" aria-label="Previous product">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                            <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6"/>
+                          </svg>
+                        </button>
+                        <button class="solutions-product-list-nav solutions-product-list-next" data-list-next="{{ block.id }}-hotspot-{{ j }}" aria-label="Next product">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                            <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/>
+                          </svg>
+                        </button>
+                        
+                        <div class="solutions-product-list-counter">
+                          {% for product in product_list limit: 10 %}
+                            <button class="solutions-product-list-dot{% if forloop.first %} active{% endif %}" 
+                                    data-list-dot="{{ block.id }}-hotspot-{{ j }}" 
+                                    data-dot-index="{{ forloop.index0 }}" 
+                                    aria-label="Go to product {{ forloop.index }}"></button>
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+  
+  <div class="solutions-quickview-modal" data-quickview-modal>
+    <div class="solutions-quickview-content">
+      <button class="solutions-quickview-close" data-quickview-close aria-label="Close quick view">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="solutions-quickview-images">
+        <div class="solutions-quickview-main-image">
+          <img src="" alt="" data-quickview-main-img>
+        </div>
+        <div class="solutions-quickview-thumbnails" data-quickview-thumbs></div>
+      </div>
+      <div class="solutions-quickview-info">
+        <h2 class="solutions-quickview-title" data-quickview-title></h2>
+        <p class="solutions-quickview-type" data-quickview-type></p>
+        <p class="solutions-quickview-price" data-quickview-price></p>
+        <div class="solutions-quickview-desc" data-quickview-desc></div>
+        <a href="" class="solutions-quickview-btn" data-quickview-link>View Product</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const section = document.querySelector('[data-section-id="{{ section.id }}"]');
+  if (!section) return;
+
+  const slides = section.querySelectorAll('.solutions-slide');
+  const slideContents = section.querySelectorAll('.solutions-slide-content');
+  const slideCtas = section.querySelectorAll('[data-slide-cta]');
+  const dots = section.querySelectorAll('.solutions-nav-dot');
+  const prevBtn = section.querySelector('.solutions-nav-prev');
+  const nextBtn = section.querySelector('.solutions-nav-next');
+  const counterCurrent = section.querySelector('.solutions-slide-counter .current');
+  let currentSlide = 1;
+  let autoplayInterval = null;
+  const autoplay = {{ section.settings.autoplay | json }};
+  const autoplaySpeed = {{ section.settings.autoplay_speed | default: 5000 }};
+  const totalSlides = slides.length;
+
+  function goToSlide(slideNum) {
+    slides.forEach(slide => slide.classList.remove('active'));
+    slideContents.forEach(content => content.classList.remove('active'));
+    slideCtas.forEach(cta => {
+      cta.style.display = 'none';
+      cta.classList.remove('active');
+    });
+
+    const targetSlide = section.querySelector('[data-slide="' + slideNum + '"]');
+    if (targetSlide) {
+      targetSlide.classList.add('active');
+      currentSlide = slideNum;
+    }
+
+    const targetContent = section.querySelector('[data-slide-content="' + slideNum + '"]');
+    if (targetContent) targetContent.classList.add('active');
+
+    const targetCta = section.querySelector('[data-slide-cta="' + slideNum + '"]');
+    if (targetCta) {
+      targetCta.style.display = 'flex';
+      targetCta.classList.add('active');
+    }
+
+    dots.forEach(dot => {
+      dot.classList.remove('active');
+      if (parseInt(dot.dataset.slideDot) === slideNum) dot.classList.add('active');
+    });
+
+    if (counterCurrent) counterCurrent.textContent = slideNum;
+  }
+
+  function nextSlide() {
+    let next = currentSlide + 1;
+    if (next > totalSlides) next = 1;
+    goToSlide(next);
+  }
+
+  function prevSlide() {
+    let prev = currentSlide - 1;
+    if (prev < 1) prev = totalSlides;
+    goToSlide(prev);
+  }
+
+  if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); resetAutoplay(); });
+  if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); resetAutoplay(); });
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      goToSlide(parseInt(dot.dataset.slideDot));
+      resetAutoplay();
+    });
+  });
+
+  function startAutoplay() {
+    if (autoplay && totalSlides > 1) {
+      autoplayInterval = setInterval(nextSlide, autoplaySpeed);
+    }
+  }
+
+  function resetAutoplay() {
+    if (autoplayInterval) {
+      clearInterval(autoplayInterval);
+      startAutoplay();
+    }
+  }
+
+  startAutoplay();
+  
+
+  const slideshowWrapper = section.querySelector('.solutions-slideshow-wrapper');
+  if (slideshowWrapper && autoplay) {
+    slideshowWrapper.addEventListener('mouseenter', () => { if (autoplayInterval) clearInterval(autoplayInterval); });
+    slideshowWrapper.addEventListener('mouseleave', () => { startAutoplay(); });
+  }
+
+  const hotspots = section.querySelectorAll('.solutions-hotspot');
+  hotspots.forEach(hotspot => {
+    const hotspotId = hotspot.dataset.hotspotId;
+    const overlayImage = section.querySelector('[data-hotspot-overlay="' + hotspotId + '"]');
+
+    hotspot.addEventListener('mouseenter', () => { if (overlayImage) overlayImage.classList.add('active'); });
+    hotspot.addEventListener('mouseleave', () => { if (overlayImage) overlayImage.classList.remove('active'); });
+
+    hotspot.addEventListener('click', () => {
+      const popup = document.querySelector('[data-popup="' + hotspotId + '"]');
+      const overlay = document.querySelector('[data-popup-overlay="' + hotspotId + '"]');
+      if (popup && overlay) {
+        popup.classList.add('active');
+        overlay.classList.add('active');
+        document.body.classList.add('solutions-popup-open');
+      }
+    });
+  });
+
+  const closeButtons = document.querySelectorAll('[data-popup-close]');
+  closeButtons.forEach(button => {
+    button.addEventListener('click', () => closePopup(button.dataset.popupClose));
+  });
+
+  const overlays = document.querySelectorAll('.solutions-popup-overlay');
+  overlays.forEach(overlay => {
+    overlay.addEventListener('click', () => closePopup(overlay.dataset.popupOverlay));
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const activePopup = document.querySelector('.solutions-popup.active');
+      if (activePopup) closePopup(activePopup.dataset.popup);
+      
+      const quickviewModal = document.querySelector('.solutions-quickview-modal.active');
+      if (quickviewModal) quickviewModal.classList.remove('active');
+    }
+  });
+
+  function closePopup(popupId) {
+    const popup = document.querySelector('[data-popup="' + popupId + '"]');
+    const overlay = document.querySelector('[data-popup-overlay="' + popupId + '"]');
+    if (popup) popup.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+    document.body.classList.remove('solutions-popup-open');
+  }
+
+  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+  const productHotspots = document.querySelectorAll('.solutions-product-hotspot');
+  
+  /* Product hotspot overlay image hover handlers */
+  productHotspots.forEach(hotspot => {
+    const productId = hotspot.dataset.productHotspot;
+    const overlayImage = document.querySelector('[data-product-overlay="' + productId + '"]');
+    hotspot.addEventListener('mouseenter', () => { if (overlayImage) overlayImage.classList.add('active'); });
+    hotspot.addEventListener('mouseleave', () => { if (overlayImage) overlayImage.classList.remove('active'); });
+  });
+
+  /* Touch device tooltip toggle */
+  productHotspots.forEach(hotspot => {
+    hotspot.addEventListener('click', (e) => {
+      if (isTouchDevice) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        productHotspots.forEach(otherHotspot => {
+          if (otherHotspot !== hotspot) {
+            otherHotspot.classList.remove('tooltip-active');
+          }
+        });
+        
+        hotspot.classList.toggle('tooltip-active');
+      }
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (isTouchDevice) {
+      const isClickInsideHotspot = e.target.closest('.solutions-product-hotspot');
+      const isClickInsideTooltip = e.target.closest('.solutions-product-tooltip');
+      
+      if (!isClickInsideHotspot && !isClickInsideTooltip) {
+        productHotspots.forEach(hotspot => {
+          hotspot.classList.remove('tooltip-active');
+        });
+      }
+    }
+  });
+
+  document.querySelectorAll('[data-list-prev]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const sliderId = btn.dataset.listPrev;
+      changeProductListSlide(sliderId, -1);
+    });
+  });
+
+  document.querySelectorAll('[data-list-next]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const sliderId = btn.dataset.listNext;
+      changeProductListSlide(sliderId, 1);
+    });
+  });
+
+  document.querySelectorAll('[data-list-dot]').forEach(dot => {
+    dot.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const sliderId = dot.dataset.listDot;
+      const index = parseInt(dot.dataset.dotIndex);
+      goToProductListSlide(sliderId, index);
+    });
+  });
+
+  function changeProductListSlide(sliderId, direction) {
+    const slider = document.querySelector('[data-product-list-slider="' + sliderId + '"]');
+    if (!slider) return;
+    
+    const track = slider.querySelector('[data-product-list-track]');
+    const slidesList = slider.querySelectorAll('.solutions-product-list-slide');
+    let activeIndex = 0;
+    
+    slidesList.forEach((s, i) => { 
+      if (s.classList.contains('active')) activeIndex = i; 
+    });
+    
+    let newIndex = activeIndex + direction;
+    if (newIndex < 0) newIndex = slidesList.length - 1;
+    if (newIndex >= slidesList.length) newIndex = 0;
+    
+    goToProductListSlide(sliderId, newIndex);
+  }
+
+  function goToProductListSlide(sliderId, index) {
+    const slider = document.querySelector('[data-product-list-slider="' + sliderId + '"]');
+    if (!slider) return;
+    
+    const track = slider.querySelector('[data-product-list-track]');
+    const slidesList = slider.querySelectorAll('.solutions-product-list-slide');
+    const dotsList = slider.querySelectorAll('[data-list-dot="' + sliderId + '"]');
+    
+    slidesList.forEach((s, i) => {
+      s.classList.remove('active');
+      if (i === index) s.classList.add('active');
+    });
+    
+    dotsList.forEach((d, i) => {
+      d.classList.remove('active');
+      if (i === index) d.classList.add('active');
+    });
+    
+    if (track) {
+      track.style.transform = 'translateX(-' + (index * 100) + '%)';
+    }
+  }
+
+  document.querySelectorAll('[data-slider-prev]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const sliderId = btn.dataset.sliderPrev;
+      const slider = document.querySelector('[data-product-slider="' + sliderId + '"]');
+      if (slider) changeProductSlide(slider, sliderId, -1);
+    });
+  });
+
+  document.querySelectorAll('[data-slider-next]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const sliderId = btn.dataset.sliderNext;
+      const slider = document.querySelector('[data-product-slider="' + sliderId + '"]');
+      if (slider) changeProductSlide(slider, sliderId, 1);
+    });
+  });
+
+  function changeProductSlide(slider, sliderId, direction) {
+    const slidesList = slider.querySelectorAll('.solutions-product-slide');
+    let activeIndex = 0;
+    slidesList.forEach((s, i) => { if (s.classList.contains('active')) activeIndex = i; });
+    let newIndex = activeIndex + direction;
+    if (newIndex < 0) newIndex = slidesList.length - 1;
+    if (newIndex >= slidesList.length) newIndex = 0;
+    goToProductSlide(slider, sliderId, newIndex);
+  }
+
+  function goToProductSlide(slider, sliderId, index) {
+    const slidesList = slider.querySelectorAll('.solutions-product-slide');
+    const dotsList = document.querySelectorAll('[data-slider-dot="' + sliderId + '"]');
+    slidesList.forEach((s, i) => {
+      s.classList.remove('active');
+      if (i === index) s.classList.add('active');
+    });
+    dotsList.forEach((d, i) => {
+      d.classList.remove('active');
+      if (i === index) d.classList.add('active');
+    });
+  }
+
+  const quickviewModal = document.querySelector('[data-quickview-modal]');
+  const quickviewClose = document.querySelector('[data-quickview-close]');
+  const quickviewMainImg = document.querySelector('[data-quickview-main-img]');
+  const quickviewThumbs = document.querySelector('[data-quickview-thumbs]');
+  const quickviewTitle = document.querySelector('[data-quickview-title]');
+  const quickviewType = document.querySelector('[data-quickview-type]');
+  const quickviewPrice = document.querySelector('[data-quickview-price]');
+  const quickviewDesc = document.querySelector('[data-quickview-desc]');
+  const quickviewLink = document.querySelector('[data-quickview-link]');
+
+  document.querySelectorAll('[data-quick-vieww]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const productId = btn.dataset.productId;
+      const handle = btn.dataset.productHandle;
+      if (!productId && !handle) return;
+
+      // Method 1: Page pe already existing quickview button dhundo aur click karo
+      const selectors = [
+        `.btn-quickview[data-id="${productId}"]`,
+        `.quickview-btn[data-id="${productId}"]`,
+        `[data-quickview][data-id="${productId}"]`,
+        `.btn-quickview[data-handle="${handle}"]`,
+        `[data-product-handle="${handle}"] .btn-quickview`,
+        `[data-product-handle="${handle}"] .quickview-btn`,
+      ];
+      for (const sel of selectors) {
+        const existing = document.querySelector(sel);
+        if (existing) {
+          existing.click();
+          return;
+        }
+      }
+
+      // Method 2: Custom events try karo (kuch themes sun'te hain)
+      const eventDetail = { id: productId, handle: handle, productId: productId };
+      const eventNames = ['quickview:open', 'theme:quickview:open', 'product:quickview', 'hdt:quickview:open'];
+      eventNames.forEach(name => {
+        document.dispatchEvent(new CustomEvent(name, { detail: eventDetail, bubbles: true }));
+        window.dispatchEvent(new CustomEvent(name, { detail: eventDetail, bubbles: true }));
+      });
+
+      // Method 3: Temp button inject karo multiple class combinations ke saath
+      const classNames = ['btn-quickview', 'quickview-btn', 'hdt-quick-view'];
+      classNames.forEach(cls => {
+        const tempBtn = document.createElement('button');
+        tempBtn.type = 'button';
+        tempBtn.className = cls;
+        tempBtn.setAttribute('data-id', productId);
+        tempBtn.setAttribute('data-handle', handle);
+        tempBtn.setAttribute('data-product-id', productId);
+        tempBtn.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none;';
+        document.body.appendChild(tempBtn);
+        tempBtn.click();
+        setTimeout(() => tempBtn.remove(), 500);
+      });
+    });
+  });
+
+  if (quickviewClose) {
+    quickviewClose.addEventListener('click', () => {
+      quickviewModal.classList.remove('active');
+    });
+  }
+
+  quickviewModal.addEventListener('click', (e) => {
+    if (e.target === quickviewModal) {
+      quickviewModal.classList.remove('active');
+    }
+  });
+
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const imageWrapper = section.querySelector('.solutions-image-wrapper');
+  if (imageWrapper) {
+    imageWrapper.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    imageWrapper.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) nextSlide(); else prevSlide();
+        resetAutoplay();
+      }
+    }, { passive: true });
+  }
+});
+</script>
+
+{% schema %}
+{
+  "name": "Solutions Hotspot Slider",
+  "tag": "section",
+  "class": "solutions-hotspot-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Main Title",
+      "default": "See our Solutions"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#f0c800"
+    },
+    {
+      "type": "header",
+      "content": "Slideshow Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable Autoplay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Autoplay Speed (ms)",
+      "min": 2000,
+      "max": 9000,
+      "step": 500,
+      "default": 5000,
+      "unit": "ms"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_navigation",
+      "label": "Show Navigation",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show Arrow Buttons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "Show Dot Indicators",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_counter",
+      "label": "Show Slide Counter",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Slide 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_1_image",
+      "label": "Slide 1 Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_1_description_title",
+      "label": "Slide 1 Description Title",
+      "default": "House and Garden"
+    },
+    {
+      "type": "richtext",
+      "id": "slide_1_description",
+      "label": "Slide 1 Description",
+      "default": "<p>With over 20 years in the hardware industry, we know what it takes to create products that last.</p>"
+    },
+    {
+      "type": "url",
+      "id": "slide_1_cta_url",
+      "label": "Slide 1 Button URL"
+    },
+    {
+      "type": "text",
+      "id": "slide_1_cta_text",
+      "label": "Slide 1 Button Text",
+      "default": "HOUSE AND GARDEN"
+    },
+    {
+      "type": "header",
+      "content": "Slide 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_2_image",
+      "label": "Slide 2 Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_2_description_title",
+      "label": "Slide 2 Description Title",
+      "default": "Interior Design"
+    },
+    {
+      "type": "richtext",
+      "id": "slide_2_description",
+      "label": "Slide 2 Description",
+      "default": "<p>Discover our range of interior solutions designed for modern living spaces.</p>"
+    },
+    {
+      "type": "url",
+      "id": "slide_2_cta_url",
+      "label": "Slide 2 Button URL"
+    },
+    {
+      "type": "text",
+      "id": "slide_2_cta_text",
+      "label": "Slide 2 Button Text",
+      "default": "INTERIOR DESIGN"
+    },
+    {
+      "type": "header",
+      "content": "Slide 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_3_image",
+      "label": "Slide 3 Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_3_description_title",
+      "label": "Slide 3 Description Title",
+      "default": "Commercial Spaces"
+    },
+    {
+      "type": "richtext",
+      "id": "slide_3_description",
+      "label": "Slide 3 Description",
+      "default": "<p>Professional solutions for commercial and industrial applications.</p>"
+    },
+    {
+      "type": "url",
+      "id": "slide_3_cta_url",
+      "label": "Slide 3 Button URL"
+    },
+    {
+      "type": "text",
+      "id": "slide_3_cta_text",
+      "label": "Slide 3 Button Text",
+      "default": "COMMERCIAL SPACES"
+    },
+    {
+      "type": "header",
+      "content": "Slide 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_4_image",
+      "label": "Slide 4 Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_4_description_title",
+      "label": "Slide 4 Description Title",
+      "default": "Outdoor Living"
+    },
+    {
+      "type": "richtext",
+      "id": "slide_4_description",
+      "label": "Slide 4 Description",
+      "default": "<p>Transform your outdoor spaces with our durable outdoor products.</p>"
+    },
+    {
+      "type": "url",
+      "id": "slide_4_cta_url",
+      "label": "Slide 4 Button URL"
+    },
+    {
+      "type": "text",
+      "id": "slide_4_cta_text",
+      "label": "Slide 4 Button Text",
+      "default": "OUTDOOR LIVING"
+    },
+    {
+      "type": "header",
+      "content": "Slide 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_5_image",
+      "label": "Slide 5 Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_5_description_title",
+      "label": "Slide 5 Description Title",
+      "default": "Workshop"
+    },
+    {
+      "type": "richtext",
+      "id": "slide_5_description",
+      "label": "Slide 5 Description",
+      "default": "<p>Everything you need to set up the perfect workshop environment.</p>"
+    },
+    {
+      "type": "url",
+      "id": "slide_5_cta_url",
+      "label": "Slide 5 Button URL"
+    },
+    {
+      "type": "text",
+      "id": "slide_5_cta_text",
+      "label": "Slide 5 Button Text",
+      "default": "WORKSHOP"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "name": "Hotspot",
+      "settings": [
+        {
+          "type": "select",
+          "id": "assigned_slide",
+          "label": "Show on Slide",
+          "options": [
+            { "value": "1", "label": "Slide 1" },
+            { "value": "2", "label": "Slide 2" },
+            { "value": "3", "label": "Slide 3" },
+            { "value": "4", "label": "Slide 4" },
+            { "value": "5", "label": "Slide 5" }
+          ],
+          "default": "1"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "TERRACE"
+        },
+        {
+          "type": "range",
+          "id": "position_x",
+          "label": "Horizontal Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "position_y",
+          "label": "Vertical Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 50
+        },
+        {
+          "type": "select",
+          "id": "label_position",
+          "label": "Label Position",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left", "label": "Left" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "right"
+        },
+        {
+          "type": "image_picker",
+          "id": "overlay_image",
+          "label": "Hover Overlay Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "popup_image",
+          "label": "Popup Main Image"
+        },
+        {
+          "type": "header",
+          "content": "Product Hotspot 1"
+        },
+        {
+          "type": "product_list",
+          "id": "hotspot_1_products",
+          "label": "Products for Hotspot 1",
+          "limit": 10
+        },
+        {
+          "type": "range",
+          "id": "hotspot_1_x",
+          "label": "Hotspot 1 X Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 30
+        },
+        {
+          "type": "range",
+          "id": "hotspot_1_y",
+          "label": "Hotspot 1 Y Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 30
+        },
+        {
+          "type": "select",
+          "id": "hotspot_1_tooltip_position",
+          "label": "Hotspot 1 Tooltip Position",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left", "label": "Left" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "image_picker",
+          "id": "hotspot_1_overlay",
+          "label": "Hotspot 1 Overlay Image"
+        },
+        {
+          "type": "header",
+          "content": "Product Hotspot 2"
+        },
+        {
+          "type": "product_list",
+          "id": "hotspot_2_products",
+          "label": "Products for Hotspot 2",
+          "limit": 10
+        },
+        {
+          "type": "range",
+          "id": "hotspot_2_x",
+          "label": "Hotspot 2 X Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "hotspot_2_y",
+          "label": "Hotspot 2 Y Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 20
+        },
+        {
+          "type": "select",
+          "id": "hotspot_2_tooltip_position",
+          "label": "Hotspot 2 Tooltip Position",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left", "label": "Left" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "image_picker",
+          "id": "hotspot_2_overlay",
+          "label": "Hotspot 2 Overlay Image"
+        },
+        {
+          "type": "header",
+          "content": "Product Hotspot 3"
+        },
+        {
+          "type": "product_list",
+          "id": "hotspot_3_products",
+          "label": "Products for Hotspot 3",
+          "limit": 10
+        },
+        {
+          "type": "range",
+          "id": "hotspot_3_x",
+          "label": "Hotspot 3 X Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 70
+        },
+        {
+          "type": "range",
+          "id": "hotspot_3_y",
+          "label": "Hotspot 3 Y Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 60
+        },
+        {
+          "type": "select",
+          "id": "hotspot_3_tooltip_position",
+          "label": "Hotspot 3 Tooltip Position",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left", "label": "Left" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "image_picker",
+          "id": "hotspot_3_overlay",
+          "label": "Hotspot 3 Overlay Image"
+        },
+        {
+          "type": "header",
+          "content": "Product Hotspot 4"
+        },
+        {
+          "type": "product_list",
+          "id": "hotspot_4_products",
+          "label": "Products for Hotspot 4",
+          "limit": 10
+        },
+        {
+          "type": "range",
+          "id": "hotspot_4_x",
+          "label": "Hotspot 4 X Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 40
+        },
+        {
+          "type": "range",
+          "id": "hotspot_4_y",
+          "label": "Hotspot 4 Y Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 80
+        },
+        {
+          "type": "select",
+          "id": "hotspot_4_tooltip_position",
+          "label": "Hotspot 4 Tooltip Position",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left", "label": "Left" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "image_picker",
+          "id": "hotspot_4_overlay",
+          "label": "Hotspot 4 Overlay Image"
+        },
+        {
+          "type": "header",
+          "content": "Product Hotspot 5"
+        },
+        {
+          "type": "product_list",
+          "id": "hotspot_5_products",
+          "label": "Products for Hotspot 5",
+          "limit": 10
+        },
+        {
+          "type": "range",
+          "id": "hotspot_5_x",
+          "label": "Hotspot 5 X Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 60
+        },
+        {
+          "type": "range",
+          "id": "hotspot_5_y",
+          "label": "Hotspot 5 Y Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 40
+        },
+        {
+          "type": "select",
+          "id": "hotspot_5_tooltip_position",
+          "label": "Hotspot 5 Tooltip Position",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left", "label": "Left" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "image_picker",
+          "id": "hotspot_5_overlay",
+          "label": "Hotspot 5 Overlay Image"
+        },
+        {
+          "type": "header",
+          "content": "Product Hotspot 6"
+        },
+        {
+          "type": "product_list",
+          "id": "hotspot_6_products",
+          "label": "Products for Hotspot 6",
+          "limit": 10
+        },
+        {
+          "type": "range",
+          "id": "hotspot_6_x",
+          "label": "Hotspot 6 X Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 25
+        },
+        {
+          "type": "range",
+          "id": "hotspot_6_y",
+          "label": "Hotspot 6 Y Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 55
+        },
+        {
+          "type": "select",
+          "id": "hotspot_6_tooltip_position",
+          "label": "Hotspot 6 Tooltip Position",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left", "label": "Left" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "image_picker",
+          "id": "hotspot_6_overlay",
+          "label": "Hotspot 6 Overlay Image"
+        },
+        {
+          "type": "header",
+          "content": "Product Hotspot 7"
+        },
+        {
+          "type": "product_list",
+          "id": "hotspot_7_products",
+          "label": "Products for Hotspot 7",
+          "limit": 10
+        },
+        {
+          "type": "range",
+          "id": "hotspot_7_x",
+          "label": "Hotspot 7 X Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 80
+        },
+        {
+          "type": "range",
+          "id": "hotspot_7_y",
+          "label": "Hotspot 7 Y Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 35
+        },
+        {
+          "type": "select",
+          "id": "hotspot_7_tooltip_position",
+          "label": "Hotspot 7 Tooltip Position",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left", "label": "Left" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "image_picker",
+          "id": "hotspot_7_overlay",
+          "label": "Hotspot 7 Overlay Image"
+        },
+        {
+          "type": "header",
+          "content": "Product Hotspot 8"
+        },
+        {
+          "type": "product_list",
+          "id": "hotspot_8_products",
+          "label": "Products for Hotspot 8",
+          "limit": 10
+        },
+        {
+          "type": "range",
+          "id": "hotspot_8_x",
+          "label": "Hotspot 8 X Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 45
+        },
+        {
+          "type": "range",
+          "id": "hotspot_8_y",
+          "label": "Hotspot 8 Y Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 65
+        },
+        {
+          "type": "select",
+          "id": "hotspot_8_tooltip_position",
+          "label": "Hotspot 8 Tooltip Position",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left", "label": "Left" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "image_picker",
+          "id": "hotspot_8_overlay",
+          "label": "Hotspot 8 Overlay Image"
+        },
+        {
+          "type": "header",
+          "content": "Product Hotspot 9"
+        },
+        {
+          "type": "product_list",
+          "id": "hotspot_9_products",
+          "label": "Products for Hotspot 9",
+          "limit": 10
+        },
+        {
+          "type": "range",
+          "id": "hotspot_9_x",
+          "label": "Hotspot 9 X Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 15
+        },
+        {
+          "type": "range",
+          "id": "hotspot_9_y",
+          "label": "Hotspot 9 Y Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 45
+        },
+        {
+          "type": "select",
+          "id": "hotspot_9_tooltip_position",
+          "label": "Hotspot 9 Tooltip Position",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left", "label": "Left" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "image_picker",
+          "id": "hotspot_9_overlay",
+          "label": "Hotspot 9 Overlay Image"
+        },
+        {
+          "type": "header",
+          "content": "Product Hotspot 10"
+        },
+        {
+          "type": "product_list",
+          "id": "hotspot_10_products",
+          "label": "Products for Hotspot 10",
+          "limit": 10
+        },
+        {
+          "type": "range",
+          "id": "hotspot_10_x",
+          "label": "Hotspot 10 X Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 85
+        },
+        {
+          "type": "range",
+          "id": "hotspot_10_y",
+          "label": "Hotspot 10 Y Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 70
+        },
+        {
+          "type": "select",
+          "id": "hotspot_10_tooltip_position",
+          "label": "Hotspot 10 Tooltip Position",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left", "label": "Left" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "image_picker",
+          "id": "hotspot_10_overlay",
+          "label": "Hotspot 10 Overlay Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Solutions Hotspot Slider",
+      "blocks": [
+        {
+          "type": "hotspot",
+          "settings": {
+            "assigned_slide": "1",
+            "label": "TERRACE",
+            "position_x": 40,
+            "position_y": 30
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,438 @@
+{%- comment -%}
+  Renders a color list with color picker popup
+  - Shows ONLY COLOR swatches (never variant images)
+  - Changes product image when color is selected
+  - Supports hover and click
+  - Works with AJAX loaded content
+  - Reads colors from shop.metafields.ecomrise.colors
+{%- endcomment -%}
+
+{%- if settings.color_mode == 'color' -%}
+  {%- liquid
+    assign color_white = 'products.theme_settings.color_white' | t | downcase | strip
+    assign index = 0
+    if settings.color_maximum == 0
+      assign color_maximum = 2
+    else
+      assign color_maximum = settings.color_maximum
+    endif
+    
+    assign colors = shop.metafields.ecomrise.colors.value
+    assign color_values = shop.metaobjects.theme_swatch.values | first
+    assign colors_2 = color_values.colors.value
+    
+    assign selected_variant = product.selected_variant | default: product.variants.first
+    assign selected_color = selected_variant[color_option_index]
+    if enable_color_limit == 'fixed'
+      assign color_maximum = 6
+      assign enable_color_limit = false
+    else
+      assign enable_color_limit = settings.enable_color_limit
+    endif
+    assign unique_id = section_id | append: '-' | append: product.id
+  -%}
+
+  <style>
+    .hdt-color-picker-wrapper {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0px;
+      background: #fff;
+      border-radius: 8px;
+    }
+    .hdt-color-picker-trigger {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .hdt-color-picker-trigger svg {
+      width: 36px;
+      height: 36px;
+    }
+    .hdt-color-picker-colors {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 4px;
+      gap: 6px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      max-height: 0;
+      overflow: hidden;
+    }
+    .hdt-color-picker-wrapper:hover .hdt-color-picker-colors,
+    .hdt-color-picker-wrapper.is-open .hdt-color-picker-colors {
+      opacity: 1;
+      visibility: visible;
+      max-height: 500px;
+    }
+    .hdt-color-picker-colors .hdt-color-swatch {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      padding: 4px;
+      cursor: pointer;
+      border: 2px solid #fff;
+      transition: all 0.2s ease;
+      overflow: hidden;
+      position: relative;
+      display: block;
+    }
+    .hdt-color-picker-colors .hdt-color-swatch.is-selected {
+      border-color: #000;
+    }
+    .hdt-color-picker-colors .hdt-color-swatch:first-child {
+      margin-top: 4px;
+    }
+    .hdt-color-picker-colors .hdt-color-swatch:last-child {
+      margin-bottom: 4px;
+    }
+    
+    .hdt-color-picker-colors .hdt-color-swatch input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      z-index: 2;
+      top: 0;
+      left: 0;
+      margin: 0;
+    }
+    .hdt-color-picker-colors .hdt-color-swatch .color-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      /* Support for CSS variables from metafield */
+      background-color: var(--hdt-bg-color, transparent);
+      background-image: var(--hdt-bg-image, none);
+      background-size: cover;
+      background-position: center;
+    }
+    .hdt-color-picker-colors .hdt-color-swatch.is-white {
+      border-color: #ddd;
+    }
+    .hdt-color-picker-colors .hdt-color-swatch[unavailable] {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .hdt-color-picker-colors .hdt-color-swatch.is-selected .color-bg {
+      margin: 3px;
+      width: 80%;
+      height: 77%;
+    }
+    @media (max-width:450px){
+      .hdt-color-picker-trigger {
+        width: 30px;
+        height: 30px;
+      }
+      .hdt-color-picker-colors .hdt-color-swatch {
+        width: 25px;
+        height: 25px;
+      }
+      .hdt-color-picker-colors .hdt-color-swatch.is-selected .color-bg {
+        margin: 2px;
+        width: 81%;
+        height: 81%;
+      }
+      .hdt-color-picker-colors {padding: 0 2px;}
+    }
+  </style>
+
+  <div class="hdt-color-picker-wrapper js-color-picker" data-product-id="{{ product.id }}"> 
+    <button type="button" class="hdt-color-picker-trigger js-color-trigger" aria-label="Select color">
+      <img src="//gezuimpex.com/cdn/shop/files/color_1.png?v=1768488955" style="width:36px; height:auto;">
+      
+    </button>
+
+    <div class="hdt-color-picker-colors js-color-list">
+      {%- for color in color_variants -%}
+        {%- liquid
+          unless color_variants_avai contains color or settings.color_type == 'all'
+            continue
+          endunless
+          assign color_downcase = color | downcase | strip
+          assign color_handle = color | handle
+          
+          assign color_obj = colors[color_handle] | default: colors_2[color_handle]
+          
+          assign variants_has_color = product.variants | where: color_option_index, color
+          assign variant_first_color = variants_has_color | first
+          if variant_first_color.featured_image
+            assign variant_first_image = variant_first_color
+          else
+            assign variant_first_image = variants_has_color | where: 'featured_image' | first
+          endif
+          
+          assign is_selected = false
+          if selected_color == color
+            assign is_selected = true
+          endif
+          
+          assign variant_image_url = ''
+          if variant_first_image.featured_image
+            assign variant_image_url = variant_first_image.featured_image | image_url: width: 1000
+          endif
+        -%}
+
+        {%- capture swatch_style -%}
+          {%- if color.swatch.color != blank -%}
+            background-color:{{ color.swatch.color }};
+          {%- elsif color_obj.colorsCSS != blank -%}
+            {%- comment -%} Convert CSS variable format to direct background style {%- endcomment -%}
+            {%- assign css_value = color_obj.colorsCSS -%}
+            {%- if css_value contains '--hdt-bg-color:' -%}
+              {%- assign color_value = css_value | remove: '--hdt-bg-color:' | remove: ';' | strip -%}
+              {%- if color_value contains 'conic-gradient' or color_value contains 'linear-gradient' or color_value contains 'radial-gradient' -%}
+                background:{{ color_value }};
+              {%- else -%}
+                background-color:{{ color_value }};
+              {%- endif -%}
+            {%- elsif css_value contains '--hdt-bg-image:' -%}
+              {%- assign image_value = css_value | remove: '--hdt-bg-image:' | remove: ';' | strip -%}
+              background-image:{{ image_value }};background-size:cover;background-position:center;
+            {%- else -%}
+              {%- comment -%} Direct CSS value {%- endcomment -%}
+              {{ css_value }}
+            {%- endif -%}
+          {%- elsif color_obj != blank -%}
+            {%- comment -%} If color_obj is just a color string {%- endcomment -%}
+            background-color:{{ color_obj }};
+          {%- else -%}
+            {%- comment -%} Fallback colors {%- endcomment -%}
+            {%- case color_downcase -%}
+              {%- when 'black' -%}
+                background-color:#000000;
+              {%- when 'white' -%}
+                background-color:#ffffff;
+              {%- when 'red' -%}
+                background-color:#ff0000;
+              {%- when 'blue' -%}
+                background-color:#0047AB;
+              {%- when 'green' -%}
+                background-color:#228b22;
+              {%- when 'yellow' -%}
+                background-color:#ffff00;
+              {%- when 'orange' -%}
+                background-color:#ffa500;
+              {%- when 'purple' -%}
+                background-color:#800080;
+              {%- when 'pink' -%}
+                background-color:#ffc0cb;
+              {%- when 'brown' -%}
+                background-color:#8b4513;
+              {%- when 'gray', 'grey' -%}
+                background-color:#808080;
+              {%- when 'silver' -%}
+                background:linear-gradient(145deg,#e8e8e8,#c0c0c0,#a8a8a8);
+              {%- when 'gold' -%}
+                background:linear-gradient(145deg,#f5d67b,#d4af37,#b8960f);
+              {%- when 'galvanised', 'galvanized' -%}
+                background:linear-gradient(145deg,#d8d8d8,#a8a8a8,#888888);
+              {%- when 'electroplated' -%}
+                background:linear-gradient(145deg,#e8e8e8,#c0c0c0,#a0a0a0);
+              {%- when 'zinc' -%}
+                background-color:#bac4cb;
+              {%- when 'chrome' -%}
+                background:linear-gradient(145deg,#fff,#dbe4eb,#b8c8d0);
+              {%- when 'nickel' -%}
+                background:linear-gradient(145deg,#9a9c9a,#727472,#555755);
+              {%- when 'brass' -%}
+                background:linear-gradient(145deg,#d4c36a,#b5a642,#8a7d30);
+              {%- when 'copper' -%}
+                background:linear-gradient(145deg,#da8a47,#b87333,#8a5525);
+              {%- when 'bronze' -%}
+                background:linear-gradient(145deg,#e09545,#cd7f32,#9a5f25);
+              {%- when 'stainless', 'stainless steel', 'stainless-steel' -%}
+                background:linear-gradient(145deg,#f0f0f0,#c9c9c9,#a8a8a8);
+              {%- when 'gunmetal' -%}
+                background-color:#2a3439;
+              {%- when 'titanium' -%}
+                background:linear-gradient(145deg,#a8a7a2,#878681,#656560);
+              {%- when 'platinum' -%}
+                background:linear-gradient(145deg,#fff,#e5e4e2,#c5c4c2);
+              {%- when 'steel' -%}
+                background:linear-gradient(145deg,#9BA4A9,#71797E,#515960);
+              {%- when 'aluminum', 'aluminium' -%}
+                background:linear-gradient(145deg,#f0f0f0,#d0d0d0,#b0b0b0);
+              {%- when 'iron' -%}
+                background-color:#48494b;
+              {%- when 'pewter' -%}
+                background-color:#8e8e8e;
+              {%- when 'graphite' -%}
+                background-color:#383838;
+              {%- when 'charcoal' -%}
+                background-color:#36454f;
+              {%- when 'navy' -%}
+                background-color:#000080;
+              {%- when 'beige' -%}
+                background-color:#f5f5dc;
+              {%- when 'cream' -%}
+                background-color:#fffdd0;
+              {%- when 'ivory' -%}
+                background-color:#fffff0;
+              {%- when 'tan' -%}
+                background-color:#d2b48c;
+              {%- when 'natural' -%}
+                background-color:#f5f5dc;
+              {%- when 'raw' -%}
+                background-color:#a8a8a8;
+              {%- when 'clear', 'transparent' -%}
+                background:repeating-conic-gradient(#ccc 0% 25%,#fff 0% 50%) 50%/8px 8px;
+              {%- when 'multicolor', 'multi' -%}
+                background:conic-gradient(red,orange,yellow,green,blue,violet,red);
+              {%- else -%}
+                background-color:#cccccc;
+            {%- endcase -%}
+          {%- endif -%}
+        {%- endcapture -%}
+
+        <label class="hdt-color-swatch{% if is_selected %} is-selected{% endif %}{% if color_downcase == 'white' %} is-white{% endif %}" title="{{ color | escape }}" data-color="{{ color_downcase }}">
+          <input 
+            type="radio" 
+            name="color-{{ product.id }}" 
+            value="{{ color | escape }}"
+            {% if is_selected %}checked{% endif %}
+            data-variant-id="{{ variant_first_color.id }}"
+            data-image="{{ variant_image_url }}"
+          >
+          <span class="color-bg" style="{{ swatch_style | strip_newlines }}"></span>
+        </label>
+
+      {%- endfor -%}
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      /* Image change function */
+      function changeProductImage(card, imageUrl) {
+        if (!card || !imageUrl) return;
+        
+        /* Find the main image */
+        var img = card.querySelector('img.hdt-card-product__media--main') ||
+                  card.querySelector('.hdt-card-product__media-wrapp img:first-child') ||
+                  card.querySelector('.hdt-card-product__media img:first-child');
+        
+        if (img) {
+          img.style.opacity = '0.5';
+          img.style.transition = 'opacity 0.3s';
+          
+          var newImg = new Image();
+          newImg.onload = function() {
+            img.src = imageUrl;
+            img.srcset = '';
+            img.removeAttribute('srcset');
+            img.style.opacity = '1';
+          };
+          newImg.onerror = function() {
+            img.style.opacity = '1';
+          };
+          newImg.src = imageUrl;
+          
+          /* Fallback */
+          setTimeout(function() {
+            img.style.opacity = '1';
+          }, 1000);
+        }
+      }
+      
+      /* Initialize color picker */
+      function init(picker) {
+        if (picker.dataset.init === 'true') return;  // ← ye wapas daalo
+        picker.dataset.init = 'true';
+        
+        var trigger = picker.querySelector('.js-color-trigger');
+        var list = picker.querySelector('.js-color-list');
+        var card = picker.closest('hdt-card-product') || picker.closest('.hdt-card-product');
+        
+        /* Toggle on click */
+        if (trigger) {
+          trigger.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            picker.classList.toggle('is-open');
+          };
+        }
+        
+        /* Color selection */
+        /* Color selection */
+        if (list) {
+          list.querySelectorAll('.hdt-color-swatch').forEach(function(swatch) {
+            swatch.addEventListener('click', function(e) {
+              e.stopPropagation();
+              var inp = swatch.querySelector('input[type="radio"]');
+              if (!inp) return;
+              inp.checked = true;
+              list.querySelectorAll('.hdt-color-swatch').forEach(function(s) {
+                s.classList.remove('is-selected');
+              });
+              swatch.classList.add('is-selected');
+              var imgUrl = inp.getAttribute('data-image');
+              if (imgUrl && card) changeProductImage(card, imgUrl);
+            });
+          });
+        }
+      }
+      
+      /* Initialize all */
+      function initAll() {
+        document.querySelectorAll('.js-color-picker').forEach(init);
+      }
+      
+      /* Close on outside click */
+      document.onclick = function(e) {
+        if (!e.target.closest('.js-color-picker')) {
+          document.querySelectorAll('.js-color-picker.is-open').forEach(function(p) {
+            p.classList.remove('is-open');
+          });
+        }
+      };
+      
+      /* Init */
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAll);
+      } else {
+        initAll();
+      }
+      
+      /* Watch for new content */
+      new MutationObserver(function(m) {
+        m.forEach(function(mut) {
+          mut.addedNodes.forEach(function(n) {
+            if (n.nodeType === 1) {
+              if (n.classList && n.classList.contains('js-color-picker')) init(n);
+              if (n.querySelectorAll) n.querySelectorAll('.js-color-picker').forEach(init);
+            }
+          });
+        });
+      }).observe(document.body, {childList: true, subtree: true});
+      
+      /* Shopify events */
+      document.addEventListener('shopify:section:load', initAll);
+      
+      window.initColorPickers = initAll;
+    })();
+  </script>
+
+{%- else -%}
+  <div class="hdt-color-list">
+    <p class="hdt-color-count">{{- 'products.product.colors_count' | t: count: color_count -}}</p>
+  </div>
+{%- endif -%}

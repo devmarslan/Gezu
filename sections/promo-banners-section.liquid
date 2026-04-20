@@ -1,0 +1,2005 @@
+{% comment %}
+  Promotional Banners Section
+  - 3 Block Types: Hero Banner, Members Card, Promo Card
+  - Fully Responsive with Stacked Layout for Mobile
+  - Complete Schema Settings
+{% endcomment %}
+<style>
+  /* ==========================================================================
+   Promotional Banners Section - CSS
+   ========================================================================== */
+
+/* Base Styles */
+.promo-banners-section {
+  width: 100%;
+}
+
+.promo-banners-wrapper {
+  position: relative;
+  
+}
+
+/* Desktop Grid Layout */
+.promo-banners-grid.desktop-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background-color: var(--section-bg-color);
+  border-radius: 20px;
+}
+
+.promo-top-row {
+  display: grid;
+  grid-template-columns: 1fr 440px;
+  gap: 20px;
+}
+
+.promo-bottom-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* Mobile Layout Hidden on Desktop */
+.promo-banners-mobile-layout {
+  display: none;
+}
+
+/* ==========================================================================
+   Hero Banner Styles
+   ========================================================================== */
+.hero-banner {
+  background-color: #f8f9fa;
+  border-radius: 16px;
+  overflow: hidden;
+  min-height: 320px;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-banner .hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px;
+  height: 100%;
+  min-height: 320px;
+}
+
+.hero-banner .hero-text {
+  max-width: 380px;
+  z-index: 2;
+}
+
+.hero-banner .upto-text {
+  display: block;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0;
+}
+
+.hero-banner .discount-wrap {
+  display: flex;
+  align-items: end;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.hero-banner .discount-number {
+  font-weight: 500;
+  line-height: 0.85;
+}
+
+.hero-banner .discount-percent-wrap {
+  display: flex;
+  flex-direction: column;
+  margin-left: 4px;
+  line-height: 1;
+}
+
+.hero-banner .discount-percent {
+  font-weight: 700;
+  line-height: 1;
+}
+
+.hero-banner .discount-off {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #000;
+}
+
+.hero-banner .hero-title {
+  font-weight: 700;
+  margin: 15px 0 8px;
+  line-height: 1.3;
+}
+
+.hero-banner .hero-description {
+  margin: 0 0 24px;
+  line-height: 1.6;
+  max-width: 320px;
+}
+
+.hero-banner .hero-btn {
+  display: inline-block;
+  padding: 14px 26px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.hero-banner .hero-image {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.hero-banner .hero-image img {
+  max-width: 100%;
+  max-height: 280px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* ==========================================================================
+   Members Card Styles
+   ========================================================================== */
+.members-card {
+  background: linear-gradient(135deg, #1a3a8f 0%, #2563eb 50%, #3b82f6 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  min-height: 320px;
+}
+
+.members-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  border-radius: 0 0 0 100%;
+}
+
+.members-card::after {
+  content: '';
+  position: absolute;
+  bottom: 20%;
+  right: 10%;
+  width: 80px;
+  height: 80px;
+  background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='40' cy='40' r='4' fill='rgba(255,255,255,0.2)'/%3E%3Ccircle cx='60' cy='20' r='2' fill='rgba(255,255,255,0.15)'/%3E%3Ccircle cx='20' cy='60' r='3' fill='rgba(255,255,255,0.1)'/%3E%3C/svg%3E") no-repeat;
+}
+
+.members-card .members-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 30px;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.members-card .members-text {
+  flex: 1;
+}
+
+.members-card .members-title {
+  font-weight: 700;
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+
+.members-card .members-subtitle {
+  margin: 0 0 20px;
+  line-height: 1.5;
+  max-width: 96%;
+}
+
+.members-card .benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+}
+
+.members-card .benefit-item {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.members-card .benefit-item::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 600;
+}
+
+.members-card .members-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  font-weight: 400;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.members-card .members-decoration {
+  position: absolute;
+  right: 15px;
+  bottom: 50%;
+  transform: translateY(50%);
+  opacity: 0.9;
+}
+
+.members-card .members-decoration img {
+  max-width: 100px;
+  height: auto;
+}
+
+/* ==========================================================================
+   Promo Card Styles
+   ========================================================================== */
+.promo-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  min-height: 180px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.promo-card .promo-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px;
+  height: 100%;
+  min-height: 180px;
+  width: 100%;
+}
+
+.promo-card .promo-card-text {
+  flex: 1;
+  z-index: 2;
+}
+
+.promo-card .upto-text {
+  display: block;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0;
+  line-height: 1;
+}
+
+.promo-card .promo-discount-wrap {
+  display: flex;
+  align-items: end;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.promo-card .promo-discount-number {
+  font-weight: 500;
+  line-height: 0.9;
+}
+
+.promo-card .promo-discount-percent-wrap {
+  display: flex;
+  flex-direction: column;
+  margin-left: 2px;
+  line-height: 1;
+}
+
+.promo-card .promo-discount-percent {
+  font-weight: 700;
+  line-height: 1;
+}
+
+.promo-card .promo-discount-off {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #000;
+}
+
+#shopify-section-{{ section.id }} .promo-card .promo-title {
+  font-weight: 700;
+  margin: 6px 0 8px;
+  line-height: 1.3;
+}
+
+.promo-card .promo-description {
+  margin: 0 0 12px;
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+.promo-card .promo-link {
+  display: inline-block;
+  font-weight: 500;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+  position: relative;
+  color: #000 !important;
+}
+
+.promo-card .promo-link:hover::after {
+  width: 100%;
+}
+
+.promo-card .promo-card-image {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.promo-card .promo-card-image img {
+  max-width: 210px;
+  {% comment %} max-height: 140px; {% endcomment %}
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* ==========================================================================
+   Mobile Layout Styles
+   ========================================================================== */
+.promo-mobile-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 15px;
+  {% comment %} background-color: var(--section-bg-color); {% endcomment %}
+  border-radius: 16px;
+}
+
+.promo-mobile-full {
+  width: 100%;
+}
+
+.promo-mobile-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+/* Mobile Hero Banner */
+.promo-mobile-grid .hero-banner {
+  min-height: auto;
+}
+
+.promo-mobile-grid .hero-banner .hero-content {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+  min-height: auto;
+  position: relative;
+}
+
+.promo-mobile-grid .hero-banner .hero-text {
+  max-width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.promo-mobile-grid .hero-banner .hero-image {
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+  opacity: 1;
+}
+
+.promo-mobile-grid .hero-banner .hero-image img {
+  max-width: 150px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.promo-mobile-grid .hero-banner .hero-btn {
+  padding: 12px 24px;
+}
+
+/* Mobile Members Card */
+.promo-mobile-grid .members-card {
+  min-height: auto;
+}
+
+.promo-mobile-grid .members-card .members-content {
+  padding: 20px;
+}
+
+.promo-mobile-grid .members-card .members-decoration {
+  right: 10px;
+  bottom: 50%;
+}
+
+.promo-mobile-grid .members-card .members-decoration img {
+  max-width: 70px;
+}
+
+/* Mobile Promo Cards - Side by Side */
+.promo-mobile-row .promo-card {
+  min-height: 200px;
+  border-radius: 12px;
+}
+
+.promo-mobile-row .promo-card .promo-card-content {
+  flex-direction: row;
+  align-items: center;
+  padding: 15px;
+  min-height: 200px;
+  position: relative;
+}
+
+.promo-mobile-row .promo-card .promo-card-text {
+  width: 100%;
+}
+
+.promo-mobile-row .promo-card .promo-card-image {
+  position: relative;
+  right: 20px;
+  bottom: 10px;
+}
+
+{% comment %} .promo-mobile-row .promo-card .promo-card-image img {
+  max-width: 70px;
+  max-height: 70px;
+} {% endcomment %}
+
+/* Mobile Typography Adjustments */
+.promo-mobile-grid .hero-banner .discount-off,
+.promo-mobile-row .promo-card .promo-discount-off {
+  font-size: 21px;
+}
+
+.promo-mobile-row .promo-card .promo-description {
+  font-size: 11px;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   Responsive Styles
+   ========================================================================== */
+
+/* Large Desktop */
+@media (min-width: 1200px) {
+  {% comment %} .promo-top-row {
+    grid-template-columns: 1fr 440px;
+  } {% endcomment %}
+  
+  .hero-banner .hero-content {
+    padding: 30px;
+  }
+  
+  .hero-banner .hero-image img {
+    max-height: 300px;
+  }
+}
+
+/* Medium Desktop / Laptop */
+@media (max-width: 1199px) and (min-width: 992px) {
+  .promo-top-row {
+    grid-template-columns: 1fr 380px;
+  }
+  
+  .hero-banner .hero-content {
+    padding: 36px;
+  }
+}
+
+/* Tablet Landscape */
+@media (max-width: 991px) and (min-width: 769px) {
+  .promo-top-row {
+    grid-template-columns: 1fr 320px;
+  }
+  
+  .hero-banner .hero-content {
+    padding: 30px;
+  }
+  
+  .hero-banner .hero-image img {
+    max-height: 220px;
+  }
+  
+  .members-card .members-content {
+    padding: 30px;
+  }
+  
+  .members-card .members-decoration img {
+    max-width: 80px;
+  }
+  
+  .promo-card .promo-card-content {
+    padding: 24px;
+  }
+  
+  {% comment %} .promo-card .promo-card-image img {
+    max-width: 140px;
+    max-height: 110px;
+  } {% endcomment %}
+}
+@media (max-width: 1160px) and (min-width: 1000px) {
+ .hero-banner .hero-image img{
+   max-width: 200px;
+ }
+}
+@media (max-width: 999px) and (min-width: 600px) {
+  .promo-mobile-grid .hero-banner .hero-image img {
+    max-width: 240px;
+  }
+}
+
+
+@media (max-width: 999px) {
+  .promo-banners-grid.desktop-grid {
+    display: none;
+  }
+  
+  .promo-banners-mobile-layout {
+    display: block;
+  }
+  .promo-mobile-row {
+   grid-template-columns: 1fr;
+  }
+  .promo-mobile-grid {
+    padding: 0px;
+  }
+  
+}
+/* Tablet Portrait and Below - Switch to Mobile Layout */
+@media (max-width: 768px) {
+  .promo-card .promo-card-image img {
+    max-width: 150px;
+  }
+  {% comment %} .promo-banners-grid.desktop-grid {
+    display: none;
+  }
+  
+  .promo-banners-mobile-layout {
+    display: block;
+  } {% endcomment %}
+  .promo-mobile-row {
+   grid-template-columns: 1fr;
+  }
+  
+  
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .promo-mobile-grid {
+    padding: 0px;
+    gap: 10px;
+  }
+  
+  .promo-mobile-row {
+    gap: 15px;
+  }
+  
+  .promo-mobile-grid .hero-banner .hero-content {
+    padding: 25px;
+    flex-direction: row;
+    align-items: center;
+    min-height: 180px;
+  }
+  .promo-mobile-grid .hero-banner .hero-image {
+    position: relative;
+    right: unset;
+    bottom: unset;
+    opacity: 1;
+  }
+  
+  .promo-mobile-grid .members-card .members-content {
+    padding: 25px;
+  }
+  
+  .promo-mobile-row .promo-card .promo-card-content {
+    padding: 25px;
+    min-height: 180px;
+  }
+  {% if block.settings.prod_img_first %}
+  .promo-mobile-row .promo-card .promo-card-content {
+    flex-direction: row-reverse;
+  }
+  {% endif %}
+  
+  
+  {% comment %} .promo-mobile-row .promo-card .promo-card-image img {
+    max-width: 55px;
+    max-height: 55px;
+  } {% endcomment %}
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .hero-btn,
+  .members-btn,
+  .promo-link {
+    transition: none;
+  }
+  
+  .promo-link::after {
+    transition: none;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .promo-banners-mobile-layout {
+    display: none;
+  }
+  
+  .promo-banners-grid.desktop-grid {
+    display: block;
+  }
+  
+  .promo-top-row,
+  .promo-bottom-row {
+    display: block;
+  }
+  
+  .hero-banner,
+  .members-card,
+  .promo-card {
+    page-break-inside: avoid;
+    margin-bottom: 20px;
+  }
+}
+
+/* High Contrast Mode */
+@media (forced-colors: active) {
+  .hero-btn,
+  .members-btn {
+    border: 2px solid currentColor;
+  }
+  
+  .promo-link {
+    text-decoration: underline;
+  }
+}
+
+</style>
+<style>
+  #promo-banners-{{ section.id }} {
+    --section-bg-color: {{ section.settings.section_bg_color }};
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --section-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --section-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+  }
+
+  #promo-banners-{{ section.id }} .promo-banners-wrapper {
+    padding-top: var(--section-padding-top);
+    padding-bottom: var(--section-padding-bottom);
+    {% if section.settings.section_bg_image != blank %}
+    background-image: url('{{ section.settings.section_bg_image | image_url: width: 1920 }}');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    {% endif %}
+  }
+
+  @media (max-width: 768px) {
+    #promo-banners-{{ section.id }} .promo-banners-wrapper {
+      padding-top: var(--section-padding-top-mobile);
+      padding-bottom: var(--section-padding-bottom-mobile);
+    }
+  }
+
+  {% for block in section.blocks %}
+    {% case block.type %}
+      {% when 'hero_banner' %}
+        #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} {
+          background-color: {{ block.settings.card_bg_color }};
+          {% if block.settings.card_bg_image != blank %}
+          background-image: url('{{ block.settings.card_bg_image | image_url: width: 1200 }}');
+          {% endif %}
+        }
+        #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} .upto-text {
+          font-size: {{ block.settings.upto_font_size }}px;
+          color: {{ block.settings.upto_color }};
+        }
+        #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} .discount-number {
+          font-size: {{ block.settings.discount_font_size }}px;
+          color: {{ block.settings.discount_color }};
+        }
+        #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} .discount-percent {
+          font-size: {{ block.settings.discount_percent_size }}px;
+          color: {{ block.settings.discount_color }};
+        }
+        #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} .hero-title {
+          font-size: {{ block.settings.title_font_size }}px;
+          color: {{ block.settings.title_color }};
+        }
+        #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} .hero-description { 
+          font-size: {{ block.settings.description_font_size }}px;
+          color: {{ block.settings.description_color }};
+        }
+        #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} .hero-btn {
+          background-color: {{ block.settings.button_bg_color }};
+          color: {{ block.settings.button_text_color }};
+          font-size: {{ block.settings.button_font_size }}px;
+          border-radius: {{ block.settings.button_border_radius }}px;
+        }
+        #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} .hero-btn:hover {
+          background-color: {{ block.settings.button_hover_bg }};
+          color: {{ block.settings.button_hover_text }};
+        }
+        @media (max-width: 999px) {
+          #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} {
+            background-color: {{ block.settings.card_bg_color_mbl }};
+            background-image: none;
+          }
+          #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} .upto-text {
+            font-size: {{ block.settings.upto_font_size_mobile }}px;
+          }
+          #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} .discount-number {
+            font-size: {{ block.settings.discount_font_size_mobile }}px;
+          }
+          #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} .discount-percent {
+            font-size: {{ block.settings.discount_percent_size_mobile }}px;
+          }
+          #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} .hero-title {
+            font-size: {{ block.settings.title_font_size_mobile }}px;
+          }
+          #promo-banners-{{ section.id }} .hero-banner-{{ block.id }} .hero-description {
+            font-size: {{ block.settings.description_font_size_mobile }}px;
+            margin: 0 0 15px;
+            line-height: 1.2;
+          }
+        }
+      {% when 'members_card' %}
+        #promo-banners-{{ section.id }} .members-card-{{ block.id }} {
+          background: {{ block.settings.card_bg_gradient }};
+          {% if block.settings.card_bg_image != blank %}
+          background-image: url('{{ block.settings.card_bg_image | image_url: width: 600 }}');
+          background-size: cover;
+          background-position: center;
+          {% endif %}
+        }
+        #promo-banners-{{ section.id }} .members-card-{{ block.id }} .members-title {
+          font-size: {{ block.settings.title_font_size }}px;
+          color: {{ block.settings.title_color }};
+        }
+        #promo-banners-{{ section.id }} .members-card-{{ block.id }} .members-subtitle {
+          font-size: {{ block.settings.subtitle_font_size }}px;
+          color: {{ block.settings.subtitle_color }};
+        }
+        #promo-banners-{{ section.id }} .members-card-{{ block.id }} .benefit-item {
+          font-size: {{ block.settings.benefits_font_size }}px;
+          color: {{ block.settings.benefits_color }};
+        }
+        #promo-banners-{{ section.id }} .members-card-{{ block.id }} .members-btn {
+          background-color: {{ block.settings.button_bg_color }};
+          color: {{ block.settings.button_text_color }};
+          font-size: {{ block.settings.button_font_size }}px;
+          border-radius: {{ block.settings.button_border_radius }}px;
+        }
+        #promo-banners-{{ section.id }} .members-card-{{ block.id }} .members-btn:hover {
+          background-color: {{ block.settings.button_hover_bg }};
+          color: {{ block.settings.button_hover_text }};
+        }
+        @media (max-width: 768px) {
+          #promo-banners-{{ section.id }} .members-card-{{ block.id }} .members-title {
+            font-size: {{ block.settings.title_font_size_mobile }}px;
+          }
+          #promo-banners-{{ section.id }} .members-card-{{ block.id }} .members-subtitle {
+            font-size: {{ block.settings.subtitle_font_size_mobile }}px;
+          }
+          #promo-banners-{{ section.id }} .members-card-{{ block.id }} .benefit-item {
+            font-size: {{ block.settings.benefits_font_size_mobile }}px;
+          }
+        }
+      {% when 'promo_card' %}
+        #promo-banners-{{ section.id }} .promo-card-{{ block.id }} {
+          background-color: {{ block.settings.card_bg_color }};
+          {% if block.settings.card_bg_image != blank %}
+          background-image: url('{{ block.settings.card_bg_image | image_url: width: 800 }}');
+          {% endif %}
+        }
+        #promo-banners-{{ section.id }} .promo-card-{{ block.id }} .upto-text {
+          font-size: {{ block.settings.upto_font_size }}px;
+          color: {{ block.settings.upto_color }};
+        }
+        #promo-banners-{{ section.id }} .promo-card-{{ block.id }} .promo-discount-number {
+          font-size: {{ block.settings.discount_font_size }}px;
+          color: {{ block.settings.discount_color }};
+        }
+        #promo-banners-{{ section.id }} .promo-card-{{ block.id }} .promo-discount-percent {
+          font-size: {{ block.settings.discount_percent_size }}px;
+          color: {{ block.settings.discount_color }};
+        }
+        #promo-banners-{{ section.id }} .promo-card-{{ block.id }} .promo-title {
+          font-size: {{ block.settings.title_font_size }}px;
+          color: {{ block.settings.title_color }};
+        }
+        #promo-banners-{{ section.id }} .promo-card-{{ block.id }} .promo-description {
+          font-size: {{ block.settings.description_font_size }}px;
+          color: {{ block.settings.description_color }};
+        }
+        #promo-banners-{{ section.id }} .promo-card-{{ block.id }} .promo-link {
+          font-size: {{ block.settings.link_font_size }}px;
+          color: {{ block.settings.link_color }};
+        }
+        #promo-banners-{{ section.id }} .promo-card-{{ block.id }} .promo-link:hover {
+          color: {{ block.settings.link_hover_color }};
+        }
+        @media (max-width: 768px) {
+          #promo-banners-{{ section.id }} .promo-card-{{ block.id }} {
+            background-color: {{ block.settings.card_bg_color_mbl }};
+            {% comment %} background-image: none; {% endcomment %}
+          }
+          #promo-banners-{{ section.id }} .promo-card-{{ block.id }} .upto-text {
+            font-size: {{ block.settings.upto_font_size_mobile }}px;
+          }
+          #promo-banners-{{ section.id }} .promo-card-{{ block.id }} .promo-discount-number {
+            font-size: {{ block.settings.discount_font_size_mobile }}px;
+          }
+          #promo-banners-{{ section.id }} .promo-card-{{ block.id }} .promo-discount-percent {
+            font-size: {{ block.settings.discount_percent_size_mobile }}px;
+          }
+          #promo-banners-{{ section.id }} .promo-card-{{ block.id }} .promo-title {
+            font-size: {{ block.settings.title_font_size_mobile }}px;
+          }
+          #promo-banners-{{ section.id }} .promo-card-{{ block.id }} .promo-description {
+            font-size: {{ block.settings.description_font_size_mobile }}px;
+          }
+          {% if block.settings.bgimg_contain %}
+          #promo-banners-{{ section.id }} .promo-card-{{ block.id }} {
+            background-size: contain;
+            background-position: right;
+          }
+          {% endif %}
+        }
+    {% endcase %}
+  {% endfor %}
+</style>
+
+<section id="promo-banners-{{ section.id }}" class="promo-banners-section">
+  <div class="promo-banners-wrapper">
+    <div class="hdt-container">
+      {% comment %} Desktop Layout {% endcomment %}
+      <div class="promo-banners-grid desktop-grid">
+        {% assign hero_block = null %}
+        {% assign members_block = null %}
+        {% assign promo_blocks = '' %}
+        
+        {% for block in section.blocks %}
+          {% if block.type == 'hero_banner' %}
+            {% assign hero_block = block %}
+          {% elsif block.type == 'members_card' %}
+            {% assign members_block = block %}
+          {% elsif block.type == 'promo_card' %}
+            {% if promo_blocks == '' %}
+              {% assign promo_blocks = block.id %}
+            {% else %}
+              {% assign promo_blocks = promo_blocks | append: ',' | append: block.id %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+        
+        {% comment %} Top Row {% endcomment %}
+        <div class="promo-top-row">
+          {% comment %} Hero Banner {% endcomment %}
+          {% if hero_block %}
+            <div class="hero-banner hero-banner-{{ hero_block.id }}" {{ hero_block.shopify_attributes }}>
+              <div class="hero-content">
+                <div class="hero-text">
+                  {% if hero_block.settings.upto_text != blank %}
+                    <span class="upto-text">{{ hero_block.settings.upto_text }}</span>
+                  {% endif %}
+                  <div class="discount-wrap">
+                    <span class="discount-number">{{ hero_block.settings.discount_number }}</span>
+                    <div class="discount-percent-wrap">
+                      <span class="discount-percent">%</span>
+                      <span class="discount-off">OFF</span>
+                    </div>
+                  </div>
+                  {% if hero_block.settings.title != blank %}
+                    <h2 class="hero-title">{{ hero_block.settings.title }}</h2>
+                  {% endif %}
+                  {% if hero_block.settings.description != blank %}
+                    <p class="hero-description">{{ hero_block.settings.description }}</p>
+                  {% endif %}
+                  {% if hero_block.settings.button_text != blank %}
+                    <a href="{{ hero_block.settings.button_link }}" class="hero-btn">
+                      {{ hero_block.settings.button_text }}
+                    </a>
+                  {% endif %}
+                </div>
+                {% if hero_block.settings.product_image != blank %}
+                  <div class="hero-image">
+                    <img src="{{ hero_block.settings.product_image | image_url: width: 600 }}" 
+                         alt="{{ hero_block.settings.title }}"
+                         loading="lazy"
+                         width="600"
+                         height="400">
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+          
+          {% comment %} Members Card {% endcomment %}
+          {% if members_block %}
+            <div class="members-card members-card-{{ members_block.id }}" {{ members_block.shopify_attributes }}>
+              <div class="members-content">
+                <div class="members-text">
+                  {% if members_block.settings.title != blank %}
+                    <h3 class="members-title">{{ members_block.settings.title }}</h3>
+                  {% endif %}
+                  {% if members_block.settings.subtitle != blank %}
+                    <p class="members-subtitle">{{ members_block.settings.subtitle }}</p>
+                  {% endif %}
+                  <ul class="benefits-list">
+                    {% if members_block.settings.benefit_1 != blank %}
+                      <li class="benefit-item">{{ members_block.settings.benefit_1 }}</li>
+                    {% endif %}
+                    {% if members_block.settings.benefit_2 != blank %}
+                      <li class="benefit-item">{{ members_block.settings.benefit_2 }}</li>
+                    {% endif %}
+                    {% if members_block.settings.benefit_3 != blank %}
+                      <li class="benefit-item">{{ members_block.settings.benefit_3 }}</li>
+                    {% endif %}
+                    {% if members_block.settings.benefit_4 != blank %}
+                      <li class="benefit-item">{{ members_block.settings.benefit_4 }}</li>
+                    {% endif %}
+                  </ul>
+                  {% if members_block.settings.button_text != blank %}
+                    <a href="{{ members_block.settings.button_link }}" class="members-btn">
+                      {{ members_block.settings.button_text }}
+                    </a>
+                  {% endif %}
+                </div>
+                {% if members_block.settings.decorative_image != blank %}
+                  <div class="members-decoration">
+                    <img src="{{ members_block.settings.decorative_image | image_url: width: 200 }}" 
+                         alt=""
+                         loading="lazy"
+                         width="200"
+                         height="200">
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+        
+        {% comment %} Bottom Row - Promo Cards {% endcomment %}
+        <div class="promo-bottom-row">
+          {% for block in section.blocks %}
+            {% if block.type == 'promo_card' %}
+              <div class="promo-card promo-card-{{ block.id }}" {{ block.shopify_attributes }}>
+                <div class="promo-card-content" style="">
+                  <div class="promo-card-text">
+                    {% if block.settings.upto_text != blank %}
+                      <span class="upto-text">{{ block.settings.upto_text }}</span>
+                    {% endif %}
+                    <div class="promo-discount-wrap">
+                      <span class="promo-discount-number">{{ block.settings.discount_number }}</span>
+                      <div class="promo-discount-percent-wrap">
+                        <span class="promo-discount-percent">%</span>
+                        <span class="promo-discount-off">OFF</span>
+                      </div>
+                    </div>
+                    {% if block.settings.title != blank %}
+                      <h4 class="promo-title">{{ block.settings.title }}</h4>
+                    {% endif %}
+                    {% if block.settings.description != blank %}
+                      <p class="promo-description">{{ block.settings.description }}</p>
+                    {% endif %}
+                    {% if block.settings.link_text != blank %}
+                      <a href="{{ block.settings.link_url }}" class="promo-link">
+                        {{ block.settings.link_text }}
+                      </a>
+                    {% endif %}
+                  </div>
+                  {% if block.settings.product_image != blank %}
+                    <div class="promo-card-image">
+                      <img src="{{ block.settings.product_image | image_url: width: 400 }}" 
+                           alt="{{ block.settings.title }}"
+                           loading="lazy"
+                           width="400"
+                           height="300">
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      
+      {% comment %} Mobile Layout - Stacked with Promo Cards Side by Side {% endcomment %}
+      <div class="promo-banners-mobile-layout">
+        <div class="promo-mobile-grid">
+          {% comment %} Hero Banner - Full Width {% endcomment %}
+          {% for block in section.blocks %}
+            {% if block.type == 'hero_banner' %}
+              <div class="promo-mobile-full">
+                <div class="hero-banner hero-banner-{{ block.id }}" {{ block.shopify_attributes }}>
+                  <div class="hero-content">
+                    <div class="hero-text">
+                      {% if block.settings.upto_text != blank %}
+                        <span class="upto-text">{{ block.settings.upto_text }}</span>
+                      {% endif %}
+                      <div class="discount-wrap">
+                        <span class="discount-number">{{ block.settings.discount_number }}</span>
+                        <div class="discount-percent-wrap">
+                          <span class="discount-percent">%</span>
+                          <span class="discount-off">OFF</span>
+                        </div>
+                      </div>
+                      {% if block.settings.title != blank %}
+                        <h2 class="hero-title">{{ block.settings.title }}</h2>
+                      {% endif %}
+                      {% if block.settings.description != blank %}
+                        <p class="hero-description">{{ block.settings.description }}</p>
+                      {% endif %}
+                      {% if block.settings.button_text != blank %}
+                        <a href="{{ block.settings.button_link }}" class="hero-btn">
+                          {{ block.settings.button_text }}
+                        </a>
+                      {% endif %}
+                    </div>
+                    {% if block.settings.product_image != blank %}
+                      <div class="hero-image">
+                        <img src="{{ block.settings.product_image | image_url: width: 300 }}" 
+                             alt="{{ block.settings.title }}"
+                             loading="lazy">
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+          
+          {% comment %} Members Card - Full Width {% endcomment %}
+          {% for block in section.blocks %}
+            {% if block.type == 'members_card' %}
+              <div class="promo-mobile-full">
+                <div class="members-card members-card-{{ block.id }}" {{ block.shopify_attributes }}>
+                  <div class="members-content">
+                    <div class="members-text">
+                      {% if block.settings.title != blank %}
+                        <h3 class="members-title">{{ block.settings.title }}</h3>
+                      {% endif %}
+                      {% if block.settings.subtitle != blank %}
+                        <p class="members-subtitle">{{ block.settings.subtitle }}</p>
+                      {% endif %}
+                      <ul class="benefits-list">
+                        {% if block.settings.benefit_1 != blank %}
+                          <li class="benefit-item">{{ block.settings.benefit_1 }}</li>
+                        {% endif %}
+                        {% if block.settings.benefit_2 != blank %}
+                          <li class="benefit-item">{{ block.settings.benefit_2 }}</li>
+                        {% endif %}
+                        {% if block.settings.benefit_3 != blank %}
+                          <li class="benefit-item">{{ block.settings.benefit_3 }}</li>
+                        {% endif %}
+                        {% if block.settings.benefit_4 != blank %}
+                          <li class="benefit-item">{{ block.settings.benefit_4 }}</li>
+                        {% endif %}
+                      </ul>
+                      {% if block.settings.button_text != blank %}
+                        <a href="{{ block.settings.button_link }}" class="members-btn">
+                          {{ block.settings.button_text }}
+                        </a>
+                      {% endif %}
+                    </div>
+                    {% if block.settings.decorative_image != blank %}
+                      <div class="members-decoration">
+                        <img src="{{ block.settings.decorative_image | image_url: width: 150 }}" 
+                             alt=""
+                             loading="lazy">
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+          
+          {% comment %} Promo Cards - Side by Side (2 columns) {% endcomment %}
+          <div class="promo-mobile-row">
+            {% for block in section.blocks %}
+              {% if block.type == 'promo_card' %}
+                <div class="promo-card promo-card-{{ block.id }}" {{ block.shopify_attributes }}>
+                  <div class="promo-card-content">
+                    <div class="promo-card-text">
+                      {% if block.settings.upto_text != blank %}
+                        <span class="upto-text">{{ block.settings.upto_text }}</span>
+                      {% endif %}
+                      <div class="promo-discount-wrap">
+                        <span class="promo-discount-number">{{ block.settings.discount_number }}</span>
+                        <div class="promo-discount-percent-wrap">
+                          <span class="promo-discount-percent">%</span>
+                          <span class="promo-discount-off">OFF</span>
+                        </div>
+                      </div>
+                      {% if block.settings.title != blank %}
+                        <h4 class="promo-title">{{ block.settings.title }}</h4>
+                      {% endif %}
+                      {% if block.settings.description != blank %}
+                        <p class="promo-description">{{ block.settings.description }}</p>
+                      {% endif %}
+                      {% if block.settings.link_text != blank %}
+                        <a href="{{ block.settings.link_url }}" class="promo-link">
+                          {{ block.settings.link_text }}
+                        </a>
+                      {% endif %}
+                    </div>
+                    {% if block.settings.product_image != blank %}
+                      <div class="promo-card-image">
+                        <img src="{{ block.settings.product_image | image_url: width: 200 }}" 
+                             alt="{{ block.settings.title }}"
+                             loading="lazy">
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+                <style>
+              {% if block.settings.reverse %}
+                .promo-mobile-row .promo-card-{{ block.id }} .promo-card-content {
+                  flex-direction: row-reverse !important;
+                }
+              {% endif %}
+              </style>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Promotional Banners",
+  "tag": "section",
+  "class": "promo-banners-section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Section Background Color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "image_picker",
+      "id": "section_bg_image",
+      "label": "Section Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Mobile Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "hero_banner",
+      "name": "Hero Banner",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Card Background"
+        },
+        {
+          "type": "color",
+          "id": "card_bg_color",
+          "label": "Background Color",
+          "default": "#fff"
+        },
+        {
+          "type": "image_picker",
+          "id": "card_bg_image",
+          "label": "Background Image"
+        },
+        {
+          "type": "color",
+          "id": "card_bg_color_mbl",
+          "label": "Mobile Background Color",
+          "default": "#f8f9fa"
+        },
+        {
+          "type": "header",
+          "content": "UPTO Text"
+        },
+        {
+          "type": "text",
+          "id": "upto_text",
+          "label": "UPTO Text",
+          "default": "UPTO"
+        },
+        {
+          "type": "range",
+          "id": "upto_font_size",
+          "min": 10,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Font Size (Desktop)",
+          "default": 14
+        },
+        {
+          "type": "range",
+          "id": "upto_font_size_mobile",
+          "min": 8,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "label": "Font Size (Mobile)",
+          "default": 12
+        },
+        {
+          "type": "color",
+          "id": "upto_color",
+          "label": "UPTO Color",
+          "default": "#0052CC"
+        },
+        {
+          "type": "header",
+          "content": "Discount Settings"
+        },
+        {
+          "type": "text",
+          "id": "discount_number",
+          "label": "Discount Number",
+          "default": "20"
+        },
+        {
+          "type": "range",
+          "id": "discount_font_size",
+          "min": 40,
+          "max": 120,
+          "step": 1,
+          "unit": "px",
+          "label": "Discount Font Size (Desktop)",
+          "default": 80
+        },
+        {
+          "type": "range",
+          "id": "discount_font_size_mobile",
+          "min": 30,
+          "max": 80,
+          "step": 2,
+          "unit": "px",
+          "label": "Discount Font Size (Mobile)",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "discount_percent_size",
+          "min": 14,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Percent Symbol Size (Desktop)",
+          "default": 24
+        },
+        {
+          "type": "range",
+          "id": "discount_percent_size_mobile",
+          "min": 12,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Percent Symbol Size (Mobile)",
+          "default": 18
+        },
+        {
+          "type": "color",
+          "id": "discount_color",
+          "label": "Discount Color",
+          "default": "#000000"
+        },
+        {
+          "type": "header",
+          "content": "Title Settings"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "On essential hardware"
+        },
+        {
+          "type": "range",
+          "id": "title_font_size",
+          "min": 16,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Title Font Size (Desktop)",
+          "default": 24
+        },
+        {
+          "type": "range",
+          "id": "title_font_size_mobile",
+          "min": 14,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Title Font Size (Mobile)",
+          "default": 18
+        },
+        {
+          "type": "color",
+          "id": "title_color",
+          "label": "Title Color",
+          "default": "#0052CC"
+        },
+        {
+          "type": "header",
+          "content": "Description Settings"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Lorem ipsum dolor sit amet consectetur. Est iaculis et ultricies nunc tincidunt."
+        },
+        {
+          "type": "range",
+          "id": "description_font_size",
+          "min": 12,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "Description Font Size (Desktop)",
+          "default": 14
+        },
+        {
+          "type": "range",
+          "id": "description_font_size_mobile",
+          "min": 10,
+          "max": 18,
+          "step": 1,
+          "unit": "px",
+          "label": "Description Font Size (Mobile)",
+          "default": 13
+        },
+        {
+          "type": "color",
+          "id": "description_color",
+          "label": "Description Color",
+          "default": "#666666"
+        },
+        {
+          "type": "header",
+          "content": "Button Settings"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button Text",
+          "default": "Shop the deal"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button Link"
+        },
+        {
+          "type": "range",
+          "id": "button_font_size",
+          "min": 12,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "Button Font Size",
+          "default": 14
+        },
+        {
+          "type": "range",
+          "id": "button_border_radius",
+          "min": 0,
+          "max": 50,
+          "step": 1,
+          "unit": "px",
+          "label": "Button Border Radius",
+          "default": 30
+        },
+        {
+          "type": "color",
+          "id": "button_bg_color",
+          "label": "Button Background",
+          "default": "#0052CC"
+        },
+        {
+          "type": "color",
+          "id": "button_text_color",
+          "label": "Button Text Color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "color",
+          "id": "button_hover_bg",
+          "label": "Button Hover Background",
+          "default": "#003d99"
+        },
+        {
+          "type": "color",
+          "id": "button_hover_text",
+          "label": "Button Hover Text",
+          "default": "#ffffff"
+        },
+        {
+          "type": "header",
+          "content": "Product Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "product_image",
+          "label": "Product Image"
+        }
+      ]
+    },
+    {
+      "type": "members_card",
+      "name": "Members Card",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Card Background"
+        },
+        {
+          "type": "text",
+          "id": "card_bg_gradient",
+          "label": "Background Gradient",
+          "default": "linear-gradient(135deg, #1a3a8f 0%, #2563eb 50%, #3b82f6 100%)"
+        },
+        {
+          "type": "image_picker",
+          "id": "card_bg_image",
+          "label": "Background Image (overrides gradient)"
+        },
+        {
+          "type": "header",
+          "content": "Title Settings"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Members get more"
+        },
+        {
+          "type": "range",
+          "id": "title_font_size",
+          "min": 18,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Title Font Size (Desktop)",
+          "default": 26
+        },
+        {
+          "type": "range",
+          "id": "title_font_size_mobile",
+          "min": 16,
+          "max": 32,
+          "step": 1,
+          "unit": "px",
+          "label": "Title Font Size (Mobile)",
+          "default": 20
+        },
+        {
+          "type": "color",
+          "id": "title_color",
+          "label": "Title Color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "header",
+          "content": "Subtitle Settings"
+        },
+        {
+          "type": "textarea",
+          "id": "subtitle",
+          "label": "Subtitle",
+          "default": "Join for free and unlock exclusive benefits designed to help you build smarter and save more."
+        },
+        {
+          "type": "range",
+          "id": "subtitle_font_size",
+          "min": 12,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "Subtitle Font Size (Desktop)",
+          "default": 14
+        },
+        {
+          "type": "range",
+          "id": "subtitle_font_size_mobile",
+          "min": 10,
+          "max": 18,
+          "step": 1,
+          "unit": "px",
+          "label": "Subtitle Font Size (Mobile)",
+          "default": 12
+        },
+        {
+          "type": "color",
+          "id": "subtitle_color",
+          "label": "Subtitle Color",
+          "default": "#e0e7ff"
+        },
+        {
+          "type": "header",
+          "content": "Benefits List"
+        },
+        {
+          "type": "text",
+          "id": "benefit_1",
+          "label": "Benefit 1",
+          "default": "Exclusive Discounts"
+        },
+        {
+          "type": "text",
+          "id": "benefit_2",
+          "label": "Benefit 2",
+          "default": "Early Access to seasonal sales"
+        },
+        {
+          "type": "text",
+          "id": "benefit_3",
+          "label": "Benefit 3",
+          "default": "Expert Tips & Guides"
+        },
+        {
+          "type": "text",
+          "id": "benefit_4",
+          "label": "Benefit 4",
+          "default": "Member-Only Bundles"
+        },
+        {
+          "type": "range",
+          "id": "benefits_font_size",
+          "min": 12,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "Benefits Font Size (Desktop)",
+          "default": 14
+        },
+        {
+          "type": "range",
+          "id": "benefits_font_size_mobile",
+          "min": 10,
+          "max": 18,
+          "step": 1,
+          "unit": "px",
+          "label": "Benefits Font Size (Mobile)",
+          "default": 12
+        },
+        {
+          "type": "color",
+          "id": "benefits_color",
+          "label": "Benefits Color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "header",
+          "content": "Button Settings"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button Text",
+          "default": "Become a member"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button Link"
+        },
+        {
+          "type": "range",
+          "id": "button_font_size",
+          "min": 12,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "Button Font Size",
+          "default": 14
+        },
+        {
+          "type": "range",
+          "id": "button_border_radius",
+          "min": 0,
+          "max": 50,
+          "step": 1,
+          "unit": "px",
+          "label": "Button Border Radius",
+          "default": 6
+        },
+        {
+          "type": "color",
+          "id": "button_bg_color",
+          "label": "Button Background",
+          "default": "#1e3a5f"
+        },
+        {
+          "type": "color",
+          "id": "button_text_color",
+          "label": "Button Text Color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "color",
+          "id": "button_hover_bg",
+          "label": "Button Hover Background",
+          "default": "#0f2847"
+        },
+        {
+          "type": "color",
+          "id": "button_hover_text",
+          "label": "Button Hover Text",
+          "default": "#ffffff"
+        },
+        {
+          "type": "header",
+          "content": "Decorative Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "decorative_image",
+          "label": "Decorative Image"
+        }
+      ]
+    },
+    {
+      "type": "promo_card",
+      "name": "Promo Card",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Card Background"
+        },
+        {
+          "type": "checkbox",
+          "id": "reverse",
+          "label": "reverse",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "card_bg_color",
+          "label": "Background Color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "image_picker",
+          "id": "card_bg_image",
+          "label": "Background Image"
+        },
+        {
+          "type": "color",
+          "id": "card_bg_color_mbl",
+          "label": "Mobile Background Color",
+          "default": "#f8f9fa"
+        },
+        {
+          "type": "checkbox",
+          "id": "bgimg_contain",
+          "label": "Background image(contain-mobile)",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "UPTO Text"
+        },
+        {
+          "type": "text",
+          "id": "upto_text",
+          "label": "UPTO Text",
+          "default": "UPTO"
+        },
+        {
+          "type": "range",
+          "id": "upto_font_size",
+          "min": 10,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "label": "Font Size (Desktop)",
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "upto_font_size_mobile",
+          "min": 8,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "Font Size (Mobile)",
+          "default": 10
+        },
+        {
+          "type": "color",
+          "id": "upto_color",
+          "label": "UPTO Color",
+          "default": "#666666"
+        },
+        {
+          "type": "header",
+          "content": "Discount Settings"
+        },
+        {
+          "type": "text",
+          "id": "discount_number",
+          "label": "Discount Number",
+          "default": "20"
+        },
+        {
+          "type": "range",
+          "id": "discount_font_size",
+          "min": 30,
+          "max": 80,
+          "step": 2,
+          "unit": "px",
+          "label": "Discount Font Size (Desktop)",
+          "default": 48
+        },
+        {
+          "type": "range",
+          "id": "discount_font_size_mobile",
+          "min": 24,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Discount Font Size (Mobile)",
+          "default": 36
+        },
+        {
+          "type": "range",
+          "id": "discount_percent_size",
+          "min": 12,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Percent Symbol Size (Desktop)",
+          "default": 18
+        },
+        {
+          "type": "range",
+          "id": "discount_percent_size_mobile",
+          "min": 10,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "label": "Percent Symbol Size (Mobile)",
+          "default": 14
+        },
+        {
+          "type": "color",
+          "id": "discount_color",
+          "label": "Discount Color",
+          "default": "#000000"
+        },
+        {
+          "type": "header",
+          "content": "Title Settings"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Clearance Sale"
+        },
+        {
+          "type": "range",
+          "id": "title_font_size",
+          "min": 14,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Title Font Size (Desktop)",
+          "default": 18
+        },
+        {
+          "type": "range",
+          "id": "title_font_size_mobile",
+          "min": 12,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "label": "Title Font Size (Mobile)",
+          "default": 16
+        },
+        {
+          "type": "color",
+          "id": "title_color",
+          "label": "Title Color",
+          "default": "#000000"
+        },
+        {
+          "type": "header",
+          "content": "Description Settings"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Lorem ipsum dolor sit amet consectetur."
+        },
+        {
+          "type": "range",
+          "id": "description_font_size",
+          "min": 10,
+          "max": 18,
+          "step": 1,
+          "unit": "px",
+          "label": "Description Font Size (Desktop)",
+          "default": 13
+        },
+        {
+          "type": "range",
+          "id": "description_font_size_mobile",
+          "min": 10,
+          "max": 16,
+          "step": 1,
+          "unit": "px",
+          "label": "Description Font Size (Mobile)",
+          "default": 12
+        },
+        {
+          "type": "color",
+          "id": "description_color",
+          "label": "Description Color",
+          "default": "#666666"
+        },
+        {
+          "type": "header",
+          "content": "Link Settings"
+        },
+        {
+          "type": "text",
+          "id": "link_text",
+          "label": "Link Text",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL"
+        },
+        {
+          "type": "range",
+          "id": "link_font_size",
+          "min": 12,
+          "max": 18,
+          "step": 1,
+          "unit": "px",
+          "label": "Link Font Size",
+          "default": 14
+        },
+        {
+          "type": "color",
+          "id": "link_color",
+          "label": "Link Color",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "link_hover_color",
+          "label": "Link Hover Color",
+          "default": "#0052CC"
+        },
+        {
+          "type": "header",
+          "content": "Product Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "product_image",
+          "label": "Product Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Promotional Banners",
+      "blocks": [
+        {
+          "type": "hero_banner"
+        },
+        {
+          "type": "members_card"
+        },
+        {
+          "type": "promo_card",
+          "settings": {
+            "discount_number": "20",
+            "title": "Clearance Sale",
+            "link_text": "Shop Now"
+          }
+        },
+        {
+          "type": "promo_card",
+          "settings": {
+            "discount_number": "40",
+            "title": "Christmas Sale coming soon",
+            "link_text": "Learn more"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

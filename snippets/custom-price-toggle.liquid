@@ -1,0 +1,257 @@
+<!-- Custom Price Toggle - Restyle Taxify's own toggle -->
+<style>
+  #PBarNextFrameWrapper {
+    display: none !important;
+  }
+
+  .taxify-switcher {
+    position: static !important;
+    z-index: 99999 !important;
+    background-color: transparent !important;
+    border-radius: 20px !important;
+    padding: 0 !important;
+    animation: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    transform: none !important;
+  }
+
+  .taxify-switcher:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .taxify-switcher:focus {
+    outline: none !important;
+  }
+
+  .taxify-switcher--bottom-right {
+    position: static !important;
+    bottom: auto !important;
+    right: auto !important;
+  }
+
+  .taxify-switcher__content {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0 !important;
+  }
+
+  .taxify-switcher__label,
+  .taxify-switcher__text-container,
+  .taxify-switcher__option {
+    display: none !important;
+  }
+
+  .taxify-switcher__toggle {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .taxify-switcher__thumb {
+    width: 15px;
+    height: 15px;
+  }
+
+  .taxify-switcher__track {
+    width: fit-content;
+    min-width: 20px;
+    height: 18px;
+  }
+
+  .custom-taxify-target {
+    position: absolute !important;
+    top: 160px;
+    right: 10%;
+    z-index: 20;
+    display: inline-flex !important;
+    align-items: center !important;
+    background-color: rgb(0, 71, 171);
+    border-radius: 50px;
+    padding: 10px 16px;
+    gap: 10px;
+    white-space: nowrap;
+  }
+
+  .custom-taxify-target .ctl {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .custom-taxify-target.taxify-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .custom-taxify-target.taxify-sticky {
+    position: fixed !important;
+    top: 115px;
+    right: 10%;
+    {% comment %} z-index: 999999; {% endcomment %}
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  @media (min-width: 1150px) and (max-width: 1549px) {
+    .custom-taxify-target,
+    .custom-taxify-target.taxify-sticky {
+      right: 20px;
+    }
+  }
+
+  @media (max-width: 1149px) {
+    .custom-taxify-target {
+      padding: 6px 12px;
+      gap: 8px;
+      top: 65px;
+      right: 100px;
+    }
+    .custom-taxify-target.taxify-sticky {
+      right: 100px;
+      top: 17px;
+      padding: 6px 12px;
+      gap: 8px;
+    }
+    .custom-taxify-target .ctl {
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .custom-taxify-target {
+      top: 135px;
+      right: 10px;
+      z-index: 10;
+    }
+    .taxify-switcher__thumb {
+      width: 12px;
+      height: 12px;
+    }
+    .taxify-switcher__track {
+      height: 15px;
+    }
+    .custom-taxify-target .ctl {
+      font-size: 10px;
+    }
+    .custom-taxify-target.taxify-sticky {
+      position: absolute !important;
+      top: 135px !important;
+      right: 10px !important;
+      z-index: 10 !important;
+    }
+    .custom-taxify-target.taxify-hidden {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+  }
+
+  @media (max-width: 410px) {
+    .custom-taxify-target {
+      top: 130px;
+    }
+    .custom-taxify-target.taxify-sticky {
+      top: 130px !important;
+    }
+  }
+
+
+  .custom-taxify-target {
+    display: none !important;
+  }
+</style>
+
+<div class="custom-taxify-target" id="customTaxifyTarget">
+  <span class="ctl">Price: Excl.</span>
+  <span class="ctl ctl-right">Incl.</span>
+</div>
+
+<script>
+  // ===== 1. Place Taxify Switcher =====
+  var taxifyPlaced = false;
+  var taxifyAttempts = 0;
+
+  function placeTaxify() {
+    if (taxifyPlaced) return;
+    var t = document.getElementById('customTaxifyTarget');
+    var r = t ? t.querySelector('.ctl-right') : null;
+    if (!t || !r) return;
+    var s = document.querySelectorAll('.taxify-switcher');
+    var sw = null;
+    s.forEach(function(el) { sw = el; });
+    if (!sw) {
+      taxifyAttempts++;
+      if (taxifyAttempts < 80) setTimeout(placeTaxify, 500);
+      return;
+    }
+    t.insertBefore(sw, r);
+    taxifyPlaced = true;
+    console.log('TAXIFY: switcher placed');
+  }
+
+  setTimeout(placeTaxify, 2000);
+  setTimeout(placeTaxify, 3000);
+  setTimeout(placeTaxify, 5000);
+  setTimeout(placeTaxify, 8000);
+
+  // ===== 2. Scroll Direction Sticky =====
+  var txLastY = window.scrollY;
+  var txUpAmt = 0;
+  var txDownAmt = 0;
+  var txState = 'normal'; // normal | hidden | sticky
+
+  console.log('TAXIFY: scroll detection initialized, scrollY=' + txLastY);
+
+  document.addEventListener('scroll', function() {
+    var el = document.getElementById('customTaxifyTarget');
+    if (!el) return;
+    if (window.innerWidth <= 768) {
+      el.className = 'custom-taxify-target';
+      txState = 'normal';
+      txLastY = window.scrollY;
+      return;
+    }
+
+    var y = window.scrollY;
+    var d = y - txLastY;
+
+    // At top of page - show normal
+    if (y <= 100) {
+      el.className = 'custom-taxify-target';
+      txState = 'normal';
+      txUpAmt = 0;
+      txDownAmt = 0;
+      txLastY = y;
+      return;
+    }
+
+    // Past header
+    if (txState === 'normal') {
+      el.className = 'custom-taxify-target taxify-hidden';
+      txState = 'hidden';
+    }
+
+    if (d > 0) {
+      // DOWN
+      txUpAmt = 0;
+      txDownAmt += d;
+      if (txState === 'sticky' && txDownAmt > 30) {
+        el.className = 'custom-taxify-target taxify-hidden';
+        txState = 'hidden';
+        console.log('TAXIFY: HIDE (scroll down)');
+      }
+    } else if (d < 0) {
+      // UP
+      txDownAmt = 0;
+      txUpAmt += Math.abs(d);
+      if (txState !== 'sticky' && txUpAmt > 60) {
+        el.className = 'custom-taxify-target taxify-sticky';
+        txState = 'sticky';
+        console.log('TAXIFY: SHOW STICKY (scroll up)');
+      }
+    }
+
+    txLastY = y;
+  });
+</script>

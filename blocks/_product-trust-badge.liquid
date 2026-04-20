@@ -1,0 +1,518 @@
+<div class="hdt-product-info__item hdt-product__trust-badge hdt-product__trust-seal hdt-flex hdt-flex-wrap" data-type="{{ block.type }}" {{ block.shopify_attributes }}>
+  {%- if block.settings.mess != blank -%}
+    <div class="hdt-product__trust-mess hdt-inline-flex hdt-align-center hdt-s-text">
+      {%- if block.settings.show_icon -%}
+        <div class="hdt-product__trust-icon"><svg class="hdt-inline-block" xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21" fill="currentColor"><path d="M10.5 0.614258L2.625 3.47813V10.4055C2.62689 11.7575 2.94764 13.0901 3.56122 14.2949C4.17479 15.4997 5.06388 16.5428 6.15628 17.3394L10.5 20.4986L14.8437 17.3394C15.9361 16.5428 16.8252 15.4997 17.4388 14.2949C18.0524 13.0901 18.3731 11.7575 18.375 10.4055V3.47813L10.5 0.614258ZM17.0625 10.4055C17.0607 11.5506 16.789 12.6791 16.2694 13.6994C15.7498 14.7198 14.9969 15.6033 14.072 16.2783L10.5 18.8764L6.92803 16.2783C6.00306 15.6033 5.25023 14.7198 4.73064 13.6994C4.21104 12.6791 3.93931 11.5506 3.9375 10.4055V4.39688L10.5 2.01076L17.0625 4.39688V10.4055Z"/><path d="M7.68184 8.88757L6.75391 9.81551L9.67881 12.7404L14.2443 8.17489L13.3164 7.24695L9.67881 10.8845L7.68184 8.88757Z"/></svg></div>
+      {%- endif -%}
+      <p class="hdt-font-semibold">{{ block.settings.mess }}</p>
+    </div>
+  {%- endif -%}
+  {%- if block.settings.source == '1' and block.settings.image != blank -%}
+    {%- assign image_size_2x = block.settings.wimg | times: 2 -%}
+    <div class="hdt-img__trust-image hdt-block lg:hdt-inline-block" style="max-width: min(100%, {{ block.settings.wimg }}px);">
+      <img width="{{ block.settings.image.width }}" class="hdt-inline-block" height="{{ block.settings.image.height }}" srcset="{{ block.settings.image | image_url: width: block.settings.image_width }}, {{ block.settings.image | image_url: width: image_size_2x }} 2x" src="{{ block.settings.image | image_url: width: 760 }}" alt="{{ block.settings.image.alt | escape }}" loading="lazy">
+    </div>
+  {%- elsif block.settings.svg != blank -%}
+    {%- assign arr = block.settings.svg | remove: ' ' | split: "," -%}
+    {%- assign total_icons = arr.size -%}
+    {%- assign visible_icons = block.settings.visible_icons | default: 6 -%}
+    {%- assign remaining_icons = total_icons | minus: visible_icons -%}
+    <div class="hdt-product_trust-svgs" style="--height-img:{{ block.settings.height }}px; --visible-icons: {{ visible_icons }};">
+      {%- for img in arr -%}
+        <div class="hdt-payment-item hdt-inline-block{% if forloop.index > visible_icons %} hdt-payment-item--hidden{% endif %}">{{ img | payment_type_svg_tag: class: 'hdt-icon-payment hdt-inline-block' }}</div>
+      {%- endfor -%}
+      {%- if remaining_icons > 0 -%}
+        <span class="cart-drawer-payments__more">+{{ remaining_icons }} more</span>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} Tooltip Section {%- endcomment -%}
+  {%- if block.settings.show_tooltip -%}
+    <div class="hdt-trust-tooltip-wrapper" data-tooltip-wrapper>
+      <button type="button" class="hdt-trust-tooltip-trigger" aria-label="More information" data-tooltip-trigger>
+        {% comment %} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg> {% endcomment %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
+        <path d="M8.5 0C3.81282 0 0 3.4603 0 7.71355C0 11.9668 3.81282 15.4271 8.5 15.4271C13.1872 15.4271 17 11.9668 17 7.71355C17 3.4603 13.1872 0 8.5 0ZM8.5 14.3986C4.43813 14.3986 1.13333 11.3998 1.13333 7.71355C1.13333 4.02724 4.43813 1.02847 8.5 1.02847C12.5619 1.02847 15.8667 4.02724 15.8667 7.71355C15.8667 11.3998 12.5619 14.3986 8.5 14.3986Z" fill="black"/>
+        <path d="M8.68988 11.8409C8.63531 11.8409 8.58414 11.813 8.53637 11.7571C8.4886 11.7012 8.46468 11.632 8.46468 11.5497C8.46468 11.1202 8.82514 9.86107 9.54656 7.7724C9.98885 6.49565 10.21 5.77191 10.21 5.60129C10.21 5.46008 10.1515 5.34829 10.0361 5.26591C9.92011 5.18352 9.75357 5.14233 9.53523 5.14233C9.14009 5.14233 8.66143 5.27912 8.09918 5.55269C7.53694 5.82627 6.91496 6.28672 6.23389 6.93393L6.68416 7.23399C7.28449 6.72798 7.67169 6.42793 7.84566 6.33382C8.01962 6.23966 8.17483 6.19261 8.31129 6.19261C8.43408 6.19261 8.49551 6.25144 8.49551 6.3691C8.49551 6.47503 8.47165 6.59567 8.42388 6.73096C7.4006 9.59048 6.8889 11.3879 6.8889 12.1234C6.8889 12.3529 6.95882 12.5323 7.09868 12.6618C7.23847 12.7911 7.4278 12.8559 7.66653 12.8559C7.93944 12.8559 8.29077 12.75 8.72053 12.5381C9.15035 12.3263 9.83256 11.8409 10.7672 11.0819L10.3681 10.7465C9.46757 11.4762 8.90821 11.8409 8.68988 11.8409Z" fill="black"/>
+        <path d="M8.50052 4.62799C9.12644 4.62799 9.63385 4.16753 9.63385 3.59952C9.63385 3.03151 9.12644 2.57104 8.50052 2.57104C7.8746 2.57104 7.36719 3.03151 7.36719 3.59952C7.36719 4.16753 7.8746 4.62799 8.50052 4.62799Z" fill="black"/>
+        </svg>
+      </button>
+      {%- if block.settings.tooltip_label != blank -%}
+        <span class="hdt-trust-tooltip-label">{{ block.settings.tooltip_label }} 
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="23" viewBox="0 0 25 23" fill="none">
+          <path d="M17.9089 0.0868173C17.5425 -0.106376 17.0888 0.0340368 16.8957 0.400437L13.7474 6.37128C13.5542 6.73768 13.6946 7.19132 14.061 7.38451C14.4274 7.57771 14.8811 7.43729 15.0742 7.07089L17.8727 1.76348L23.1801 4.56193C23.5465 4.75513 24.0002 4.61471 24.1933 4.24831C24.3865 3.88191 24.2461 3.42827 23.8797 3.23508L17.9089 0.0868173ZM0.059082 21.7502L0.118109 22.4979C1.65022 22.377 4.01039 22.3095 6.48612 21.9535C8.9734 21.596 11.6813 20.9369 13.9993 19.5857C16.337 18.2229 18.2755 16.1557 19.1781 13.0286C20.074 9.92488 19.9257 5.85989 18.2755 0.528481L17.5591 0.750244L16.8426 0.972007C18.4424 6.1406 18.5234 9.88811 17.7369 12.6126C16.9573 15.3135 15.302 17.09 13.2439 18.2898C11.166 19.5011 8.67601 20.1233 6.27266 20.4688C3.85777 20.816 1.63461 20.8735 5.51678e-05 21.0026L0.059082 21.7502Z" fill="black"/>
+          </svg>
+        </span>
+      {%- endif -%}
+      {%- if block.settings.tooltip_text != blank -%}
+        <div class="hdt-trust-tooltip-content" data-tooltip-content>
+          <div class="hdt-trust-tooltip-arrow"></div>
+          <p>{{ block.settings.tooltip_text }}</p>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <style>
+      {%- if block.settings.show_tooltip -%}
+      .hdt-product-info__item.hdt-product__trust-badge.hdt-product__trust-seal {
+          justify-content: space-between;
+      }
+      @media(max-width:999px){
+        .hdt-product-info__item.hdt-product__trust-badge.hdt-product__trust-seal {
+          justify-content: center;
+          gap: 5px;
+          flex-direction: column-reverse;
+        }
+      }
+       @media(min-width:1000px) and (max-width:1300px){
+        .hdt-product-info__item.hdt-product__trust-badge.hdt-product__trust-seal {
+              flex-wrap: nowrap;
+        }
+      }
+      {%- endif -%}
+      .hdt-trust-tooltip-wrapper {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: 10px;
+      }
+
+      .hdt-trust-tooltip-label {
+        font-size: {{ block.settings.tooltip_label_size }}px;
+        color: {{ block.settings.tooltip_label_color }};
+        line-height: 1.4;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .hdt-trust-tooltip-label svg {
+          margin-top: -20px;
+      }
+
+      .hdt-trust-tooltip-trigger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        padding: 0;
+        {% comment %} border: 1px solid {{ block.settings.tooltip_icon_border }};
+        background-color: {{ block.settings.tooltip_icon_bg }}; {% endcomment %}
+        color: {{ block.settings.tooltip_icon_color }};
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+      }
+
+      .hdt-trust-tooltip-trigger:hover {
+        opacity: 0.8;
+      }
+
+      .hdt-trust-tooltip-trigger svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .hdt-trust-tooltip-content {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 43%;
+        transform: translateX(-50%);
+        min-width: 180px;
+        max-width: {{ block.settings.tooltip_max_width }}px;
+        padding: 10px 14px;
+        background-color: {{ block.settings.tooltip_bg_color }};
+        color: {{ block.settings.tooltip_text_color }};
+        border: 1px solid {{ block.settings.tooltip_border_color }};
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        font-size: {{ block.settings.tooltip_text_size }}px;
+        line-height: 1.5;
+        z-index: 100;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+        pointer-events: none;
+      }
+
+      .hdt-trust-tooltip-content.is-active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      .hdt-trust-tooltip-content p {
+        margin: 0;
+      }
+
+      .hdt-trust-tooltip-arrow {
+        position: absolute;
+        top: -7px;
+        left: 7%;
+        transform: translateX(-50%);
+        width: 12px;
+        height: 12px;
+        background-color: {{ block.settings.tooltip_bg_color }};
+        border-left: 1px solid {{ block.settings.tooltip_border_color }};
+        border-top: 1px solid {{ block.settings.tooltip_border_color }};
+        transform: translateX(-50%) rotate(45deg);
+      }
+
+      /* Position: Top */
+      {% if block.settings.tooltip_position == 'top' %}
+      .hdt-trust-tooltip-content {
+        top: auto;
+        bottom: calc(100% + 8px);
+      }
+      .hdt-trust-tooltip-arrow {
+        top: auto;
+        bottom: -7px;
+        border-left: none;
+        border-top: none;
+        border-right: 1px solid {{ block.settings.tooltip_border_color }};
+        border-bottom: 1px solid {{ block.settings.tooltip_border_color }};
+      }
+      {% endif %}
+
+      /* Position: Left */
+      {% if block.settings.tooltip_position == 'left' %}
+      .hdt-trust-tooltip-content {
+        top: 50%;
+        left: auto;
+        right: calc(100% + 8px);
+        transform: translateY(-50%);
+      }
+      .hdt-trust-tooltip-arrow {
+        top: 50%;
+        left: auto;
+        right: -7px;
+        border-left: none;
+        border-top: none;
+        border-right: 1px solid {{ block.settings.tooltip_border_color }};
+        border-bottom: none;
+        border-top: 1px solid {{ block.settings.tooltip_border_color }};
+        transform: translateY(-50%) rotate(45deg);
+      }
+      {% endif %}
+
+      /* Position: Right */
+      {% if block.settings.tooltip_position == 'right' %}
+      .hdt-trust-tooltip-content {
+        top: 50%;
+        left: calc(100% + 8px);
+        transform: translateY(-50%);
+      }
+      .hdt-trust-tooltip-arrow {
+        top: 50%;
+        left: -7px;
+        right: auto;
+        border-right: none;
+        border-top: none;
+        border-left: 1px solid {{ block.settings.tooltip_border_color }};
+        border-bottom: 1px solid {{ block.settings.tooltip_border_color }};
+        transform: translateY(-50%) rotate(45deg);
+      }
+      {% endif %}
+
+      @media(max-width:768px){
+        .hdt-trust-tooltip-wrapper {justify-content: center;}
+      }
+    </style>
+
+    <script>
+      (function() {
+        const wrapper = document.currentScript.closest('.hdt-product__trust-badge').querySelector('[data-tooltip-wrapper]');
+        if (!wrapper) return;
+        
+        const trigger = wrapper.querySelector('[data-tooltip-trigger]');
+        const content = wrapper.querySelector('[data-tooltip-content]');
+        
+        if (!trigger || !content) return;
+
+        // Click to toggle
+        trigger.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          content.classList.toggle('is-active');
+        });
+
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+          if (!wrapper.contains(e.target)) {
+            content.classList.remove('is-active');
+          }
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') {
+            content.classList.remove('is-active');
+          }
+        });
+      })();
+    </script>
+  {%- endif -%}
+</div>
+
+<style>
+  /* Hide payment icons beyond visible limit */
+  .hdt-payment-item--hidden {
+    display: none !important;
+  }
+  
+  {% comment %} .cart-drawer-payments__more {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    background: #f5f5f5;
+    border-radius: 4px;
+  } {% endcomment %}
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.main-product.blocks.img_trust.name",
+  "tag": null,
+  "settings":[
+    {
+      "type": "checkbox",
+      "id": "show_icon",
+      "label": "t:sections.main-product.blocks.img_trust.settings.show_icon.label",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "mess",
+      "label": "t:sections.main-product.blocks.img_trust.settings.mess.label",
+      "default": "Guaranteed Safe Checkout",
+      "placeholder": "Guaranteed Safe Checkout"
+    },
+    {
+      "type": "select",
+      "id": "source",
+      "label": "t:sections.main-product.blocks.img_trust.settings.source.label",
+      "default": "1",
+      "options": [
+        {
+          "value": "1",
+          "label": "t:sections.main-product.blocks.img_trust.settings.source.options__1.label"
+        },
+        {
+          "value": "2",
+          "label": "t:sections.main-product.blocks.img_trust.settings.source.options__2.label"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:sections.main-product.blocks.img_trust.settings.header_image.content",
+      "visible_if": "{{ block.settings.source == '1' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.main-product.blocks.img_trust.settings.image.label",
+      "visible_if": "{{ block.settings.source == '1' }}"
+    },
+    {
+      "type": "range",
+      "id": "wimg",
+      "min": 100,
+      "max": 600,
+      "step": 5,
+      "unit": "px",
+      "label": "t:sections.main-product.blocks.img_trust.settings.wimg.label",
+      "default": 350,
+      "visible_if": "{{ block.settings.source == '1' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.main-product.blocks.img_trust.settings.header_svg.content",
+      "visible_if": "{{ block.settings.source == '2' }}"
+    },
+    {
+      "type": "textarea",
+      "id": "svg",
+      "label": "t:sections.main-product.blocks.img_trust.settings.svg.label",
+      "default": "amazon_payments,american_express,apple_pay,bitcoin,dankort,diners_club,discover,dogecoin,dwolla,forbrugsforeningen,interac,google_pay,jcb,klarna,klarna-pay-later,litecoin,maestro,master,paypal,shopify_pay,sofort,visa",
+      "info": "Review the [list of available values](https:\/\/github.com\/activemerchant\/payment_icons\/tree\/master\/app\/assets\/images\/payment_icons) and copy the name of each icon that you need from that list, without the .svg extension",
+      "visible_if": "{{ block.settings.source == '2' }}"
+    },
+    {
+      "type": "range",
+      "id": "visible_icons",
+      "min": 3,
+      "max": 20,
+      "step": 1,
+      "label": "Visible Icons Count",
+      "info": "Number of payment icons to show before '+X more' appears",
+      "default": 6,
+      "visible_if": "{{ block.settings.source == '2' }}"
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "label": "t:sections.main-product.blocks.img_trust.settings.height.label",
+      "unit": "px",
+      "default": 30,
+      "visible_if": "{{ block.settings.source == '2' }}"
+    },
+    {
+      "type": "header",
+      "content": "Tooltip Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tooltip",
+      "label": "Show Tooltip",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "tooltip_label",
+      "label": "Label Text (shown next to icon)",
+      "default": "Only for bulk quantities",
+      "placeholder": "Text displayed beside the icon",
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "range",
+      "id": "tooltip_label_size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Label Text Size",
+      "default": 14,
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "color",
+      "id": "tooltip_label_color",
+      "label": "Label Text Color",
+      "default": "#333333",
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "header",
+      "content": "Tooltip Popup Box",
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "textarea",
+      "id": "tooltip_text",
+      "label": "Tooltip Popup Text",
+      "default": "Please upload a high-resolution photo for best results.",
+      "placeholder": "Text shown when clicking the icon...",
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "select",
+      "id": "tooltip_position",
+      "label": "Tooltip Position",
+      "default": "bottom",
+      "options": [
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "range",
+      "id": "tooltip_max_width",
+      "min": 150,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "Tooltip Max Width",
+      "default": 250,
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "range",
+      "id": "tooltip_text_size",
+      "min": 10,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Tooltip Text Size",
+      "default": 13,
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "header",
+      "content": "Tooltip Icon Style",
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "color",
+      "id": "tooltip_icon_color",
+      "label": "Icon Color",
+      "default": "#888888",
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "header",
+      "content": "Tooltip Box Style",
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "color",
+      "id": "tooltip_bg_color",
+      "label": "Tooltip Background",
+      "default": "#ffffff",
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "color",
+      "id": "tooltip_text_color",
+      "label": "Tooltip Text Color",
+      "default": "#333333",
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "color",
+      "id": "tooltip_border_color",
+      "label": "Tooltip Border Color",
+      "default": "#e0e0e0",
+      "visible_if": "{{ block.settings.show_tooltip }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "Enhance your store's legitimacy with [eye-catching trust badges](https:\/\/kits.ecomrise.app\/install?utm_source=the4-Dawn&utm_medium=intheme&utm_content=productpage-trustbadge)"
+    }
+  ],
+  "presets": [
+    { 
+      "name": "t:sections.main-product.blocks.img_trust.name" 
+    }
+  ]
+}
+{% endschema %}

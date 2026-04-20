@@ -1,0 +1,38 @@
+{%- liquid
+  assign current_locale = request.locale
+  assign current_locale_iso_code = current_locale.iso_code 
+  
+  # Map 2-letter codes to 3-letter display codes
+  case current_locale_iso_code
+    when 'en'
+      assign display_code = 'ENG'
+    when 'de'
+      assign display_code = 'DEU'
+    when 'fr'
+      assign display_code = 'FRA'
+    when 'es'
+      assign display_code = 'ESP'
+    when 'it'
+      assign display_code = 'ITA'
+    when 'nl'
+      assign display_code = 'NLD'
+    when 'pt'
+      assign display_code = 'POR'
+    when 'pl'
+      assign display_code = 'POL'
+    when 'ja'
+      assign display_code = 'JPN'
+    when 'zh'
+      assign display_code = 'CHN'
+    else
+      assign display_code = current_locale_iso_code | upcase
+  endcase
+-%}
+<div data-locale-wrap class="hdt-languages hdt-inline-block">
+  <button aria-controls="popover-languages">
+    <span class="hdt-inline-block">
+      <span data-flagshdt="{{ sz }}" data-current class="hdt-inline-block lazyloadhdt flagshdt-{{ current_locale_iso_code }}">{{ display_code }}</span>
+    </span>
+    <svg class="hdt-icon-select-arrow hdt-inline-block" role="presentation" viewBox="0 0 19 12" width="10"><polyline fill="none" stroke="currentColor" points="17 2 9.5 10 2 2" fill-rule="evenodd" stroke-width="2" stroke-linecap="square"></polyline></svg>
+  </button>
+</div>

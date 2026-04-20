@@ -1,0 +1,597 @@
+{% comment %}
+  FAQ Section
+  - Left: Heading, description, contact card
+  - Right: Accordion FAQ items
+  - Fully responsive
+{% endcomment %}
+
+{{ 'section-faq.css' | asset_url | stylesheet_tag }}
+
+<style>
+  #faq-section-{{ section.id }} {
+    --section-bg-color: {{ section.settings.section_bg_color }};
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --section-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --section-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+    --heading-color: {{ section.settings.heading_color }};
+    --heading-size: {{ section.settings.heading_font_size }}px;
+    --heading-size-mobile: {{ section.settings.heading_font_size_mobile }}px;
+    --description-color: {{ section.settings.description_color }};
+    --description-size: {{ section.settings.description_font_size }}px;
+    --description-size-mobile: {{ section.settings.description_font_size_mobile }}px;
+    --contact-bg: {{ section.settings.contact_bg_color }};
+    --contact-title-color: {{ section.settings.contact_title_color }};
+    --contact-title-size: {{ section.settings.contact_title_font_size }}px;
+    --contact-text-color: {{ section.settings.contact_text_color }};
+    --contact-text-size: {{ section.settings.contact_text_font_size }}px;
+    --question-color: {{ section.settings.question_color }};
+    --question-size: {{ section.settings.question_font_size }}px;
+    --question-size-mobile: {{ section.settings.question_font_size_mobile }}px;
+    --answer-color: {{ section.settings.answer_color }};
+    --answer-size: {{ section.settings.answer_font_size }}px;
+    --answer-size-mobile: {{ section.settings.answer_font_size_mobile }}px;
+    --accordion-border-color: {{ section.settings.accordion_border_color }};
+    --accordion-icon-color: {{ section.settings.accordion_icon_color }};
+  }
+  #faq-section-{{ section.id }} .accordion-item:first-child {
+    border-top: none !important;
+  }
+  {% if section.settings.cont_bgcolor != blank %}
+  #faq-section-{{ section.id }} .faq-container {
+    padding: 50px;
+    background: {{ section.settings.cont_bgcolor }};
+    border-radius: 12px;
+  }
+   @media (max-width: 768px) {
+    #faq-section-{{ section.id }} .faq-container {
+      padding: 30px 15px;
+    }
+  }
+  {% endif %}
+
+  {% if section.settings.faq_cont_bgcolor != blank %}
+  #faq-section-{{ section.id }} .faq-accordion-column {
+        background: {{ section.settings.faq_cont_bgcolor }};
+        padding: 20px 40px;
+        border-radius: 12px;
+  }
+  @media (max-width: 768px) {
+    #faq-section-{{ section.id }} .faq-accordion-column {
+          padding: 20px;
+    }
+  }
+  {% endif %}
+
+  #faq-section-{{ section.id }} .faq-wrapper {
+    padding-top: var(--section-padding-top);
+    padding-bottom: var(--section-padding-bottom);
+    background-color: var(--section-bg-color);
+    {% if section.settings.section_bg_image != blank %}
+    background-image: url('{{ section.settings.section_bg_image | image_url: width: 1920 }}');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    {% endif %}
+  }
+  @media (min-width: 769px) {
+    .faq-contact-card.mbl-contact-card {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    #faq-section-{{ section.id }} .faq-wrapper {
+      padding-top: var(--section-padding-top-mobile);
+      padding-bottom: var(--section-padding-bottom-mobile);
+    }
+    .faq-contact-card.dsk-contact-card {
+      display: none;
+    }
+    .faq-contact-card.mbl-contact-card {
+      margin-bottom: -70px;
+    }
+  }
+</style>
+
+<section id="faq-section-{{ section.id }}" class="faq-section">
+  <div class="faq-wrapper">
+    <div class="hdt-container">
+      <div class="faq-container">
+        {% comment %} Left Column - Header & Contact {% endcomment %}
+        <div class="faq-header-column">
+          <div class="faq-header">
+            {% if section.settings.heading != blank %}
+              <h2 class="faq-heading">{{ section.settings.heading }}</h2>
+            {% endif %}
+            {% if section.settings.description != blank %}
+              <p class="faq-description">{{ section.settings.description }}</p>
+            {% endif %}
+          </div>
+
+          {% comment %} Contact Card {% endcomment %}
+          {% if section.settings.show_contact_card %}
+            <div class="faq-contact-card dsk-contact-card">
+              {% if section.settings.contact_image != blank %}
+                <div class="contact-avatar">
+                  <img 
+                    src="{{ section.settings.contact_image | image_url: width: 100 }}" 
+                    alt="{{ section.settings.contact_title }}"
+                    width="50"
+                    height="50"
+                    loading="lazy"
+                  >
+                </div>
+              {% endif %}
+              <div class="contact-content">
+                {% if section.settings.contact_title != blank %}
+                  <h4 class="contact-title">{{ section.settings.contact_title }}</h4>
+                {% endif %}
+                {% if section.settings.contact_text != blank %}
+                  <p class="contact-text">{{ section.settings.contact_text }}</p>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        {% comment %} Right Column - Accordion {% endcomment %}
+        <div class="faq-accordion-column">
+          <div class="faq-accordion">
+            {% for block in section.blocks %}
+              {% if block.type == 'faq_item' %}
+                <div class="accordion-item {% if forloop.first and section.settings.first_open %}active{% endif %}" {{ block.shopify_attributes }}>
+                  <button class="accordion-header" aria-expanded="{% if forloop.first and section.settings.first_open %}true{% else %}false{% endif %}">
+                    <span class="accordion-question">{{ block.settings.question }}</span>
+                    <span class="accordion-icon">
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 7.5l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </span>
+                  </button>
+                  <div class="accordion-content" {% if forloop.first and section.settings.first_open %}style="max-height: 500px;"{% endif %}>
+                    <div class="accordion-answer">
+                      {{ block.settings.answer }}
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        {% if section.settings.show_contact_card %}
+            <div class="faq-contact-card mbl-contact-card">
+              {% if section.settings.contact_image != blank %}
+                <div class="contact-avatar">
+                  <img 
+                    src="{{ section.settings.contact_image | image_url: width: 100 }}" 
+                    alt="{{ section.settings.contact_title }}"
+                    width="50"
+                    height="50"
+                    loading="lazy"
+                  >
+                </div>
+              {% endif %}
+              <div class="contact-content">
+                {% if section.settings.contact_title != blank %}
+                  <h4 class="contact-title">{{ section.settings.contact_title }}</h4>
+                {% endif %}
+                {% if section.settings.contact_text != blank %}
+                  <p class="contact-text">{{ section.settings.contact_text }}</p>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const section = document.getElementById('faq-section-{{ section.id }}');
+    const accordionItems = section.querySelectorAll('.accordion-item');
+    const allowMultiple = {{ section.settings.allow_multiple }};
+    
+    accordionItems.forEach(item => {
+      const header = item.querySelector('.accordion-header');
+      const content = item.querySelector('.accordion-content');
+      
+      header.addEventListener('click', function() {
+        const isActive = item.classList.contains('active');
+        
+        // Close all if not allowing multiple
+        if (!allowMultiple) {
+          accordionItems.forEach(otherItem => {
+            if (otherItem !== item) {
+              otherItem.classList.remove('active');
+              otherItem.querySelector('.accordion-header').setAttribute('aria-expanded', 'false');
+              otherItem.querySelector('.accordion-content').style.maxHeight = null;
+            }
+          });
+        }
+        
+        // Toggle current item
+        if (isActive) {
+          item.classList.remove('active');
+          header.setAttribute('aria-expanded', 'false');
+          content.style.maxHeight = null;
+        } else {
+          item.classList.add('active');
+          header.setAttribute('aria-expanded', 'true');
+          content.style.maxHeight = content.scrollHeight + 'px';
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "FAQ Section",
+  "tag": "section",
+  "class": "faq-section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Background"
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Background Color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "image_picker",
+      "id": "section_bg_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "color",
+      "id": "cont_bgcolor",
+      "label": "Container Background Color"
+    },
+    {
+      "type": "color",
+      "id": "faq_cont_bgcolor",
+      "label": "FAQ Container Background Color"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Mobile Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Heading Settings"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Frequently asked questions!"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "min": 20,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading Font Size (Desktop)",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size_mobile",
+      "min": 18,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading Font Size (Mobile)",
+      "default": 26
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Description Settings"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Lorem ipsum dolor sit amet consectetur. Ut libero at id fringilla malesuada. Eget nibh semper risus elit eu nunc aliquet. Amet nullam consectetur ultrices sem. Semper id ipsum ut odio mi eget id id."
+    },
+    {
+      "type": "range",
+      "id": "description_font_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Description Font Size (Desktop)",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "description_font_size_mobile",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Description Font Size (Mobile)",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description Color",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Contact Card Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact_card",
+      "label": "Show Contact Card",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "contact_image",
+      "label": "Contact Avatar Image"
+    },
+    {
+      "type": "text",
+      "id": "contact_title",
+      "label": "Contact Title",
+      "default": "Is there any question?"
+    },
+    {
+      "type": "range",
+      "id": "contact_title_font_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Contact Title Font Size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "contact_title_color",
+      "label": "Contact Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "textarea",
+      "id": "contact_text",
+      "label": "Contact Text",
+      "default": "you can contact our email@example.com or Call on +123155466"
+    },
+    {
+      "type": "range",
+      "id": "contact_text_font_size",
+      "min": 11,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Contact Text Font Size",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "contact_text_color",
+      "label": "Contact Text Color",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "contact_bg_color",
+      "label": "Contact Card Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Accordion Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "first_open",
+      "label": "Open First Item by Default",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "allow_multiple",
+      "label": "Allow Multiple Open Items",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "accordion_border_color",
+      "label": "Accordion Border Color",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "color",
+      "id": "accordion_icon_color",
+      "label": "Accordion Icon Color",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Question Settings"
+    },
+    {
+      "type": "range",
+      "id": "question_font_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Question Font Size (Desktop)",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "question_font_size_mobile",
+      "min": 13,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Question Font Size (Mobile)",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "question_color",
+      "label": "Question Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Answer Settings"
+    },
+    {
+      "type": "range",
+      "id": "answer_font_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Answer Font Size (Desktop)",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "answer_font_size_mobile",
+      "min": 12,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Answer Font Size (Mobile)",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "answer_color",
+      "label": "Answer Color",
+      "default": "#666666"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Do you ship across Europe?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Yes. We offer fast, reliable shipping across most European countries. Shipping options and delivery times are shown during checkout.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ Section",
+      "blocks": [
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you ship across Europe?",
+            "answer": "<p>Yes. We offer fast, reliable shipping across most European countries. Shipping options and delivery times are shown during checkout.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Can beginners use your DIY hardware?",
+            "answer": "<p>Absolutely! Our products are designed for all skill levels. We provide detailed instructions and video guides to help you complete your projects with confidence.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "How do I choose the right hardware for my project?",
+            "answer": "<p>We recommend checking our product guides and comparison charts. You can also contact our support team for personalized recommendations based on your specific project needs.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>We offer a 30-day return policy for unused items in their original packaging. Please contact our customer service team to initiate a return.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "What payment methods do you accept?",
+            "answer": "<p>We accept all major credit cards (Visa, MasterCard, American Express), PayPal, Apple Pay, Google Pay, and bank transfers for larger orders.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

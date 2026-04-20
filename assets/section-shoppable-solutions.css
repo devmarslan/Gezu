@@ -1,0 +1,697 @@
+/* ==========================================================================
+   Shoppable Solutions Section - CSS
+   ========================================================================== */
+
+/* Base Styles */
+.shoppable-solutions-section {
+  width: 100%;
+  background-color: var(--section-bg, #ffffff);
+}
+
+.solutions-wrapper {
+  position: relative;
+  padding-top: var(--section-padding-top, 40px);
+  padding-bottom: var(--section-padding-bottom, 40px);
+}
+
+/* .shoppable-solutions-section .page-width {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+} */
+
+.solutions-container.full-width {
+  width: 100%;
+  padding: 0 40px;
+}
+
+/* ==========================================================================
+   Layout - Stacked (Content above Image)
+   ========================================================================== */
+.solutions-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   Section Title
+   ========================================================================== */
+.solutions-section-title {
+  margin-bottom: 20px;
+}
+
+.solutions-section-title h2 {
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/* ==========================================================================
+   Content Area - Above Image (Desktop: aligned right)
+   ========================================================================== */
+.solutions-content-area {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+
+.solutions-heading {
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  margin-bottom: 5px;
+}
+
+.solutions-description {
+  max-width: 440px;
+  line-height: 1.6;
+}
+
+.solutions-description p {
+  margin: 0;
+}
+
+.solutions-button {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+
+.solutions-button:hover {
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   Image Wrapper
+   ========================================================================== */
+.solutions-image-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.solutions-image-container {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+      margin-top: -10rem;
+}
+
+.solutions-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.solutions-image-desktop {
+  display: block;
+}
+
+.solutions-image-mobile {
+  display: none;
+}
+
+/* ==========================================================================
+   Hotspot Styles
+   ========================================================================== */
+.hotspot {
+  position: absolute;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+  left: var(--desktop-x, 50%);
+  top: var(--desktop-y, 50%);
+}
+
+.hotspot-button {
+  width: var(--hotspot-size, 40px);
+  height: var(--hotspot-size, 40px);
+  border-radius: 50%;
+  background-color: var(--hotspot-bg, #0066cc);
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  color: var(--hotspot-color, #ffffff);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.hotspot-button::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: var(--hotspot-bg, #0066cc);
+  animation: pulse 2s ease-out infinite;
+  opacity: 0;
+  z-index: -1;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.hotspot-button:hover {
+  transform: scale(1.15);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.hotspot.active .hotspot-button {
+  transform: scale(1.1);
+}
+
+.hotspot.active .hotspot-button::before {
+  animation: none;
+}
+
+.hotspot-button svg {
+  width: 14px;
+  height: 14px;
+}
+
+.hotspot-button svg .icon-vertical {
+  transition: opacity 0.2s ease;
+}
+
+.hotspot.active .hotspot-button svg .icon-vertical {
+  opacity: 0;
+}
+
+/* ==========================================================================
+   Product Popup Styles
+   ========================================================================== */
+.hotspot-popup {
+  position: absolute;
+  background-color: var(--popup-bg, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  min-width: 260px;
+  max-width: 300px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 20;
+}
+
+.hotspot.active .hotspot-popup {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ==========================================================================
+   Desktop Popup Positions
+   ========================================================================== */
+/* Top Position */
+.hotspot-popup[data-position="top"] {
+  bottom: calc(100% + 15px);
+  top: auto;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+}
+
+.hotspot.active .hotspot-popup[data-position="top"] {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Bottom Position */
+.hotspot-popup[data-position="bottom"] {
+  top: calc(100% + 15px);
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+}
+
+.hotspot.active .hotspot-popup[data-position="bottom"] {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Left Position */
+.hotspot-popup[data-position="left"] {
+  right: calc(100% + 15px);
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%) translateX(-10px);
+}
+
+.hotspot.active .hotspot-popup[data-position="left"] {
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Right Position */
+.hotspot-popup[data-position="right"] {
+  left: calc(100% + 15px);
+  right: auto;
+  top: 50%;
+  transform: translateY(-50%) translateX(10px);
+}
+
+.hotspot.active .hotspot-popup[data-position="right"] {
+  transform: translateY(-50%) translateX(0);
+}
+
+/* ==========================================================================
+   Popup Arrow
+   ========================================================================== */
+.popup-arrow {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: var(--popup-bg, #ffffff);
+  transform: rotate(45deg);
+}
+
+/* Arrow for Top Position */
+.hotspot-popup[data-position="top"] .popup-arrow {
+  bottom: -6px;
+  top: auto;
+  left: 50%;
+  right: auto;
+  margin-left: -6px;
+}
+
+/* Arrow for Bottom Position */
+.hotspot-popup[data-position="bottom"] .popup-arrow {
+  top: -6px;
+  bottom: auto;
+  left: 50%;
+  right: auto;
+  margin-left: -6px;
+}
+
+/* Arrow for Left Position */
+.hotspot-popup[data-position="left"] .popup-arrow {
+  right: -6px;
+  left: auto;
+  top: 50%;
+  bottom: auto;
+  margin-top: -6px;
+}
+
+/* Arrow for Right Position */
+.hotspot-popup[data-position="right"] .popup-arrow {
+  left: -6px;
+  right: auto;
+  top: 50%;
+  bottom: auto;
+  margin-top: -6px;
+}
+
+/* ==========================================================================
+   Popup Inner Content
+   ========================================================================== */
+.popup-inner {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.popup-image {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #f5f5f5;
+  flex-shrink: 0;
+}
+
+.popup-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.popup-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.popup-title {
+  font-size: var(--popup-title-size, 14px);
+  font-weight: 400;
+  color: var(--popup-title-color, #000000);
+  margin: 0 0 8px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.popup-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.current-price {
+  font-size: var(--popup-price-size, 14px);
+  font-weight: 700;
+  color: var(--popup-price-color, #000000);
+}
+
+.compare-price {
+  font-size: calc(var(--popup-price-size, 14px) - 2px);
+  color: var(--popup-compare-color, #999999);
+  text-decoration: line-through;
+}
+
+.discount-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--popup-discount-color, #e53935);
+}
+
+/* Add to Cart Button */
+.popup-form {
+  margin: 0;
+}
+
+.popup-add-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  background-color: var(--popup-btn-bg, #0066cc);
+  color: var(--popup-btn-color, #ffffff);
+  border: none;
+  border-radius: 25px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.popup-add-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.popup-add-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+.solutions-content-box {
+    z-index: 1;
+}
+/* ==========================================================================
+   Responsive Styles
+   ========================================================================== */
+
+/* Tablet Landscape */
+@media (max-width: 991px) {
+  .solutions-content-area {
+    gap: 30px;
+  }
+
+  .solutions-description {
+    max-width: 350px;
+  }
+
+  .hotspot-popup {
+    min-width: 240px;
+    max-width: 260px;
+    padding: 14px;
+  }
+  .solutions-image-wrapper {
+  padding: 0;
+}
+.solutions-image-container {
+  margin:0;
+}
+}
+
+/* Tablet Portrait & Mobile */
+@media (max-width: 768px) {
+  .solutions-wrapper {
+    padding-top: var(--section-padding-top-mobile, 30px);
+    padding-bottom: var(--section-padding-bottom-mobile, 30px);
+  }
+
+  .solutions-container.full-width {
+    padding: 0 20px;
+  }
+
+  /* .shoppable-solutions-section .page-width {
+    padding: 0 16px;
+  } */
+
+  .solutions-section-title {
+    margin-bottom: 40px;
+    text-align:center;
+  }
+
+  /* Stack content vertically on mobile */
+  .solutions-content-area {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 12px;
+    margin-bottom: 15px;
+    text-align:center;
+  }
+
+  .solutions-heading {
+    white-space: normal;
+    font-size:18px !important;
+  }
+
+  .solutions-description {
+    max-width: 75%;
+    margin: 10px auto 0;
+    line-height:normal;
+    font-size: 14px;
+  }
+
+  .solutions-button {
+    display: none;
+  }
+
+  /* Switch to mobile image */
+  .solutions-image-container[data-has-mobile-image="true"] .solutions-image-desktop {
+    display: none;
+  }
+
+  .solutions-image-container[data-has-mobile-image="true"] .solutions-image-mobile {
+    display: block;
+  }
+
+  /* Switch hotspot to mobile position */
+  .hotspot {
+    left: var(--mobile-x, var(--desktop-x, 50%));
+    top: var(--mobile-y, var(--desktop-y, 50%));
+  }
+
+  .hotspot-button {
+    width: var(--hotspot-size-mobile, 32px);
+    height: var(--hotspot-size-mobile, 32px);
+    border-width: 2px;
+  }
+
+  .hotspot-button svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Mobile Popup Styles */
+  .hotspot-popup {
+    min-width: 220px;
+    max-width: 240px;
+    padding: 12px;
+  }
+
+  /* Mobile Popup Positions */
+  /* Top Position */
+  .hotspot-popup[data-mobile-position="top"] {
+    bottom: calc(100% + 10px) !important;
+    top: auto !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) translateY(-10px) !important;
+  }
+
+  .hotspot.active .hotspot-popup[data-mobile-position="top"] {
+    transform: translateX(-50%) translateY(0) !important;
+  }
+
+  .hotspot-popup[data-mobile-position="top"] .popup-arrow {
+    bottom: -6px;
+    top: auto;
+    left: 50%;
+    right: auto;
+    margin-left: -6px;
+    margin-top: 0;
+  }
+
+  /* Bottom Position */
+  .hotspot-popup[data-mobile-position="bottom"] {
+    top: calc(100% + 10px) !important;
+    bottom: auto !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) translateY(10px) !important;
+  }
+
+  .hotspot.active .hotspot-popup[data-mobile-position="bottom"] {
+    transform: translateX(-50%) translateY(0) !important;
+  }
+
+  .hotspot-popup[data-mobile-position="bottom"] .popup-arrow {
+    top: -6px;
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    margin-left: -6px;
+    margin-top: 0;
+  }
+
+  /* Left Position */
+  .hotspot-popup[data-mobile-position="left"] {
+    right: calc(100% + 10px) !important;
+    left: auto !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) translateX(-10px) !important;
+  }
+
+  .hotspot.active .hotspot-popup[data-mobile-position="left"] {
+    transform: translateY(-50%) translateX(0) !important;
+  }
+
+  .hotspot-popup[data-mobile-position="left"] .popup-arrow {
+    right: -6px;
+    left: auto;
+    top: 50%;
+    bottom: auto;
+    margin-top: -6px;
+    margin-left: 0;
+  }
+
+  /* Right Position */
+  .hotspot-popup[data-mobile-position="right"] {
+    left: calc(100% + 10px) !important;
+    right: auto !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) translateX(10px) !important;
+  }
+
+  .hotspot.active .hotspot-popup[data-mobile-position="right"] {
+    transform: translateY(-50%) translateX(0) !important;
+  }
+
+  .hotspot-popup[data-mobile-position="right"] .popup-arrow {
+    left: -6px;
+    right: auto;
+    top: 50%;
+    bottom: auto;
+    margin-top: -6px;
+    margin-left: 0;
+  }
+
+  .popup-inner {
+    gap: 12px;
+  }
+
+  .popup-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .popup-title {
+    font-size: 13px;
+  }
+
+  .popup-add-btn {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .hotspot-button {
+    width: calc(var(--hotspot-size-mobile, 32px) * 0.9);
+    height: calc(var(--hotspot-size-mobile, 32px) * 0.9);
+  }
+
+  .hotspot-popup {
+    min-width: 200px;
+    max-width: 220px;
+  }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+.hotspot-button:focus {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.popup-add-btn:focus {
+  outline: 2px solid var(--popup-btn-bg, #0066cc);
+  outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .hotspot-button::before {
+    animation: none;
+  }
+
+  .hotspot-button,
+  .hotspot-popup,
+  .popup-add-btn,
+  .hotspot-button svg .icon-vertical {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+@media print {
+  .hotspot {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   High Contrast Mode
+   ========================================================================== */
+@media (forced-colors: active) {
+  .hotspot-button {
+    border: 3px solid currentColor;
+  }
+
+  .hotspot-popup {
+    border: 2px solid currentColor;
+  }
+
+  .popup-add-btn {
+    border: 2px solid currentColor;
+  }
+}

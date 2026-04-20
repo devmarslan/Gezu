@@ -1,0 +1,1670 @@
+{%- if request.page_type != 'cart' -%}
+{{ 'hdt-cart-drawer.css' | asset_url | stylesheet_tag }}
+
+<hdt-cart-drawer detect-adm-se-evt section-id="{{ section.id }}" ref="hdt-cart" data-count="{{ cart.item_count }}" nested color-scheme="{{ section.settings.color_scheme }}" class="hdt-contents" data-currency-iso="{{ cart.currency.iso_code }}">
+  <dialog id="CartDrawer" ref="dialog" class="hdt-dialog hdt-dialog-drawer hdt-dialog-drawer--cart hdt-mini-cart" scroll-lock pos="right">
+    <div class="cart-drawer-wrapper">
+      {% comment %} {%- if section.settings.collection != blank -%}
+        <div class="cart-drawer-left-panel">
+        <div class="cart-drawer-left-panel-full">
+          <h4 class="cart-drawer-left-panel__title">often bought together</h4>
+          <div class="cart-drawer-left-panel__scroll">
+            <div class="cart-drawer-left-panel__products">
+              {%- for product in collections[section.settings.collection].products limit: 5 -%}
+                <div class="cart-drawer-left-product">
+                  <div class="cart-drawer-left-product__image">
+                    <a href="{{ product.url }}">{%- if product.featured_image -%}<img src="{{ product.featured_image | image_url: width: 200 }}" alt="{{ product.featured_image.alt | escape }}" width="100" height="100" loading="lazy">{%- else -%}{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}{%- endif -%}</a>
+                    <button type="button" class="cart-drawer-left-product__quickview" data-quick-view data-product-handle="{{ product.handle }}">
+                      <svg width="17" height="11" viewBox="0 0 17 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.5 0C10.3723 0 12.1095 0.821176 13.5136 1.82296C15.5567 3.28163 16.8833 5.10681 16.8833 5.10681C17.0389 5.32008 17.0389 5.60846 16.8833 5.82173C16.8833 5.82173 15.5567 7.64696 13.5136 9.10558C12.1096 10.1074 10.3723 10.9285 8.5 10.9285C6.62765 10.9285 4.89053 10.1074 3.48641 9.10558C1.44328 7.6469 0.116686 5.82173 0.116686 5.82173C-0.0388954 5.60846 -0.0388954 5.32008 0.116686 5.10681C0.116686 5.10681 1.4433 3.28157 3.48641 1.82296C4.89045 0.821176 6.62765 0 8.5 0ZM8.5 1.2143C6.88726 1.2143 5.40208 1.94742 4.19226 2.81111C2.84893 3.7704 1.84177 4.90048 1.37956 5.4643C1.84175 6.02818 2.84885 7.15825 4.19226 8.11749C5.40201 8.98116 6.88722 9.7143 8.5 9.7143C10.1128 9.7143 11.5979 8.98117 12.8077 8.11749C14.1511 7.15819 15.1582 6.02812 15.6204 5.4643C15.1583 4.90042 14.1511 3.77034 12.8077 2.81111C11.598 1.94744 10.1128 1.2143 8.5 1.2143ZM8.5 2.42859C10.1757 2.42859 11.5357 3.78861 11.5357 5.46434C11.5357 7.14007 10.1757 8.50008 8.5 8.50008C6.82427 8.50008 5.46426 7.14007 5.46426 5.46434C5.46426 3.78861 6.82427 2.42859 8.5 2.42859ZM8.5 3.64289C7.49441 3.64289 6.67855 4.45874 6.67855 5.46434C6.67855 6.46993 7.49441 7.28578 8.5 7.28578C9.50559 7.28578 10.3214 6.46993 10.3214 5.46434C10.3214 4.45874 9.50559 3.64289 8.5 3.64289Z" fill="white"></path></svg> QUICK VIEW
+                    </button>
+                  </div>
+                  <div class="cart-drawer-left-product__info">
+                    <a href="{{ product.url }}" class="cart-drawer-left-product__name">{{ product.title }}</a>
+                    <div class="cart-drawer-left-product__prices">{%- if product.compare_at_price > product.price -%}<s class="cart-drawer-left-product__compare">{{ product.compare_at_price | money }}</s><span class="cart-drawer-left-product__price cart-drawer-left-product__price--sale">{{ product.price | money }} <span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400;">Inc VAT</span></span>{%- else -%}<span class="cart-drawer-left-product__price">{{ product.price | money }} <span class="tax-text"style="color:#000;font-size: 12px; font-weight: 400;">Inc VAT</span></span>{%- endif -%}</div>
+                  </div>
+                </div>
+              {%- endfor -%}
+            </div>
+          </div>
+        </div>
+        </div>
+      {%- endif -%} {% endcomment %}
+<div class="cart-drawer-left-panel" id="cart-related-panel" {% if cart == empty %}style="display:none"{% endif %}>
+  <div class="cart-drawer-left-panel-full" id="cart-drawer-related-full">
+    <h4 class="cart-drawer-left-panel__title">Often Bought Together</h4>
+    <div class="cart-drawer-left-panel__scroll">
+      <div class="cart-drawer-left-panel__products" id="cart-drawer-related-products">
+        <div class="cart-related-loading">
+          <span class="loading-spinner" style="width:20px;height:20px;border-width:3px;margin:30px auto;display:block;"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="cart-drawer-main-panel" id="cart-panel">
+        <div class="cart-drawer-header">
+          <h3 class="cart-drawer-header__title">Your Cart</h3>
+          <div class="cart-drawer-header__actions">
+            <button type="button" class="cart-drawer-toggle__btn cart-drawer-toggle__btn--cart is-active" data-drawer-toggle="cart"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-drawer-toggle__count" data-cart-count>{{ cart.item_count }}</span></button>
+            <button type="button" class="cart-drawer-toggle__btn cart-drawer-toggle__btn--wishlist" data-drawer-toggle="wishlist"><svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M12.5 0H0.5C0.367 0 0.24 0.056 0.146 0.156C0.053 0.255 0 0.39 0 0.531V15.399C0 15.5 0.027 15.599 0.078 15.684C0.129 15.769 0.202 15.837 0.288 15.88C0.374 15.922 0.47 15.938 0.564 15.925C0.658 15.913 0.747 15.871 0.82 15.807L6.5 10.78L12.18 15.807C12.27 15.886 12.383 15.93 12.5 15.93C12.573 15.93 12.646 15.913 12.712 15.88C12.798 15.837 12.871 15.769 12.922 15.684C12.973 15.599 13 15.5 13 15.399V0.531C13 0.39 12.947 0.255 12.854 0.156C12.76 0.056 12.633 0 12.5 0ZM12 14.266L6.82 9.681C6.73 9.602 6.617 9.558 6.5 9.558C6.383 9.558 6.27 9.602 6.18 9.681L1 14.266V1.062H12V14.266Z" fill="currentColor"/></svg><span class="cart-drawer-toggle__count" id="toggle-wishlist-count">0</span></button>
+            <button class="cart-drawer-header__close" aria-controls="CartDrawer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+        </div>
+
+        {%- if section.settings.show_free_shipping_bar -%}
+          {%- assign cart_total = cart.total_price -%}
+          {%- assign shipping_threshold = localization.market.metafields.custom.free_shipping_threshold | default: 10000 -%}
+          {%- assign remaining = shipping_threshold | minus: cart_total -%}
+          {%- if remaining < 0 -%}{%- assign remaining = 0 -%}{%- endif -%}
+          {%- assign progress = cart_total | times: 100 | divided_by: shipping_threshold -%}
+          {%- if progress > 100 -%}{%- assign progress = 100 -%}{%- endif -%}
+          {%- assign threshold_money = shipping_threshold | money_without_trailing_zeros -%}
+          <div class="cart-drawer-shipping" id="cart-shipping-bar" data-threshold="{{ shipping_threshold }}" data-currency-iso="{{ cart.currency.iso_code }}">
+            <p class="cart-drawer-shipping__text">
+              {%- if remaining > 0 -%}
+                You're <span class="cart-drawer-shipping__amount" data-shipping-remaining>{{ cart.currency.symbol }}{{ remaining | money_without_currency }}</span> away from Free Standard Shipping
+              {%- else -%}
+                🎉 You've unlocked Free Standard Shipping!
+              {%- endif -%}
+            </p>
+            <div class="cart-drawer-shipping__bar"><div class="cart-drawer-shipping__progress" style="width: {{ progress }}%;" data-shipping-progress></div></div>
+            <div class="cart-drawer-shipping__labels"><span>{{ cart.currency.symbol }}0</span><span>{{ threshold_money }}</span></div>
+          </div>
+        {%- endif -%}
+
+        <div class="cart-drawer-warning" id="cart-warning" {% if cart == empty %}style="display:none"{% endif %}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none"><path d="M8.5 0C3.81282 0 0 3.8131 0 8.5C0 13.1869 3.81282 17 8.5 17C13.1872 17 17 13.1869 17 8.5C17 3.8131 13.1872 0 8.5 0ZM8.5 15.8667C4.43813 15.8667 1.13333 12.5622 1.13333 8.5C1.13333 4.43785 4.43813 1.13333 8.5 1.13333C12.5619 1.13333 15.8667 4.43785 15.8667 8.5C15.8667 12.5622 12.5619 15.8667 8.5 15.8667Z" fill="black"/><path d="M8.69037 13.0486C8.6358 13.0486 8.58463 13.0178 8.53686 12.9562C8.48909 12.8946 8.46517 12.8184 8.46517 12.7277C8.46517 12.2543 8.82563 10.8668 9.54705 8.56521C9.98934 7.15829 10.2105 6.36076 10.2105 6.17274C10.2105 6.01714 10.152 5.89394 10.0365 5.80316C9.9206 5.71238 9.75405 5.66699 9.53572 5.66699C9.14058 5.66699 8.66192 5.81773 8.09967 6.11919C7.53743 6.42066 6.91545 6.92805 6.23438 7.64126L6.68465 7.97191C7.28497 7.41431 7.67218 7.08366 7.84615 6.97996C8.02011 6.8762 8.17532 6.82435 8.31178 6.82435C8.43457 6.82435 8.496 6.88918 8.496 7.01883C8.496 7.13557 8.47214 7.26851 8.42437 7.4176C7.40109 10.5687 6.88939 12.5494 6.88939 13.3598C6.88939 13.6127 6.95931 13.8104 7.09917 13.9531C7.23896 14.0956 7.42829 14.167 7.66702 14.167C7.93993 14.167 8.29126 14.0503 8.72102 13.8168C9.15084 13.5834 9.83305 13.0486 10.7677 12.2122L10.3686 11.8426C9.46806 12.6466 8.9087 13.0486 8.69037 13.0486Z" fill="black"/><path d="M8.50052 5.10016C9.12644 5.10016 9.63385 4.59275 9.63385 3.96683C9.63385 3.34091 9.12644 2.8335 8.50052 2.8335C7.8746 2.8335 7.36719 3.34091 7.36719 3.96683C7.36719 4.59275 7.8746 5.10016 8.50052 5.10016Z" fill="black"/></svg>
+          <p>Your items aren't reserved, <strong>checkout quickly to make sure you don't miss out.</strong></p>
+        </div>
+
+        <div class="cart-drawer-content">
+          <div class="cart-drawer-scroll" id="cart-drawer-scroll">
+            <div class="cart-drawer-empty" id="cart-empty-state" {% if cart != empty %}style="display:none"{% endif %}>
+              <div class="cart-drawer-empty__icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></div>
+              <h3 class="cart-drawer-empty__title">Your cart is empty</h3>
+              <p class="cart-drawer-empty__text">Looks like you have not added anything yet</p>
+              <a href="/collections/all" class="cart-drawer-empty__btn">Continue Shopping</a>
+            </div>
+
+            <div class="cart-drawer-items" id="cart-drawer-items" {% if cart == empty %}style="display:none"{% endif %}>
+              {%- for item in cart.items -%}
+                <div class="cart-drawer-item" data-line-item data-line="{{ forloop.index }}" data-key="{{ item.key }}">
+                  <div class="cart-drawer-item__main-content">
+                    <div class="cart-drawer-item__image"><a href="{{ item.url }}">{%- if item.image -%}<img src="{{ item.image | image_url: width: 200 }}" alt="{{ item.image.alt | escape }}" width="80" height="80" loading="lazy">{%- else -%}{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}{%- endif -%}</a></div>
+                    <div class="cart-drawer-item__content">
+                      <div class="cart-drawer-item__top">
+                        <div class="cart-drawer-item__info">
+                          <a href="{{ item.url }}" class="cart-drawer-item__title">{{ item.product.title }}</a>
+                          {%- if item.sku != blank -%}<p class="cart-drawer-item__sku">SKU: {{ item.sku }}</p>{%- endif -%}
+                          {%- unless item.product.has_only_default_variant -%}<p class="cart-drawer-item__variant">{{ item.variant.title }}</p>{%- endunless -%}
+                        </div>
+                        <button type="button" class="cart-drawer-item__wishlist" data-wishlist-btn data-product-id="{{ item.product.id }}" data-product-handle="{{ item.product.handle }}"><svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M12.5 0H0.5C0.367 0 0.24 0.056 0.146 0.156C0.053 0.255 0 0.39 0 0.531V15.399C0 15.5 0.027 15.599 0.078 15.684C0.129 15.769 0.202 15.837 0.288 15.88C0.374 15.922 0.47 15.938 0.564 15.925C0.658 15.913 0.747 15.871 0.82 15.807L6.5 10.78L12.18 15.807C12.27 15.886 12.383 15.93 12.5 15.93C12.573 15.93 12.646 15.913 12.712 15.88C12.798 15.837 12.871 15.769 12.922 15.684C12.973 15.599 13 15.5 13 15.399V0.531C13 0.39 12.947 0.255 12.854 0.156C12.76 0.056 12.633 0 12.5 0ZM12 14.266L6.82 9.681C6.73 9.602 6.617 9.558 6.5 9.558C6.383 9.558 6.27 9.602 6.18 9.681L1 14.266V1.062H12V14.266Z" fill="currentColor"/></svg></button>
+                      </div>
+                      <div class="cart-drawer-item__price-row">
+                        <span class="cart-drawer-item__price aa" data-item-price>{{ item.final_line_price | money }} <span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400;">Inc VAT</span></span>
+                        {%- if item.original_line_price > item.final_line_price -%}
+                          <s class="cart-drawer-item__compare">{{ item.original_line_price | money }}</s>
+                        {%- else -%}
+                          <s class="cart-drawer-item__compare" style="display:none"></s>
+                        {%- endif -%}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cart-drawer-item__actions">
+                    <div class="cart-drawer-qty"><button type="button" class="cart-drawer-qty__btn" data-qty-minus data-line="{{ forloop.index }}">−</button><input type="number" class="cart-drawer-qty__input" value="{{ item.quantity }}" min="1" data-qty-input data-line="{{ forloop.index }}" data-unit-price="{{ item.final_price }}"><button type="button" class="cart-drawer-qty__btn" data-qty-plus data-line="{{ forloop.index }}">+</button></div>
+                    <button type="button" class="cart-drawer-item__remove" data-remove-item data-line="{{ forloop.index }}">Remove</button>
+                  </div>
+                </div>
+              {%- endfor -%}
+            </div>
+
+            {% comment %} {%- if section.settings.collection != blank -%}
+              <div class="cart-drawer-recommendations" id="cart-recommendations" {% if cart == empty %}style="display:none"{% endif %}>
+                <h4 class="cart-drawer-recommendations__title">often bought together</h4>
+                <div class="cart-drawer-recommendations__scroll">
+                  {%- for product in collections[section.settings.collection].products limit: 5 -%}
+                    <div class="cart-drawer-rec-card">
+                      <div class="cart-drawer-rec-card__image">
+                        <a href="{{ product.url }}">{%- if product.featured_image -%}<img src="{{ product.featured_image | image_url: width: 200 }}" alt="{{ product.featured_image.alt | escape }}" loading="lazy">{%- endif -%}</a>
+                        <button type="button" class="cart-drawer-rec-card__quickview-hover" data-quick-view data-product-handle="{{ product.handle }}"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Quick View</button>
+                      </div>
+                      <div class="cart-drawer-rec-card__info">
+                        <a href="{{ product.url }}" class="cart-drawer-rec-card__title">{{ product.title }}</a>
+                        <div class="cart-drawer-rec-card__prices"><span class="cart-drawer-rec-card__price">{{ product.price | money }}</span>{%- if product.compare_at_price > product.price -%}<s class="cart-drawer-rec-card__compare">{{ product.compare_at_price | money }}</s>{%- endif -%}</div>
+                        <button type="button" class="cart-drawer-rec-card__quickview-text" data-quick-view data-product-handle="{{ product.handle }}"><u>Quick View</u></button>
+                      </div>
+                    </div>
+                  {%- endfor -%}
+                </div>
+              </div>
+            {%- endif -%} {% endcomment %}
+            <div class="cart-drawer-recommendations" id="cart-recommendations" {% if cart == empty %}style="display:none"{% endif %}>
+              <h4 class="cart-drawer-recommendations__title">often bought together</h4>
+              <div class="cart-drawer-recommendations__scroll" id="cart-recommendations-scroll">
+                <div class="cart-related-loading">
+                  <span class="loading-spinner" style="width:20px;height:20px;border-width:3px;margin:30px auto;display:block;"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cart-drawer-bottom" id="cart-drawer-bottom" {% if cart == empty %}style="display:none"{% endif %}>
+            {%- if section.settings.show_trust_badges -%}
+              <div class="cart-drawer-trust">
+                <div class="cart-drawer-trust__item"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="25" viewBox="0 0 22 25" fill="none"><path d="M21.0207 20.2316L17.4523 15.1544C18.0179 15.0205 18.4709 14.686 18.7645 14.1828C19.058 13.6776 19.1204 13.1151 18.9506 12.5546C18.7778 11.9889 18.9455 11.361 19.3771 10.957C19.8036 10.5591 20.0317 10.0375 20.0317 9.45452C20.0317 8.87051 19.8067 8.34991 19.3771 7.95206C18.9424 7.54908 18.7747 6.92315 18.9506 6.35448C19.1204 5.79401 19.058 5.23147 18.7645 4.72622C18.4709 4.22096 18.0158 3.88344 17.4472 3.75252C16.8713 3.61854 16.4101 3.16034 16.2792 2.58453C16.1483 2.01382 15.8107 1.55766 15.3055 1.26721C14.8002 0.973676 14.2377 0.911282 13.6772 1.08107C13.1116 1.25392 12.4857 1.08618 12.0796 0.654574C11.6787 0.225016 11.1581 0 10.5741 0C9.9901 0 9.46951 0.225011 9.07166 0.654574C8.66868 1.08926 8.04275 1.25699 7.47408 1.08107C6.91361 0.911287 6.35107 0.973676 5.84581 1.26721C5.34056 1.56075 5.00304 2.01589 4.87212 2.58453C4.73814 3.16034 4.27994 3.62161 3.70413 3.75252C3.13342 3.88344 2.67726 4.22096 2.38681 4.72622C2.09327 5.23147 2.03088 5.79398 2.20066 6.35448C2.37351 6.92009 2.20578 7.54806 1.77417 7.95206C1.34768 8.34991 1.1196 8.87153 1.1196 9.45452C1.1196 10.0385 1.34461 10.5591 1.77417 10.957C2.20886 11.36 2.37659 11.9859 2.20066 12.5546C2.03088 13.115 2.09327 13.6776 2.38681 14.1828C2.67728 14.6881 3.13035 15.0235 3.69902 15.1544L0.127405 20.2316C-0.0270327 20.4515 -0.042376 20.7348 0.0885388 20.97C0.219454 21.2053 0.467982 21.3423 0.738007 21.329L3.43511 21.1828C3.52102 21.1776 3.59262 21.2196 3.62842 21.2953L4.85166 23.7039C4.97234 23.9391 5.21065 24.0864 5.47452 24.0864H5.48782C5.75782 24.0813 5.99614 23.9268 6.10864 23.6834L8.7505 17.9939C8.86812 18.0675 8.97858 18.1534 9.07473 18.2557C9.47258 18.6822 9.99419 18.9103 10.5772 18.9103C11.1612 18.9103 11.6818 18.6852 12.0796 18.2557C12.1768 18.1534 12.2862 18.0644 12.4039 17.9939L15.0457 23.6834C15.1582 23.9268 15.3965 24.0813 15.6665 24.0864H15.6798C15.9447 24.0864 16.1831 23.9401 16.3027 23.7039L17.5259 21.2953C17.5648 21.2196 17.6364 21.1776 17.7193 21.1828L20.4164 21.329C20.6864 21.3443 20.9349 21.2063 21.0658 20.97C21.1916 20.7368 21.1752 20.4545 21.0207 20.2316ZM5.65973 23.4788C5.62598 23.5545 5.56052 23.5964 5.47666 23.5995C5.39279 23.5995 5.32733 23.5606 5.28847 23.487L4.06522 21.0783C3.93942 20.8267 3.68578 20.6805 3.40554 20.6958L0.708438 20.8421C0.624572 20.8472 0.55707 20.8083 0.51718 20.7378C0.478314 20.6641 0.480362 20.5884 0.527408 20.5209L4.15924 15.355C4.51313 15.5698 4.77496 15.9207 4.86904 16.3318C4.99995 16.9025 5.33748 17.3587 5.84273 17.6491C6.34798 17.9427 6.91356 18.0051 7.47099 17.8353C7.74099 17.7545 8.0233 17.7494 8.28819 17.8148L5.65973 23.4788ZM11.7187 17.922C11.4119 18.2523 11.0273 18.419 10.5742 18.419C10.1242 18.419 9.73864 18.2513 9.42976 17.922C9.03702 17.5006 8.48676 17.2705 7.92424 17.2705C7.7248 17.2705 7.52333 17.2991 7.33002 17.3594C6.89842 17.4904 6.48214 17.4433 6.09144 17.2183C5.70175 16.9933 5.45221 16.6558 5.35096 16.216C5.17504 15.4571 4.57364 14.8547 3.81373 14.6788C3.37393 14.5765 3.03641 14.328 2.81142 13.9383C2.58641 13.5486 2.53935 13.1324 2.67028 12.6997C2.89835 11.9562 2.67846 11.1318 2.10776 10.6C1.77741 10.2931 1.61071 9.90858 1.61071 9.45548C1.61071 9.00545 1.77844 8.61988 2.10776 8.311C2.67847 7.77917 2.89836 6.9548 2.67028 6.21126C2.53936 5.77966 2.58641 5.36337 2.81142 4.97267C3.03643 4.58299 3.37393 4.33344 3.81373 4.23219C4.57261 4.05628 5.17503 3.45487 5.35096 2.69496C5.45323 2.25517 5.70175 1.91764 6.09144 1.69265C6.48112 1.46764 6.89737 1.42059 7.33002 1.55151C8.07665 1.77959 8.89793 1.55969 9.42976 0.988998C9.7366 0.658648 10.1211 0.491941 10.5742 0.491941C11.0243 0.491941 11.4098 0.659674 11.7187 0.988998C12.2506 1.55971 13.0749 1.77959 13.8185 1.55151C14.2501 1.41753 14.6664 1.46765 15.0571 1.69265C15.4467 1.91767 15.6963 2.25517 15.7975 2.69496C15.9735 3.45385 16.5749 4.05627 17.3348 4.23219C17.7746 4.33447 18.1121 4.58299 18.3371 4.97267C18.5621 5.36235 18.6091 5.77861 18.4782 6.21126C18.2501 6.9548 18.47 7.77917 19.0407 8.311C19.3711 8.61784 19.5378 9.00238 19.5378 9.45548C19.5378 9.90551 19.3701 10.2911 19.0407 10.6C18.47 11.1318 18.2501 11.9562 18.4782 12.6997C18.6091 13.1313 18.5621 13.5476 18.3371 13.9383C18.1121 14.328 17.7746 14.5775 17.3348 14.6788C16.5759 14.8547 15.9735 15.4561 15.7975 16.216C15.6953 16.6558 15.4467 16.9933 15.0571 17.2183C14.6674 17.4433 14.2511 17.4904 13.8185 17.3594C13.0718 17.1314 12.2475 17.3513 11.7187 17.922ZM20.628 20.7346C20.5891 20.8082 20.5206 20.845 20.4367 20.8389L17.7396 20.6926C17.4594 20.6773 17.2057 20.8235 17.08 21.0751L15.8567 23.4837C15.8199 23.5574 15.7544 23.5963 15.6736 23.5963H15.6685C15.5847 23.5932 15.5192 23.5512 15.4854 23.4756L12.8548 17.8075C13.1218 17.7451 13.402 17.7471 13.672 17.8279C14.2325 17.9977 14.7951 17.9353 15.3003 17.6418C15.8056 17.3483 16.1431 16.8931 16.274 16.3245C16.3681 15.9113 16.633 15.5625 16.9838 15.3477L20.6156 20.5136C20.6647 20.5821 20.6699 20.6609 20.628 20.7346ZM16.9338 9.45441C16.9338 5.94825 14.0804 3.09484 10.5743 3.09484C7.06811 3.09484 4.21469 5.94825 4.21469 9.45441C4.21469 12.9606 7.06811 15.814 10.5743 15.814C14.0804 15.8171 16.9338 12.9635 16.9338 9.45441ZM10.5743 15.3252C7.33832 15.3252 4.70667 12.6935 4.70667 9.45755C4.70667 6.21846 7.33832 3.58681 10.5743 3.58681C13.8102 3.58681 16.4419 6.21846 16.4419 9.45441C16.4419 12.6904 13.8102 15.3252 10.5743 15.3252ZM14.8761 7.98869C14.7902 7.71869 14.5621 7.53049 14.2819 7.49674L12.1423 7.22674L11.2259 5.27632C11.1052 5.0196 10.8566 4.86313 10.5743 4.86313C10.2921 4.86313 10.0425 5.02268 9.92284 5.27632L9.00644 7.22674L6.86679 7.49674C6.58656 7.53049 6.35848 7.7197 6.27257 7.98869C6.18666 8.25869 6.25927 8.54406 6.46383 8.73736L8.03481 10.2112L7.62876 12.3293C7.5766 12.6065 7.68399 12.8816 7.9141 13.0463C8.14218 13.211 8.43776 13.2294 8.68629 13.0933L10.5743 12.0542L12.4623 13.0933C12.5728 13.1537 12.6925 13.1854 12.8101 13.1854C12.9594 13.1854 13.1057 13.1383 13.2315 13.0463C13.4595 12.8816 13.569 12.6034 13.5168 12.3293L13.1138 10.2112L14.6848 8.73736C14.8914 8.54304 14.9651 8.25769 14.8761 7.98869ZM14.3504 8.37837L12.6802 9.94424C12.6199 10.0015 12.5913 10.0885 12.6066 10.1693L13.0362 12.4183C13.0546 12.5104 13.0208 12.5912 12.9441 12.6464C12.8684 12.7016 12.7815 12.7067 12.6976 12.6617L10.692 11.5571C10.6551 11.5367 10.6132 11.5254 10.5743 11.5254C10.5324 11.5254 10.4935 11.5357 10.4567 11.5571L8.45105 12.6617C8.37025 12.7067 8.28127 12.7006 8.20456 12.6464C8.12888 12.5912 8.09717 12.5104 8.11252 12.4183L8.54207 10.1693C8.55741 10.0854 8.52878 10.0015 8.46843 9.94424L6.79825 8.37837C6.72972 8.31291 6.70927 8.22905 6.73791 8.14007C6.76654 8.05108 6.83507 7.99585 6.9261 7.98256L9.1987 7.69722C9.28256 7.68699 9.3562 7.63483 9.38995 7.55812L10.3636 5.48393C10.4025 5.40007 10.4762 5.35302 10.5702 5.35302C10.6643 5.35302 10.738 5.40007 10.7768 5.48393L11.7505 7.55812C11.7874 7.6338 11.8579 7.68597 11.9418 7.69722L14.2144 7.98256C14.3085 7.99279 14.374 8.05108 14.4026 8.14007C14.4394 8.22904 14.4179 8.31291 14.3504 8.37837Z" fill="black"></path></svg><span>{{ section.settings.trust_badge_1 | default: 'Certified Quality' }}</span></div>
+                <div class="cart-drawer-trust__item"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="21" viewBox="0 0 26 21" fill="none"><path d="M8.41966 8.14917C8.41966 7.97487 8.27925 7.83447 8.10496 7.83447H0.314697C0.140399 7.83447 0 7.97488 0 8.14917C0 8.32346 0.140405 8.46387 0.314697 8.46387H8.10496C8.27926 8.46387 8.41966 8.32346 8.41966 8.14917Z" fill="black"></path>
+                  <path d="M8.4188 10.7576C8.4188 10.5833 8.27839 10.4429 8.1041 10.4429H1.92017C1.74587 10.4429 1.60547 10.5833 1.60547 10.7576C1.60547 10.9319 1.74587 11.0723 1.92017 11.0723H8.1041C8.2784 11.0723 8.4188 10.9319 8.4188 10.7576Z" fill="black"></path>
+                  <path d="M8.41881 13.3674C8.41881 13.1931 8.2784 13.0527 8.10411 13.0527H3.37622C3.20192 13.0527 3.06152 13.1931 3.06152 13.3674C3.06152 13.5417 3.20193 13.6821 3.37622 13.6821H8.10411C8.27841 13.6821 8.41881 13.5417 8.41881 13.3674Z" fill="black"></path>
+                  <path d="M25.8223 4.29675C25.8187 4.16966 25.7364 4.0583 25.6226 4.00747L20.3478 1.94617L15.4216 0.0216382C15.3478 -0.00741142 15.2642 -0.00741135 15.1904 0.0228486L5.12358 4.00862C5.0098 4.06066 4.92507 4.17444 4.92507 4.30153V6.57952C4.92507 6.75382 5.06548 6.89422 5.23976 6.89422C5.41405 6.89422 5.55446 6.75381 5.55446 6.57952V4.77482L15.0586 8.76678V19.7669L5.55322 15.6479V14.5888C5.54959 14.1736 4.92745 14.1773 4.92383 14.5888V15.8549C4.92383 15.9807 4.99887 16.0945 5.11386 16.1441L15.251 20.5368C15.291 20.5537 15.3333 20.5622 15.3757 20.5622C15.4168 20.5622 15.4568 20.5549 15.4955 20.538L25.629 16.362C25.7476 16.3135 25.8238 16.1985 25.8238 16.0702V11.2299C25.8178 10.8147 25.1981 10.8196 25.1945 11.2299V15.8595L15.6891 19.7765V8.76678L25.1945 4.77481V9.97121C25.1969 10.3827 25.8202 10.3864 25.8238 9.97121V4.297L25.8223 4.29675ZM6.07226 4.31007L15.3065 0.653374L19.4255 2.2632L10.6573 6.23565L6.07226 4.31007ZM15.3719 8.21589L11.449 6.56853L20.2438 2.58277L24.6678 4.31121L15.3719 8.21589Z" fill="black"></path>
+                  <path d="M24.2504 13.6265C24.1851 13.4655 24.0011 13.3869 23.8413 13.4522L21.7413 14.2959C21.5803 14.3612 21.5016 14.544 21.567 14.705C21.6311 14.8684 21.8199 14.9447 21.9761 14.8793L24.0761 14.0356C24.2371 13.9703 24.3158 13.7875 24.2504 13.6265Z" fill="black"></path>
+                  <path d="M22.2074 16.1696C22.2461 16.1696 22.286 16.1623 22.3248 16.1466L24.4248 15.3029C24.8061 15.1431 24.5773 14.5694 24.19 14.7183L22.09 15.5619C21.7716 15.6842 21.8709 16.1756 22.2074 16.1696Z" fill="black"></path>
+                  </svg>
+                  <span>{{ section.settings.trust_badge_2 | default: 'Lowest Delivery' }}</span></div>
+                <div class="cart-drawer-trust__item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17" fill="none">
+                  <path d="M6.3639 8.75681C5.87777 8.26805 5.38982 7.77929 4.9037 7.28872C4.13172 6.5147 3.36157 5.73886 2.58959 4.96485C2.41116 4.78497 2.23273 4.60691 2.05431 4.42703C2.05431 4.68322 2.05431 4.94123 2.05431 5.19741C2.54225 4.71411 3.0302 4.2308 3.51633 3.74749C4.2883 2.98256 5.06028 2.21763 5.83043 1.45269C6.00704 1.27645 6.18547 1.10021 6.36208 0.925781C6.56599 0.7241 6.57874 0.353443 6.36208 0.155396C6.14359 -0.0444673 5.80676 -0.0590029 5.5901 0.155396C5.10215 0.638703 4.61421 1.12201 4.12808 1.60532C3.3561 2.37025 2.58413 3.13518 1.81397 3.90012C1.63737 4.07636 1.45894 4.2526 1.28233 4.42703C1.07295 4.63416 1.07477 4.98847 1.28233 5.19741C1.76846 5.68617 2.2564 6.17493 2.74253 6.6655C3.5145 7.43952 4.28466 8.21536 5.05664 8.98938C5.23506 9.16925 5.41349 9.34731 5.59192 9.52719C5.79402 9.72887 6.16544 9.74341 6.3639 9.52719C6.56417 9.31098 6.57874 8.97302 6.3639 8.75681Z" fill="black"></path>
+                  <path d="M1.68093 5.35956C1.94311 5.35956 2.20529 5.35956 2.4693 5.36138C3.09197 5.36138 3.71283 5.36319 4.33551 5.36319C5.07107 5.36501 5.80663 5.36501 6.5422 5.36683C7.13392 5.36683 7.72565 5.36865 8.31738 5.36865C8.64692 5.36865 8.98011 5.35956 9.30966 5.38136C9.43528 5.38863 9.56091 5.40135 9.68654 5.4177C9.63738 5.41044 9.59004 5.40498 9.54088 5.39772C10.0215 5.46313 10.4931 5.59031 10.941 5.77746C10.8973 5.75929 10.8536 5.74112 10.8099 5.72295C11.0703 5.83197 11.3215 5.96097 11.5637 6.10814C11.6802 6.179 11.7931 6.25531 11.9042 6.33344C11.9296 6.35161 11.957 6.3716 11.9824 6.38977C11.9988 6.40249 12.0134 6.41339 12.0298 6.42611C12.0808 6.46426 11.926 6.34616 11.977 6.38432C12.0334 6.42974 12.0899 6.47335 12.1445 6.52059C12.3557 6.69865 12.5523 6.89124 12.7344 7.09838C12.7799 7.14925 12.8236 7.20194 12.8655 7.25282C12.8855 7.27825 12.9055 7.30187 12.9256 7.32731C12.9401 7.34548 12.9765 7.39272 12.9201 7.32004C12.8564 7.23828 12.9146 7.31277 12.9292 7.33094C13.013 7.44359 13.0931 7.55806 13.1677 7.67616C13.337 7.94144 13.4827 8.21943 13.6047 8.50832C13.5865 8.46472 13.5683 8.42111 13.5501 8.3775C13.7376 8.82447 13.865 9.29324 13.9306 9.77473C13.9233 9.72568 13.9178 9.67844 13.9106 9.62938C13.9743 10.1163 13.9743 10.6087 13.9106 11.0957C13.9178 11.0466 13.9233 10.9994 13.9306 10.9503C13.865 11.43 13.7376 11.9006 13.5501 12.3475C13.5683 12.3039 13.5865 12.2603 13.6047 12.2167C13.4954 12.4765 13.3662 12.7273 13.2187 12.9689C13.1477 13.0852 13.0712 13.1979 12.9929 13.3087C12.9747 13.3341 12.9547 13.3614 12.9365 13.3868C12.9237 13.4032 12.9128 13.4177 12.9001 13.4341C12.8618 13.4849 12.9802 13.3305 12.9419 13.3814C12.8964 13.4377 12.8527 13.494 12.8054 13.5485C12.627 13.7593 12.434 13.9555 12.2264 14.1372C12.1754 14.1826 12.1226 14.2262 12.0717 14.268C12.0462 14.288 12.0225 14.308 11.997 14.328C11.9788 14.3425 11.9315 14.3789 12.0043 14.3225C12.0862 14.2589 12.0116 14.3171 11.9934 14.3316C11.8805 14.4152 11.7658 14.4952 11.6474 14.5696C11.3816 14.7386 11.103 14.884 10.8136 15.0057C10.8572 14.9875 10.9009 14.9694 10.9446 14.9512C10.4968 15.1384 10.027 15.2655 9.54453 15.3309C9.59369 15.3237 9.64102 15.3182 9.69018 15.311C9.25139 15.3691 8.80896 15.36 8.36836 15.36C7.71655 15.36 7.06474 15.36 6.41293 15.36C5.57358 15.36 4.73242 15.36 3.89308 15.36C3.14842 15.36 2.40375 15.36 1.65908 15.36C1.29312 15.36 0.927164 15.3527 0.563025 15.36C0.557563 15.36 0.552101 15.36 0.546639 15.36C0.260789 15.36 -0.0123156 15.6108 0.000429258 15.9051C0.0131741 16.2013 0.240761 16.4502 0.546639 16.4502C1.09649 16.4502 1.64816 16.4502 2.19801 16.4502C3.33595 16.4502 4.47206 16.4502 5.61 16.4502C6.5604 16.4502 7.51081 16.4502 8.46303 16.4502C8.62689 16.4502 8.79076 16.4502 8.95462 16.4502C9.82855 16.4484 10.6788 16.254 11.4763 15.8997C13.0366 15.2056 14.2437 13.8193 14.7681 12.204C15.307 10.5451 15.0722 8.66821 14.1527 7.18741C13.2551 5.7393 11.7439 4.67457 10.0561 4.37841C9.28234 4.24214 8.49398 4.27485 7.71108 4.27485C6.58771 4.27303 5.46252 4.27121 4.33915 4.27121C3.49799 4.26939 2.65865 4.2694 1.81749 4.26758C1.77379 4.26758 1.72827 4.26758 1.68457 4.26758C1.39873 4.26758 1.12562 4.51832 1.13837 4.81266C1.14929 5.11064 1.37506 5.35956 1.68093 5.35956Z" fill="black"></path>
+                  </svg>
+                  <span>{{ section.settings.trust_badge_3 | default: '30-Day Return' }}</span></div>
+              </div>
+            {%- endif -%}
+
+            <div class="cart-drawer-summary-full">
+              <div class="cart-drawer-summary">
+              {%- comment -%} Discount Code {%- endcomment -%}
+                {%- if section.settings.show_discount_code -%}
+                  <div class="hdt-cart-discount-section">
+                    <label class="hdt-cart-discount__label">{{ section.settings.discount_label | default: 'Do you have a discount code?' }}</label>
+                    <hdt-cart-discount data-cart-scope="main">
+                      <div class="hdt-cart-discount__input-wrap">
+                        <input type="text" 
+                              name="discount" 
+                              class="hdt-cart-discount__input" 
+                              data-cart-discount-input 
+                              placeholder="{{ section.settings.discount_placeholder | default: 'Discount code' }}" 
+                              value="{{ cart.discount }}">
+                        <button type="button" class="hdt-cart-discount__btn" data-cart-discount-apply aria-label="Apply discount">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                          </svg>
+                        </button>
+                      </div>
+                      <div data-cart-discount-error class="hdt-discount-error hdt-text-error hdt-mt-2" style="display: none; color: #d32f2f; font-size: 13px; margin-top: 8px;">{{ section.settings.discount_error_message | default: 'Enter a valid discount code' }}</div>
+                    </hdt-cart-discount>
+                    
+                    {%- if cart.cart_level_discount_applications.size > 0 -%}
+                      {%- for discount in cart.cart_level_discount_applications -%}
+                        <div class="hdt-cart-discount-applied">
+                          <div class="hdt-cart-discount-applied__info">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2">
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span class="hdt-cart-discount-applied__code">{{ discount.title }}</span>
+                            <span class="hdt-cart-discount-applied__amount">(-{{ discount.total_allocated_amount | money }})</span>
+                          </div>
+                          <button type="button" class="hdt-cart-discount-applied__remove" data-discount-code="{{ discount.title }}" aria-label="Remove discount">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <line x1="18" y1="6" x2="6" y2="18"></line>
+                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                          </button>
+                        </div>
+                      {%- endfor -%}
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+                <div class="cart-drawer-summary__row"><span class="ct-btm-subtotal">Item Subtotal (<span data-cart-count>{{ cart.item_count }}</span>)</span><span class="ct-btm-subtota" data-cart-subtotal>{{ cart.items_subtotal_price | money }} <span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400;">Inc VAT</span></span></div>
+                <div class="cart-drawer-summary__row"><span class="ct-btm-delivery">Delivery</span><span>Calculated in checkout</span></div>
+                <div class="cart-drawer-summary__row"><span class="ct-btm-tax">Estimated tax</span><span class="cart-drawer-summary__muted">Calculated in checkout</span></div>
+
+                {%- if cart.cart_level_discount_applications.size > 0 -%}
+                  {%- for discount in cart.cart_level_discount_applications -%}
+                    <div class="cart-drawer-summary__row cart-drawer-summary__row--discount"><span class="ct-btm-discount">{{ discount.title }}</span><span style="color:#2e7d32;font-weight:600;">-{{ discount.total_allocated_amount | money }}</span></div>
+                  {%- endfor -%}
+                {%- endif -%}
+
+                <div class="cart-drawer-summary__row cart-drawer-summary__row--total"><span class="ct-btm-total">Total</span><span data-cart-total>{{ cart.total_price | money }} <span class="tax-text" style="color:#000;font-size:12px;font-weight:400;">Inc VAT</span></span></div>
+
+              </div>
+              {%- if section.settings.show_vat_validation -%}
+                {% content_for "blocks" %}
+              {%- endif -%}
+              {%- if section.settings.show_terms_checkbox -%}
+                <label class="cart-drawer-terms"><input type="checkbox" class="cart-drawer-terms__input" id="cart-agree-terms"><span class="cart-drawer-terms__check"></span><span class="cart-drawer-terms__text">I agree with the <a href="{{ section.settings.terms_page_url | default: '/policies/terms-of-service' }}">terms and conditions</a></span></label>
+              {%- endif -%}
+              <form action="{{ routes.cart_url }}" method="POST" id="CartDrawer-Form"><button type="submit" name="checkout" class="cart-drawer-checkout-btn">Proceed to Checkout</button></form>
+              <div class="cart-drawer-cta-info"><a href="/cart" class="cart-drawer-checkout-btn-link">VIEW CART</a></div>
+              <div class="cart-drawer-payments">{{ 'visa' | payment_type_svg_tag }}{{ 'apple_pay' | payment_type_svg_tag }}{{ 'google_pay' | payment_type_svg_tag }}{{ 'master' | payment_type_svg_tag }}{{ 'paypal' | payment_type_svg_tag }}<span class="cart-drawer-payments__more">+5 more</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cart-drawer-wishlist-panel" id="wishlist-panel" style="display:none">
+        <div class="cart-drawer-header">
+          <h3 class="cart-drawer-header__title">Your Wishlist (<span id="wishlist-count">0</span>)</h3>
+          <div class="cart-drawer-header__actions">
+            <button type="button" class="cart-drawer-toggle__btn cart-drawer-toggle__btn--cart" data-drawer-toggle="cart"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-drawer-toggle__count" data-cart-count>{{ cart.item_count }}</span></button>
+            <button type="button" class="cart-drawer-toggle__btn cart-drawer-toggle__btn--wishlist is-active" data-drawer-toggle="wishlist"><svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M12.5 0H0.5C0.367 0 0.24 0.056 0.146 0.156C0.053 0.255 0 0.39 0 0.531V15.399C0 15.5 0.027 15.599 0.078 15.684C0.129 15.769 0.202 15.837 0.288 15.88C0.374 15.922 0.47 15.938 0.564 15.925C0.658 15.913 0.747 15.871 0.82 15.807L6.5 10.78L12.18 15.807C12.27 15.886 12.383 15.93 12.5 15.93C12.573 15.93 12.646 15.913 12.712 15.88C12.798 15.837 12.871 15.769 12.922 15.684C12.973 15.599 13 15.5 13 15.399V0.531C13 0.39 12.947 0.255 12.854 0.156C12.76 0.056 12.633 0 12.5 0ZM12 14.266L6.82 9.681C6.73 9.602 6.617 9.558 6.5 9.558C6.383 9.558 6.27 9.602 6.18 9.681L1 14.266V1.062H12V14.266Z" fill="currentColor"/></svg><span class="cart-drawer-toggle__count" id="toggle-wishlist-count-header">0</span></button>
+            <button class="cart-drawer-header__close" aria-controls="CartDrawer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+        </div>
+        <div class="cart-drawer-wishlist-content" id="wishlist-content">
+          <div class="wishlist-items" id="wishlist-items"></div>
+          <div class="cart-drawer-empty" id="wishlist-empty">
+            <div class="cart-drawer-empty__icon"><svg width="40" height="48" viewBox="0 0 13 16" fill="none"><path d="M12.5 0H0.5C0.367 0 0.24 0.056 0.146 0.156C0.053 0.255 0 0.39 0 0.531V15.399C0 15.5 0.027 15.599 0.078 15.684C0.129 15.769 0.202 15.837 0.288 15.88C0.374 15.922 0.47 15.938 0.564 15.925C0.658 15.913 0.747 15.871 0.82 15.807L6.5 10.78L12.18 15.807C12.27 15.886 12.383 15.93 12.5 15.93C12.573 15.93 12.646 15.913 12.712 15.88C12.798 15.837 12.871 15.769 12.922 15.684C12.973 15.599 13 15.5 13 15.399V0.531C13 0.39 12.947 0.255 12.854 0.156C12.76 0.056 12.633 0 12.5 0ZM12 14.266L6.82 9.681C6.73 9.602 6.617 9.558 6.5 9.558C6.383 9.558 6.27 9.602 6.18 9.681L1 14.266V1.062H12V14.266Z" fill="currentColor"/></svg></div>
+            <h3 class="cart-drawer-empty__title">Your wishlist is empty</h3>
+            <p class="cart-drawer-empty__text">Save items you love by clicking the bookmark icon</p>
+            <a href="/collections/all" class="cart-drawer-empty__btn">Browse Products</a>
+          </div>
+        </div>
+        <div class="cart-drawer-wishlist-footer" id="wishlist-footer" style="display:none"><a href="/pages/wishlist" class="cart-drawer-checkout-btn">View Full Wishlist</a></div>
+      </div>
+    </div>
+  </dialog>
+</hdt-cart-drawer>
+
+{{- '<!-- CQV PRE-RENDERED BLOCKS (Liquid, correct market currency) -->' -}}
+{%- if section.settings.collection != blank -%}
+  {%- for product in collections[section.settings.collection].products limit: 5 -%}
+    {%- assign first_variant = product.variants | first -%}
+    {%- assign has_compare = false -%}
+    {%- if product.compare_at_price > product.price -%}{%- assign has_compare = true -%}{%- endif -%}
+    {%- assign discount_pct = 0 -%}
+    {%- if has_compare -%}{%- assign discount_pct = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}{%- endif -%}
+    <div class="cqv-prerendered" data-cqv-handle="{{ product.handle }}" style="display:none">
+      <div class="cqv-product{% if product.images.size > 1 %} has-gallery{% endif %}">
+        <div class="cqv-product__images">
+          <div class="cqv-gallery">
+            {%- if product.images.size > 0 -%}
+              {%- for img in product.images -%}
+                <div class="cqv-gallery__item"><img src="{{ img | image_url: width: 800 }}" alt="{{ img.alt | escape }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"></div>
+              {%- endfor -%}
+            {%- else -%}
+              <div class="cqv-gallery__placeholder">No image</div>
+            {%- endif -%}
+          </div>
+        </div>
+        <div class="cqv-product__info">
+          <h2 class="cqv-product__title">{{ product.title }}</h2>
+          <div class="cqv-product__pricing">
+            <div class="hdt-price-wrapp cqv-hdt-price{% if has_compare %} hdt-price--show-badge{% endif %}">
+              <div class="hdt-price__container">
+                <div class="hdt-price__sale hdt-price__list">
+                  <hdt-compare-at-price class="hdt-compare-at-price"{% unless has_compare %} hidden{% endunless %}>
+                    <span class="hdt-money">{% if has_compare %}{{ product.compare_at_price | money }}{% endif %}</span>
+                  </hdt-compare-at-price>
+                  <hdt-price class="hdt-price" data-qv-price>
+                    <span class="hdt-money">{{ product.price | money }} <span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400;" >Inc VAT</span></span>
+                  </hdt-price>
+                </div>
+              </div>
+              {% if has_compare and discount_pct > 0 %}<span class="sale-badge">{{ discount_pct }}% OFF</span>{% endif %}
+            </div>
+          </div>
+          {% comment %} <p class="cqv-product__tax">Tax included.</p> {% endcomment %}
+          {%- if product.variants.size > 1 -%}
+            {%- for option in product.options -%}
+              {%- assign opt_idx = forloop.index0 -%}
+              <div class="cqv-option" data-option-index="{{ opt_idx }}">
+                <div class="cqv-option__label">{{ option }}: <strong data-option-selected="{{ opt_idx }}">{{ product.variants[0].options[opt_idx] }}</strong></div>
+                <div class="cqv-option__btns">
+                  {%- assign seen_values = '' -%}
+                  {%- for variant in product.variants -%}
+                    {%- assign opt_val = variant.options[opt_idx] -%}
+                    {%- unless seen_values contains opt_val -%}
+                      {%- assign seen_values = seen_values | append: opt_val | append: '|||' -%}
+                      {%- assign is_first = forloop.first -%}
+                      <button type="button" class="cqv-option__btn {% if is_first %}is-active{% endif %} {% unless variant.available %}is-soldout{% endunless %}" data-option-index="{{ opt_idx }}" data-option-value="{{ opt_val }}">{{ opt_val }}</button>
+                    {%- endunless -%}
+                  {%- endfor -%}
+                </div>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+          <div class="cqv-product__availability" data-qv-availability>{% unless first_variant.available %}<span class="cqv-soldout-text">Sold Out</span>{% endunless %}</div>
+          <div class="cqv-product__actions">
+            <div class="cqv-qty">
+              <button type="button" class="cqv-qty__btn" data-qv-minus>−</button>
+              <input type="text" class="cqv-qty__input" value="1" data-qv-qty readonly>
+              <button type="button" class="cqv-qty__btn" data-qv-plus>+</button>
+            </div>
+            <button type="button" class="cqv-add {% unless first_variant.available %}is-disabled{% endunless %}" data-qv-add data-variant-id="{{ first_variant.id }}" {% unless first_variant.available %}disabled{% endunless %}>{% if first_variant.available %}ADD TO CART{% else %}SOLD OUT{% endif %}</button>
+          </div>
+          <button type="button" class="cqv-wishlist" data-qv-wishlist data-product-id="{{ product.id }}">
+            <svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M12.5 0H0.5C0.367 0 0.24 0.056 0.146 0.156C0.053 0.255 0 0.39 0 0.531V15.399C0 15.5 0.027 15.599 0.078 15.684C0.129 15.769 0.202 15.837 0.288 15.88C0.374 15.922 0.47 15.938 0.564 15.925C0.658 15.913 0.747 15.871 0.82 15.807L6.5 10.78L12.18 15.807C12.27 15.886 12.383 15.93 12.5 15.93C12.573 15.93 12.646 15.913 12.712 15.88C12.798 15.837 12.871 15.769 12.922 15.684C12.973 15.599 13 15.5 13 15.399V0.531C13 0.39 12.947 0.255 12.854 0.156C12.76 0.056 12.633 0 12.5 0ZM12 14.266L6.82 9.681C6.73 9.602 6.617 9.558 6.5 9.558C6.383 9.558 6.27 9.602 6.18 9.681L1 14.266V1.062H12V14.266Z" fill="currentColor"></path></svg>
+            <span class="cqv-wishlist__text">Add to Wishlist</span>
+          </button>
+        </div>
+      </div>
+      {{- '<!-- VARIANTS_JSON_START -->' -}}
+      <script type="application/json" class="cqv-variants-json">
+        [{% for variant in product.variants %}{%- assign v_has_compare = false -%}{%- if variant.compare_at_price > variant.price -%}{%- assign v_has_compare = true -%}{%- endif -%}{%- assign v_discount = 0 -%}{%- if v_has_compare -%}{%- assign v_discount = variant.compare_at_price | minus: variant.price | times: 100 | divided_by: variant.compare_at_price -%}{%- endif -%}{"id":{{ variant.id }},"price":"{{ variant.price | money }}","compare_price":"{% if v_has_compare %}{{ variant.compare_at_price | money }}{% endif %}","has_compare":{{ v_has_compare }},"discount_pct":{{ v_discount }},"available":{{ variant.available }},"options":[{% for opt in variant.options %}"{{ opt }}"{% unless forloop.last %},{% endunless %}{% endfor %}]}{% unless forloop.last %},{% endunless %}{% endfor %}]
+      </script>
+    </div>
+  {%- endfor -%}
+{%- endif -%}
+
+<div class="cqv-overlay" id="cqv-overlay"></div>
+<div class="cqv-modal" id="cqv-modal">
+  <div class="cqv-modal__header"><span class="cqv-modal__title">SELECT OPTIONS</span><button type="button" class="cqv-modal__close" id="cqv-close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+  <div class="cqv-modal__body" id="cqv-content"></div>
+</div>
+
+<style>
+.cqv-modal .hdt-money,
+.cqv-modal hdt-price .hdt-money,
+.cqv-modal hdt-compare-at-price .hdt-money,
+.cqv-modal .hdt-price__sale hdt-price .hdt-money {
+    opacity: 1 !important;
+}
+
+.cart-drawer-checkout-btn{display:flex;align-items:center;justify-content:center}
+.cart-drawer-bottom .cart-drawer-cta-info{text-align:center;margin:5px 0 5px; line-height: normal;}
+.cart-drawer-bottom .cart-drawer-checkout-btn-link{text-decoration:underline;font-weight:500;color:#000;}
+.cart-drawer-item__wishlist.is-added svg path{fill:currentColor}
+.cart-drawer-item__wishlist.is-added{color:#ef4444}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-radius:50%;border-top-color:transparent;animation:spin .8s linear infinite;margin-right:6px;vertical-align:middle}
+.is-updating{opacity:.5;pointer-events:none}
+.cqv-option__btn.is-soldout{opacity:.4;text-decoration:line-through;cursor:not-allowed}
+.cqv-add.is-disabled{opacity:.3 !important;cursor:not-allowed !important;background:#0047ab;}
+.cqv-soldout-text{color:#dc3545;font-size:14px;font-weight:500}
+.cqv-product__availability{min-height:20px;margin-bottom:10px}
+.cqv-wishlist{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 20px;margin-top:15px;background:transparent;border:1px solid #ddd;border-radius:12px;cursor:pointer;transition:all .2s ease;font-size:14px}
+.cqv-wishlist:hover{border-color:#0047ab;background:#f9f9f9}
+.cqv-wishlist.is-active{background:#0047ab;border-color:#0047ab;color:#fff}
+.cqv-wishlist__icon{flex-shrink:0;transition:all .2s ease}
+.cqv-wishlist.is-active .cqv-wishlist__icon{color:#fff}
+.wishlist-item{display:flex;gap:15px;padding:15px 0;border-bottom:1px solid #eee;transition:all .3s ease}
+.wishlist-item__image{flex-shrink:0;width:80px;height:80px}
+.wishlist-item__image img{width:100%;height:100%;object-fit:cover;border-radius:4px}
+.wishlist-item__placeholder{width:100%;height:100%;background:#f5f5f5;border-radius:4px}
+.wishlist-item__content{flex:1;display:flex;flex-direction:column;gap:5px;min-width:0}
+.wishlist-item__title{font-size:14px;font-weight:500;color:#333;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wishlist-item__title:hover{text-decoration:underline}
+.wishlist-item__prices{display:flex;align-items:center;gap:8px}
+.wishlist-item__price{font-size:14px;font-weight:600}
+.wishlist-item__price.is-sale{color:#ef4444}
+.wishlist-item__compare{font-size:12px;color:#999}
+.wishlist-item__actions{display:flex;gap:10px;margin-top:auto}
+.wishlist-item__quickview,.wishlist-item__remove{padding:6px 12px;font-size:12px;border:1px solid #ddd;background:#fff;border-radius:4px;cursor:pointer;transition:all .2s ease}
+.wishlist-item__quickview:hover{background:#0047ab;color:#fff;border-color:#0047ab}
+.wishlist-item__remove:hover{background:#fef2f2;color:#ef4444;border-color:#ef4444}
+.wishlist-error{padding:20px;text-align:center;color:#999}
+
+.hdt-cart-discount__label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 5px;
+  display: block;
+  line-height: normal;
+}
+.hdt-cart-discount__btn {
+  width: 50px;
+  height: 32px;
+  background: #0047ab;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.hdt-cart-discount__btn:hover {
+  background: #002266;
+}
+.hdt-cart-discount__btn svg {
+  width: 20px;
+  height: 20px;
+  color: #fff;
+}
+.hdt-cart-discount__input-wrap {
+    display: flex;
+    gap: 10px;
+}
+.hdt-cart-discount__input-wrap input.hdt-cart-discount__input {
+    border: 1px solid #0047AB;
+    border-radius: 6px;
+    padding: 0 10px;
+    width: 100%;
+}
+.hdt-cart-discount-section {
+    margin-bottom: 10px;
+}
+.hdt-cart-discount-applied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #e8f5e9;
+  padding: 2px 15px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+.hdt-cart-discount-applied__info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hdt-cart-discount-applied__code {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+.hdt-cart-discount-applied__amount {
+  color: #2e7d32;
+  font-weight: 500;
+}
+.hdt-cart-discount-applied__remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 5px;
+}
+.hdt-cart-discount-applied__remove:hover {
+  color: #1a1a1a;
+}
+.cart-drawer-summary__row span.ct-btm-discount {
+    font-size: 14px;
+    color: #000000;
+    font-weight: 500;
+}
+.cart-drawer-summary__row--total {
+  border-top: 1px solid #e5e5e5;
+  margin-top: 0px;
+  padding-top: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: normal;
+}
+.cart-drawer-summary__row--total [data-cart-total] {
+  color: #0047ab;
+  font-size: 18px;
+  font-weight: 700;
+}
+.cart-drawer-summary__row--discount {
+  font-size: 13px;
+}
+.cqv-product__pricing .hdt-price .hdt-money {
+    color: #0047ab;
+}
+/* QV price wrapper */
+.cqv-product__pricing .hdt-price-wrapp { margin:0; }
+.cqv-product__pricing .hdt-price__container { display:flex;align-items:baseline;gap:8px;flex-wrap:wrap; }
+.cqv-product__pricing .hdt-price__sale { display:flex;align-items:baseline;gap:8px;flex-wrap:wrap; }
+.cqv-product__pricing hdt-price.hdt-price { font-size:2.5rem;font-weight:700;color:#0047ab;letter-spacing:0; }
+.cqv-product__pricing hdt-compare-at-price.hdt-compare-at-price { font-size:1.6rem;color:#999;text-decoration:line-through; }
+.cqv-product__pricing .hdt-price__decimal { font-size:0.65em;font-weight:inherit;margin-left:1px;display:inline; }
+.cqv-product__pricing .hdt-money { display:inline;white-space:nowrap; }
+{% comment %} .cqv-product__pricing .sale-badge { display:inline-block;margin-top:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;background:#ef4444;color:#fff;padding:2px 8px;border-radius:4px; } {% endcomment %}
+
+div#ExemptifyCartValidationSnippet input#exemptify_email{border:1px solid #0047AB;max-width:175px !important;border-radius: 6px;  padding-top: 6px !important; padding-bottom: 6px !important;}
+div#ExemptifyCartValidationSnippet input#VatId{border:1px solid #0047AB;max-width:175px !important;margin-right:10px;border-radius: 6px;  padding-top: 6px !important; padding-bottom: 6px !important;}
+div#ExemptifyCartValidationSnippet{margin:10px 0;}
+div#ExemptifyCartValidationSnippet div{color:#000;margin:5px 0;line-height: normal;}
+.taxify-price-container.cart-drawer-item__compare{margin:0;}
+.taxify-price-container.cart-drawer-item__compare span.taxify-price.taxify-price--exclusive{color:#a3a3a3 !important;font-size:12px !important;text-align:left !important;margin-top:5px !important;}
+@media screen and (max-width:767px){
+  div#ExemptifyCartValidationSnippet input#exemptify_email,
+  div#ExemptifyCartValidationSnippet input#VatId{max-width:47% !important;}
+}
+</style>
+
+<script>
+(function(){
+  'use strict';
+  // ── RELATED PRODUCTS (Shopify Recommendations API) ───────────────────────
+async function fetchRelatedProducts() {
+  try {
+    const cartRes = await fetch('/cart.js');
+    const cart    = await cartRes.json();
+    if (cart.currency) _activeCurrencyISO = cart.currency;
+    if (!cart.items || cart.items.length === 0) return [];
+    const cartProductIds = [...new Set(cart.items.map(item => item.product_id))];
+    const sourceId = cartProductIds[0];
+    const res  = await fetch(`/recommendations/products.json?product_id=${sourceId}&limit=8&intent=related`);
+    const data = await res.json();
+    const filtered = data.products.filter(p => !cartProductIds.includes(p.id)).slice(0, 5);
+
+    const enriched = await Promise.all(filtered.map(async (product) => {
+      try {
+        const pRes  = await fetch(`/products/${product.handle}`);
+        const pText = await pRes.text();
+        const pDoc  = new DOMParser().parseFromString(pText, 'text/html');
+        const priceEl   = pDoc.querySelector('.hdt-price__sale hdt-price .hdt-money, hdt-price .hdt-money');
+        const compareEl = pDoc.querySelector('.hdt-compare-at-price .hdt-money, hdt-compare-at-price .hdt-money');
+        const priceText   = priceEl   ? priceEl.textContent.replace(/inc\s*vat/gi,'').trim() : null;
+        const compareText = compareEl ? compareEl.textContent.trim() : null;
+        const hasComp     = !!(compareText && compareText.trim().length > 0);
+        return Object.assign({}, product, {
+          _priceText:   priceText,
+          _compareText: hasComp ? compareText : null,
+          _hasCompare:  hasComp,
+        });
+      } catch(e) {
+        return product;
+      }
+    }));
+
+    return enriched;
+  } catch(e) {
+    console.error('Related products fetch error:', e);
+    return [];
+  }
+}
+
+function renderRelatedProductsInPanel(products) {
+  const container  = document.getElementById('cart-drawer-related-products');
+  const panelWrap  = document.getElementById('cart-related-panel');
+  const panelFull  = document.getElementById('cart-drawer-related-full');
+  if (!container) return;
+
+  if (!products || products.length === 0) {
+    if (panelWrap) panelWrap.style.display = 'none';
+    return;
+  }
+
+  if (panelWrap) panelWrap.style.display = '';
+
+  container.innerHTML = products.map(product => {
+    const imgSrc     = product.featured_image
+      ? product.featured_image.replace(/(\?.*)?$/, '') + '?width=200'
+      : null;
+    const imgTag     = imgSrc
+      ? `<img src="${imgSrc}" alt="${product.title.replace(/"/g,'&quot;')}" width="100" height="100" loading="lazy">`
+      : '<div style="width:100px;height:100px;background:#f5f5f5;border-radius:4px;"></div>';
+
+    const hasCompare    = product._hasCompare || (product.compare_at_price && product.compare_at_price > product.price);
+    const priceDisplay  = product._priceText  || fmtCurrency(product.price);
+    const compareDisplay= product._compareText|| (hasCompare ? fmtCurrency(product.compare_at_price) : null);
+
+    const priceHtml = hasCompare
+      ? `<s class="cart-drawer-left-product__compare">${compareDisplay}</s>
+        <span class="cart-drawer-left-product__price cart-drawer-left-product__price--sale">
+          ${priceDisplay}
+          <span class="tax-text" style="color:#000;font-size:12px;font-weight:400;">Inc VAT</span>
+        </span>`
+      : `<span class="cart-drawer-left-product__price">
+          ${priceDisplay}
+          <span class="tax-text" style="color:#000;font-size:12px;font-weight:400;">Inc VAT</span>
+        </span>`;
+
+    return `<div class="cart-drawer-left-product">
+      <div class="cart-drawer-left-product__image">
+        <a href="/products/${product.handle}">${imgTag}</a>
+        <button type="button" class="cart-drawer-left-product__quickview"
+          data-quick-view data-product-handle="${product.handle}">
+          <svg width="17" height="11" viewBox="0 0 17 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M8.5 0C10.3723 0 12.1095 0.821176 13.5136 1.82296C15.5567 3.28163 16.8833 5.10681 16.8833 5.10681C17.0389 5.32008 17.0389 5.60846 16.8833 5.82173C16.8833 5.82173 15.5567 7.64696 13.5136 9.10558C12.1096 10.1074 10.3723 10.9285 8.5 10.9285C6.62765 10.9285 4.89053 10.1074 3.48641 9.10558C1.44328 7.6469 0.116686 5.82173 0.116686 5.82173C-0.0388954 5.60846 -0.0388954 5.32008 0.116686 5.10681C0.116686 5.10681 1.4433 3.28157 3.48641 1.82296C4.89045 0.821176 6.62765 0 8.5 0ZM8.5 1.2143C6.88726 1.2143 5.40208 1.94742 4.19226 2.81111C2.84893 3.7704 1.84177 4.90048 1.37956 5.4643C1.84175 6.02818 2.84885 7.15825 4.19226 8.11749C5.40201 8.98116 6.88722 9.7143 8.5 9.7143C10.1128 9.7143 11.5979 8.98117 12.8077 8.11749C14.1511 7.15819 15.1582 6.02812 15.6204 5.4643C15.1583 4.90042 14.1511 3.77034 12.8077 2.81111C11.598 1.94744 10.1128 1.2143 8.5 1.2143ZM8.5 2.42859C10.1757 2.42859 11.5357 3.78861 11.5357 5.46434C11.5357 7.14007 10.1757 8.50008 8.5 8.50008C6.82427 8.50008 5.46426 7.14007 5.46426 5.46434C5.46426 3.78861 6.82427 2.42859 8.5 2.42859ZM8.5 3.64289C7.49441 3.64289 6.67855 4.45874 6.67855 5.46434C6.67855 6.46993 7.49441 7.28578 8.5 7.28578C9.50559 7.28578 10.3214 6.46993 10.3214 5.46434C10.3214 4.45874 9.50559 3.64289 8.5 3.64289Z" fill="white"/>
+          </svg> QUICK VIEW
+        </button>
+      </div>
+      <div class="cart-drawer-left-product__info">
+        <a href="/products/${product.handle}" class="cart-drawer-left-product__name">
+          ${product.title}
+        </a>
+        <div class="cart-drawer-left-product__prices"><span class="money">${priceHtml}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Animation trigger — sirf tab jab panel pehli baar load ho
+  if (panelFull && !panelFull.classList.contains('is-visible')) {
+      setTimeout(() => panelFull.classList.add('is-visible'), 150);
+  } else if (panelFull) {
+      panelFull.classList.add('is-visible');
+  }
+  // Taxify/currency conversion trigger karo naye rendered prices pe
+  setTimeout(triggerTaxifyRefresh, 200);
+}
+
+function renderRelatedProductsInScroll(products) {
+  const container = document.getElementById('cart-recommendations-scroll');
+  const recsWrap  = document.getElementById('cart-recommendations');
+  if (!container) return;
+
+  if (!products || products.length === 0) {
+    if (recsWrap) recsWrap.style.display = 'none';
+    return;
+  }
+  if (recsWrap) recsWrap.style.display = '';
+
+  container.innerHTML = products.map(product => {
+    const imgSrc = product.featured_image
+      ? product.featured_image.replace(/(\?.*)?$/, '') + '?width=200'
+      : null;
+    const imgTag = imgSrc
+      ? `<img src="${imgSrc}" alt="${product.title.replace(/"/g,'&quot;')}" loading="lazy">`
+      : '';
+    const hasCompare    = product._hasCompare || (product.compare_at_price && product.compare_at_price > product.price);
+    const priceDisplay  = product._priceText  || fmtCurrency(product.price);
+    const compareDisplay= product._compareText || (hasCompare ? fmtCurrency(product.compare_at_price) : null);
+
+    return `<div class="cart-drawer-rec-card">
+      <div class="cart-drawer-rec-card__image">
+        <a href="/products/${product.handle}">${imgTag}</a>
+        <button type="button" class="cart-drawer-rec-card__quickview-hover" data-quick-view data-product-handle="${product.handle}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Quick View
+        </button>
+      </div>
+      <div class="cart-drawer-rec-card__info">
+        <a href="/products/${product.handle}" class="cart-drawer-rec-card__title">${product.title}</a>
+        <div class="cart-drawer-rec-card__prices">
+          <span class="cart-drawer-rec-card__price">${priceDisplay}</span>
+          ${hasCompare ? `<s class="cart-drawer-rec-card__compare">${compareDisplay}</s>` : ''}
+        </div>
+        <button type="button" class="cart-drawer-rec-card__quickview-text" data-quick-view data-product-handle="${product.handle}"><u>Quick View</u></button>
+      </div>
+    </div>`;
+  }).join('');
+
+  setTimeout(triggerTaxifyRefresh, 200);
+}
+
+var _lastRelatedProducts = null;
+var _activeCurrencyISO = (function() {
+  var el = document.querySelector('hdt-cart-drawer');
+  return (el && el.dataset.currencyIso) || '{{ cart.currency.iso_code }}';
+})();
+
+async function updateRelatedPanel() {
+  const products = await fetchRelatedProducts();
+  _lastRelatedProducts = products;
+  renderRelatedProductsInPanel(products);
+  renderRelatedProductsInScroll(products);
+}
+
+function reRenderRelatedWithNewCurrency() {
+  if (_lastRelatedProducts && _lastRelatedProducts.length > 0) {
+    renderRelatedProductsInPanel(_lastRelatedProducts);
+    renderRelatedProductsInScroll(_lastRelatedProducts);
+  }
+}
+// ────────────────────────────────────────────────────────────────────────────
+  const WL_KEY='theme4:wishlist:id';
+
+  function sectionUrl() {
+    return '/?section_id=cart-drawer&_=' + Date.now();
+  }
+
+  function replaceShippingBar(doc) {
+    const liquidBar   = doc.getElementById('cart-shipping-bar');
+    const currentBar  = document.getElementById('cart-shipping-bar');
+    if (liquidBar && currentBar) currentBar.replaceWith(liquidBar.cloneNode(true));
+  }
+
+  function formatMoney(cents, format) {
+    if (typeof cents === 'string') cents = cents.replace('.', '');
+    var value = '';
+    var placeholderRegex = /\{\{\s*(\w+)\s*\}\}/;
+    var formatString = format || (window.Shopify && window.Shopify.money_format) || '€{{amount_with_comma_separator}}';
+    function formatWithDelimiters(number, precision, thousands, decimal) {
+      precision = precision == null ? 2 : precision;
+      thousands = thousands == null ? ',' : thousands;
+      decimal   = decimal   == null ? '.' : decimal;
+      if (isNaN(number) || number == null) return '0';
+      number = (number / 100.0).toFixed(precision);
+      var parts   = number.split('.');
+      var dollars = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + thousands);
+      var cents2  = parts[1] ? (decimal + parts[1]) : '';
+      return dollars + cents2;
+    }
+    var match = formatString.match(placeholderRegex);
+    if (match) {
+      switch (match[1]) {
+        case 'amount':                                   value = formatWithDelimiters(cents, 2); break;
+        case 'amount_no_decimals':                       value = formatWithDelimiters(cents, 0); break;
+        case 'amount_with_comma_separator':              value = formatWithDelimiters(cents, 2, '.', ','); break;
+        case 'amount_no_decimals_with_comma_separator':  value = formatWithDelimiters(cents, 0, '.', ''); break;
+        case 'amount_with_apostrophe_separator':         value = formatWithDelimiters(cents, 2, "'", '.'); break;
+        default: value = formatWithDelimiters(cents, 2); break;
+      }
+      return formatString.replace(placeholderRegex, value);
+    }
+    return '€' + formatWithDelimiters(cents, 2, '.', ',');
+  }
+
+  const COMMA_DECIMAL_CURRENCIES = new Set(['EUR','DKK','NOK','SEK','ISK','PLN','CZK','HUF','RON','BGN','HRK','RSD','BAM','MKD','ALL','TRY','UAH','RUB','KZT','UZS','AZN','AMD','GEL','MDL','BRL','ARS','CLP','COP','VEF','UYU','PYG','BOB','PEN','GTQ','HNL','NIO','CRC','SVC','DOP','AWG','ANG','SRD','MZN','MNT','LAK','IDR','VND','CHF']);
+  const CURRENCY_SYMBOL_MAP = {'AED':'د.إ','AFN':'؋','ALL':'Lek','AMD':'֏','ANG':'ƒ','AOA':'Kz','ARS':'$','AUD':'$','AWG':'ƒ','AZN':'₼','BAM':'KM','BBD':'$','BDT':'৳','BGN':'лв','BHD':'.د.ب','BMD':'$','BND':'$','BOB':'Bs.','BRL':'R$','BSD':'$','BWP':'P','BYR':'p.','BZD':'BZ$','CAD':'$','CHF':'CHF','CLP':'$','CNY':'¥','COP':'$','CRC':'₡','CUP':'₱','CZK':'Kč','DKK':'kr','DOP':'RD$','EGP':'£','EUR':'€','FJD':'$','GBP':'£','GEL':'₾','GHS':'₵','GIP':'£','GTQ':'Q','GYD':'$','HKD':'$','HNL':'L','HRK':'kn','HUF':'Ft','IDR':'Rp','ILS':'₪','INR':'₹','IRR':'﷼','ISK':'kr','JMD':'J$','JPY':'¥','KES':'KSh','KGS':'лв','KHR':'៛','KPW':'₩','KRW':'₩','KWD':'د.ك','KYD':'$','KZT':'лв','LAK':'₭','LBP':'£','LKR':'₨','LRD':'$','MAD':'MAD','MDL':'L','MKD':'ден','MNT':'₮','MUR':'₨','MVR':'Rf','MXN':'$','MYR':'RM','MZN':'MT','NAD':'$','NGN':'₦','NIO':'C$','NOK':'kr','NPR':'₨','NZD':'$','OMR':'﷼','PAB':'B/.','PEN':'S/.','PHP':'₱','PKR':'₨','PLN':'zł','PYG':'Gs','QAR':'﷼','RON':'lei','RSD':'Дин.','RUB':'₽','SAR':'﷼','SCR':'₨','SEK':'kr','SGD':'$','SHP':'£','SOS':'S','SRD':'$','SYP':'£','THB':'฿','TRY':'₺','TTD':'TT$','TWD':'NT$','UAH':'₴','USD':'$','UYU':'$U','UZS':'лв','VEF':'Bs.F','VND':'₫','XCD':'$','YER':'﷼','ZAR':'R','ZWD':'Z$'};
+
+  function getActiveCurrencyFormat(isoOverride) {
+    const hdtEl = document.querySelector('hdt-cart-drawer');
+  const iso = isoOverride
+    || _activeCurrencyISO
+    || (hdtEl && hdtEl.dataset.currencyIso)
+    || (window.Shopify && window.Shopify.currency && window.Shopify.currency.active)
+    || '{{ cart.currency.iso_code }}';
+    const symbol = CURRENCY_SYMBOL_MAP[iso] || iso;
+    const noDecimalCurrencies = new Set(['JPY','KRW','VND','IDR','ISK','CLP','GNF','KMF','MGA','PYG','RWF','UGX','XAF','XOF','XPF']);
+    if (noDecimalCurrencies.has(iso)) return symbol + '{{amount_no_decimals_with_comma_separator}}';
+    if (COMMA_DECIMAL_CURRENCIES.has(iso)) return symbol + '{{amount_with_comma_separator}}';
+    return symbol + '{{amount}}';
+  }
+
+  const fmtCurrency = (cents, isoOverride) => formatMoney(parseInt(cents), getActiveCurrencyFormat(isoOverride));
+  const fmt = c => formatMoney(parseInt(c));
+
+  const qvPriceCache = {};
+
+  async function fetchLiquidPrice(handle) {
+    if (qvPriceCache[handle]) return qvPriceCache[handle];
+    const root = (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || '/';
+    const url  = root.replace(/\/$/, '') + '/products/' + handle;
+    try {
+      const res  = await fetch(url);
+      const text = await res.text();
+      const doc  = new DOMParser().parseFromString(text, 'text/html');
+      const priceEl = doc.querySelector('.hdt-price-wrapp');
+      const html = priceEl ? priceEl.outerHTML : null;
+      if (html) qvPriceCache[handle] = html;
+      return html;
+    } catch(e) {
+      return null;
+    }
+  }
+
+  async function fetchLiquidVariantPrices(handle) {
+    const cacheKey = handle + ':variants';
+    if (qvPriceCache[cacheKey]) return qvPriceCache[cacheKey];
+    const root = (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || '/';
+    const variantMap = {};
+    try {
+      const res  = await fetch(root.replace(/\/$/, '') + '/products/' + handle + '.js');
+      const prod = await res.json();
+      for (const v of prod.variants) {
+        const vRes  = await fetch(root.replace(/\/$/, '') + '/products/' + handle + '?variant=' + v.id);
+        const vText = await vRes.text();
+        const vDoc  = new DOMParser().parseFromString(vText, 'text/html');
+        const vPriceEl = vDoc.querySelector('.hdt-price-wrapp');
+        if (vPriceEl) variantMap[v.id] = vPriceEl.outerHTML;
+      }
+      qvPriceCache[cacheKey] = variantMap;
+      return variantMap;
+    } catch(e) {
+      return {};
+    }
+  }
+
+  let productCache={};
+  let isQuickViewOpen=false;
+  let wasCartDrawerOpen=false;
+  let isProcessingWishlist=false;
+
+  const animationStyles = document.createElement('style');
+  animationStyles.textContent = `
+    .hdt-dialog-drawer.hdt-mini-cart:modal{background:transparent;}
+    .cart-drawer-left-panel-full{opacity:1;transform:translateX(0px);visibility:visible !important;background:white;}
+    .cart-drawer-left-panel-full.is-visible{opacity:1 !important;transform:translateX(0) !important;visibility:visible !important;background:white;}
+    .cart-drawer-left-product{opacity:1;transform:translateX(-40px);transition:opacity 0.1s cubic-bezier(0.25,0.46,0.45,0.94),transform 0.9s cubic-bezier(0.25,0.46,0.45,0.94);}
+    .cart-drawer-left-panel-full.is-visible .cart-drawer-left-product{opacity:1;transform:translateX(0);}
+    .cart-drawer-recommendations{opacity:0;transform:translateY(30px);transition:opacity 1s cubic-bezier(0.25,0.46,0.45,0.94),transform 1s cubic-bezier(0.25,0.46,0.45,0.94);}
+    .cart-drawer-recommendations.is-visible{opacity:1;transform:translateY(0);}
+    .cart-drawer-rec-card{opacity:0;transform:translateY(25px);transition:opacity 0.8s cubic-bezier(0.25,0.46,0.45,0.94),transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94);}
+    .cart-drawer-recommendations.is-visible .cart-drawer-rec-card{opacity:1;transform:translateY(0);}
+    .cart-drawer-rec-card:nth-child(1){transition-delay:0.15s;}
+    .cart-drawer-rec-card:nth-child(2){transition-delay:0.3s;}
+    .cart-drawer-rec-card:nth-child(3){transition-delay:0.45s;}
+    .cart-drawer-rec-card:nth-child(4){transition-delay:0.6s;}
+    .cart-drawer-rec-card:nth-child(5){transition-delay:0.75s;}
+    .wishlist-item{transition:opacity 0.5s ease,transform 0.5s ease,max-height 0.5s ease,padding 0.5s ease,margin 0.5s ease;max-height:200px;overflow:hidden;}
+    .wishlist-item.is-removing{opacity:0 !important;transform:translateX(60px) !important;max-height:0 !important;padding-top:0 !important;padding-bottom:0 !important;margin-top:0 !important;margin-bottom:0 !important;border:none !important;}
+    .cart-drawer-item{transition:opacity 0.4s ease,transform 0.4s ease,max-height 0.4s ease,padding 0.4s ease,margin 0.4s ease;max-height:300px;overflow:hidden;}
+    .cart-drawer-item.is-removing{opacity:0 !important;transform:translateX(40px) !important;max-height:0 !important;padding:0 !important;margin:0 !important;border:none !important;}
+    .is-updating{opacity:0.5;pointer-events:none;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .loading-spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-radius:50%;border-top-color:transparent;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;}
+    .hdt-card-product.is-removing,.hdt-card.is-removing,.wishlist-product-item.is-removing,.wishlist-card.is-removing,.wishlist__item.is-removing,[data-wishlist-product].is-removing{opacity:0 !important;transform:scale(0.8) !important;max-height:0 !important;padding:0 !important;margin:0 !important;overflow:hidden;transition:all 0.5s ease !important;}
+  `;
+  document.head.appendChild(animationStyles);
+
+  function getWishlistIds(){ const s=localStorage.getItem(WL_KEY); return s?s.split(',').filter(id=>id&&id.trim()):[]; }
+  function saveWishlistIds(ids){ const u=[...new Set(ids.filter(id=>id&&id.trim()))]; u.length>0?localStorage.setItem(WL_KEY,u.join(',')):localStorage.removeItem(WL_KEY); return u; }
+  function isInWishlist(id){ return getWishlistIds().includes(id.toString()); }
+  function addToWishlist(id){ const idStr=id.toString(); if(isInWishlist(idStr))return false; let ids=getWishlistIds(); ids.unshift(idStr); saveWishlistIds(ids); document.dispatchEvent(new CustomEvent('theme4:wishlist:update',{bubbles:true,detail:'cartDrawer'})); return true; }
+  function removeFromWishlist(id){ const idStr=id.toString(); let ids=getWishlistIds().filter(i=>i!==idStr); saveWishlistIds(ids); document.dispatchEvent(new CustomEvent('theme4:wishlist:update',{bubbles:true,detail:'cartDrawer'})); return true; }
+
+  function updateWishlistUI(){
+    const ids=getWishlistIds(); const count=ids.length;
+    document.querySelectorAll('#wishlist-count,#toggle-wishlist-count,#toggle-wishlist-count-header,hdt-wishlist-count,[data-wishlist-count]').forEach(el=>el.textContent=count);
+    const emptyEl=document.getElementById('wishlist-empty'); const itemsEl=document.getElementById('wishlist-items'); const footerEl=document.getElementById('wishlist-footer');
+    if(emptyEl)emptyEl.style.display=count===0?'block':'none';
+    if(itemsEl)itemsEl.style.display=count===0?'none':'block';
+    if(footerEl)footerEl.style.display=count===0?'none':'block';
+    updateAllWishlistButtons();
+  }
+
+  function updateAllWishlistButtons(){
+    const ids=getWishlistIds();
+    document.querySelectorAll('[data-wishlist-btn]').forEach(btn=>{ const productId=btn.dataset.productId; if(productId)btn.classList.toggle('is-added',ids.includes(productId.toString())); });
+    document.querySelectorAll('hdt-wishlist').forEach(btn=>{ const productId=btn.dataset.id; if(productId){ const inWishlist=ids.includes(productId.toString()); btn.setAttribute('action',inWishlist?'added':'add'); } });
+  }
+
+  function renderWishlist(){
+    const ids=getWishlistIds(); const container=document.getElementById('wishlist-items');
+    if(!container)return; updateWishlistUI();
+    if(ids.length===0){ container.innerHTML=''; return; }
+    const uncachedIds=ids.filter(id=>!productCache[id]);
+    if(uncachedIds.length===0){ renderWishlistHTML(ids,container); return; }
+    fetch('/products.json?limit=250').then(r=>r.json()).then(data=>{ data.products.forEach(p=>productCache[p.id.toString()]=p); renderWishlistHTML(ids,container); }).catch(e=>{ console.error('Wishlist fetch error:',e); container.innerHTML='<div class="wishlist-error">Unable to load wishlist</div>'; });
+  }
+
+  function renderWishlistHTML(ids,container){
+    let html='';
+    [...new Set(ids)].forEach(id=>{
+      const p=productCache[id];
+      if(p){
+        const imgSrc=p.featured_image?.src||(p.images?.[0]?.src)||(p.image?.src)||'';
+        let priceValue=p.price||p.variants?.[0]?.price||0; let compareValue=p.compare_at_price||p.variants?.[0]?.compare_at_price||null;
+        if(typeof priceValue==='string')priceValue=parseFloat(priceValue);
+        if(typeof compareValue==='string')compareValue=parseFloat(compareValue);
+        const priceCents=Math.round(priceValue); const compareCents=compareValue?Math.round(compareValue):null;
+        const hasDiscount=compareCents&&compareCents>priceCents;
+        const price=fmtCurrency(priceCents); const comparePrice=hasDiscount?fmtCurrency(compareCents):null;
+        html+=`<div class="wishlist-item" data-wishlist-item data-product-id="${id}">
+          <div class="wishlist-item__image"><a href="/products/${p.handle}">${imgSrc?`<img src="${imgSrc}&width=80" alt="${p.title}" width="80" height="80" loading="lazy">`:'<div class="wishlist-item__placeholder"></div>'}</a></div>
+          <div class="wishlist-item__content">
+            <a href="/products/${p.handle}" class="wishlist-item__title">${p.title}</a>
+            <div class="wishlist-item__prices">${comparePrice?`<s class="wishlist-item__compare">${comparePrice}</s>`:''}<span class="wishlist-item__price ${comparePrice?'is-sale':''}">${price}</span></div>
+            <div class="wishlist-item__actions">
+              <button type="button" class="wishlist-item__quickview" data-quick-view data-product-handle="${p.handle}">Quick View</button>
+              <button type="button" class="wishlist-item__remove" data-remove-wishlist="${id}">Remove</button>
+            </div>
+          </div>
+        </div>`;
+      }
+    });
+    container.innerHTML=html;
+  }
+
+  function ajaxRemoveFromWishlist(productId,element){
+    const item=element.closest('[data-wishlist-item]')||element.closest('.hdt-card-product')||element.closest('.hdt-card')||element.closest('[data-product-id]')||element.closest('.wishlist-product-item')||element.closest('.wishlist-card')||element.closest('.wishlist__item')||element.closest('[data-wishlist-product]');
+    if(element.tagName==='BUTTON'){element.disabled=true;element.innerHTML='<span class="loading-spinner"></span>';}
+    const isWishlistPage=window.location.href.includes('wishlist')||window.location.search.includes('view=wishlist');
+    if(item&&isWishlistPage){item.style.transition='all 0.5s ease';item.classList.add('is-removing');}
+    removeFromWishlist(productId);
+    document.querySelectorAll(`hdt-wishlist[data-id="${productId}"]`).forEach(btn=>btn.setAttribute('action','add'));
+    document.querySelectorAll(`[data-wishlist-btn][data-product-id="${productId}"]`).forEach(btn=>btn.classList.remove('is-added'));
+    setTimeout(()=>{if(item&&isWishlistPage)item.remove();updateWishlistUI();checkWishlistPageEmpty();},550);
+  }
+
+  function checkWishlistPageEmpty(){
+    const isWishlistPage=window.location.href.includes('wishlist')||window.location.search.includes('view=wishlist');
+    if(isWishlistPage){
+      const ids=getWishlistIds();
+      if(ids.length===0){
+        const productsGrid=document.querySelector('.hdt-products-grid,.hdt-grid,.wishlist-grid,[data-wishlist-grid]');
+        const emptyState=document.querySelector('.wishlist-empty,.hdt-wishlist-empty,[data-wishlist-empty]');
+        if(productsGrid)productsGrid.style.display='none';
+        if(emptyState)emptyState.style.display='block';
+      }
+    }
+  }
+
+  function triggerTaxifyRefresh(){
+    if(window.Taxify&&typeof window.Taxify.refresh==='function')window.Taxify.refresh();
+    if(window.Taxify&&typeof window.Taxify.init==='function')window.Taxify.init();
+    if(window.Exemptify&&typeof window.Exemptify.refresh==='function')window.Exemptify.refresh();
+    const evts=['taxify:refresh','taxify:cart:updated','cart:refresh','cart:updated','cart-drawer:refreshed','theme:cart:updated','section:load'];
+    evts.forEach(name=>document.dispatchEvent(new CustomEvent(name,{bubbles:true})));
+  }
+
+  async function refreshCart(){
+    try{
+      const [sectionRes,cartRes]=await Promise.all([fetch(sectionUrl()),fetch('/cart.js')]);
+      const [html,cart]=await Promise.all([sectionRes.text(),cartRes.json()]);
+
+      if (cart.currency) {
+        _activeCurrencyISO = cart.currency;
+        const hdtEl = document.querySelector('hdt-cart-drawer');
+        if (hdtEl) hdtEl.dataset.currencyIso = cart.currency;
+      }
+      const doc=new DOMParser().parseFromString(html,'text/html');
+
+      const newItems=doc.getElementById('cart-drawer-items');
+      const currentItems=document.getElementById('cart-drawer-items');
+      if(newItems&&currentItems)currentItems.innerHTML=newItems.innerHTML;
+
+      // ── Sync discount applied badge in discount section ──────────────────
+      const newDiscountSection=doc.querySelector('.hdt-cart-discount-section');
+      const currentDiscountSection=document.querySelector('.hdt-cart-discount-section');
+      if(newDiscountSection&&currentDiscountSection){
+        currentDiscountSection.querySelectorAll('.hdt-cart-discount-applied').forEach(el=>el.remove());
+        newDiscountSection.querySelectorAll('.hdt-cart-discount-applied').forEach(el=>currentDiscountSection.appendChild(el.cloneNode(true)));
+      }
+
+      // ── CHANGE 1: Sync discount rows in summary section ──────────────────
+      document.querySelectorAll('.cart-drawer-summary__row--discount').forEach(el=>el.remove());
+      const newDiscountRows=doc.querySelectorAll('.cart-drawer-summary__row--discount');
+      const summaryEl=document.querySelector('.cart-drawer-summary');
+      const totalRow=summaryEl?summaryEl.querySelector('.cart-drawer-summary__row--total'):null;
+      if(summaryEl&&newDiscountRows.length){
+        newDiscountRows.forEach(row=>{
+          totalRow?summaryEl.insertBefore(row.cloneNode(true),totalRow):summaryEl.appendChild(row.cloneNode(true));
+        });
+      }
+      // ─────────────────────────────────────────────────────────────────────
+
+      const liquidSubtotal=doc.querySelector('[data-cart-subtotal]');
+      const liquidSubtotalText=liquidSubtotal?liquidSubtotal.textContent.trim():null;
+
+      const liquidTotalEl = doc.querySelector('[data-cart-total]');
+      const liquidTotalHTML = liquidTotalEl ? liquidTotalEl.innerHTML : null;
+
+      const liquidShippingBar = doc.getElementById('cart-shipping-bar');
+      const currentShippingBar = document.getElementById('cart-shipping-bar');
+      if (liquidShippingBar && currentShippingBar) {
+        currentShippingBar.replaceWith(liquidShippingBar.cloneNode(true));
+      }
+
+      updateCartUI(cart,liquidSubtotalText,true, liquidTotalHTML);
+      triggerTaxifyRefresh();
+      updateRelatedPanel();
+    }catch(e){console.error('Cart refresh error:',e);}
+  }
+
+  function updateShippingBar(totalCents, isoOverride){
+    const shippingBar=document.getElementById('cart-shipping-bar'); if(!shippingBar)return;
+    const iso = isoOverride || shippingBar.dataset.currencyIso || undefined;
+    const shippingThreshold=parseInt(shippingBar.dataset.threshold)||10000;
+    const remaining=Math.max(0,shippingThreshold-totalCents); const progress=Math.min(100,(totalCents*100)/shippingThreshold);
+    const remainingEl=shippingBar.querySelector('[data-shipping-remaining]'); const progressEl=shippingBar.querySelector('[data-shipping-progress]'); const textEl=shippingBar.querySelector('.cart-drawer-shipping__text');
+    if(progressEl)progressEl.style.width=progress+'%';
+    const formattedRemaining=fmtCurrency(remaining,iso);
+    if(remainingEl)remainingEl.textContent=formattedRemaining;
+    if(textEl){
+      if(remaining>0){textEl.innerHTML=`You're <span class="cart-drawer-shipping__amount" data-shipping-remaining>${formattedRemaining}</span> away from Free Standard Shipping`;}
+      else{textEl.innerHTML='🎉 You\'ve unlocked Free Standard Shipping!';}
+    }
+  }
+
+  function readDisplayedSubtotalCents(){
+    const subtotalEl=document.querySelector('[data-cart-subtotal]');
+    if(subtotalEl&&subtotalEl.textContent.trim()){
+      const raw=subtotalEl.textContent.replace(/[^\d.,]/g,'').trim(); let normalised=raw;
+      if(raw.indexOf(',')>-1&&raw.indexOf('.')>-1){if(raw.lastIndexOf('.')<raw.lastIndexOf(','))normalised=raw.replace(/\./g,'').replace(',','.');else normalised=raw.replace(/,/g,'');}
+      else if(raw.indexOf(',')>-1){normalised=raw.replace(',','.');}
+      const parsed=parseFloat(normalised); if(!isNaN(parsed)&&parsed>0)return Math.round(parsed*100);
+    }
+    return null;
+  }
+
+  function updateCartUI(cart, liquidSubtotalText, skipShippingBar, liquidTotalHTML){
+    const isEmpty=cart.item_count===0;
+    const emptyState=document.getElementById('cart-empty-state'); const itemsContainer=document.getElementById('cart-drawer-items');
+    const bottomSection=document.getElementById('cart-drawer-bottom'); const warningSection=document.getElementById('cart-warning');
+    const recsSection=document.getElementById('cart-recommendations'); const leftPanel=document.querySelector('.cart-drawer-left-panel');
+    if(emptyState)emptyState.style.display=isEmpty?'block':'none';
+    if(itemsContainer)itemsContainer.style.display=isEmpty?'none':'block';
+    if(bottomSection)bottomSection.style.display=isEmpty?'none':'block';
+    if(warningSection)warningSection.style.display=isEmpty?'none':'flex';
+    if(recsSection){recsSection.style.display=isEmpty?'none':'block';if(!isEmpty)setTimeout(()=>recsSection.classList.add('is-visible'),400);else recsSection.classList.remove('is-visible');}
+    if(leftPanel&&isEmpty)leftPanel.classList.remove('is-visible');
+    const relatedPanelWrap = document.getElementById('cart-related-panel');
+   if (relatedPanelWrap) relatedPanelWrap.style.display = isEmpty ? 'none' : '';
+    document.querySelectorAll('[data-cart-count]').forEach(el=>el.textContent=cart.item_count);
+    document.querySelectorAll('.hdt-count-box,hdt-cart-count').forEach(el=>el.textContent=cart.item_count);
+    if(liquidSubtotalText){
+      document.querySelectorAll('[data-cart-subtotal]').forEach(el=>el.textContent=liquidSubtotalText);
+    } else {
+      document.querySelectorAll('[data-cart-subtotal]').forEach(el=>el.textContent=fmtCurrency(cart.items_subtotal_price));
+    }
+    // ── CHANGE 2: Total with Inc VAT text preserved ───────────────────────
+    //document.querySelectorAll('[data-cart-total]').forEach(el=>{
+    //  el.innerHTML=fmtCurrency(cart.total_price)+' <span class="tax-text" style="color:#000;font-size:12px;font-weight:400;">Inc VAT</span>';
+    //});
+    document.querySelectorAll('[data-cart-total]').forEach(el=>{
+      if(liquidTotalHTML){
+        el.innerHTML = liquidTotalHTML;
+      } else {
+        el.innerHTML = fmtCurrency(cart.total_price) + ' <span class="tax-text" style="color:#000;font-size:12px;font-weight:400;">Inc VAT</span>';
+      }
+    });
+    // ─────────────────────────────────────────────────────────────────────
+    if(!skipShippingBar) updateShippingBar(cart.items_subtotal_price);
+  }
+
+  async function changeQuantity(line,quantity,element){
+    if(!line)return; if(element)element.classList.add('is-updating');
+    try{
+      const response=await fetch('/cart/change.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({line:parseInt(line),quantity:parseInt(quantity)})});
+      if(!response.ok)throw new Error('Failed');
+      const cart=await response.json();
+
+      if (cart.currency) {
+        _activeCurrencyISO = cart.currency;
+        const hdtEl = document.querySelector('hdt-cart-drawer');
+        if (hdtEl) hdtEl.dataset.currencyIso = cart.currency;
+      }
+      
+      if(quantity===0&&element){
+        element.classList.add('is-removing');
+        setTimeout(async()=>{element.remove();document.querySelectorAll('[data-line-item]').forEach((item,idx)=>{item.dataset.line=idx+1;item.querySelectorAll('[data-line]').forEach(el=>el.dataset.line=idx+1);}); updateCartUI(cart); await refreshCart();},450);
+      }else{await refreshCart();if(element){const qtyInput=element.querySelector('[data-qty-input]');if(qtyInput)qtyInput.value=quantity;}}
+    }catch(e){await refreshCart();}
+    finally{if(element)element.classList.remove('is-updating');}
+  }
+
+  async function addToCart(variantId,quantity,button){
+    if(button){button.disabled=true;button.dataset.originalText=button.textContent;button.innerHTML='<span class="loading-spinner"></span> Adding...';}
+    try{
+      const response=await fetch('/cart/add.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:parseInt(variantId),quantity:parseInt(quantity)||1})});
+      if(!response.ok){const error=await response.json();throw new Error(error.description||'Failed to add');}
+      await refreshCart(); if(button){button.innerHTML='✓ Added!';button.disabled=false;} return{success:true};
+    }catch(e){console.error('Add to cart error:',e);if(button){button.innerHTML='Error - Try Again';button.disabled=false;}return{success:false,error:e.message};}
+  }
+
+  function openDrawer(){ const drawer=document.querySelector('hdt-cart-drawer'); if(drawer&&drawer.open)drawer.open(); else document.querySelector('[aria-controls="CartDrawer"]')?.click(); }
+  function closeDrawer(){ const drawer=document.querySelector('hdt-cart-drawer'); if(drawer&&drawer.close)drawer.close(); }
+  function isDrawerOpen(){ const dialog=document.getElementById('CartDrawer'); return dialog&&dialog.open; }
+
+  function showPanel(panel){
+    const cartPanel=document.getElementById('cart-panel'); const wishlistPanel=document.getElementById('wishlist-panel'); const leftPanel=document.querySelector('.cart-drawer-left-panel-full');
+    if(panel==='cart'){
+      if(cartPanel)cartPanel.style.display='flex'; if(wishlistPanel)wishlistPanel.style.display='none';
+      if(leftPanel){leftPanel.classList.remove('is-visible');setTimeout(()=>leftPanel.classList.add('is-visible'),150);}
+      const recsSection=document.getElementById('cart-recommendations');
+      if(recsSection&&recsSection.style.display!=='none'){recsSection.classList.remove('is-visible');setTimeout(()=>recsSection.classList.add('is-visible'),300);}
+    }else{
+      if(cartPanel)cartPanel.style.display='none'; if(wishlistPanel)wishlistPanel.style.display='flex'; renderWishlist();
+    }
+    document.querySelectorAll('[data-drawer-toggle]').forEach(btn=>btn.classList.toggle('is-active',btn.dataset.drawerToggle===panel));
+  }
+
+  const qvModal=document.getElementById('cqv-modal');
+  const qvOverlay=document.getElementById('cqv-overlay');
+  const qvContent=document.getElementById('cqv-content');
+  const qvClose=document.getElementById('cqv-close');
+
+  async function openQuickView(handle){
+    if(!qvModal||!handle)return;
+    isQuickViewOpen=true;
+    qvModal.classList.add('is-open');
+    qvOverlay.classList.add('is-open');
+    document.body.style.overflow='hidden';
+
+    const preEl = document.querySelector(`.cqv-prerendered[data-cqv-handle="${handle}"]`);
+
+    if(preEl){
+      // ── Pre-rendered path (static collection products) ──────────────────
+      qvContent.innerHTML = preEl.innerHTML;
+      const jsonScript = qvContent.querySelector('.cqv-variants-json');
+      let variantsData = [];
+      if(jsonScript){
+        try{ variantsData = JSON.parse(jsonScript.textContent.trim()); }catch(e){}
+        jsonScript.remove();
+      }
+      const productId = preEl.dataset.productId || '';
+      const wishlistBtn = qvContent.querySelector('[data-qv-wishlist]');
+      if(wishlistBtn && productId){
+        const inWl = isInWishlist(productId);
+        if(inWl){ wishlistBtn.classList.add('is-active'); const t=wishlistBtn.querySelector('.cqv-wishlist__text'); if(t)t.textContent='In Wishlist'; }
+      }
+      initQuickViewEventsLiquid(handle, variantsData, productId);
+
+    } else {
+      // ── Dynamic fallback path (Recommendations API products) ────────────
+      qvContent.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:200px"><span class="loading-spinner" style="width:24px;height:24px;border-width:3px;"></span></div>';
+      try {
+        const res  = await fetch(`/products/${handle}.js`);
+        const prod = await res.json();
+        const productId = prod.id.toString();
+        const firstVariant = prod.variants[0];
+
+        const hasCompare = !!(prod.compare_at_price) && parseInt(prod.compare_at_price) > parseInt(prod.price);
+        const discountPct = hasCompare ? Math.round((prod.compare_at_price - prod.price) * 100 / prod.compare_at_price) : 0;
+
+        // HTML page se market-correct prices fetch karo
+        let qvPriceStr = fmtCurrency(prod.price);
+        let qvCompareStr = hasCompare ? fmtCurrency(prod.compare_at_price) : '';
+        try {
+          const hRes  = await fetch(`/products/${handle}`);
+          const hText = await hRes.text();
+          const hDoc  = new DOMParser().parseFromString(hText, 'text/html');
+          const hPriceEl   = hDoc.querySelector('hdt-price .hdt-money, .hdt-price .hdt-money');
+          const hCompareEl = hDoc.querySelector('hdt-compare-at-price .hdt-money, .hdt-compare-at-price .hdt-money');
+          if (hPriceEl)   qvPriceStr   = hPriceEl.textContent.replace(/inc\s*vat/gi,'').trim();
+          if (hCompareEl) qvCompareStr = hCompareEl.textContent.trim();
+        } catch(e) {}
+
+        // Sabhi variants ke market prices parallel pre-fetch karo
+        const variantPriceCache = {};
+        await Promise.all(prod.variants.map(async (v) => {
+          try {
+            const vr = await fetch(`/products/${handle}?variant=${v.id}`);
+            const vt = await vr.text();
+            const vd = new DOMParser().parseFromString(vt, 'text/html');
+            const vp = vd.querySelector('hdt-price .hdt-money, .hdt-price .hdt-money');
+            const vc = vd.querySelector('hdt-compare-at-price .hdt-money, .hdt-compare-at-price .hdt-money');
+            if(vp) variantPriceCache[v.id] = {
+              price:   vp.textContent.replace(/inc\s*vat/gi,'').trim(),
+              compare: vc ? vc.textContent.trim() : ''
+            };
+          } catch(e) {}
+        }));
+
+        const variantsData = prod.variants.map(v => {
+          const vHasCompare = !!(v.compare_at_price) && parseInt(v.compare_at_price) > parseInt(v.price);
+          const vDiscount   = vHasCompare ? Math.round((v.compare_at_price - v.price) * 100 / v.compare_at_price) : 0;
+          return {
+            id:            v.id,
+            price:         fmtCurrency(v.price),
+            compare_price: vHasCompare ? fmtCurrency(v.compare_at_price) : '',
+            has_compare:   vHasCompare,
+            discount_pct:  vDiscount,
+            available:     v.available,
+            options:       v.options
+          };
+        });
+
+        let optionsHtml = '';
+        prod.options.forEach((opt, idx) => {
+          const optName = typeof opt === 'string' ? opt : (opt.name || String(opt));
+          if(prod.options.length === 1 && optName === 'Title') return;
+          const seen = [];
+          let btnsHtml = '';
+          prod.variants.forEach(v => {
+            const rawVal = v.options[idx];
+            const val = typeof rawVal === 'string' ? rawVal : String(rawVal);
+            if(seen.includes(val)) return;
+            seen.push(val);
+            const isFirst = seen.length === 1;
+            btnsHtml += `<button type="button" class="cqv-option__btn ${isFirst?'is-active':''} ${!v.available?'is-soldout':''}" data-option-index="${idx}" data-option-value="${val}">${val}</button>`;
+          });
+          const firstVal = prod.variants[0].options[idx];
+          const firstValStr = typeof firstVal === 'string' ? firstVal : String(firstVal);
+          optionsHtml += `<div class="cqv-option" data-option-index="${idx}">
+            <div class="cqv-option__label">${optName}: <strong data-option-selected="${idx}">${firstValStr}</strong></div>
+            <div class="cqv-option__btns">${btnsHtml}</div>
+          </div>`;
+        });
+
+        const images = prod.images || [];
+        const imgsHtml = images.length
+          ? images.map((img, i) => {
+              const rawSrc = typeof img === 'string' ? img : (img.src || '');
+              const cleanSrc = rawSrc.replace(/^\/\//, 'https://').replace(/(\?.*)?$/, '') + '?width=800';
+              return `<div class="cqv-gallery__item"><img src="${cleanSrc}" alt="${prod.title.replace(/"/g,'&quot;')}" loading="${i===0?'eager':'lazy'}"></div>`;
+            }).join('')
+          : '<div class="cqv-gallery__placeholder">No image</div>';
+
+        const inWl = isInWishlist(productId);
+
+        qvContent.innerHTML = `
+          <div class="cqv-product${images.length > 1 ? ' has-gallery' : ''}">
+            <div class="cqv-product__images">
+              <div class="cqv-gallery">${imgsHtml}</div>
+            </div>
+            <div class="cqv-product__info">
+              <h2 class="cqv-product__title">${prod.title}</h2>
+              <div class="cqv-product__pricing">
+                ${buildThemePriceFromStrings(qvPriceStr, qvCompareStr, hasCompare, discountPct)}
+              </div>
+              ${optionsHtml}
+              <div class="cqv-product__availability" data-qv-availability>${!firstVariant.available ? '<span class="cqv-soldout-text">Sold Out</span>' : ''}</div>
+              <div class="cqv-product__actions">
+                <div class="cqv-qty">
+                  <button type="button" class="cqv-qty__btn" data-qv-minus>−</button>
+                  <input type="text" class="cqv-qty__input" value="1" data-qv-qty readonly>
+                  <button type="button" class="cqv-qty__btn" data-qv-plus>+</button>
+                </div>
+                <button type="button" class="cqv-add ${!firstVariant.available ? 'is-disabled' : ''}" data-qv-add data-variant-id="${firstVariant.id}" ${!firstVariant.available ? 'disabled' : ''}>
+                  ${firstVariant.available ? 'ADD TO CART' : 'SOLD OUT'}
+                </button>
+              </div>
+              <button type="button" class="cqv-wishlist ${inWl ? 'is-active' : ''}" data-qv-wishlist data-product-id="${productId}">
+                <svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M12.5 0H0.5C0.367 0 0.24 0.056 0.146 0.156C0.053 0.255 0 0.39 0 0.531V15.399C0 15.5 0.027 15.599 0.078 15.684C0.129 15.769 0.202 15.837 0.288 15.88C0.374 15.922 0.47 15.938 0.564 15.925C0.658 15.913 0.747 15.871 0.82 15.807L6.5 10.78L12.18 15.807C12.27 15.886 12.383 15.93 12.5 15.93C12.573 15.93 12.646 15.913 12.712 15.88C12.798 15.837 12.871 15.769 12.922 15.684C12.973 15.599 13 15.5 13 15.399V0.531C13 0.39 12.947 0.255 12.854 0.156C12.76 0.056 12.633 0 12.5 0ZM12 14.266L6.82 9.681C6.73 9.602 6.617 9.558 6.5 9.558C6.383 9.558 6.27 9.602 6.18 9.681L1 14.266V1.062H12V14.266Z" fill="currentColor"></path></svg>
+                <span class="cqv-wishlist__text">${inWl ? 'In Wishlist' : 'Add to Wishlist'}</span>
+              </button>
+            </div>
+          </div>`;
+
+        initQuickViewEventsLiquid(handle, variantsData, productId);
+
+      } catch(err) {
+        console.error('QV dynamic fetch error:', err);
+        qvContent.innerHTML = '<div class="cqv-error"><p>Could not load product</p></div>';
+      }
+    }
+  }
+
+  function initQuickViewEventsLiquid(handle, variantsData, productId){
+    const qtyInput      = qvContent.querySelector('[data-qv-qty]');
+    const addBtn        = qvContent.querySelector('[data-qv-add]');
+    const wishlistBtn   = qvContent.querySelector('[data-qv-wishlist]');
+    const availabilityEl= qvContent.querySelector('[data-qv-availability]');
+    if(!qtyInput||!addBtn)return;
+
+    qvContent.querySelector('[data-qv-minus]').onclick = ()=>{ const q=parseInt(qtyInput.value)||1; if(q>1)qtyInput.value=q-1; };
+    qvContent.querySelector('[data-qv-plus]').onclick  = ()=>{ qtyInput.value=(parseInt(qtyInput.value)||1)+1; };
+
+    const optionBtnGroups = qvContent.querySelectorAll('.cqv-option');
+    let selectedOptions = [];
+    optionBtnGroups.forEach((group, idx)=>{
+      const activeBtn = group.querySelector('.cqv-option__btn.is-active');
+      selectedOptions[idx] = activeBtn ? activeBtn.dataset.optionValue.trim() : '';
+    });
+
+    // ── Exact variant match (trim for safety) ────────────────────────────
+    function findVariant(opts){
+      if(!variantsData||!variantsData.length) return null;
+      return variantsData.find(v =>
+        v.options && v.options.length === opts.length &&
+        v.options.every((opt,i) => String(opt).trim() === String(opts[i]).trim())
+      ) || null;
+    }
+
+    // ── Availability check: variantsData first, DOM fallback ─────────────
+    function isAvailable(opts){
+      const v = findVariant(opts);
+      if(v !== null) return { available: v.available, variant: v };
+      // DOM fallback: any active button is-soldout → sold out
+      const active = [...qvContent.querySelectorAll('.cqv-option__btn.is-active')];
+      const anySoldout = active.some(b => b.classList.contains('is-soldout'));
+      return { available: !anySoldout, variant: null };
+    }
+
+    // ── Apply button state ────────────────────────────────────────────────
+    // ── Apply button state ────────────────────────────────────────────────
+    function applyState(opts, variantOverride){
+      // ── DOM check PEHLE: koi bhi active button soldout hai? ───────────
+      // Yeh sabse reliable source hai — Liquid ne render kiya hai
+      const activeButtons = [...qvContent.querySelectorAll('.cqv-option__btn.is-active')];
+      const domSaysUnavailable = activeButtons.some(b => b.classList.contains('is-soldout'));
+
+      if(domSaysUnavailable){
+        if(variantOverride && variantOverride.id) addBtn.dataset.variantId = variantOverride.id;
+        addBtn.disabled = true;
+        addBtn.classList.add('is-disabled');
+        addBtn.textContent = 'SOLD OUT';
+        if(availabilityEl) availabilityEl.innerHTML = '<span class="cqv-soldout-text">Sold Out</span>';
+        return;
+      }
+
+      // ── DOM ne available bola — variantsData/override se confirm karo ─
+      const { available, variant } = variantOverride !== undefined
+        ? { available: variantOverride.available, variant: variantOverride }
+        : isAvailable(opts);
+
+      if(variant) addBtn.dataset.variantId = variant.id;
+
+      if(available){
+        addBtn.disabled        = false;
+        addBtn.classList.remove('is-disabled');
+        addBtn.textContent     = 'ADD TO CART';
+        if(availabilityEl) availabilityEl.innerHTML = '';
+      } else {
+        addBtn.disabled        = true;
+        addBtn.classList.add('is-disabled');
+        addBtn.textContent     = 'SOLD OUT';
+        if(availabilityEl) availabilityEl.innerHTML = '<span class="cqv-soldout-text">Sold Out</span>';
+      }
+    }
+
+    // ── Set initial state on QV open ──────────────────────────────────────
+    applyState(selectedOptions);
+
+    // ── Option button clicks ──────────────────────────────────────────────
+    qvContent.querySelectorAll('.cqv-option__btn').forEach(btn=>{
+      btn.onclick = function(){
+        const optIdx   = parseInt(this.dataset.optionIndex);
+        const optValue = this.dataset.optionValue.trim();
+
+        this.closest('.cqv-option').querySelectorAll('.cqv-option__btn').forEach(b=>b.classList.remove('is-active'));
+        this.classList.add('is-active');
+        const lbl = qvContent.querySelector('[data-option-selected="'+optIdx+'"]');
+        if(lbl) lbl.textContent = optValue;
+        selectedOptions[optIdx] = optValue;
+
+        // Find exact variant, fallback auto-adjust
+        let matchingVariant = findVariant(selectedOptions);
+        if(!matchingVariant){
+          matchingVariant = variantsData.find(v => v.options && String(v.options[optIdx]).trim() === optValue) || null;
+          if(matchingVariant){
+            matchingVariant.options.forEach((opt,i)=>{
+              if(i===optIdx) return;
+              const trimOpt = String(opt).trim();
+              selectedOptions[i] = trimOpt;
+              const grp = optionBtnGroups[i];
+              if(grp){
+                grp.querySelectorAll('.cqv-option__btn').forEach(b=>b.classList.toggle('is-active', b.dataset.optionValue.trim()===trimOpt));
+                const l2 = qvContent.querySelector('[data-option-selected="'+i+'"]');
+                if(l2) l2.textContent = trimOpt;
+              }
+            });
+          }
+        }
+
+        // ── Update button IMMEDIATELY ─────────────────────────────────────
+        applyState(selectedOptions, matchingVariant || undefined);
+
+        // ── Update price async ────────────────────────────────────────────
+        if(matchingVariant){
+          const priceWrapper = qvContent.querySelector('.cqv-product__pricing');
+          if(priceWrapper){
+            priceWrapper.innerHTML = buildThemePriceFromStrings(
+              matchingVariant.price, matchingVariant.compare_price,
+              matchingVariant.has_compare, matchingVariant.discount_pct
+            );
+            fetch('/products/'+handle+'?variant='+matchingVariant.id)
+              .then(r=>r.text())
+              .then(html=>{
+                const vDoc=new DOMParser().parseFromString(html,'text/html');
+                const vP=vDoc.querySelector('hdt-price .hdt-money, .hdt-price .hdt-money');
+                const vC=vDoc.querySelector('hdt-compare-at-price .hdt-money, .hdt-compare-at-price .hdt-money');
+                if(vP){
+                  priceWrapper.innerHTML = buildThemePriceFromStrings(
+                    vP.textContent.replace(/inc\s*vat/gi,'').trim(),
+                    vC?vC.textContent.trim():'',
+                    matchingVariant.has_compare, matchingVariant.discount_pct
+                  );
+                }
+                // Re-confirm state after price re-render
+                applyState(selectedOptions, matchingVariant);
+              }).catch(()=>{});
+          }
+        }
+      };
+    });
+
+    addBtn.onclick = async function(){
+      if(this.disabled)return;
+      const variantId=this.dataset.variantId; const quantity=parseInt(qtyInput.value)||1;
+      this.disabled=true; this.textContent='ADDING...';
+      const result=await addToCart(variantId,quantity,null);
+      if(result.success){this.textContent='ADDED!';setTimeout(()=>{closeQuickView();setTimeout(openDrawer,300);},500);}
+      else{this.disabled=false;this.textContent='ADD TO CART';alert(result.error||'Could not add to cart');}
+    };
+
+    if(wishlistBtn){
+      wishlistBtn.onclick=function(){
+        const pid=productId||this.dataset.productId; const text=this.querySelector('.cqv-wishlist__text');
+        if(isInWishlist(pid)){removeFromWishlist(pid);this.classList.remove('is-active');if(text)text.textContent='Add to Wishlist';}
+        else{addToWishlist(pid);this.classList.add('is-active');if(text)text.textContent='In Wishlist';}
+        updateWishlistUI();renderWishlist();
+      };
+    }
+  }
+
+  function buildThemePriceFromStrings(priceStr, compareStr, hasCompare, discountPct){
+    return `<div class="hdt-price-wrapp cqv-hdt-price${hasCompare?' hdt-price--show-badge':''}">
+      <div class="hdt-price__container">
+        <div class="hdt-price__sale hdt-price__list">
+          <hdt-price class="hdt-price" data-qv-price>
+            <span class="hdt-money">${priceStr}</span>
+          </hdt-price>
+          <hdt-compare-at-price class="hdt-compare-at-price"${hasCompare?'':' hidden'}>
+            <span class="hdt-money">${hasCompare?compareStr:''}</span>
+          </hdt-compare-at-price>
+        </div>
+        ${hasCompare&&discountPct>0?`<span class="sale-badge">${discountPct}% OFF</span>`:''}
+      </div>
+      
+    </div>`;
+  }
+
+  function closeQuickView(){
+    if(!qvModal)return;
+    isQuickViewOpen=false;
+    qvModal.classList.remove('is-open');
+    qvOverlay.classList.remove('is-open');
+    document.body.style.overflow='';
+    if(wasCartDrawerOpen){setTimeout(()=>{openDrawer();wasCartDrawerOpen=false;},300);}
+  }
+
+  if(qvClose)qvClose.addEventListener('click',closeQuickView);
+  if(qvOverlay)qvOverlay.addEventListener('click',closeQuickView);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&isQuickViewOpen)closeQuickView();});
+
+  document.addEventListener('theme4:wishlist:update',(e)=>{
+    if(e.detail!=='cartDrawer')setTimeout(()=>{updateWishlistUI();renderWishlist();},100);
+  });
+
+  const cartDialog=document.getElementById('CartDrawer');
+  if(cartDialog){
+    const observer=new MutationObserver((mutations)=>{
+      mutations.forEach((mutation)=>{
+        if(mutation.attributeName==='open'){
+          const leftPanel=document.querySelector('.cart-drawer-left-panel-full');
+          const recsSection=document.getElementById('cart-recommendations');
+          if(cartDialog.hasAttribute('open')){
+            if(leftPanel){leftPanel.classList.remove('is-visible');setTimeout(()=>leftPanel.classList.add('is-visible'),200);}
+            updateRelatedPanel(); 
+            if(recsSection&&recsSection.style.display!=='none'){recsSection.classList.remove('is-visible');setTimeout(()=>recsSection.classList.add('is-visible'),400);}
+            fetch('/cart.js').then(r=>r.json()).then(cart=>{
+              //updateShippingBar(cart.items_subtotal_price);
+              refreshCart();
+            }).catch(()=>{});
+          }else{
+            if(leftPanel)leftPanel.classList.remove('is-visible');
+            if(recsSection)recsSection.classList.remove('is-visible');
+          }
+        }
+      });
+    });
+    observer.observe(cartDialog,{attributes:true});
+  }
+
+  document.addEventListener('click',function(e){
+    const hdtWishlist=e.target.closest('hdt-wishlist');
+    if(!hdtWishlist)return;
+    if(isProcessingWishlist){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();return false;}
+    const productId=hdtWishlist.dataset.id; if(!productId)return;
+    e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+    isProcessingWishlist=true;
+    const currentlyInWishlist=isInWishlist(productId);
+    const isWishlistPage=window.location.href.includes('wishlist')||window.location.search.includes('view=wishlist');
+    if(currentlyInWishlist){
+      if(isWishlistPage&&hdtWishlist.hasAttribute('remove-on-page')){ajaxRemoveFromWishlist(productId,hdtWishlist);}
+      else{removeFromWishlist(productId);hdtWishlist.setAttribute('action','add');updateWishlistUI();renderWishlist();}
+    }else{addToWishlist(productId);hdtWishlist.setAttribute('action','added');updateWishlistUI();renderWishlist();}
+    setTimeout(()=>{isProcessingWishlist=false;},300);
+    return false;
+  },true);
+
+  document.addEventListener('click',e=>{
+    const toggleBtn=e.target.closest('[data-drawer-toggle]');
+    if(toggleBtn){e.preventDefault();showPanel(toggleBtn.dataset.drawerToggle);return;}
+
+    const wishlistBtn=e.target.closest('[data-wishlist-btn]');
+    if(wishlistBtn){
+      e.preventDefault();e.stopPropagation();
+      const productId=wishlistBtn.dataset.productId; if(!productId)return;
+      if(isInWishlist(productId)){removeFromWishlist(productId);wishlistBtn.classList.remove('is-added');document.querySelectorAll(`hdt-wishlist[data-id="${productId}"]`).forEach(btn=>btn.setAttribute('action','add'));}
+      else{addToWishlist(productId);wishlistBtn.classList.add('is-added');document.querySelectorAll(`hdt-wishlist[data-id="${productId}"]`).forEach(btn=>btn.setAttribute('action','added'));}
+      updateWishlistUI();renderWishlist();return;
+    }
+
+    const removeWishlistBtn=e.target.closest('[data-remove-wishlist]');
+    if(removeWishlistBtn){e.preventDefault();e.stopPropagation();ajaxRemoveFromWishlist(removeWishlistBtn.dataset.removeWishlist,removeWishlistBtn);return;}
+
+    const plusBtn=e.target.closest('[data-qty-plus]');
+    if(plusBtn){
+      e.preventDefault(); const item=plusBtn.closest('[data-line-item]'); if(!item)return;
+      const input=item.querySelector('[data-qty-input]'); const newQty=(parseInt(input.value)||1)+1;
+      input.value=newQty; changeQuantity(item.dataset.line,newQty,item);return;
+    }
+
+    const minusBtn=e.target.closest('[data-qty-minus]');
+    if(minusBtn){
+      e.preventDefault(); const item=minusBtn.closest('[data-line-item]'); if(!item)return;
+      const input=item.querySelector('[data-qty-input]'); const currentQty=parseInt(input.value)||1;
+      if(currentQty>1){input.value=currentQty-1;changeQuantity(item.dataset.line,currentQty-1,item);}return;
+    }
+
+    const removeBtn=e.target.closest('[data-remove-item]');
+    if(removeBtn){e.preventDefault();const item=removeBtn.closest('[data-line-item]');if(!item)return;changeQuantity(item.dataset.line,0,item);return;}
+
+    const quickViewBtn=e.target.closest('[data-quick-view]');
+    if(quickViewBtn){
+      e.preventDefault();e.stopPropagation();
+      const handle=quickViewBtn.dataset.productHandle; if(!handle)return;
+      wasCartDrawerOpen=isDrawerOpen();
+      if(wasCartDrawerOpen)closeDrawer();
+      setTimeout(()=>openQuickView(handle),wasCartDrawerOpen?300:0);return;
+    }
+  });
+
+  document.addEventListener('submit',async e=>{
+    const form=e.target;
+    if(form.action&&form.action.includes('/cart/add')){
+      e.preventDefault();e.stopPropagation();
+      const variantInput=form.querySelector('[name="id"]'); const qtyInput=form.querySelector('[name="quantity"]'); const submitBtn=form.querySelector('[type="submit"][name="add"]');
+      if(!variantInput)return;
+      const result=await addToCart(variantInput.value,qtyInput?qtyInput.value:1,submitBtn);
+      if(result.success){if(isQuickViewOpen)closeQuickView();setTimeout(openDrawer,300);if(submitBtn)setTimeout(()=>submitBtn.textContent='Add to cart',1500);}
+    }
+  },true);
+
+  function syncWishlistPage(){
+    const isWishlistPage=window.location.href.includes('wishlist')||window.location.search.includes('view=wishlist')||document.querySelector('[data-wishlist-page]')||document.querySelector('.wishlist-page')||document.querySelector('.template-wishlist');
+    if(!isWishlistPage)return;
+    const ids=getWishlistIds();
+    const productsGrid=document.querySelector('.hdt-products-grid,.hdt-grid,.wishlist-grid,[data-wishlist-grid],.collection-products,.products-grid');
+    if(!productsGrid)return;
+    const productCards=productsGrid.querySelectorAll('.hdt-card-product,.hdt-card,.product-card,[data-product-id],.wishlist-product-item');
+    productCards.forEach(card=>{
+      let productId=card.dataset.productId||card.dataset.id||card.querySelector('hdt-wishlist')?.dataset.id||card.querySelector('[data-product-id]')?.dataset.productId||card.querySelector('[data-wishlist-btn]')?.dataset.productId;
+      if(productId&&!ids.includes(productId.toString())){card.style.transition='all 0.5s ease';card.classList.add('is-removing');setTimeout(()=>{card.remove();checkWishlistPageEmpty();},500);}
+    });
+    setTimeout(checkWishlistPageEmpty,600);
+  }
+
+  async function fetchAndCacheProducts(){
+    if(Object.keys(productCache).length>0)return;
+    try{
+      const response=await fetch('/products.json?limit=250'); const data=await response.json();
+      data.products.forEach(p=>{productCache[p.id.toString()]=p;productCache[p.handle]=p;});
+    }catch(e){console.error('Error fetching products:',e);}
+  }
+
+  window.addEventListener('storage',function(e){if(e.key===WL_KEY){updateWishlistUI();renderWishlist();syncWishlistPage();}});
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'){updateWishlistUI();renderWishlist();syncWishlistPage();}});
+  window.addEventListener('pageshow',function(e){if(e.persisted){updateWishlistUI();renderWishlist();syncWishlistPage();}});
+
+  document.addEventListener('DOMContentLoaded',async()=>{
+    await fetchAndCacheProducts();
+    updateWishlistUI();renderWishlist();syncWishlistPage();
+    const leftPanel=document.querySelector('.cart-drawer-left-panel-full');
+    if(leftPanel)leftPanel.classList.remove('is-visible');
+    const recsSection=document.getElementById('cart-recommendations');
+    if(recsSection)recsSection.classList.remove('is-visible');
+
+    // ── CHANGE 3: Watch HDT discount section for apply/remove → auto refresh ─
+    const discountSection=document.querySelector('.hdt-cart-discount-section');
+    if(discountSection){
+      const discountObserver=new MutationObserver(()=>{
+        clearTimeout(window._discountRefreshTimer);
+        window._discountRefreshTimer=setTimeout(refreshCart,700);
+      });
+      discountObserver.observe(discountSection,{childList:true,subtree:true});
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+    
+    var currencyEvents = ['currency:changed', 'shopify:currency:changed', 'theme:currency:changed'];
+    currencyEvents.forEach(function(evt) {
+      document.addEventListener(evt, reRenderRelatedWithNewCurrency);
+    });
+    document.addEventListener('change', function(e) {
+      if (e.target.closest('form[action*="localization"]') ||
+          e.target.closest('[name="currency"]') ||
+          e.target.closest('.shopify-currency-form')) {
+        setTimeout(reRenderRelatedWithNewCurrency, 800);
+      }
+    });
+
+    setTimeout(()=>{
+      fetch('/cart.js').then(r=>r.json()).then(cart=>{
+        updateShippingBar(cart.items_subtotal_price);
+      }).catch(()=>{});
+    },900);
+  });
+
+  setTimeout(()=>{updateWishlistUI();renderWishlist();syncWishlistPage();},1000);
+})();
+
+const cartDialogFix=document.getElementById('CartDrawer');
+if(cartDialogFix){
+  const fixObserver=new MutationObserver(()=>{
+    if(cartDialogFix.hasAttribute('open')){
+      requestAnimationFrame(()=>{
+        cartDialogFix.scrollTop=0;
+        const wrapper=cartDialogFix.querySelector('.cart-drawer-wrapper');
+        if(wrapper)wrapper.scrollTop=0;
+      });
+    }
+  });
+  fixObserver.observe(cartDialogFix,{attributes:true,attributeFilter:['open']});
+}
+</script>
+
+{%- endif -%}
+
+<script>
+  // Bypass app's thumbnail scrollIntoView
+(function () {
+  const _original = Element.prototype.scrollIntoView;
+  Element.prototype.scrollIntoView = function (options) {
+    if (
+      this.matches('.hdt-slider__slide') ||
+      this.closest('.hdt-slider__slide')
+    ) {
+      return; // block scroll on thumb slides
+    }
+    return _original.call(this, options);
+  };
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Cart Drawer",
+  "settings": [
+    {"type":"color_scheme","id":"color_scheme","label":"Color scheme","default":"scheme-1"},
+    {"type":"checkbox","id":"show_free_shipping_bar","label":"Show free shipping bar","default":true},
+    {"type":"header","content":"Trust Badges"},
+    {"type":"checkbox","id":"show_trust_badges","label":"Show trust badges","default":true},
+    {"type":"text","id":"trust_badge_1","label":"Badge 1","default":"Certified Quality"},
+    {"type":"text","id":"trust_badge_2","label":"Badge 2","default":"Lowest Delivery"},
+    {"type":"text","id":"trust_badge_3","label":"Badge 3","default":"30-Day Return"},
+    {"type":"header","content":"EU VAT"},
+    {"type":"checkbox","id":"show_vat_validation","label":"Show EU VAT validation","default":true},
+    {"type":"header","content":"Terms"},
+    {"type":"checkbox","id":"show_terms_checkbox","label":"Show terms checkbox","default":true},
+    {"type":"url","id":"terms_page_url","label":"Terms page URL"},
+    {"type":"header","content":"Products"},
+    {"type":"text","id":"heading","label":"Heading","default":"You may also like"},
+    {"type":"collection","id":"collection","label":"Collection"},
+    {
+      "type": "header",
+      "content": "Discount Code"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_discount_code",
+      "label": "Show Discount Code Section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "discount_label",
+      "label": "Discount Label",
+      "default": "Do you have a discount code?"
+    },
+    {
+      "type": "text",
+      "id": "discount_placeholder",
+      "label": "Discount Placeholder",
+      "default": "Discount code"
+    },
+    {
+      "type": "text",
+      "id": "discount_error_message",
+      "label": "Discount Error Message",
+      "default": "Enter a valid discount code"
+    }
+  ],
+  "blocks":[{"type":"@app"}]
+}
+{% endschema %}

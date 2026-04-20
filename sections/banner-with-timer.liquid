@@ -1,0 +1,715 @@
+{% comment %}
+  Promotional Banner Section with Countdown Timer
+  - Dynamic typography for desktop/mobile
+  - Customizable colors and padding
+  - Optional countdown timer
+  - Content alignment: left, center, right
+  - Fully responsive
+{% endcomment %}
+
+{%- style -%}
+  #promo-banner-{{ section.id }}.promo-banner.hdt-container {
+    position: relative;
+    overflow: hidden;
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__container {
+    background-color: {{ section.settings.bg_color }};
+    padding-top: {{ section.settings.padding_top_mobile }}px;
+    padding-bottom: {{ section.settings.padding_bottom_mobile }}px;
+    margin: 0 auto;
+    border-radius: 12px;
+    text-align: {{ section.settings.content_alignment }};
+    position: relative;
+    z-index: 2;
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__heading {
+    color: {{ section.settings.heading_color }};
+    font-size: {{ section.settings.heading_font_size_mobile }}px;
+    line-height: 1.2;
+    margin: 0 auto 15px;
+    font-weight: 400;
+    max-width: 80%;
+    {% if section.settings.content_alignment == 'left' %}
+      margin-left: 0;
+      padding-left: 40px;
+    {% elsif section.settings.content_alignment == 'right' %}
+      margin-right: 0;
+      padding-right: 40px;
+    {% endif %}
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__heading .highlight {
+    color: {{ section.settings.highlight_color }};
+    font-weight: 700;
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__subheading {
+    color: {{ section.settings.subheading_color }};
+    font-size: {{ section.settings.subheading_font_size_mobile }}px;
+    line-height: 1.5;
+    max-width: 70%;
+    margin: 0 auto 25px;
+    opacity: 0.9;
+    {% if section.settings.content_alignment == 'left' %}
+      margin-left: 0;
+      padding-left: 40px;
+    {% elsif section.settings.content_alignment == 'right' %}
+      margin-right: 0;
+      padding-right: 40px;
+    {% endif %}
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__button {
+    display: inline-block;
+    background-color: {{ section.settings.button_bg_color }};
+    color: {{ section.settings.button_text_color }};
+    padding: 14px 35px;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: {{ section.settings.button_radius }}px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    {% if section.settings.content_alignment == 'left' %}
+      margin-left: 40px;
+    {% elsif section.settings.content_alignment == 'right' %}
+      margin-right: 40px;
+    {% endif %}
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__timer-wrapper {
+    position: absolute;
+    {% if section.settings.content_alignment == 'left' %}
+      right: 75px;
+    {% elsif section.settings.content_alignment == 'right' %}
+      left: 75px;
+    {% else %}
+      right: 75px;
+    {% endif %}
+    bottom: 8%;
+    z-index: 3;
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__timer {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: {{ section.settings.timer_bg_color }};
+    padding: 5px 15px;
+    border-radius: {{ section.settings.timer_radius }}px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__timer-item {
+    text-align: center;
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__timer-number {
+    font-size: 20px;
+    font-weight: 700;
+    color: {{ section.settings.timer_number_color }};
+    min-width: 30px;
+    display: block;
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__timer-number.highlight {
+    color: {{ section.settings.timer_highlight_color }};
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__timer-label {
+    font-size: 10px;
+    color: {{ section.settings.timer_label_color }};
+    text-transform: capitalize;
+    display: block;
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__timer-separator {
+    font-size: 18px;
+    font-weight: 700;
+    color: {{ section.settings.timer_number_color }};
+    margin: 0 2px;
+    align-self: flex-start;
+    margin-top: 5px;
+  }
+
+  /* Decorative percent icons */
+  #promo-banner-{{ section.id }} .promo-banner__decor {
+    position: absolute;
+    font-size: 150px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.08);
+    z-index: 1;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__decor--left {
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-15deg);
+  }
+
+  #promo-banner-{{ section.id }} .promo-banner__decor--right {
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%) rotate(15deg);
+  }
+
+  @media (min-width: 750px) and (max-width: 1000px) {
+    #promo-banner-{{ section.id }} .promo-banner__timer-wrapper {
+      {% if section.settings.content_alignment == 'right' %}
+        left: 50px;
+      {% else %}
+        right: 50px;
+      {% endif %}
+      bottom: 8%;
+    }
+  }
+
+  @media (min-width: 751px) and (max-width: 1024px) {
+    #promo-banner-{{ section.id }} .promo-banner__heading {
+      max-width: 60% !important;
+    }
+  }
+
+  /* Desktop styles */
+  @media screen and (min-width: 750px) {
+    #promo-banner-{{ section.id }} .promo-banner__container {
+      padding-top: {{ section.settings.padding_top_desktop }}px;
+      padding-bottom: {{ section.settings.padding_bottom_desktop }}px;
+    }
+    {% if section.settings.cont_bgimg != blank %}
+    #promo-banner-{{ section.id }} .promo-banner__container {
+      background-image: url({{ section.settings.cont_bgimg | img_url: "master" }});
+      background-repeat: no-repeat;
+      background-size: cover;
+    } 
+    {% endif %}
+
+    #promo-banner-{{ section.id }} .promo-banner__heading {
+      font-size: {{ section.settings.heading_font_size_desktop }}px;
+      margin: 0 auto 15px;
+      max-width: 100%;
+      {% if section.settings.content_alignment == 'left' %}
+        margin-left: 0;
+        max-width: 60%;
+      {% elsif section.settings.content_alignment == 'right' %}
+        margin-right: 0;
+        max-width: 60%;
+      {% endif %}
+    }
+
+    #promo-banner-{{ section.id }} .promo-banner__subheading {
+      font-size: {{ section.settings.subheading_font_size_desktop }}px;
+      max-width: 38%;
+      {% if section.settings.content_alignment == 'left' %}
+        margin-left: 0;
+      {% elsif section.settings.content_alignment == 'right' %}
+        margin-right: 0;
+      {% endif %}
+    }
+
+    #promo-banner-{{ section.id }} .promo-banner__timer-number {
+      font-size: 20px;
+      min-width: 35px;
+    }
+
+    #promo-banner-{{ section.id }} .promo-banner__timer-label {
+      font-size: 12px;
+    }
+  }
+
+  /* Mobile styles */
+  @media screen and (max-width: 749px) {
+    #promo-banner-{{ section.id }} .promo-banner__timer-wrapper {
+      right: 0;
+      left: 0;
+      bottom: -10%;
+      margin-top: 25px;
+      display: flex;
+      justify-content: center;
+    }
+    {% if section.settings.enable_timer %}
+    #promo-banner-{{ section.id }}.promo-banner.hdt-container {
+      padding-bottom: 50px;
+    }
+    {% endif %}
+    
+    {% if section.settings.cont_bgimg_mbl != blank %}
+    #promo-banner-{{ section.id }} .promo-banner__container {
+      background-image: url({{ section.settings.cont_bgimg_mbl | img_url: "master" }});
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: bottom;
+    }
+    {% endif %}
+
+    #promo-banner-{{ section.id }} .promo-banner__decor {
+      font-size: 80px;
+    }
+
+    #promo-banner-{{ section.id }} .promo-banner__timer {
+      padding: 8px 12px;
+    }
+
+    #promo-banner-{{ section.id }} .promo-banner__timer-number {
+      font-size: 20px;
+      min-width: 30px;
+    }
+
+    #promo-banner-{{ section.id }} .promo-banner__heading,
+    #promo-banner-{{ section.id }} .promo-banner__subheading {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    #promo-banner-{{ section.id }} .promo-banner__button {
+      {% if section.settings.content_alignment == 'left' %}
+        margin-left: 20px;
+      {% elsif section.settings.content_alignment == 'right' %}
+        margin-right: 20px;
+      {% endif %}
+    }
+  }
+{%- endstyle -%}
+
+<div id="promo-banner-{{ section.id }}" class="promo-banner hdt-container">
+  <div class="promo-banner__container">
+    {% if section.settings.heading != blank %}
+      <h2 class="promo-banner__heading">
+        {{ section.settings.heading_before_highlight }}
+        {% if section.settings.heading_highlight != blank %}
+          <span class="highlight">{{ section.settings.heading_highlight }}</span>
+        {% endif %}
+        {{ section.settings.heading_after_highlight }}
+      </h2>
+    {% endif %}
+
+    {% if section.settings.subheading != blank %}
+      <p class="promo-banner__subheading">{{ section.settings.subheading }}</p>
+    {% endif %}
+
+    {% if section.settings.button_text != blank %}
+      <a href="{{ section.settings.button_link }}" class="promo-banner__button">
+        {{ section.settings.button_text }}
+      </a>
+    {% endif %}
+
+    {% if section.settings.enable_timer %}
+      <div class="promo-banner__timer-wrapper promo-banner__timer-wrapper--mobile">
+        <div class="promo-banner__timer" data-timer data-end-date="{{ section.settings.timer_end_date }}">
+          <div class="promo-banner__timer-item">
+            <span class="promo-banner__timer-number" data-days>00</span>
+            <span class="promo-banner__timer-label">Days</span>
+          </div>
+          <span class="promo-banner__timer-separator">:</span>
+          <div class="promo-banner__timer-item">
+            <span class="promo-banner__timer-number" data-hours>00</span>
+            <span class="promo-banner__timer-label">Hours</span>
+          </div>
+          <span class="promo-banner__timer-separator">:</span>
+          <div class="promo-banner__timer-item">
+            <span class="promo-banner__timer-number highlight" data-minutes>00</span>
+            <span class="promo-banner__timer-label">Min</span>
+          </div>
+          <span class="promo-banner__timer-separator">:</span>
+          <div class="promo-banner__timer-item">
+            <span class="promo-banner__timer-number highlight" data-seconds>00</span>
+            <span class="promo-banner__timer-label">Sec</span>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if section.settings.enable_timer %}
+    <div class="promo-banner__timer-wrapper promo-banner__timer-wrapper--desktop">
+      <div class="promo-banner__timer" data-timer data-end-date="{{ section.settings.timer_end_date }}">
+        <div class="promo-banner__timer-item">
+          <span class="promo-banner__timer-number" data-days>00</span>
+          <span class="promo-banner__timer-label">Days</span>
+        </div>
+        <span class="promo-banner__timer-separator">:</span>
+        <div class="promo-banner__timer-item">
+          <span class="promo-banner__timer-number" data-hours>00</span>
+          <span class="promo-banner__timer-label">Hours</span>
+        </div>
+        <span class="promo-banner__timer-separator">:</span>
+        <div class="promo-banner__timer-item">
+          <span class="promo-banner__timer-number highlight" data-minutes>00</span>
+          <span class="promo-banner__timer-label">Min</span>
+        </div>
+        <span class="promo-banner__timer-separator">:</span>
+        <div class="promo-banner__timer-item">
+          <span class="promo-banner__timer-number highlight" data-seconds>00</span>
+          <span class="promo-banner__timer-label">Sec</span>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{% if section.settings.enable_timer %}
+<script>
+  (function() {
+    const section = document.getElementById('promo-banner-{{ section.id }}');
+    const timers = section.querySelectorAll('[data-timer]');
+    
+    function updateTimer() {
+      const endDate = new Date('{{ section.settings.timer_end_date }}T23:59:59').getTime();
+      const now = new Date().getTime();
+      const distance = endDate - now;
+
+      if (distance < 0) {
+        timers.forEach(timer => {
+          timer.querySelector('[data-days]').textContent = '00';
+          timer.querySelector('[data-hours]').textContent = '00';
+          timer.querySelector('[data-minutes]').textContent = '00';
+          timer.querySelector('[data-seconds]').textContent = '00';
+        });
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      timers.forEach(timer => {
+        timer.querySelector('[data-days]').textContent = String(days).padStart(2, '0');
+        timer.querySelector('[data-hours]').textContent = String(hours).padStart(2, '0');
+        timer.querySelector('[data-minutes]').textContent = String(minutes).padStart(2, '0');
+        timer.querySelector('[data-seconds]').textContent = String(seconds).padStart(2, '0');
+      });
+    }
+
+    updateTimer();
+    setInterval(updateTimer, 1000);
+  })();
+</script>
+{% endif %}
+
+<style>
+  @media screen and (max-width: 749px) {
+    #promo-banner-{{ section.id }} .promo-banner__timer-wrapper--desktop {
+      display: none !important;
+    }
+    #promo-banner-{{ section.id }} .promo-banner__timer-wrapper--mobile {
+      display: flex !important;
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    #promo-banner-{{ section.id }} .promo-banner__timer-wrapper--desktop {
+      display: block !important;
+    }
+    #promo-banner-{{ section.id }} .promo-banner__timer-wrapper--mobile {
+      display: none !important;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Promo Banner with Timer",
+  "tag": "section",
+  "class": "promo-banner-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "cont_bgimg",
+      "label": "Content Background Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "cont_bgimg_mbl",
+      "label": "Content Mobile Background Image"
+    },
+    {
+      "type": "text",
+      "id": "heading_before_highlight",
+      "label": "Heading (before highlight)",
+      "default": "Shop new limited time"
+    },
+    {
+      "type": "text",
+      "id": "heading_highlight",
+      "label": "Heading (highlighted text)",
+      "default": "20% OFF"
+    },
+    {
+      "type": "text",
+      "id": "heading_after_highlight",
+      "label": "Heading (after highlight)",
+      "default": "every week !"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Full Heading (fallback)",
+      "default": "Shop new limited time 20% OFF every week !",
+      "info": "Used if highlight fields are empty"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Lorem ipsum dolor sit amet consectetur. Convallis aliquam elementum tristique nisi dictum diam."
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Shop the Sale"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "label": "Button Border Radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "default": 5,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Typography - Desktop"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size_desktop",
+      "label": "Heading Font Size (Desktop)",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "default": 42,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "subheading_font_size_desktop",
+      "label": "Subheading Font Size (Desktop)",
+      "min": 12,
+      "max": 30,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Typography - Mobile"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size_mobile",
+      "label": "Heading Font Size (Mobile)",
+      "min": 16,
+      "max": 50,
+      "step": 2,
+      "default": 26,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "subheading_font_size_mobile",
+      "label": "Subheading Font Size (Mobile)",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#0052CC"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "highlight_color",
+      "label": "Highlight Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Subheading Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Countdown Timer"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_timer",
+      "label": "Enable Countdown Timer",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "timer_end_date",
+      "label": "Timer End Date",
+      "default": "2025-12-31",
+      "info": "Format: YYYY-MM-DD"
+    },
+    {
+      "type": "color",
+      "id": "timer_bg_color",
+      "label": "Timer Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "timer_number_color",
+      "label": "Timer Number Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "timer_highlight_color",
+      "label": "Timer Highlight Color (Min/Sec)",
+      "default": "#e53935"
+    },
+    {
+      "type": "color",
+      "id": "timer_label_color",
+      "label": "Timer Label Color",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "timer_radius",
+      "label": "Timer Border Radius",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 5,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Section Padding - Desktop"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "label": "Padding Top (Desktop)",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "default": 50,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "label": "Padding Bottom (Desktop)",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "default": 50,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Section Padding - Mobile"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding Top (Mobile)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 30,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding Bottom (Mobile)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 30,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Decorative Elements"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_decor",
+      "label": "Show Percent Decorations",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Promo Banner with Timer"
+    }
+  ]
+}
+{% endschema %}
