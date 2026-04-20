@@ -311,14 +311,17 @@
       clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important;
       border: 0 !important; visibility: hidden !important;
     }
-    /* Hide sale badge when no discount is present */
-    .hdt-price-wrapp:has(hdt-compare-at-price[hidden]) .sale-badge {
-      display: none !important;
+    {%- if use_variant -%}
+    .hdt-price__sale hdt-price .hdt-money { opacity: 0; }
+    .hdt-price__sale hdt-price .hdt-money.price-visible { opacity: 1; }
+    .hdt-compare-at-price .hdt-money { opacity: 0; }
+    .hdt-compare-at-price .hdt-money.price-visible { opacity: 1; }
+
+    .hdt-quick-view-modal .hdt-price__sale hdt-price .hdt-money,
+    .hdt-quick-view-modal .hdt-compare-at-price .hdt-money {
+      opacity: 1 !important;
     }
-    .tax-text {
-      margin-left: 4px;
-      vertical-align: baseline;
-    }
+    {%- endif -%}
   </style>
 
 {%- if localization.market.handle == 'sweden' or localization.market.handle == 'hungary' or localization.market.handle == 'serbia' or localization.market.handle == 'moldova' or localization.market.handle == 'iceland' -%}
@@ -413,11 +416,11 @@
       <div class="hdt-price__sale hdt-price__list b"{% if use_variant == false and price_varies_item != '' %} hidden{% endif %}>
         <hdt-compare-at-price class="hdt-compare-at-price"{% if product.has_only_default_variant == false and form_id %} form="{{ form_id }}"{% endif %}{% if compare_at_price == nil or compare_at_price <= price or on_sale == false or un_no_pick == false %} hidden{% endif %}>
           <span class="sr-only sr-only--inline">{{ 'products.product.price.regular_price' | t }}</span>
-          <span class="hdt-money">{{ money_compare_at_price }}</span>
+          <span class="hdt-money price-visible">{{ money_compare_at_price }}</span>
         </hdt-compare-at-price>
         <hdt-price class="hdt-price"{% if product.has_only_default_variant == false and form_id %} form="{{ form_id }}"{% endif %}>
           <span class="sr-only sr-only--inline">{{ 'products.product.price.sale_price' | t }}</span>
-          <span class="hdt-money">{{ money_price_clone | default: money_price }}</span>
+          <span class="hdt-money price-visible">{{ money_price_clone | default: money_price }}</span>
         </hdt-price>
       </div>
       <hdt-unit-price class="hdt-unit-price"{% if form_id %} form="{{ form_id }}"{% endif %}{% if selected_variant.unit_price_measurement == nil %} hidden{% endif %}>
@@ -545,11 +548,11 @@
       {%- endif -%}
       <div class="hdt-price__sale hdt-price__list d"{% if use_variant == false and price_varies_item != '' %} hidden{% endif %}>
         <hdt-compare-at-price class="hdt-compare-at-price"{% if product.has_only_default_variant == false and form_id %} form="{{ form_id }}"{% endif %}{% if compare_at_price == nil or compare_at_price <= price or on_sale == false or un_no_pick == false %} hidden{% endif %}>
-          <span class="hdt-money">{{ money_compare_at_price }}</span>
+          <span class="hdt-money price-visible">{{ money_compare_at_price }}</span>
           <span class="sr-only">{{ 'products.product.price.regular_price' | t }}</span>
         </hdt-compare-at-price>
         <hdt-price class="hdt-price"{% if product.has_only_default_variant == false and form_id %} form="{{ form_id }}"{% endif %}>
-          <span class="hdt-money">{{ money_price_clone | default: money_price }}</span><span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400;">Inc VAT</span>
+          <span class="hdt-money price-visible">{{ money_price_clone | default: money_price }} <span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400;">Inc VAT</span></span>
           <span class="sr-only">{{ 'products.product.price.sale_price' | t }}</span>
         </hdt-price>
       </div>
@@ -568,7 +571,10 @@
         </span>
       </hdt-unit-price>
     </div>
-     <span class="sale-badge">{% if on_sale %}{{ discount_percentage }}% OFF{% endif %}</span>
+    {% comment %} {%- if on_sale -%}
+      <span class="sale-badge">{{ discount_percentage }}% OFF</span>
+    {%- endif -%} {% endcomment %}
+     <span class="sale-badge"{% unless on_sale %} style="display:none"{% endunless %}>{% if on_sale %}{{ discount_percentage }}% OFF{% endif %}</span>
     {%- liquid
       if show_badges
         assign sale_text_t = 'products.product.on_sale_single' | t
@@ -580,5 +586,90 @@
   {%- if show_volume_note and product.quantity_price_breaks_configured? -%}
     <div class="hdt-volume-pricing-note">{{ 'products.product.volume_pricing.note' | t }}</div>
   {%- endif -%}
+
+<script>
+(function() {
+
+  var RIGHT_SYMBOLS = ['Kč', 'kr.', 'kr', 'Ft', 'ден', 'zł', 'Lei', 'РСД', 'КМ', 'L'];
+
+  function isRightSymbol(symbol) {
+    return RIGHT_SYMBOLS.some(function(s) {
+      return symbol.trim().toLowerCase() === s.toLowerCase();
+    });
+  }
+
+  function extractSymbol(text) {
+    var raw = text.replace(/[\d.,\s]/g, '').replace(/inc\s*vat/gi, '').trim();
+    return raw || '£';
+  }
+
+  function reformatRenderedPrice(text) {
+    text = text.replace(/inc\s*vat/gi, '').trim();
+    var leftMatch = text.match(/^([^\d\s,\.]+)\s*([\d.,]+)$/);
+    if (leftMatch) {
+      var sym = leftMatch[1].trim();
+      var num = leftMatch[2].trim();
+      return isRightSymbol(sym) ? num + sym : sym + num;
+    }
+    var rightMatch = text.match(/^([\d.,]+)\s*([^\d\s,\.]+)$/);
+    if (rightMatch) {
+      var num = rightMatch[1].trim();
+      var sym = rightMatch[2].trim();
+      return isRightSymbol(sym) ? num + sym : sym + num;
+    }
+    return text;
+  }
+
+  function applyPriceVisible() {
+    // Sale price
+    var priceEl = document.querySelector('.hdt-price__sale hdt-price .hdt-money');
+    if (priceEl) {
+      var taxSpan = priceEl.querySelector('.tax-text');
+      var taxHTML = taxSpan
+        ? taxSpan.outerHTML
+        : '<span class="tax-text" style="color:#000;font-size:12px;font-weight:400;">Inc VAT</span>';
+      var rawText = priceEl.textContent;
+      var formatted = reformatRenderedPrice(rawText);
+      priceEl.innerHTML = formatted + ' ' + taxHTML;
+      priceEl.classList.add('price-visible');
+    }
+
+    // Compare-at price
+    document.querySelectorAll('.hdt-compare-at-price .hdt-money').forEach(function(el) {
+      var raw = el.textContent.trim();
+      if (raw) el.textContent = reformatRenderedPrice(raw);
+      el.classList.add('price-visible');
+    });
+
+    // Sale badge
+    var compareWrapper = document.querySelector('.hdt-price__sale hdt-compare-at-price');
+    var badge = document.querySelector('.sale-badge');
+    if (badge && compareWrapper) {
+      if (compareWrapper.hasAttribute('hidden')) {
+        badge.style.display = 'none';
+      } else {
+        badge.style.display = '';
+      }
+    }
+  }
+
+  // Run on page load
+  applyPriceVisible();
+
+  // Watch for theme JS updating price on variant change
+  var priceContainer = document.querySelector('.hdt-price__sale');
+  if (priceContainer) {
+    var observer = new MutationObserver(function() {
+      // Disconnect to avoid infinite loop while we update
+      observer.disconnect();
+      applyPriceVisible();
+      // Reconnect
+      observer.observe(priceContainer, { childList: true, subtree: true });
+    });
+    observer.observe(priceContainer, { childList: true, subtree: true });
+  }
+
+})();
+</script>
 
 {%- endif -%}
