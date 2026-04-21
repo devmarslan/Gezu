@@ -543,6 +543,7 @@ document.addEventListener('DOMContentLoaded', function () {
           
           // 3. Open the modal (calls the existing hdt-lazy-modal or dialog open method)
             const modalWrapper = modal.closest('hdt-lazy-modal, hdt-modal');
+            modal.dataset.openedAt = Date.now(); // Record open time to prevent accidental auto-close
             if (modalWrapper && typeof modalWrapper.open === 'function') {
               modalWrapper.open();
             } else if (typeof modal.showModal === 'function') {

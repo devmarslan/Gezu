@@ -67,6 +67,10 @@
         document.addEventListener(evt, () => {
           const modal = document.getElementById('hdt-quick-view-modal');
           if (modal && (modal.hasAttribute('open') || modal.open)) {
+            // Check if the modal was just opened (within the last 1000ms)
+            const openedAt = parseInt(modal.dataset.openedAt || 0);
+            if (Date.now() - openedAt < 1000) return; 
+
             const parent = modal.closest('hdt-lazy-modal, hdt-modal');
             if (parent && typeof parent.close === 'function') {
               parent.close();
