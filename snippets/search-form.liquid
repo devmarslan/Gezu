@@ -69,6 +69,9 @@
 					<div slot="sticky" class="hdt-search-sticky lg:hdt-text-center">
 						<div class="hdt-container">
 							<form data-frm-search action="{{ routes.search_url }}" method="get" class="hdt-mini-search__frm hdt-pr" role="search">
+								<input type="hidden" name="type" value="product">
+								<input type="hidden" name="options[fields]" value="title,body,tag,product_type,variants.title,vendor,variants.sku">
+								<input type="hidden" name="resources[type]" value="product">
 								<input type="hidden" name="resources[options][fields]" value="title,body,tag,product_type,variants.title,vendor,variants.sku">
 								<input type="hidden" name="resources[limit_scope]" value="each">
 								<div class="hdt-search-inner hdt-relative hdt-oh">
@@ -222,6 +225,9 @@
 				<div class="hdt-dialog-drawer__inner hdt-current-scrollbar">
 					<div slot="sticky" class="hdt-search-sticky hdt-px-15">
 						<form data-frm-search action="{{ routes.search_url }}" method="get" class="hdt-mini-search__frm hdt-pr" role="search">
+							<input type="hidden" name="type" value="product">
+							<input type="hidden" name="options[fields]" value="title,body,tag,product_type,variants.title,vendor,variants.sku">
+							<input type="hidden" name="resources[type]" value="product">
 							<input type="hidden" name="resources[options][fields]" value="title,body,tag,product_type,variants.title,vendor,variants.sku">
 							<input type="hidden" name="resources[limit_scope]" value="each">
 							<div class="hdt-search-inner hdt-relative hdt-oh">
