@@ -17,7 +17,7 @@
   endif 
  %}
 <div class="hdt-card-product__btn-qv hdt-theme-quick-view-wrapper" placement="{{ placement | default: 'none' }}" {% if inner_tooltip %} inner{% endif %}>
-  <button type="button" handle="{{ product.handle }}" aria-controls="hdt-custom-qv-modal" aria-expanded="false" class="hdt-card-product__btn-quick-view hdt-theme-quick-view-btn {{ class }}" placement="{{ placement | default: 'none' }}" {{ attr }}>
+  <button type="button" handle="{{ product.handle }}" aria-controls="hdt-quick-view-modal" aria-expanded="false" class="hdt-card-product__btn-quick-view hdt-theme-quick-view-btn {{ class }}" placement="{{ placement | default: 'none' }}" {{ attr }}>
     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><use xlink:href="#hdt-icon-quickview"></use></svg>
     <span {% unless disable_sr_only %}class="sr-only"{% endunless %}>{{ 'products.product.quick_view' | t }}</span>
   </button>

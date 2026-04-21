@@ -510,96 +510,61 @@ document.addEventListener('DOMContentLoaded', function () {
     const btn = e.target.closest('.hdt-theme-quick-view-btn');
     if (!btn) return;
 
-    console.log('Quick View Clicked:', btn);
     e.preventDefault();
-    e.stopImmediatePropagation();
-
-    const handle = btn.getAttribute('data-handle') || btn.getAttribute('handle');
-    const modalId = btn.getAttribute('aria-controls') || 'hdt-custom-qv-modal';
-    console.log('Handle:', handle, 'Modal ID:', modalId);
-    
+    const handle = btn.getAttribute('handle');
+    const modalId = btn.getAttribute('aria-controls');
     const modal = document.getElementById(modalId);
-    if (!modal) {
-      console.error('Modal NOT found:', modalId);
-      return;
-    }
-    if (!handle) {
-      console.error('Product handle NOT found on button');
-      return;
-    }
+    
+    if (!modal || !handle) return;
 
     // 1. Show Loading State
     btn.classList.add('loading');
     btn.setAttribute('aria-busy', 'true');
     
-    // 2. Fetch the correct section
+    // 2. Fetch the correct section based on the target modal
     const sectionId = (modalId === 'hdt-quick-add-modal') ? 'main-quick-add' : 'main-quick-view';
     const fetchUrl = `${window.location.origin}/products/${handle}?section_id=${sectionId}`;
-    console.log('Fetching:', fetchUrl);
     
     fetch(fetchUrl)
       .then(response => response.text())
       .then(html => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
+        // Both sections use a similar naming convention for the primary wrapper
         const content = doc.querySelector('.hdt-main-product-quick-view, .hdt-main-product-quick-add');
         
         if (content) {
-          // Close any open cart drawers
-          document.querySelectorAll('hdt-cart-drawer, #CartDrawer').forEach(el => {
-            if (typeof el.close === 'function') el.close();
-            el.removeAttribute('open');
-          });
-
           const modalInner = modal.querySelector('.hdt-dialog-modal__inner');
           if (modalInner) {
+            // Use createContextualFragment to ensure scripts in the injected content are executed
             modalInner.innerHTML = '';
-            const fragment = document.createRange().createContextualFragment(content.innerHTML);
-            
-            // Manually re-create and append scripts to ensure they execute in all browsers
-            const scripts = fragment.querySelectorAll('script');
-            modalInner.appendChild(fragment);
-            
-            scripts.forEach(oldScript => {
-              const newScript = document.createElement('script');
-              Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-              newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-              oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
+            modalInner.appendChild(document.createRange().createContextualFragment(content.innerHTML));
           }
           
-          // 3. Open the modal
-          const modalWrapper = modal.closest('hdt-lazy-modal, hdt-modal');
-          modal.dataset.openedAt = Date.now(); 
-          
-          setTimeout(() => {
+          // 3. Open the modal (calls the existing hdt-lazy-modal or dialog open method)
+            const modalWrapper = modal.closest('hdt-lazy-modal, hdt-modal');
             if (modalWrapper && typeof modalWrapper.open === 'function') {
-              console.log('Opening modal via wrapper');
               modalWrapper.open();
             } else if (typeof modal.showModal === 'function') {
               modal.showModal();
             } else {
               modal.setAttribute('open', '');
             }
-            // Clear loading state after attempt
-            btn.classList.remove('loading');
-            btn.removeAttribute('aria-busy');
-          }, 50);
-
-          document.dispatchEvent(new CustomEvent('dialog:opening', { detail: { id: modalId } }));
-          document.dispatchEvent(new CustomEvent('currency:update'));
-        } else {
-          console.error('Content NOT found in AJAX response');
-          btn.classList.remove('loading');
+            // Trigger theme event for other listeners (like currency update)
+            document.dispatchEvent(new CustomEvent('dialog:opening', { detail: { id: modalId } }));
+            document.dispatchEvent(new CustomEvent('currency:update'));
+          }
         }
       })
       .catch(err => {
         console.error('Quick View Error:', err);
         btn.classList.remove('loading');
+      })
+      .finally(() => {
+        // We don't remove loading here immediately because the section-closing logic
+        // in main-quick-view.liquid will handle it once the modal actually loads/opens.
       });
-  }); // Bubble phase
-})();
-// --- END HDT THEME QUICK VIEW HANDLER ---
+  });
 </script>
 {% render 'consent-banner' %}
   </body>
