@@ -41,7 +41,7 @@
       });
 
       // Clear states on the buttons themselves
-      document.querySelectorAll('[aria-controls="hdt-quick-view-modal"], .hdt-theme-quick-view-btn').forEach(btn => {
+      document.querySelectorAll('[aria-controls="hdt-quick-view-modal"], [data-hdt-controls="hdt-quick-view-modal"], .hdt-theme-quick-view-btn').forEach(btn => {
         btn.setAttribute('aria-expanded', 'false');
         btn.removeAttribute('aria-busy');
         btn.classList.remove('loading');

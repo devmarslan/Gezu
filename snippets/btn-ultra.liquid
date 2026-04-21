@@ -30,7 +30,7 @@
   {%- if product.variants.size > 1 or qty_rules or product.selling_plan_groups.size > 0 -%}
     {%- if settings.show_quick_add -%}
     <div class="hdt-theme-quick-view-wrapper" placement="{{ placement | default: 'none' }}" {%- if inner_tooltip %} inner{% endif %}>
-      <button type="button" handle="{{ product.handle }}" aria-controls="hdt-quick-add-modal" aria-expanded="false" class="hdt-card-product__btn-ultra hdt-theme-quick-view-btn {{ class }}" placement="{{ placement | default: 'none' }}" >
+      <button type="button" handle="{{ product.handle }}" data-hdt-controls="hdt-quick-add-modal" aria-expanded="false" class="hdt-card-product__btn-ultra hdt-theme-quick-view-btn {{ class }}" placement="{{ placement | default: 'none' }}" >
         <svg id="hdt-icon-cart" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="#hdt-icon-cart-sym"></use>
         </svg>

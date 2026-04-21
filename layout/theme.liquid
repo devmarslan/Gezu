@@ -510,16 +510,25 @@ document.addEventListener('DOMContentLoaded', function () {
     const btn = e.target.closest('.hdt-theme-quick-view-btn');
     if (!btn) return;
 
-    e.preventDefault();
+    // Prevent theme's native toggle from firing by using data-hdt-controls or aria-controls
+    const modalId = btn.dataset.hdtControls || btn.getAttribute('aria-controls');
     const handle = btn.getAttribute('handle');
-    const modalId = btn.getAttribute('aria-controls');
+    if (!modalId || !handle) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
     const modal = document.getElementById(modalId);
-    
-    if (!modal || !handle) return;
+    if (!modal) return;
+
+    // PREVENT DOUBLE CLICK BUG: If already loading or open for same product, do nothing
+    if (btn.classList.contains('loading')) return;
+    if (modal.dataset.currentHandle === handle && (modal.hasAttribute('open') || modal.open)) return;
 
     // 1. Show Loading State
     btn.classList.add('loading');
     btn.setAttribute('aria-busy', 'true');
+    btn.setAttribute('aria-expanded', 'true');
     
     // 2. Fetch the correct section based on the target modal
     const sectionId = (modalId === 'hdt-quick-add-modal') ? 'main-quick-add' : 'main-quick-view';
@@ -530,41 +539,35 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(html => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
-        // Both sections use a similar naming convention for the primary wrapper
         const content = doc.querySelector('.hdt-main-product-quick-view, .hdt-main-product-quick-add');
         
         if (content) {
           const modalInner = modal.querySelector('.hdt-dialog-modal__inner');
           if (modalInner) {
-            // Use createContextualFragment to ensure scripts in the injected content are executed
             modalInner.innerHTML = '';
             modalInner.appendChild(document.createRange().createContextualFragment(content.innerHTML));
+            modal.dataset.currentHandle = handle;
           }
           
-          // 3. Open the modal (calls the existing hdt-lazy-modal or dialog open method)
-            const modalWrapper = modal.closest('hdt-lazy-modal, hdt-modal');
-            if (modalWrapper && typeof modalWrapper.open === 'function') {
+          // 3. Open the modal
+          const modalWrapper = modal.closest('hdt-lazy-modal, hdt-modal');
+          if (modalWrapper && typeof modalWrapper.open === 'function') {
+            if (!modal.hasAttribute('open') && !modal.open) {
               modalWrapper.open();
-            } else if (typeof modal.showModal === 'function') {
-              modal.showModal();
-            } else {
-              modal.setAttribute('open', '');
             }
-            // Trigger theme event for other listeners (like currency update)
-            document.dispatchEvent(new CustomEvent('dialog:opening', { detail: { id: modalId } }));
-            document.dispatchEvent(new CustomEvent('currency:update'));
+          } else {
+            modal.showModal ? modal.showModal() : modal.setAttribute('open', '');
           }
+          
+          document.dispatchEvent(new CustomEvent('dialog:opening', { detail: { id: modalId } }));
+          document.dispatchEvent(new CustomEvent('currency:update'));
         }
       })
       .catch(err => {
         console.error('Quick View Error:', err);
         btn.classList.remove('loading');
-      })
-      .finally(() => {
-        // We don't remove loading here immediately because the section-closing logic
-        // in main-quick-view.liquid will handle it once the modal actually loads/opens.
       });
-  });
+  }, true); // Use capture phase to intercept before other scripts
 </script>
 {% render 'consent-banner' %}
   </body>
