@@ -48,8 +48,7 @@ var linkWishlistApp = '/apps/ecomrise/wishlist',
     
     // 2. Add cache-buster to prevent Shopify from serving stale HTML
     const cacheBuster = `&_v=${new Date().getTime()}`; 
-    // FIX: Use encodeURIComponent for the query part specifically to handle special characters correctly
-    return (array.length) ? y + encodeURIComponent(`id:${array.join(' OR id:')}`) + cacheBuster : x + cacheBuster;
+    return (array.length) ? y + encodeURI(`id:${array.join(' OR id:')}`) + cacheBuster : x + cacheBuster;
   };
 
 // Reset if limit change
@@ -61,14 +60,12 @@ if (arr_wishlist_list.length > limitWishlist) {
 // 3. STRICT SYNC: Force reload if the URL doesn't match the LocalStorage data exactly
 if (window.isPageWishlist) {
   const urlParams = new URLSearchParams(window.location.search);
-  const currentQuery = (urlParams.get('q') || "").replace(/\+/g, ' ').trim();
+  const currentQuery = decodeURIComponent(urlParams.get('q') || "");
   const expectedQuery = arr_wishlist_list.length ? `id:${arr_wishlist_list.join(' OR id:')}` : "";
 
-  // Only redirect if there is a real difference to avoid infinite loops or unnecessary refreshes
   if (currentQuery !== expectedQuery && arr_wishlist_list.length > 0) {
     window.location.replace(conver_to_link_fn('wishlist', arr_wishlist_list));
-  } else if (currentQuery === expectedQuery) {
-    // Current query is correct, but we might want to update history to have the latest timestamp
+  } else {
     window.history.replaceState({}, document.title, conver_to_link_fn('wishlist', arr_wishlist_list));
   }
   themeHDN.wisHref = conver_to_link_fn('wishlist', arr_wishlist_list);
@@ -83,12 +80,12 @@ if (arr_compare_list.length > limitCompare) {
 // STRICT SYNC (Compare Page)
 if (window.isPageCompare) {
   const urlParams = new URLSearchParams(window.location.search);
-  const currentQuery = (urlParams.get('q') || "").replace(/\+/g, ' ').trim();
+  const currentQuery = decodeURIComponent(urlParams.get('q') || "");
   const expectedQuery = arr_compare_list.length ? `id:${arr_compare_list.join(' OR id:')}` : "";
 
   if (currentQuery !== expectedQuery && arr_compare_list.length > 0) {
     window.location.replace(conver_to_link_fn('compare', arr_compare_list));
-  } else if (currentQuery === expectedQuery) {
+  } else {
     window.history.replaceState({}, document.title, conver_to_link_fn('compare', arr_compare_list));
   }
 }
@@ -213,17 +210,7 @@ click_wis_fn = function (e) {
 };
 
 add_wis_fn = function (e) {
-    const productId = getterGet(_wishlist_id, this);
-    const productHandle = getterGet(_wishlist_handle, this);
-    
-    // OPTIMISTIC UPDATE: Add to local array immediately to ensure links are updated
-    if (!this.array.includes(productId)) {
-      this.array.unshift(productId);
-      if (this.array.length > this.limit) this.array.pop();
-      localStorage.setItem(this.nameCached, this.array.toString());
-      getterRunFn(_action_after_remove_add, this, action_after_remove_add_fn).call(this, this.actionAfterAdded);
-    }
-
+  if ($wishlist_list && this.isFnWishlist || $compare_list && !this.isFnWishlist) {
     this.setAttribute('aria-busy', true);
     fetch(this.isFnWishlist ? linkWishlistApp : linkCompareApp, {
       method: 'POST',
@@ -231,8 +218,8 @@ add_wis_fn = function (e) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        product_id: productId,
-        product_handle: productHandle,
+        product_id: getterGet(_wishlist_id, this),
+        product_handle: getterGet(_wishlist_handle, this),
         action: 'add'
       })
     })
@@ -243,7 +230,7 @@ add_wis_fn = function (e) {
         return;
       }
       
-      // 4. Update LocalStorage again with authoritative data from server
+      // 4. Update LocalStorage immediately on add
       if(this.isFnWishlist) {
         arr_wishlist_list = JSON.parse(data.response.metafield.value).ecomrise_ids;
         if (!Array.isArray(arr_wishlist_list)) {
@@ -284,16 +271,6 @@ remove_wis_fn = function (e) {
   e.preventDefault();
   e.stopPropagation();
   if ($wishlist_list && this.isFnWishlist || $compare_list && !this.isFnWishlist) {
-    const productId = getterGet(_wishlist_id, this);
-    const productHandle = getterGet(_wishlist_handle, this);
-
-    // OPTIMISTIC UPDATE: Remove from local array immediately
-    if (this.array.includes(productId)) {
-      this.array.splice(this.array.indexOf(productId), 1);
-      localStorage.setItem(this.nameCached, this.array.toString());
-      getterRunFn(_action_after_remove_add, this, action_after_remove_add_fn).call(this, 'add');
-    }
-
     this.setAttribute('aria-busy', true);
     fetch(this.isFnWishlist ? linkWishlistApp : linkCompareApp, {
       method: 'DELETE',
@@ -301,8 +278,8 @@ remove_wis_fn = function (e) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        product_id: productId,
-        product_handle: productHandle,
+        product_id: getterGet(_wishlist_id, this),
+        product_handle: getterGet(_wishlist_handle, this),
         action: 'add',
         _method: 'DELETE'
       })
@@ -314,7 +291,7 @@ remove_wis_fn = function (e) {
         return;
       }
       
-      // 5. Update LocalStorage authoritative from server
+      // 5. Update LocalStorage immediately on remove
       let updated_ids = JSON.parse(data.response.metafield.value).ecomrise_ids;
       if (!Array.isArray(updated_ids)) {
         updated_ids = updated_ids.split(',');
