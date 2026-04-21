@@ -542,6 +542,8 @@ document.addEventListener('DOMContentLoaded', function () {
           }
           
           // 3. Open the modal (calls the existing hdt-lazy-modal or dialog open method)
+            // Mark the open timestamp so stale cart events don't auto-close this session
+            window.__hdtQVOpenedAt = Date.now();
             const modalWrapper = modal.closest('hdt-lazy-modal, hdt-modal');
             if (modalWrapper && typeof modalWrapper.open === 'function') {
               modalWrapper.open();

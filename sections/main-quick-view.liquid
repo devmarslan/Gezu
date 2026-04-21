@@ -60,13 +60,16 @@
     document.removeEventListener('close', window.hdtResetQuickView, true);
     document.addEventListener('close', window.hdtResetQuickView, true);
 
-    // 3. Handle Auto-Close on Cart Events (standard theme practice)
+    // 3. Handle Auto-Close on Cart Events (with stale-event guard)
     if (!window.hdtCartCloseBound) {
       const cartEvents = ['cart:updated', 'cart:add', 'ajaxProduct:added', 'theme:cart:update'];
       cartEvents.forEach(evt => {
         document.addEventListener(evt, () => {
           const modal = document.getElementById('hdt-quick-view-modal');
           if (modal && (modal.hasAttribute('open') || modal.open)) {
+            // Skip if modal was just opened — this event is stale from a previous session
+            if (window.__hdtQVOpenedAt && (Date.now() - window.__hdtQVOpenedAt) < 2000) return;
+
             const parent = modal.closest('hdt-lazy-modal, hdt-modal');
             if (parent && typeof parent.close === 'function') {
               parent.close();
