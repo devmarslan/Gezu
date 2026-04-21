@@ -510,18 +510,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const btn = e.target.closest('.hdt-theme-quick-view-btn');
     if (!btn) return;
 
-    // Prevent theme's native toggle from firing by using data-hdt-controls or aria-controls
-    const modalId = btn.dataset.hdtControls || btn.getAttribute('aria-controls');
-    const handle = btn.getAttribute('handle');
+    // Direct attribute lookup for maximum reliability
+    const modalId = btn.getAttribute('data-hdt-controls') || btn.getAttribute('aria-controls');
+    const handle = btn.getAttribute('handle') || btn.dataset.handle;
+    
     if (!modalId || !handle) return;
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
 
     e.preventDefault();
     e.stopPropagation();
 
-    const modal = document.getElementById(modalId);
-    if (!modal) return;
+    // Reset current handle if modal is closed to allow re-opening same product
+    if (!modal.hasAttribute('open') && !modal.open) {
+      delete modal.dataset.currentHandle;
+    }
 
-    // PREVENT DOUBLE CLICK BUG: If already loading or open for same product, do nothing
+    // Prevent redundant clicks while loading or if already open for same product
     if (btn.classList.contains('loading')) return;
     if (modal.dataset.currentHandle === handle && (modal.hasAttribute('open') || modal.open)) return;
 
@@ -530,7 +535,6 @@ document.addEventListener('DOMContentLoaded', function () {
     btn.setAttribute('aria-busy', 'true');
     btn.setAttribute('aria-expanded', 'true');
     
-    // 2. Fetch the correct section based on the target modal
     const sectionId = (modalId === 'hdt-quick-add-modal') ? 'main-quick-add' : 'main-quick-view';
     const fetchUrl = `${window.location.origin}/products/${handle}?section_id=${sectionId}`;
     
@@ -549,14 +553,13 @@ document.addEventListener('DOMContentLoaded', function () {
             modal.dataset.currentHandle = handle;
           }
           
-          // 3. Open the modal
           const modalWrapper = modal.closest('hdt-lazy-modal, hdt-modal');
           if (modalWrapper && typeof modalWrapper.open === 'function') {
-            if (!modal.hasAttribute('open') && !modal.open) {
-              modalWrapper.open();
-            }
+            modalWrapper.open();
+          } else if (typeof modal.showModal === 'function') {
+            modal.showModal();
           } else {
-            modal.showModal ? modal.showModal() : modal.setAttribute('open', '');
+            modal.setAttribute('open', '');
           }
           
           document.dispatchEvent(new CustomEvent('dialog:opening', { detail: { id: modalId } }));
@@ -564,10 +567,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       })
       .catch(err => {
-        console.error('Quick View Error:', err);
+        console.error('Quick View AJAX Error:', err);
+      })
+      .finally(() => {
         btn.classList.remove('loading');
+        btn.removeAttribute('aria-busy');
       });
-  }, true); // Use capture phase to intercept before other scripts
+  });
 </script>
 {% render 'consent-banner' %}
   </body>
