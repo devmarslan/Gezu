@@ -229,7 +229,7 @@
 
         <div class="whish mbl-compare-topbtn">
           {%- liquid
-            render 'btn-wishlist', class: 'hdt-product-form__btn-wishlist hdt-flex hdt-align-center hdt-justify-center hdt-relative hdt-s-text', placement: 'top'
+            render 'btn-wishlist', product_id: product.id, product_handle: product.handle, class: 'hdt-product-form__btn-wishlist hdt-flex hdt-align-center hdt-justify-center hdt-relative hdt-s-text', placement: 'top'
           %}
           {%- liquid
             render 'btn-compare', product_id: product.id, product_handle: product.handle, class: 'hdt-product-form__btn-compare hdt-flex hdt-align-center hdt-justify-center hdt-relative hdt-s-text', placement: 'top'

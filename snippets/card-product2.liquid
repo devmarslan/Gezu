@@ -431,19 +431,21 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
 
         <a data-pr-url href="{{ product_url }}" class="hdt-card-product__title hdt-text-{{ settings.pr_title_size }} hdt-font-{{ settings.pr_title_weight }} {% if settings.hdt_show_long_title == false %} hdt-line-clamp {% endif %}" data-instant>{{ card_product.title | escape }}</a>
         <div class="ict-wrapper">
-          <div class="ict-1">
-            <svg class="ict-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>
-              <path d="M6.66671 10L9.16671 12.5L13.3334 7.5" stroke="black" stroke-width="1.45833"/>
-            </svg>
-            <div class="ict-text">
-              {% if card_product.metafields.custom.card_product_text != blank %}
-                {{ card_product.metafields.custom.card_product_text }}
-              {% else %} 
-                In Stock, Same day shipping
-              {% endif %}
-            </div>
-          </div>
+        <div class="ict-1">
+  <svg class="ict-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>
+    <path d="M6.66671 10L9.16671 12.5L13.3334 7.5" stroke="black" stroke-width="1.45833"/>
+  </svg>
+  <div class="ict-text">
+    {%- if card_product.variants.first.available == false -%}
+      Out of Stock
+    {%- elsif card_product.metafields.custom.card_product_text != blank -%}
+      {{ card_product.metafields.custom.card_product_text }}
+    {%- else -%}
+      In Stock, Same day shipping
+    {%- endif -%}
+  </div>
+</div>
           <div class="ict-2">
             <svg class="ict-icon-2" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>

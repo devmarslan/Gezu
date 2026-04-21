@@ -10,94 +10,95 @@
     <hdt-modal un-detect color-scheme="{{ section.settings.color_scheme }}" section-id="{{ section.id }}" class="hdt-contents" effect="slide">
       <dialog id="hdt-quick-view-modal" class="hdt-dialog hdt-dialog-modal hdt-quick-view-modal hdt-s-gradient" scroll-lock>
   {%- endif -%}
+  
   <div class="hdt-s-gradient hdt-main-product-quick-view" color-scheme="{{ section.settings.color_scheme }}">
       <div class="hdt-row-grid hdt-grid-cols-1 md:hdt-grid-cols-2" style="--spacing-x:0px;--spacing-y:0px;">
         {% content_for 'block', type: '_quickview-medias', id: 'quickview-medias' %}
         {% content_for 'blocks' %}
       </div>
   </div>
+
   {%- if template == 'product.only_config' -%}
-    </dialog>
-  </hdt-modal>
-  <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-      if (!Shopify.designMode) return;
-      document.addEventListener("shopify:section:select", (event) => {
-        const modal = event.target.querySelector('#hdt-quick-view-modal');
-        if (modal) modal.parentElement.open();
-      });
-      document.addEventListener("shopify:section:deselect", (event) => {
-        const modal = event.target.querySelector('#hdt-quick-view-modal');
-        if (modal) modal.parentElement.close();
-      });
-    });
-  </script>
+      </dialog>
+    </hdt-modal>
   {%- endif -%}
 {%- endif -%}
 
 <script>
   (function() {
-    // Close quick view when cart is updated (product added successfully)
-    function closeQuickView() {
-      const modal = document.getElementById('hdt-quick-view-modal');
-      if (!modal || !modal.hasAttribute('open')) return;
-      
-      const parentModal = modal.closest('hdt-lazy-modal') || modal.closest('hdt-modal');
-      if (parentModal && typeof parentModal.close === 'function') {
-        parentModal.close();
-      } else {
-        modal.close ? modal.close() : modal.removeAttribute('open');
-        modal.style.opacity = '';
-        modal.style.transform = '';
+    // 1. Global Reset Function (Ensures buttons work on every click)
+    // We define this on window to keep it consistent across AJAX reloads
+    window.hdtResetQuickView = window.hdtResetQuickView || function(e) {
+      // If triggered by an event, check if it's the right one
+      if (e && e.target) {
+        const target = e.target;
+        if (!(target.id === 'hdt-quick-view-modal' || target.querySelector('#hdt-quick-view-modal'))) return;
       }
-      // Remove scroll lock
-      document.body.classList.remove('hdt-scroll-locked');
-      document.documentElement.classList.remove('hdt-scroll-locked');
+
+      // Clear loading/open states on all Quickview trigger wrappers site-wide
+      document.querySelectorAll('wrapp-hdt-open-modal-btn').forEach(wrapper => {
+        ['open', 'loading', 'aria-busy'].forEach(attr => wrapper.removeAttribute(attr));
+      });
+
+      // Clear states on the buttons themselves
+      document.querySelectorAll('[aria-controls="hdt-quick-view-modal"]').forEach(btn => {
+        btn.setAttribute('aria-expanded', 'false');
+        btn.removeAttribute('aria-busy');
+        btn.classList.remove('loading');
+      });
+
+      // Ensure scroll lock is released from both HTML and BODY
+      document.documentElement.classList.remove('hdt-scroll-locked', 'overflow-hidden');
+      document.body.classList.remove('hdt-scroll-locked', 'overflow-hidden');
+    };
+
+    // 2. Clear and Re-attach Listeners to prevent "Double Listener" bugs on AJAX reload
+    document.removeEventListener('dialog:close', window.hdtResetQuickView);
+    document.addEventListener('dialog:close', window.hdtResetQuickView);
+
+    // Native dialog close listener (handles Escape key and browser-level closing)
+    document.removeEventListener('close', window.hdtResetQuickView, true);
+    document.addEventListener('close', window.hdtResetQuickView, true);
+
+    // 3. Handle Auto-Close on Cart Events (standard theme practice)
+    if (!window.hdtCartCloseBound) {
+      const cartEvents = ['cart:updated', 'cart:add', 'ajaxProduct:added', 'theme:cart:update'];
+      cartEvents.forEach(evt => {
+        document.addEventListener(evt, () => {
+          const modal = document.getElementById('hdt-quick-view-modal');
+          if (modal && (modal.hasAttribute('open') || modal.open)) {
+            const parent = modal.closest('hdt-lazy-modal, hdt-modal');
+            if (parent && typeof parent.close === 'function') {
+              parent.close();
+            } else {
+              modal.removeAttribute('open');
+              window.hdtResetQuickView();
+            }
+          }
+        });
+      });
+      window.hdtCartCloseBound = true;
     }
 
-    // Listen for all common cart update events
-    ['cart:updated', 'cart:add', 'ajaxProduct:added', 'cart:item-added', 'theme:cart:update'].forEach(function(evt) {
-      document.addEventListener(evt, closeQuickView);
-    });
-
-    // Also watch for cart drawer opening via DOM mutation
-    var observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        var target = mutation.target;
-        if (target && target.id && (
-          target.id.includes('cart') || 
-          target.id.includes('Cart') ||
-          (target.classList && (target.classList.contains('hdt-cart-drawer') || target.classList.contains('cart-drawer')))
-        )) {
-          if (target.hasAttribute('open') || target.classList.contains('is-open') || target.classList.contains('active')) {
-            closeQuickView();
-          }
+    // Shopify Design Mode Support
+    if (Shopify.designMode && !window.hdtDesignModeBound) {
+      document.addEventListener("shopify:section:select", (event) => {
+        const modal = event.target.querySelector('#hdt-quick-view-modal');
+        if (modal) {
+          const parent = modal.closest('hdt-lazy-modal, hdt-modal');
+          if (parent && parent.open) parent.open();
         }
       });
-    });
-
-    observer.observe(document.body, {
-      attributes: true,
-      attributeFilter: ['open', 'class'],
-      subtree: true
-    });
-
-    // Fallback: watch the add to cart button click inside quick view
-    document.addEventListener('click', function(e) {
-      var btn = e.target.closest('#hdt-quick-view-modal .hdt-product-form__submit');
-      if (!btn) return;
-      
-      // Poll for cart drawer to appear, then close quick view
-      var attempts = 0;
-      var check = setInterval(function() {
-        attempts++;
-        var cartDrawer = document.querySelector('[id*="cart-drawer"][open], [id*="CartDrawer"][open], .hdt-cart-drawer[open], dialog[open][id*="cart"], dialog[open][id*="Cart"]');
-        if (cartDrawer || attempts > 30) {
-          clearInterval(check);
-          if (cartDrawer) closeQuickView();
+      document.addEventListener("shopify:section:deselect", (event) => {
+        const modal = event.target.querySelector('#hdt-quick-view-modal');
+        if (modal) {
+          const parent = modal.closest('hdt-lazy-modal, hdt-modal');
+          if (parent && parent.close) parent.close();
         }
-      }, 100);
-    });
+      });
+      window.hdtDesignModeBound = true;
+    }
+
   })();
 </script>
 {% schema %}

@@ -25,9 +25,22 @@
   (min-width: 1150px) calc(({{ current_width }} -  ({{ space_item }} * ( {{ section.settings.col_dk }} - 1 ))) * 1 / {{ section.settings.col_dk }}),(min-width: 768px) calc( ({{ current_width_tb }} - ({{ space_item_tb }} * ( {{ section.settings.col_tb }} - 1 ))) * 1 / {{ section.settings.col_tb }}), calc( ({{ current_width_mb }} - ({{ space_item_mb }} * ( {{ section.settings.col_mb }} - 1 ) )) * 1 / {{ section.settings.col_mb }})
 {%- endcapture -%}
 <div id="{{ section.id }}" class="hdt-s-gradient hdt-section-spacing" color-scheme="{{ section.settings.color_scheme }}">
-  <product-recently class="recently-products" data-url="{{ routes.search_url }}?section_id={{ section.id }}&q=%20NOT%20id:{{ product.id }}&limit={{ section.settings.limit }}&type=product" data-id="{{product.id}}">
+  <product-recently class="recently-products hdt-relative" data-url="{{ routes.search_url }}?section_id={{ section.id }}&q=%20NOT%20id:{{ product.id }}&limit={{ section.settings.limit }}&type=product" data-id="{{product.id}}">
+    <div class="hdt-container hdt-recently-skeleton">
+      <div class="hdt-row-grid lg:hdt-grid-cols-{{ section.settings.col_dk }} md:hdt-grid-cols-{{ section.settings.col_tb }} hdt-grid-cols-{{ section.settings.col_mb }} hdt-slide-spacing-x">
+        {%- for i in (1..section.settings.col_dk) -%}
+          <div class="hdt-skeleton-item">
+            <div class="hdt-skeleton-media hdt-ratio--{{ section.settings.image_ratio }}"></div>
+            <div class="hdt-skeleton-info">
+              <div class="hdt-skeleton-text hdt-skeleton-title"></div>
+              <div class="hdt-skeleton-text hdt-skeleton-price"></div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
     {%- if search.terms and search.results_count > 0 -%}
-      <div class="hdt-container{%- if section.settings.full_width -%}-full{% endif %}">
+      <div class="hdt-container{%- if section.settings.full_width -%}-full{% endif %} hdt-recently-content" style="opacity: 0; transition: opacity 0.4s ease;">
         {%- render 'section-top-head' -%}
         <hdt-slider id="Slider-{{ section.id }}" class="hdt-collection-products hdt-slider__products hdt-collection-has-pr{{ section.settings.product_des }} hdt-pr-border_{{ section.settings.pr_border }} hdt-slider hdt-slider-parent hdt-slide-spacing-x hdt-relative {% if section.settings.navUI %}hdt-slider-has-nav hdt-nav-btns-{{ section.settings.nav_des }} hdt-nav-shape_{{ section.settings.nav_shape }} hdt-nav-{{ section.settings.nav_pos }} hdt-nav-{{ section.settings.nav_size }} hdt-slider-btn-vi-{{ section.settings.btn_vi }}{% endif %} {% if section.settings.dotUI %} hdt-slider-has-dots-dk{% endif %} hdt-slider__dots_outline hdt-ratio--{{ section.settings.image_ratio }} {% unless section.settings.image_size %} hdt-ratio--contain{% endunless %} lg:hdt-slides-{{ section.settings.col_dk }} md:hdt-slides-{{ section.settings.col_tb }} hdt-slides-{{ section.settings.col_mb }}" config='{ "dotUI": true, "navUI": {{ section.settings.navUI }}, "navUICenter":true }'>
           <div class="hdt-slider__viewport hdt-relative">
@@ -200,6 +213,78 @@
 
 
   
+</style>
+
+<script>
+(function() {
+  const sectionId = '{{ section.id }}';
+  const observer = new MutationObserver((mutations) => {
+    const section = document.getElementById(sectionId);
+    const container = section?.querySelector('.recently-products');
+    const skeleton = container?.querySelector('.hdt-recently-skeleton');
+    const content = container?.querySelector('.hdt-recently-content');
+    
+    if (content && skeleton) {
+      skeleton.style.display = 'none';
+      content.style.opacity = '1';
+      observer.disconnect();
+    }
+  });
+  
+  const target = document.getElementById(sectionId);
+  if (target) observer.observe(target, { childList: true, subtree: true });
+})();
+</script>
+
+<style>
+  /* Skeleton Loader Styles - Shared with Related Products */
+  .hdt-recently-skeleton {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  .hdt-skeleton-item {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .hdt-skeleton-media {
+    width: 100%;
+    background: #f0f0f0;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hdt-skeleton-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .hdt-skeleton-text {
+    height: 12px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hdt-skeleton-title { width: 70%; }
+  .hdt-skeleton-price { width: 40%; }
+
+  .hdt-skeleton-media::after,
+  .hdt-skeleton-text::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+    animation: hdt-shimmer 1.5s infinite;
+    transform: translateX(-100%);
+  }
+
+  @keyframes hdt-shimmer {
+    100% { transform: translateX(100%); }
+  }
 </style>
 {% schema %}
 {

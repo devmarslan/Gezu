@@ -1067,12 +1067,14 @@
   }
 {%- endstyle -%}
 
-<section class="solutions-section" data-section-id="{{ section.id }}">
+<solutions-section 
+  class="solutions-section" 
+  data-section-id="{{ section.id }}"
+  data-autoplay="{{ section.settings.autoplay }}"
+  data-autoplay-speed="{{ section.settings.autoplay_speed | default: 5000 }}"
+>
   <div class="solutions-container hdt-container">
     <div class="solutions-content">
-      {% comment %} <div class="solutions-overline">
-        <h2 class="solutions-title">{{ section.settings.title }}</h2>
-      </div> {% endcomment %}
       <div class="solutions-mobile-cta">
         {% for i in (1..5) %}
           {% assign slide_cta_url_key = 'slide_' | append: i | append: '_cta_url' %}
@@ -1225,7 +1227,6 @@
               {{ 'lifestyle-2' | placeholder_svg_tag: 'solutions-popup-main-image' }}
             {% endif %}
 
-            {% comment %} Overlay images for each product hotspot {% endcomment %}
             {% for j in (1..10) %}
               {% assign overlay_key = 'hotspot_' | append: j | append: '_overlay' %}
               {% assign overlay_image = block.settings[overlay_key] %}
@@ -1284,13 +1285,13 @@
                                   </svg>
                                 </button>
                               {% endif %}
-                              <div class="solutions-quick-view-btn" style="pointer-events:auto;">
+                              
+                              <div class="solutions-quick-view-btn" style="pointer-events: auto;">
                                 {% render 'btn-quick-view', class: 'hdt-pr_btn', product: product, section_id: section.id, disable_sr_only: true %}
                               </div>
-                            </div>
+                              </div>
                             <a href="{{ product.url }}" class="solutions-product-info">
                               <p class="solutions-product-code">{{ product.title | truncate: 25, '' }}</p>
-                              {% comment %} <p class="solutions-product-name">{{ product.product_type | default: 'Product' }}</p> {% endcomment %}
                               <p class="solutions-product-price">{{ product.price | money }}</p>
                             </a>
                           </div>
@@ -1329,416 +1330,305 @@
     {% endif %}
   {% endfor %}
   
-  <div class="solutions-quickview-modal" data-quickview-modal>
-    <div class="solutions-quickview-content">
-      <button class="solutions-quickview-close" data-quickview-close aria-label="Close quick view">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-      <div class="solutions-quickview-images">
-        <div class="solutions-quickview-main-image">
-          <img src="" alt="" data-quickview-main-img>
-        </div>
-        <div class="solutions-quickview-thumbnails" data-quickview-thumbs></div>
-      </div>
-      <div class="solutions-quickview-info">
-        <h2 class="solutions-quickview-title" data-quickview-title></h2>
-        <p class="solutions-quickview-type" data-quickview-type></p>
-        <p class="solutions-quickview-price" data-quickview-price></p>
-        <div class="solutions-quickview-desc" data-quickview-desc></div>
-        <a href="" class="solutions-quickview-btn" data-quickview-link>View Product</a>
-      </div>
-    </div>
-  </div>
-</section>
+  <div class="solutions-quickview-modal" data-quickview-modal></div>
+</solutions-section>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const section = document.querySelector('[data-section-id="{{ section.id }}"]');
-  if (!section) return;
+  if (!customElements.get('solutions-section')) {
+    class SolutionsSection extends HTMLElement {
+      connectedCallback() {
+        const section = this;
 
-  const slides = section.querySelectorAll('.solutions-slide');
-  const slideContents = section.querySelectorAll('.solutions-slide-content');
-  const slideCtas = section.querySelectorAll('[data-slide-cta]');
-  const dots = section.querySelectorAll('.solutions-nav-dot');
-  const prevBtn = section.querySelector('.solutions-nav-prev');
-  const nextBtn = section.querySelector('.solutions-nav-next');
-  const counterCurrent = section.querySelector('.solutions-slide-counter .current');
-  let currentSlide = 1;
-  let autoplayInterval = null;
-  const autoplay = {{ section.settings.autoplay | json }};
-  const autoplaySpeed = {{ section.settings.autoplay_speed | default: 5000 }};
-  const totalSlides = slides.length;
+        const slides = section.querySelectorAll('.solutions-slide');
+        const slideContents = section.querySelectorAll('.solutions-slide-content');
+        const slideCtas = section.querySelectorAll('[data-slide-cta]');
+        const dots = section.querySelectorAll('.solutions-nav-dot');
+        const prevBtn = section.querySelector('.solutions-nav-prev');
+        const nextBtn = section.querySelector('.solutions-nav-next');
+        const counterCurrent = section.querySelector('.solutions-slide-counter .current');
+        let currentSlide = 1;
+        let autoplayInterval = null;
+        const autoplay = section.dataset.autoplay === 'true';
+        const autoplaySpeed = parseInt(section.dataset.autoplaySpeed) || 5000;
+        const totalSlides = slides.length;
 
-  function goToSlide(slideNum) {
-    slides.forEach(slide => slide.classList.remove('active'));
-    slideContents.forEach(content => content.classList.remove('active'));
-    slideCtas.forEach(cta => {
-      cta.style.display = 'none';
-      cta.classList.remove('active');
-    });
+        function goToSlide(slideNum) {
+          slides.forEach(slide => slide.classList.remove('active'));
+          slideContents.forEach(content => content.classList.remove('active'));
+          slideCtas.forEach(cta => {
+            cta.style.display = 'none';
+            cta.classList.remove('active');
+          });
 
-    const targetSlide = section.querySelector('[data-slide="' + slideNum + '"]');
-    if (targetSlide) {
-      targetSlide.classList.add('active');
-      currentSlide = slideNum;
-    }
+          const targetSlide = section.querySelector('[data-slide="' + slideNum + '"]');
+          if (targetSlide) {
+            targetSlide.classList.add('active');
+            currentSlide = slideNum;
+          }
 
-    const targetContent = section.querySelector('[data-slide-content="' + slideNum + '"]');
-    if (targetContent) targetContent.classList.add('active');
+          const targetContent = section.querySelector('[data-slide-content="' + slideNum + '"]');
+          if (targetContent) targetContent.classList.add('active');
 
-    const targetCta = section.querySelector('[data-slide-cta="' + slideNum + '"]');
-    if (targetCta) {
-      targetCta.style.display = 'flex';
-      targetCta.classList.add('active');
-    }
+          const targetCta = section.querySelector('[data-slide-cta="' + slideNum + '"]');
+          if (targetCta) {
+            targetCta.style.display = 'flex';
+            targetCta.classList.add('active');
+          }
 
-    dots.forEach(dot => {
-      dot.classList.remove('active');
-      if (parseInt(dot.dataset.slideDot) === slideNum) dot.classList.add('active');
-    });
+          dots.forEach(dot => {
+            dot.classList.remove('active');
+            if (parseInt(dot.dataset.slideDot) === slideNum) dot.classList.add('active');
+          });
 
-    if (counterCurrent) counterCurrent.textContent = slideNum;
-  }
+          if (counterCurrent) counterCurrent.textContent = slideNum;
+        }
 
-  function nextSlide() {
-    let next = currentSlide + 1;
-    if (next > totalSlides) next = 1;
-    goToSlide(next);
-  }
+        function nextSlide() {
+          let next = currentSlide + 1;
+          if (next > totalSlides) next = 1;
+          goToSlide(next);
+        }
 
-  function prevSlide() {
-    let prev = currentSlide - 1;
-    if (prev < 1) prev = totalSlides;
-    goToSlide(prev);
-  }
+        function prevSlide() {
+          let prev = currentSlide - 1;
+          if (prev < 1) prev = totalSlides;
+          goToSlide(prev);
+        }
 
-  if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); resetAutoplay(); });
-  if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); resetAutoplay(); });
+        if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); resetAutoplay(); });
+        if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); resetAutoplay(); });
 
-  dots.forEach(dot => {
-    dot.addEventListener('click', () => {
-      goToSlide(parseInt(dot.dataset.slideDot));
-      resetAutoplay();
-    });
-  });
+        dots.forEach(dot => {
+          dot.addEventListener('click', () => {
+            goToSlide(parseInt(dot.dataset.slideDot));
+            resetAutoplay();
+          });
+        });
 
-  function startAutoplay() {
-    if (autoplay && totalSlides > 1) {
-      autoplayInterval = setInterval(nextSlide, autoplaySpeed);
-    }
-  }
+        function startAutoplay() {
+          if (autoplay && totalSlides > 1) {
+            autoplayInterval = setInterval(nextSlide, autoplaySpeed);
+          }
+        }
 
-  function resetAutoplay() {
-    if (autoplayInterval) {
-      clearInterval(autoplayInterval);
-      startAutoplay();
-    }
-  }
+        function resetAutoplay() {
+          if (autoplayInterval) {
+            clearInterval(autoplayInterval);
+            startAutoplay();
+          }
+        }
 
-  startAutoplay();
-  
-
-  const slideshowWrapper = section.querySelector('.solutions-slideshow-wrapper');
-  if (slideshowWrapper && autoplay) {
-    slideshowWrapper.addEventListener('mouseenter', () => { if (autoplayInterval) clearInterval(autoplayInterval); });
-    slideshowWrapper.addEventListener('mouseleave', () => { startAutoplay(); });
-  }
-
-  const hotspots = section.querySelectorAll('.solutions-hotspot');
-  hotspots.forEach(hotspot => {
-    const hotspotId = hotspot.dataset.hotspotId;
-    const overlayImage = section.querySelector('[data-hotspot-overlay="' + hotspotId + '"]');
-
-    hotspot.addEventListener('mouseenter', () => { if (overlayImage) overlayImage.classList.add('active'); });
-    hotspot.addEventListener('mouseleave', () => { if (overlayImage) overlayImage.classList.remove('active'); });
-
-    hotspot.addEventListener('click', () => {
-      const popup = document.querySelector('[data-popup="' + hotspotId + '"]');
-      const overlay = document.querySelector('[data-popup-overlay="' + hotspotId + '"]');
-      if (popup && overlay) {
-        popup.classList.add('active');
-        overlay.classList.add('active');
-        document.body.classList.add('solutions-popup-open');
-      }
-    });
-  });
-
-  const closeButtons = document.querySelectorAll('[data-popup-close]');
-  closeButtons.forEach(button => {
-    button.addEventListener('click', () => closePopup(button.dataset.popupClose));
-  });
-
-  const overlays = document.querySelectorAll('.solutions-popup-overlay');
-  overlays.forEach(overlay => {
-    overlay.addEventListener('click', () => closePopup(overlay.dataset.popupOverlay));
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      const activePopup = document.querySelector('.solutions-popup.active');
-      if (activePopup) closePopup(activePopup.dataset.popup);
-      
-      const quickviewModal = document.querySelector('.solutions-quickview-modal.active');
-      if (quickviewModal) quickviewModal.classList.remove('active');
-    }
-  });
-
-  function closePopup(popupId) {
-    const popup = document.querySelector('[data-popup="' + popupId + '"]');
-    const overlay = document.querySelector('[data-popup-overlay="' + popupId + '"]');
-    if (popup) popup.classList.remove('active');
-    if (overlay) overlay.classList.remove('active');
-    document.body.classList.remove('solutions-popup-open');
-  }
-
-  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-
-  const productHotspots = document.querySelectorAll('.solutions-product-hotspot');
-  
-  /* Product hotspot overlay image hover handlers */
-  productHotspots.forEach(hotspot => {
-    const productId = hotspot.dataset.productHotspot;
-    const overlayImage = document.querySelector('[data-product-overlay="' + productId + '"]');
-    hotspot.addEventListener('mouseenter', () => { if (overlayImage) overlayImage.classList.add('active'); });
-    hotspot.addEventListener('mouseleave', () => { if (overlayImage) overlayImage.classList.remove('active'); });
-  });
-
-  /* Touch device tooltip toggle */
-  productHotspots.forEach(hotspot => {
-    hotspot.addEventListener('click', (e) => {
-      if (isTouchDevice) {
-        e.preventDefault();
-        e.stopPropagation();
+        startAutoplay();
         
-        productHotspots.forEach(otherHotspot => {
-          if (otherHotspot !== hotspot) {
-            otherHotspot.classList.remove('tooltip-active');
+        const slideshowWrapper = section.querySelector('.solutions-slideshow-wrapper');
+        if (slideshowWrapper && autoplay) {
+          slideshowWrapper.addEventListener('mouseenter', () => { if (autoplayInterval) clearInterval(autoplayInterval); });
+          slideshowWrapper.addEventListener('mouseleave', () => { startAutoplay(); });
+        }
+
+        const hotspots = section.querySelectorAll('.solutions-hotspot');
+        hotspots.forEach(hotspot => {
+          const hotspotId = hotspot.dataset.hotspotId;
+          const overlayImage = section.querySelector('[data-hotspot-overlay="' + hotspotId + '"]');
+
+          hotspot.addEventListener('mouseenter', () => { if (overlayImage) overlayImage.classList.add('active'); });
+          hotspot.addEventListener('mouseleave', () => { if (overlayImage) overlayImage.classList.remove('active'); });
+
+          hotspot.addEventListener('click', () => {
+            const popup = document.querySelector('[data-popup="' + hotspotId + '"]');
+            const overlay = document.querySelector('[data-popup-overlay="' + hotspotId + '"]');
+            if (popup && overlay) {
+              popup.classList.add('active');
+              overlay.classList.add('active');
+              document.body.classList.add('solutions-popup-open');
+            }
+          });
+        });
+
+        const closeButtons = document.querySelectorAll('[data-popup-close]');
+        closeButtons.forEach(button => {
+          button.addEventListener('click', () => closePopup(button.dataset.popupClose));
+        });
+
+        const overlays = document.querySelectorAll('.solutions-popup-overlay');
+        overlays.forEach(overlay => {
+          overlay.addEventListener('click', () => closePopup(overlay.dataset.popupOverlay));
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            const activePopup = document.querySelector('.solutions-popup.active');
+            if (activePopup) closePopup(activePopup.dataset.popup);
           }
         });
+
+        function closePopup(popupId) {
+          const popup = document.querySelector('[data-popup="' + popupId + '"]');
+          const overlay = document.querySelector('[data-popup-overlay="' + popupId + '"]');
+          if (popup) popup.classList.remove('active');
+          if (overlay) overlay.classList.remove('active');
+          document.body.classList.remove('solutions-popup-open');
+        }
+
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+        const productHotspots = document.querySelectorAll('.solutions-product-hotspot');
         
-        hotspot.classList.toggle('tooltip-active');
-      }
-    });
-  });
-
-  document.addEventListener('click', (e) => {
-    if (isTouchDevice) {
-      const isClickInsideHotspot = e.target.closest('.solutions-product-hotspot');
-      const isClickInsideTooltip = e.target.closest('.solutions-product-tooltip');
-      
-      if (!isClickInsideHotspot && !isClickInsideTooltip) {
         productHotspots.forEach(hotspot => {
-          hotspot.classList.remove('tooltip-active');
+          const productId = hotspot.dataset.productHotspot;
+          const overlayImage = document.querySelector('[data-product-overlay="' + productId + '"]');
+          hotspot.addEventListener('mouseenter', () => { if (overlayImage) overlayImage.classList.add('active'); });
+          hotspot.addEventListener('mouseleave', () => { if (overlayImage) overlayImage.classList.remove('active'); });
         });
-      }
-    }
-  });
 
-  document.querySelectorAll('[data-list-prev]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const sliderId = btn.dataset.listPrev;
-      changeProductListSlide(sliderId, -1);
-    });
-  });
+        productHotspots.forEach(hotspot => {
+          hotspot.addEventListener('click', (e) => {
+            if (isTouchDevice) {
+              e.preventDefault();
+              e.stopPropagation();
+              productHotspots.forEach(otherHotspot => {
+                if (otherHotspot !== hotspot) {
+                  otherHotspot.classList.remove('tooltip-active');
+                }
+              });
+              hotspot.classList.toggle('tooltip-active');
+            }
+          });
+        });
 
-  document.querySelectorAll('[data-list-next]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const sliderId = btn.dataset.listNext;
-      changeProductListSlide(sliderId, 1);
-    });
-  });
+        document.addEventListener('click', (e) => {
+          if (isTouchDevice) {
+            const isClickInsideHotspot = e.target.closest('.solutions-product-hotspot');
+            const isClickInsideTooltip = e.target.closest('.solutions-product-tooltip');
+            if (!isClickInsideHotspot && !isClickInsideTooltip) {
+              productHotspots.forEach(hotspot => {
+                hotspot.classList.remove('tooltip-active');
+              });
+            }
+          }
+        });
 
-  document.querySelectorAll('[data-list-dot]').forEach(dot => {
-    dot.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const sliderId = dot.dataset.listDot;
-      const index = parseInt(dot.dataset.dotIndex);
-      goToProductListSlide(sliderId, index);
-    });
-  });
+        section.querySelectorAll('[data-list-prev]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const sliderId = btn.dataset.listPrev;
+            changeProductListSlide(sliderId, -1);
+          });
+        });
 
-  function changeProductListSlide(sliderId, direction) {
-    const slider = document.querySelector('[data-product-list-slider="' + sliderId + '"]');
-    if (!slider) return;
-    
-    const track = slider.querySelector('[data-product-list-track]');
-    const slidesList = slider.querySelectorAll('.solutions-product-list-slide');
-    let activeIndex = 0;
-    
-    slidesList.forEach((s, i) => { 
-      if (s.classList.contains('active')) activeIndex = i; 
-    });
-    
-    let newIndex = activeIndex + direction;
-    if (newIndex < 0) newIndex = slidesList.length - 1;
-    if (newIndex >= slidesList.length) newIndex = 0;
-    
-    goToProductListSlide(sliderId, newIndex);
-  }
+        section.querySelectorAll('[data-list-next]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const sliderId = btn.dataset.listNext;
+            changeProductListSlide(sliderId, 1);
+          });
+        });
 
-  function goToProductListSlide(sliderId, index) {
-    const slider = document.querySelector('[data-product-list-slider="' + sliderId + '"]');
-    if (!slider) return;
-    
-    const track = slider.querySelector('[data-product-list-track]');
-    const slidesList = slider.querySelectorAll('.solutions-product-list-slide');
-    const dotsList = slider.querySelectorAll('[data-list-dot="' + sliderId + '"]');
-    
-    slidesList.forEach((s, i) => {
-      s.classList.remove('active');
-      if (i === index) s.classList.add('active');
-    });
-    
-    dotsList.forEach((d, i) => {
-      d.classList.remove('active');
-      if (i === index) d.classList.add('active');
-    });
-    
-    if (track) {
-      track.style.transform = 'translateX(-' + (index * 100) + '%)';
-    }
-  }
+        section.querySelectorAll('[data-list-dot]').forEach(dot => {
+          dot.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const sliderId = dot.dataset.listDot;
+            const index = parseInt(dot.dataset.dotIndex);
+            goToProductListSlide(sliderId, index);
+          });
+        });
 
-  document.querySelectorAll('[data-slider-prev]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const sliderId = btn.dataset.sliderPrev;
-      const slider = document.querySelector('[data-product-slider="' + sliderId + '"]');
-      if (slider) changeProductSlide(slider, sliderId, -1);
-    });
-  });
+        function changeProductListSlide(sliderId, direction) {
+          const slider = document.querySelector('[data-product-list-slider="' + sliderId + '"]');
+          if (!slider) return;
+          const slidesList = slider.querySelectorAll('.solutions-product-list-slide');
+          let activeIndex = 0;
+          slidesList.forEach((s, i) => { if (s.classList.contains('active')) activeIndex = i; });
+          let newIndex = activeIndex + direction;
+          if (newIndex < 0) newIndex = slidesList.length - 1;
+          if (newIndex >= slidesList.length) newIndex = 0;
+          goToProductListSlide(sliderId, newIndex);
+        }
 
-  document.querySelectorAll('[data-slider-next]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const sliderId = btn.dataset.sliderNext;
-      const slider = document.querySelector('[data-product-slider="' + sliderId + '"]');
-      if (slider) changeProductSlide(slider, sliderId, 1);
-    });
-  });
+        function goToProductListSlide(sliderId, index) {
+          const slider = document.querySelector('[data-product-list-slider="' + sliderId + '"]');
+          if (!slider) return;
+          const track = slider.querySelector('[data-product-list-track]');
+          const slidesList = slider.querySelectorAll('.solutions-product-list-slide');
+          const dotsList = slider.querySelectorAll('[data-list-dot="' + sliderId + '"]');
+          slidesList.forEach((s, i) => {
+            s.classList.remove('active');
+            if (i === index) s.classList.add('active');
+          });
+          dotsList.forEach((d, i) => {
+            d.classList.remove('active');
+            if (i === index) d.classList.add('active');
+          });
+          if (track) track.style.transform = 'translateX(-' + (index * 100) + '%)';
+        }
 
-  function changeProductSlide(slider, sliderId, direction) {
-    const slidesList = slider.querySelectorAll('.solutions-product-slide');
-    let activeIndex = 0;
-    slidesList.forEach((s, i) => { if (s.classList.contains('active')) activeIndex = i; });
-    let newIndex = activeIndex + direction;
-    if (newIndex < 0) newIndex = slidesList.length - 1;
-    if (newIndex >= slidesList.length) newIndex = 0;
-    goToProductSlide(slider, sliderId, newIndex);
-  }
+        section.querySelectorAll('[data-slider-prev]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const sliderId = btn.dataset.sliderPrev;
+            const slider = document.querySelector('[data-product-slider="' + sliderId + '"]');
+            if (slider) changeProductSlide(slider, sliderId, -1);
+          });
+        });
 
-  function goToProductSlide(slider, sliderId, index) {
-    const slidesList = slider.querySelectorAll('.solutions-product-slide');
-    const dotsList = document.querySelectorAll('[data-slider-dot="' + sliderId + '"]');
-    slidesList.forEach((s, i) => {
-      s.classList.remove('active');
-      if (i === index) s.classList.add('active');
-    });
-    dotsList.forEach((d, i) => {
-      d.classList.remove('active');
-      if (i === index) d.classList.add('active');
-    });
-  }
+        section.querySelectorAll('[data-slider-next]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const sliderId = btn.dataset.sliderNext;
+            const slider = document.querySelector('[data-product-slider="' + sliderId + '"]');
+            if (slider) changeProductSlide(slider, sliderId, 1);
+          });
+        });
 
-  const quickviewModal = document.querySelector('[data-quickview-modal]');
-  const quickviewClose = document.querySelector('[data-quickview-close]');
-  const quickviewMainImg = document.querySelector('[data-quickview-main-img]');
-  const quickviewThumbs = document.querySelector('[data-quickview-thumbs]');
-  const quickviewTitle = document.querySelector('[data-quickview-title]');
-  const quickviewType = document.querySelector('[data-quickview-type]');
-  const quickviewPrice = document.querySelector('[data-quickview-price]');
-  const quickviewDesc = document.querySelector('[data-quickview-desc]');
-  const quickviewLink = document.querySelector('[data-quickview-link]');
+        function changeProductSlide(slider, sliderId, direction) {
+          const slidesList = slider.querySelectorAll('.solutions-product-slide');
+          let activeIndex = 0;
+          slidesList.forEach((s, i) => { if (s.classList.contains('active')) activeIndex = i; });
+          let newIndex = activeIndex + direction;
+          if (newIndex < 0) newIndex = slidesList.length - 1;
+          if (newIndex >= slidesList.length) newIndex = 0;
+          goToProductSlide(slider, sliderId, newIndex);
+        }
 
-  document.querySelectorAll('[data-quick-vieww]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const productId = btn.dataset.productId;
-      const handle = btn.dataset.productHandle;
-      if (!productId && !handle) return;
+        function goToProductSlide(slider, sliderId, index) {
+          const slidesList = slider.querySelectorAll('.solutions-product-slide');
+          const dotsList = document.querySelectorAll('[data-slider-dot="' + sliderId + '"]');
+          slidesList.forEach((s, i) => {
+            s.classList.remove('active');
+            if (i === index) s.classList.add('active');
+          });
+          dotsList.forEach((d, i) => {
+            d.classList.remove('active');
+            if (i === index) d.classList.add('active');
+          });
+        }
 
-      // Method 1: Page pe already existing quickview button dhundo aur click karo
-      const selectors = [
-        `.btn-quickview[data-id="${productId}"]`,
-        `.quickview-btn[data-id="${productId}"]`,
-        `[data-quickview][data-id="${productId}"]`,
-        `.btn-quickview[data-handle="${handle}"]`,
-        `[data-product-handle="${handle}"] .btn-quickview`,
-        `[data-product-handle="${handle}"] .quickview-btn`,
-      ];
-      for (const sel of selectors) {
-        const existing = document.querySelector(sel);
-        if (existing) {
-          existing.click();
-          return;
+
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const imageWrapper = section.querySelector('.solutions-image-wrapper');
+        if (imageWrapper) {
+          imageWrapper.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+          imageWrapper.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) nextSlide(); else prevSlide();
+              resetAutoplay();
+            }
+          }, { passive: true });
         }
       }
-
-      // Method 2: Custom events try karo (kuch themes sun'te hain)
-      const eventDetail = { id: productId, handle: handle, productId: productId };
-      const eventNames = ['quickview:open', 'theme:quickview:open', 'product:quickview', 'hdt:quickview:open'];
-      eventNames.forEach(name => {
-        document.dispatchEvent(new CustomEvent(name, { detail: eventDetail, bubbles: true }));
-        window.dispatchEvent(new CustomEvent(name, { detail: eventDetail, bubbles: true }));
-      });
-
-      // Method 3: Temp button inject karo multiple class combinations ke saath
-      const classNames = ['btn-quickview', 'quickview-btn', 'hdt-quick-view'];
-      classNames.forEach(cls => {
-        const tempBtn = document.createElement('button');
-        tempBtn.type = 'button';
-        tempBtn.className = cls;
-        tempBtn.setAttribute('data-id', productId);
-        tempBtn.setAttribute('data-handle', handle);
-        tempBtn.setAttribute('data-product-id', productId);
-        tempBtn.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none;';
-        document.body.appendChild(tempBtn);
-        tempBtn.click();
-        setTimeout(() => tempBtn.remove(), 500);
-      });
-    });
-  });
-
-  if (quickviewClose) {
-    quickviewClose.addEventListener('click', () => {
-      quickviewModal.classList.remove('active');
-    });
-  }
-
-  quickviewModal.addEventListener('click', (e) => {
-    if (e.target === quickviewModal) {
-      quickviewModal.classList.remove('active');
     }
-  });
-
-  let touchStartX = 0;
-  let touchEndX = 0;
-  const imageWrapper = section.querySelector('.solutions-image-wrapper');
-  if (imageWrapper) {
-    imageWrapper.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
-    imageWrapper.addEventListener('touchend', (e) => {
-      touchEndX = e.changedTouches[0].screenX;
-      const diff = touchStartX - touchEndX;
-      if (Math.abs(diff) > 50) {
-        if (diff > 0) nextSlide(); else prevSlide();
-        resetAutoplay();
-      }
-    }, { passive: true });
+    customElements.define('solutions-section', SolutionsSection);
   }
-});
 </script>
-
 {% schema %}
 {
   "name": "Solutions Hotspot Slider",
