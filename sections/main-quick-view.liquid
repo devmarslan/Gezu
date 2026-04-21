@@ -103,6 +103,24 @@
       window.hdtDesignModeBound = true;
     }
 
+    // 4. Overwrite Modal Wrapper Close (Nuclear Option for theme conflicts)
+    (function() {
+      const modal = document.getElementById('hdt-quick-view-modal');
+      const parent = modal?.closest('hdt-lazy-modal, hdt-modal');
+      if (parent && !parent._hdtCloseOverridden) {
+        const originalClose = parent.close;
+        parent.close = function() {
+          const openedAt = parseInt(modal.dataset.openedAt || 0);
+          if (Date.now() - openedAt < 2500 && (modal.hasAttribute('open') || modal.open)) {
+             console.info('HDT: Quickview auto-close blocked (grace period).');
+             return;
+          }
+          originalClose.apply(parent, arguments);
+        };
+        parent._hdtCloseOverridden = true;
+      }
+    })();
+
   })();
 </script>
 {% schema %}

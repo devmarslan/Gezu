@@ -533,15 +533,21 @@ document.addEventListener('DOMContentLoaded', function () {
         // Both sections use a similar naming convention for the primary wrapper
         const content = doc.querySelector('.hdt-main-product-quick-view, .hdt-main-product-quick-add');
         
-        if (content) {
-          const modalInner = modal.querySelector('.hdt-dialog-modal__inner');
-          if (modalInner) {
-            // Use createContextualFragment to ensure scripts in the injected content are executed
-            modalInner.innerHTML = '';
-            modalInner.appendChild(document.createRange().createContextualFragment(content.innerHTML));
-          }
-          
-          // 3. Open the modal (calls the existing hdt-lazy-modal or dialog open method)
+          if (content) {
+            // Close any open cart drawers/modals first to prevent theme auto-close conflicts
+            document.querySelectorAll('hdt-cart-drawer, #CartDrawer, #hdt-cart-drawer').forEach(el => {
+              if (typeof el.close === 'function') el.close();
+              el.removeAttribute('open');
+            });
+
+            const modalInner = modal.querySelector('.hdt-dialog-modal__inner');
+            if (modalInner) {
+              // Use createContextualFragment to ensure scripts in the injected content are executed
+              modalInner.innerHTML = '';
+              modalInner.appendChild(document.createRange().createContextualFragment(content.innerHTML));
+            }
+            
+            // 3. Open the modal (calls the existing hdt-lazy-modal or dialog open method)
             const modalWrapper = modal.closest('hdt-lazy-modal, hdt-modal');
             modal.dataset.openedAt = Date.now(); // Record open time to prevent accidental auto-close
             if (modalWrapper && typeof modalWrapper.open === 'function') {
