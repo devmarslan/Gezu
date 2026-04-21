@@ -545,8 +545,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const content = doc.querySelector('.hdt-main-product-quick-view, .hdt-main-product-quick-add');
         
         if (content) {
-          // Close any open cart drawers/modals first
-          document.querySelectorAll('hdt-cart-drawer, #CartDrawer, #hdt-cart-drawer').forEach(el => {
+          // Close any open cart drawers
+          document.querySelectorAll('hdt-cart-drawer, #CartDrawer').forEach(el => {
             if (typeof el.close === 'function') el.close();
             el.removeAttribute('open');
           });
@@ -554,22 +554,38 @@ document.addEventListener('DOMContentLoaded', function () {
           const modalInner = modal.querySelector('.hdt-dialog-modal__inner');
           if (modalInner) {
             modalInner.innerHTML = '';
-            modalInner.appendChild(document.createRange().createContextualFragment(content.innerHTML));
+            const fragment = document.createRange().createContextualFragment(content.innerHTML);
+            
+            // Manually re-create and append scripts to ensure they execute in all browsers
+            const scripts = fragment.querySelectorAll('script');
+            modalInner.appendChild(fragment);
+            
+            scripts.forEach(oldScript => {
+              const newScript = document.createElement('script');
+              Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+              newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+              oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
           }
           
           // 3. Open the modal
           const modalWrapper = modal.closest('hdt-lazy-modal, hdt-modal');
           modal.dataset.openedAt = Date.now(); 
-          if (modalWrapper && typeof modalWrapper.open === 'function') {
-            console.log('Opening modal via wrapper');
-            modalWrapper.open();
-          } else if (typeof modal.showModal === 'function') {
-            console.log('Opening modal via showModal');
-            modal.showModal();
-          } else {
-            console.log('Opening modal via attribute');
-            modal.setAttribute('open', '');
-          }
+          
+          setTimeout(() => {
+            if (modalWrapper && typeof modalWrapper.open === 'function') {
+              console.log('Opening modal via wrapper');
+              modalWrapper.open();
+            } else if (typeof modal.showModal === 'function') {
+              modal.showModal();
+            } else {
+              modal.setAttribute('open', '');
+            }
+            // Clear loading state after attempt
+            btn.classList.remove('loading');
+            btn.removeAttribute('aria-busy');
+          }, 50);
+
           document.dispatchEvent(new CustomEvent('dialog:opening', { detail: { id: modalId } }));
           document.dispatchEvent(new CustomEvent('currency:update'));
         } else {
@@ -582,6 +598,8 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.classList.remove('loading');
       });
   }); // Bubble phase
+})();
+// --- END HDT THEME QUICK VIEW HANDLER ---
 </script>
 {% render 'consent-banner' %}
   </body>
