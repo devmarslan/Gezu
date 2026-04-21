@@ -57,18 +57,46 @@ if (arr_wishlist_list.length > limitWishlist) {
   localStorage.setItem(nameCachedWishlist, arr_wishlist_list.toString());
 }
 
-// 3. STRICT SYNC: Force reload if the URL doesn't match the LocalStorage data exactly
+// 3. INSTANT SYNC: Use AJAX section fetch instead of full-page redirect to avoid double-refresh
 if (window.isPageWishlist) {
-  const urlParams = new URLSearchParams(window.location.search);
-  const currentQuery = decodeURIComponent(urlParams.get('q') || "");
+  // What was the page rendered with (before any JS modifications)?
+  const pageParams = new URLSearchParams(window.location.search);
+  const renderedQuery = decodeURIComponent(pageParams.get('q') || "");
   const expectedQuery = arr_wishlist_list.length ? `id:${arr_wishlist_list.join(' OR id:')}` : "";
+  const correctUrl = conver_to_link_fn('wishlist', arr_wishlist_list);
 
-  if (currentQuery !== expectedQuery && arr_wishlist_list.length > 0) {
-    window.location.replace(conver_to_link_fn('wishlist', arr_wishlist_list));
-  } else {
-    window.history.replaceState({}, document.title, conver_to_link_fn('wishlist', arr_wishlist_list));
+  // Always keep URL and wishlist href in sync with localStorage
+  window.history.replaceState({}, document.title, correctUrl);
+  themeHDN.wisHref = correctUrl;
+
+  // If the rendered page doesn't match localStorage, re-fetch the section via AJAX
+  if (renderedQuery !== expectedQuery && arr_wishlist_list.length > 0) {
+    const sectionWrapper = document.querySelector('.hdt-main-wishlist')?.closest('[id^="shopify-section-"]');
+    if (sectionWrapper) {
+      const sectionId = sectionWrapper.id.replace('shopify-section-', '');
+      fetch(`${correctUrl}&section_id=${sectionId}`, {
+        headers: { 'Cache-Control': 'no-cache, no-store' }
+      })
+        .then(r => r.text())
+        .then(html => {
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const freshSection = doc.querySelector('[id^="shopify-section-"]');
+          if (freshSection) {
+            sectionWrapper.innerHTML = freshSection.innerHTML;
+            document.dispatchEvent(new CustomEvent("currency:update"));
+          }
+        })
+        .catch(() => {
+          // Last resort: full reload (should rarely happen)
+          window.location.href = correctUrl;
+        });
+    } else {
+      window.location.href = correctUrl;
+    }
+  } else if (arr_wishlist_list.length === 0 && renderedQuery) {
+    // User removed all items but page still shows products — reload to show empty state
+    window.location.href = correctUrl;
   }
-  themeHDN.wisHref = conver_to_link_fn('wishlist', arr_wishlist_list);
 }
 
 // Reset if limit change
@@ -77,16 +105,37 @@ if (arr_compare_list.length > limitCompare) {
   localStorage.setItem(nameCachedCompare, arr_compare_list.toString());
 }
 
-// STRICT SYNC (Compare Page)
+// INSTANT SYNC (Compare Page)
 if (window.isPageCompare) {
-  const urlParams = new URLSearchParams(window.location.search);
-  const currentQuery = decodeURIComponent(urlParams.get('q') || "");
+  const pageParams = new URLSearchParams(window.location.search);
+  const renderedQuery = decodeURIComponent(pageParams.get('q') || "");
   const expectedQuery = arr_compare_list.length ? `id:${arr_compare_list.join(' OR id:')}` : "";
+  const correctUrl = conver_to_link_fn('compare', arr_compare_list);
 
-  if (currentQuery !== expectedQuery && arr_compare_list.length > 0) {
-    window.location.replace(conver_to_link_fn('compare', arr_compare_list));
-  } else {
-    window.history.replaceState({}, document.title, conver_to_link_fn('compare', arr_compare_list));
+  window.history.replaceState({}, document.title, correctUrl);
+
+  if (renderedQuery !== expectedQuery && arr_compare_list.length > 0) {
+    const sectionWrapper = document.querySelector('.hdt-main-compare')?.closest('[id^="shopify-section-"]');
+    if (sectionWrapper) {
+      const sectionId = sectionWrapper.id.replace('shopify-section-', '');
+      fetch(`${correctUrl}&section_id=${sectionId}`, {
+        headers: { 'Cache-Control': 'no-cache, no-store' }
+      })
+        .then(r => r.text())
+        .then(html => {
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const freshSection = doc.querySelector('[id^="shopify-section-"]');
+          if (freshSection) {
+            sectionWrapper.innerHTML = freshSection.innerHTML;
+            document.dispatchEvent(new CustomEvent("currency:update"));
+          }
+        })
+        .catch(() => window.location.href = correctUrl);
+    } else {
+      window.location.href = correctUrl;
+    }
+  } else if (arr_compare_list.length === 0 && renderedQuery) {
+    window.location.href = correctUrl;
   }
 }
 
