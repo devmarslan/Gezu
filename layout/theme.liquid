@@ -506,20 +506,27 @@ document.addEventListener('DOMContentLoaded', function () {
    * Option B: Standard Quick View Handler 
    * Replaces the heavy 'wrapp-hdt' component with a basic global listener.
    */
-  // Use capture phase (true) to intercept the click before other theme scripts can see it
   document.addEventListener('click', function(e) {
     const btn = e.target.closest('.hdt-theme-quick-view-btn');
     if (!btn) return;
 
-    // Prevent theme's default behavior and stop other listeners from firing
+    console.log('Quick View Clicked:', btn);
     e.preventDefault();
     e.stopImmediatePropagation();
 
-    const handle = btn.getAttribute('handle') || btn.getAttribute('data-handle');
+    const handle = btn.getAttribute('data-handle') || btn.getAttribute('handle');
     const modalId = btn.getAttribute('aria-controls') || 'hdt-quick-view-modal';
-    const modal = document.getElementById(modalId);
+    console.log('Handle:', handle, 'Modal ID:', modalId);
     
-    if (!modal || !handle) return;
+    const modal = document.getElementById(modalId);
+    if (!modal) {
+      console.error('Modal NOT found:', modalId);
+      return;
+    }
+    if (!handle) {
+      console.error('Product handle NOT found on button');
+      return;
+    }
 
     // 1. Show Loading State
     btn.classList.add('loading');
@@ -528,6 +535,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // 2. Fetch the correct section
     const sectionId = (modalId === 'hdt-quick-add-modal') ? 'main-quick-add' : 'main-quick-view';
     const fetchUrl = `${window.location.origin}/products/${handle}?section_id=${sectionId}`;
+    console.log('Fetching:', fetchUrl);
     
     fetch(fetchUrl)
       .then(response => response.text())
@@ -553,21 +561,27 @@ document.addEventListener('DOMContentLoaded', function () {
           const modalWrapper = modal.closest('hdt-lazy-modal, hdt-modal');
           modal.dataset.openedAt = Date.now(); 
           if (modalWrapper && typeof modalWrapper.open === 'function') {
+            console.log('Opening modal via wrapper');
             modalWrapper.open();
           } else if (typeof modal.showModal === 'function') {
+            console.log('Opening modal via showModal');
             modal.showModal();
           } else {
+            console.log('Opening modal via attribute');
             modal.setAttribute('open', '');
           }
           document.dispatchEvent(new CustomEvent('dialog:opening', { detail: { id: modalId } }));
           document.dispatchEvent(new CustomEvent('currency:update'));
+        } else {
+          console.error('Content NOT found in AJAX response');
+          btn.classList.remove('loading');
         }
       })
       .catch(err => {
         console.error('Quick View Error:', err);
         btn.classList.remove('loading');
       });
-  }, true); // Capture phase
+  }); // Bubble phase
 </script>
 {% render 'consent-banner' %}
   </body>
