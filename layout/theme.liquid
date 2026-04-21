@@ -137,22 +137,58 @@
 </script>
 <script>
 (function() {
-  // PART 1: Update URL when variant changes
-  // Monitor the product form's hidden id input
+  // PART 1: Update URL and Sync Gallery when variant changes
   const picker = document.querySelector('hdt-variant-picker');
   if (!picker) return;
 
   const formId = picker.getAttribute('form');
   const formEl = document.getElementById(formId);
 
+  function getVariantData(variantId) {
+    if (!variantId) return null;
+    const scripts = document.querySelectorAll('script[type="application/json"]');
+    for (let script of scripts) {
+      try {
+        const data = JSON.parse(script.textContent);
+        const variants = data.variants || data.product?.variants;
+        if (variants) {
+          const v = variants.find(v => String(v.id) === String(variantId));
+          if (v) return v;
+        }
+      } catch(e) {}
+    }
+    return null;
+  }
+
   function getVariantId() {
-    // Try from form input first
     if (formEl) {
       const idInput = formEl.querySelector('input[name="id"]');
       if (idInput && idInput.value) return idInput.value;
     }
-    // Fallback to picker attribute
     return picker.getAttribute('selected-variant');
+  }
+
+  function syncGalleryWithVariantId(variantId) {
+    const variant = getVariantData(variantId);
+    if (!variant || !variant.featured_media_id) return;
+    
+    const gallery = document.querySelector('hdt-product-media');
+    if (!gallery) return;
+    
+    const slider = gallery.querySelector('hdt-slider');
+    if (!slider) return;
+    
+    const slide = slider.querySelector(`[data-media-id="${variant.featured_media_id}"]`);
+    if (slide) {
+      const index = Array.from(slide.parentElement.children).indexOf(slide);
+      if (index !== -1) {
+        if (typeof slider.slideTo === 'function') {
+          slider.slideTo(index);
+        } else if (typeof slider.index !== 'undefined') {
+          slider.index = index;
+        }
+      }
+    }
   }
 
   function updateURLWithVariant() {
@@ -163,6 +199,8 @@
         url.searchParams.set('variant', variantId);
         window.history.replaceState({}, '', url.toString());
       }
+      // Force Gallery Sync
+      syncGalleryWithVariantId(variantId);
     }
   }
 
@@ -170,7 +208,6 @@
   document.addEventListener('click', function(e) {
     const option = e.target.closest('hdt-richlist button[role="option"]');
     if (option) {
-      // Use increasing timeouts to catch async updates
       setTimeout(updateURLWithVariant, 100);
       setTimeout(updateURLWithVariant, 300);
       setTimeout(updateURLWithVariant, 600);
@@ -190,7 +227,6 @@
         updateURLWithVariant();
       }).observe(idInput, { attributes: true, attributeFilter: ['value'] });
 
-      // Also override the value setter to catch programmatic changes
       const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
       const originalSet = descriptor.set;
       Object.defineProperty(idInput, 'value', {
@@ -208,41 +244,20 @@
   const urlVariantId = urlParams.get('variant');
 
   if (urlVariantId && urlVariantId !== picker.getAttribute('selected-variant')) {
-    // Find variant data from the page
-    let variantData = null;
-    try {
-      const scripts = document.querySelectorAll('script[type="application/json"]');
-      scripts.forEach(function(script) {
-        try {
-          const data = JSON.parse(script.textContent);
-          if (data.variants || (data.product && data.product.variants)) {
-            const variants = data.variants || data.product.variants;
-            variantData = variants.find(function(v) {
-              return String(v.id) === String(urlVariantId);
-            });
-          }
-        } catch(e) {}
-      });
-    } catch(e) {}
-
+    const variantData = getVariantData(urlVariantId);
     if (variantData) {
-      // Update hidden option inputs to match the URL variant
       variantData.options.forEach(function(optionValue, index) {
         const fieldset = picker.querySelector('fieldset[data-index="' + index + '"]');
         if (fieldset) {
-          // Update hidden input
           const hiddenInput = fieldset.querySelector('input[is-value]');
           if (hiddenInput) hiddenInput.value = optionValue;
 
-          // Update the button text
           const selectBtn = fieldset.querySelector('button.hdt-select');
           if (selectBtn) selectBtn.textContent = optionValue;
 
-          // Update the legend display value
           const updateSpan = fieldset.querySelector('span[update-value]');
           if (updateSpan) updateSpan.textContent = optionValue;
 
-          // Update richlist selected state
           const richlist = fieldset.querySelector('hdt-richlist');
           if (richlist) {
             richlist.setAttribute('selected', optionValue);
@@ -253,18 +268,16 @@
         }
       });
 
-      // Update the picker's selected-variant attribute
       picker.setAttribute('selected-variant', urlVariantId);
-
-      // Update form id input
       if (formEl) {
         const idInput = formEl.querySelector('input[name="id"]');
         if (idInput) idInput.value = urlVariantId;
       }
+      // Initial Sync
+      setTimeout(() => syncGalleryWithVariantId(urlVariantId), 500);
     }
   }
 
-  // Set initial URL if no variant param exists
   if (!urlVariantId) {
     updateURLWithVariant();
   }
