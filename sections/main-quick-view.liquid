@@ -36,12 +36,12 @@
       }
 
       // Clear loading/open states on all Quickview trigger wrappers site-wide
-      document.querySelectorAll('wrapp-hdt-open-modal-btn').forEach(wrapper => {
+      document.querySelectorAll('wrapp-hdt-open-modal-btn, .hdt-theme-quick-view-wrapper').forEach(wrapper => {
         ['open', 'loading', 'aria-busy'].forEach(attr => wrapper.removeAttribute(attr));
       });
 
       // Clear states on the buttons themselves
-      document.querySelectorAll('[aria-controls="hdt-quick-view-modal"]').forEach(btn => {
+      document.querySelectorAll('[aria-controls="hdt-quick-view-modal"], .hdt-theme-quick-view-btn').forEach(btn => {
         btn.setAttribute('aria-expanded', 'false');
         btn.removeAttribute('aria-busy');
         btn.classList.remove('loading');

@@ -145,7 +145,8 @@
     width: 100%;
   }
 
-  #shoppable-lookbook-{{ section.id }} .popup-qv-wrapper wrapp-hdt-open-modal-btn {
+  #shoppable-lookbook-{{ section.id }} .popup-qv-wrapper wrapp-hdt-open-modal-btn,
+  #shoppable-lookbook-{{ section.id }} .popup-qv-wrapper .hdt-theme-quick-view-wrapper {
     width: 100%;
     max-width: 100%;
     display: block;
@@ -705,7 +706,8 @@
       // Don't close if clicking on quick view button or wrapper
       if (e.target.closest('.popup-qv-wrapper') || 
           e.target.closest('.hdt-card-product__btn-quick-view') ||
-          e.target.closest('wrapp-hdt-open-modal-btn')) {
+          e.target.closest('wrapp-hdt-open-modal-btn') ||
+          e.target.closest('.hdt-theme-quick-view-wrapper')) {
         return;
       }
       
@@ -727,7 +729,8 @@
         // Allow quick view button clicks to propagate normally
         if (e.target.closest('.popup-qv-wrapper') || 
             e.target.closest('.hdt-card-product__btn-quick-view') ||
-            e.target.closest('wrapp-hdt-open-modal-btn')) {
+            e.target.closest('wrapp-hdt-open-modal-btn') ||
+            e.target.closest('.hdt-theme-quick-view-wrapper')) {
           return;
         }
         e.stopPropagation();

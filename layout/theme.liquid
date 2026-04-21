@@ -501,6 +501,68 @@ document.addEventListener('DOMContentLoaded', function () {
 
 })();
 </script>
+<script>
+  /** 
+   * Option B: Standard Quick View Handler 
+   * Replaces the heavy 'wrapp-hdt' component with a basic global listener.
+   */
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.hdt-theme-quick-view-btn');
+    if (!btn) return;
+
+    e.preventDefault();
+    const handle = btn.getAttribute('handle');
+    const modalId = btn.getAttribute('aria-controls');
+    const modal = document.getElementById(modalId);
+    
+    if (!modal || !handle) return;
+
+    // 1. Show Loading State
+    btn.classList.add('loading');
+    btn.setAttribute('aria-busy', 'true');
+    
+    // 2. Fetch the correct section based on the target modal
+    const sectionId = (modalId === 'hdt-quick-add-modal') ? 'main-quick-add' : 'main-quick-view';
+    const fetchUrl = `${window.location.origin}/products/${handle}?section_id=${sectionId}`;
+    
+    fetch(fetchUrl)
+      .then(response => response.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        // Both sections use a similar naming convention for the primary wrapper
+        const content = doc.querySelector('.hdt-main-product-quick-view, .hdt-main-product-quick-add');
+        
+        if (content) {
+          const modalInner = modal.querySelector('.hdt-dialog-modal__inner');
+          if (modalInner) {
+            modalInner.innerHTML = content.innerHTML;
+            
+            // 3. Open the modal (calls the existing hdt-lazy-modal or dialog open method)
+            const modalWrapper = modal.closest('hdt-lazy-modal, hdt-modal');
+            if (modalWrapper && typeof modalWrapper.open === 'function') {
+              modalWrapper.open();
+            } else if (typeof modal.showModal === 'function') {
+              modal.showModal();
+            } else {
+              modal.setAttribute('open', '');
+            }
+            // Trigger theme event for other listeners (like currency update)
+            document.dispatchEvent(new CustomEvent('dialog:opening', { detail: { id: modalId } }));
+            document.dispatchEvent(new CustomEvent('currency:update'));
+          }
+        }
+      })
+      .catch(err => {
+        console.error('Quick View Error:', err);
+        btn.classList.remove('loading');
+      })
+      .finally(() => {
+        // We don't remove loading here immediately because the section-closing logic
+        // in main-quick-view.liquid will handle it once the modal actually loads/opens.
+      });
+  });
+</script>
 {% render 'consent-banner' %}
   </body>
 
