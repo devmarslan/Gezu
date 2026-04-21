@@ -536,9 +536,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (content) {
           const modalInner = modal.querySelector('.hdt-dialog-modal__inner');
           if (modalInner) {
-            modalInner.innerHTML = content.innerHTML;
-            
-            // 3. Open the modal (calls the existing hdt-lazy-modal or dialog open method)
+            // Use createContextualFragment to ensure scripts in the injected content are executed
+            modalInner.innerHTML = '';
+            modalInner.appendChild(document.createRange().createContextualFragment(content.innerHTML));
+          }
+          
+          // 3. Open the modal (calls the existing hdt-lazy-modal or dialog open method)
             const modalWrapper = modal.closest('hdt-lazy-modal, hdt-modal');
             if (modalWrapper && typeof modalWrapper.open === 'function') {
               modalWrapper.open();

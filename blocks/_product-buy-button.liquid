@@ -75,6 +75,24 @@
     <wrapp-hdt-pr-frm class="hdt-contents">
       {%- form 'product', product, id: product_form_id, class: 'hdt-main-product-form', data-gift-card-recipient: gift_card_recipient_feature_active -%}
         <input type="hidden" name="id" value="{{ selected_variant.id }}"{% if variant_picker_block != blank and product.has_only_default_variant == false %} disabled{% endif %}>
+        <input type="hidden" name="quantity" value="1" data-hdt-quantity-sync>
+        <script>
+          (function() {
+            const formId = '{{ product_form_id }}';
+            const sync = () => {
+              const ext = document.querySelector('input[name="quantity"][form="' + formId + '"]');
+              const hid = document.querySelector('#' + formId + ' [data-hdt-quantity-sync]');
+              if (ext && hid) hid.value = ext.value;
+            };
+            document.addEventListener('change', (e) => { if (e.target.name === 'quantity' && e.target.getAttribute('form') === formId) sync(); });
+            document.addEventListener('input', (e) => { if (e.target.name === 'quantity' && e.target.getAttribute('form') === formId) sync(); });
+            const f = document.getElementById(formId);
+            if (f) f.addEventListener('submit', sync);
+            // Re-sync after a small delay to catch component initialization
+            setTimeout(sync, 100);
+            setTimeout(sync, 500);
+          })();
+        </script>
         {%- if gift_card_recipient_feature_active -%}
           {%- render 'gift-card-recipient-form', product: product, form: form, section: section, form_id: product_form_id -%}
         {%- endif -%}
