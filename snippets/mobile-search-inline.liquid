@@ -58,6 +58,15 @@
     var hiddenPrefix = document.createElement('input');
     hiddenPrefix.type = 'hidden'; hiddenPrefix.name = 'options[prefix]'; hiddenPrefix.value = 'last';
 
+    var hiddenFields = document.createElement('input');
+    hiddenFields.type = 'hidden'; hiddenFields.name = 'options[fields]'; hiddenFields.value = 'title,body,tag,product_type,variants.title,vendor,variants.sku';
+    
+    var hiddenResType = document.createElement('input');
+    hiddenResType.type = 'hidden'; hiddenResType.name = 'resources[type]'; hiddenResType.value = 'product';
+    
+    var hiddenResFields = document.createElement('input');
+    hiddenResFields.type = 'hidden'; hiddenResFields.name = 'resources[options][fields]'; hiddenResFields.value = 'title,body,tag,product_type,variants.title,vendor,variants.sku';
+
     var inputWrap = document.createElement('div');
     inputWrap.setAttribute('style',
       'display:flex;align-items:center;background:#f0f0f0;border:1px solid #ddd;' +
@@ -91,6 +100,9 @@
     inputWrap.appendChild(clearBtn);
     form.appendChild(hiddenType);
     form.appendChild(hiddenPrefix);
+    form.appendChild(hiddenFields);
+    form.appendChild(hiddenResType);
+    form.appendChild(hiddenResFields);
     form.appendChild(inputWrap);
     bar.appendChild(backBtn);
     bar.appendChild(form);
@@ -173,7 +185,7 @@
         '</div>';
 
       var root = (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || '/';
-      fetch(root + 'search/suggest.json?q=' + encodeURIComponent(q) + '&resources[type]=product&resources[limit]=6')
+      fetch(root + 'search/suggest.json?q=' + encodeURIComponent(q) + '&resources[type]=product&resources[limit]=6&resources[options][fields]=title,body,tag,product_type,variants.title,vendor,variants.sku')
         .then(function(r){ return r.json(); })
         .then(function(d){ renderResults(d, q); })
         .catch(function(){ resultsInner.innerHTML = '<div style="padding:20px 16px;font-size:14px;color:#666;">Something went wrong.</div>'; });
