@@ -1,14 +1,14 @@
 {%- if template == 'product.only_config' and request.design_mode == false -%}
   <hdt-lazy-modal color-scheme="{{ section.settings.color_scheme }}" section-id="{{ section.id }}" class="hdt-contents" effect="slide">
-    <dialog id="hdt-quick-view-modal" class="hdt-dialog hdt-dialog-modal hdt-quick-view-modal hdt-s-gradient" scroll-lock>
-      <button ref="closeButton" class="hdt-s-text hdt-dialog-btn__close" aria-controls="hdt-quick-view-modal" aria-label="{{ 'accessibility.close' | t | escape }}">{%- render 'icon' with 'close' -%}</button>
+    <dialog id="hdt-custom-qv-modal" class="hdt-dialog hdt-dialog-modal hdt-quick-view-modal hdt-s-gradient" scroll-lock>
+      <button ref="closeButton" class="hdt-s-text hdt-dialog-btn__close" aria-controls="hdt-custom-qv-modal" aria-label="{{ 'accessibility.close' | t | escape }}">{%- render 'icon' with 'close' -%}</button>
       <div class="hdt-dialog-modal__inner hdt-current-scrollbar"></div>
     </dialog>
   </hdt-lazy-modal>
 {%- else -%}
   {%- if template == 'product.only_config' -%}
     <hdt-modal un-detect color-scheme="{{ section.settings.color_scheme }}" section-id="{{ section.id }}" class="hdt-contents" effect="slide">
-      <dialog id="hdt-quick-view-modal" class="hdt-dialog hdt-dialog-modal hdt-quick-view-modal hdt-s-gradient" scroll-lock>
+      <dialog id="hdt-custom-qv-modal" class="hdt-dialog hdt-dialog-modal hdt-quick-view-modal hdt-s-gradient" scroll-lock>
   {%- endif -%}
   
   <div class="hdt-s-gradient hdt-main-product-quick-view" color-scheme="{{ section.settings.color_scheme }}">
@@ -32,7 +32,7 @@
       // If triggered by an event, check if it's the right one
       if (e && e.target) {
         const target = e.target;
-        if (!(target.id === 'hdt-quick-view-modal' || target.querySelector('#hdt-quick-view-modal'))) return;
+        if (!(target.id === 'hdt-custom-qv-modal' || target.querySelector('#hdt-custom-qv-modal'))) return;
       }
 
       // Clear loading/open states on all Quickview trigger wrappers site-wide
@@ -41,7 +41,7 @@
       });
 
       // Clear states on the buttons themselves
-      document.querySelectorAll('[aria-controls="hdt-quick-view-modal"], .hdt-theme-quick-view-btn').forEach(btn => {
+      document.querySelectorAll('[aria-controls="hdt-custom-qv-modal"], .hdt-theme-quick-view-btn').forEach(btn => {
         btn.setAttribute('aria-expanded', 'false');
         btn.removeAttribute('aria-busy');
         btn.classList.remove('loading');
@@ -65,7 +65,7 @@
       const cartEvents = ['cart:updated', 'cart:add', 'ajaxProduct:added', 'theme:cart:update'];
       cartEvents.forEach(evt => {
         document.addEventListener(evt, () => {
-          const modal = document.getElementById('hdt-quick-view-modal');
+          const modal = document.getElementById('hdt-custom-qv-modal');
           if (modal && (modal.hasAttribute('open') || modal.open)) {
             // Check if the modal was just opened (within the last 1000ms)
             const openedAt = parseInt(modal.dataset.openedAt || 0);
@@ -87,14 +87,14 @@
     // Shopify Design Mode Support
     if (Shopify.designMode && !window.hdtDesignModeBound) {
       document.addEventListener("shopify:section:select", (event) => {
-        const modal = event.target.querySelector('#hdt-quick-view-modal');
+        const modal = event.target.querySelector('#hdt-custom-qv-modal');
         if (modal) {
           const parent = modal.closest('hdt-lazy-modal, hdt-modal');
           if (parent && parent.open) parent.open();
         }
       });
       document.addEventListener("shopify:section:deselect", (event) => {
-        const modal = event.target.querySelector('#hdt-quick-view-modal');
+        const modal = event.target.querySelector('#hdt-custom-qv-modal');
         if (modal) {
           const parent = modal.closest('hdt-lazy-modal, hdt-modal');
           if (parent && parent.close) parent.close();
@@ -105,7 +105,7 @@
 
     // 4. Overwrite Modal Wrapper Close (Nuclear Option for theme conflicts)
     (function() {
-      const modal = document.getElementById('hdt-quick-view-modal');
+      const modal = document.getElementById('hdt-custom-qv-modal');
       const parent = modal?.closest('hdt-lazy-modal, hdt-modal');
       if (parent && !parent._hdtCloseOverridden) {
         const originalClose = parent.close;

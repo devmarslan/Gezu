@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', function () {
     e.stopImmediatePropagation();
 
     const handle = btn.getAttribute('data-handle') || btn.getAttribute('handle');
-    const modalId = btn.getAttribute('aria-controls') || 'hdt-quick-view-modal';
+    const modalId = btn.getAttribute('aria-controls') || 'hdt-custom-qv-modal';
     console.log('Handle:', handle, 'Modal ID:', modalId);
     
     const modal = document.getElementById(modalId);
