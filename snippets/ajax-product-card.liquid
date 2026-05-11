@@ -1,0 +1,53 @@
+{%- liquid
+  assign color_list = 'products.theme_settings.color' | t | downcase | strip | replace: ' ,', ',' | replace: ', ', ',' | split: ',' | uniq
+  assign size_list = 'products.theme_settings.size' | t | downcase | strip | replace: ' ,', ',' | replace: ', ', ',' | split: ',' | uniq 
+-%}
+{%- liquid
+  assign section_id = request.query_string | split: 'section_id=' | last | split: '&' | first | default: 'recently-viewed'
+  assign product_des = request.query_string | split: 'product_des=' | last | split: '&' | first | default: '1'
+  assign image_ratio = request.query_string | split: 'image_ratio=' | last | split: '&' | first | default: 'adapt_image'
+  assign show_vendor = request.query_string | split: 'show_vendor=' | last | split: '&' | first | default: 'false'
+  assign col_dk = request.query_string | split: 'col_dk=' | last | split: '&' | first | default: '4'
+  assign col_tb = request.query_string | split: 'col_tb=' | last | split: '&' | first | default: '3'
+  assign col_mb = request.query_string | split: 'col_mb=' | last | split: '&' | first | default: '2'
+
+  if show_vendor == 'true'
+    assign show_vendor = true
+  else
+    assign show_vendor = false
+  endif
+
+  assign current_width = settings.page_width | default: 1200
+  assign space_item = 30
+-%}
+{%- capture sizes -%}(min-width: 1150px) calc(({{ current_width }}px - ({{ space_item }}px * ({{ col_dk }} - 1))) / {{ col_dk }}), (min-width: 768px) calc((100vw - (15px * ({{ col_tb }} - 1))) / {{ col_tb }}), calc((100vw - (15px * ({{ col_mb }} - 1))) / {{ col_mb }}){%- endcapture -%}
+
+<div id="HDT-RVP-Card-Response">
+{%- liquid
+  case product_des
+    when '2'
+      render 'card-product2', card_product: product, section_id: section_id, class: "hdt-slider__slide hdt-pr-style2", sizes: sizes, image_ratio: image_ratio, color_list: color_list, size_list: size_list, show_vendor: show_vendor
+    when '3'
+      render 'card-product3', card_product: product, section_id: section_id, class: "hdt-slider__slide hdt-pr-style3", sizes: sizes, image_ratio: image_ratio, color_list: color_list, size_list: size_list, show_vendor: show_vendor
+    when '4'
+      render 'card-product4', card_product: product, section_id: section_id, class: "hdt-slider__slide hdt-pr-style4", sizes: sizes, image_ratio: image_ratio, color_list: color_list, size_list: size_list, show_vendor: show_vendor
+    when '5'
+      render 'card-product5', card_product: product, section_id: section_id, class: "hdt-slider__slide hdt-pr-style5", sizes: sizes, image_ratio: image_ratio, color_list: color_list, size_list: size_list, show_vendor: show_vendor
+    when '6'
+      render 'card-product6', card_product: product, section_id: section_id, class: "hdt-slider__slide hdt-pr-style6", sizes: sizes, image_ratio: image_ratio, color_list: color_list, size_list: size_list, show_vendor: show_vendor
+    when '7'
+      render 'card-product7', card_product: product, section_id: section_id, class: "hdt-slider__slide hdt-pr-style7 hdt-relative", sizes: sizes, image_ratio: image_ratio, color_list: color_list, size_list: size_list, show_vendor: show_vendor
+    when '8'
+      render 'card-product8', card_product: product, section_id: section_id, class: "hdt-slider__slide hdt-pr-style8", sizes: sizes, image_ratio: image_ratio, color_list: color_list, size_list: size_list, show_vendor: show_vendor
+    when '9'
+      render 'card-product9', card_product: product, section_id: section_id, class: "hdt-slider__slide hdt-pr-style1 hdt-pr-style9", sizes: sizes, image_ratio: image_ratio, color_list: color_list, size_list: size_list, show_vendor: show_vendor
+    when '10'
+      render 'card-product10', card_product: product, section_id: section_id, class: "hdt-slider__slide hdt-pr-style1 hdt-pr-style10", sizes: sizes, image_ratio: image_ratio, color_list: color_list, size_list: size_list, show_vendor: show_vendor
+    when '11', '12'
+      assign class = "hdt-slider__slide hdt-pr-style1 hdt-pr-style" | append: product_des
+      render 'card-product11', card_product: product, section_id: section_id, class: class, sizes: sizes, image_ratio: image_ratio, color_list: color_list, size_list: size_list, show_vendor: show_vendor
+    else
+      render 'card-product1', card_product: product, section_id: section_id, class: "hdt-slider__slide hdt-pr-style1", sizes: sizes, image_ratio: image_ratio, color_list: color_list, size_list: size_list, show_vendor: show_vendor
+  endcase
+-%}
+</div>

@@ -1,5 +1,64 @@
 <!-- recently-products.liquid -->
+<style>
+  #shopify-section-{{section.id}} .hdt-slider__button {box-shadow: 0 6px 4px rgba(0, 0, 0, 0.18);}
+  #shopify-section-{{section.id}} .hdt-half_item .hdt-slider__viewport {
+    overflow: hidden;
+  }
 
+  {% if section.settings.btn_heading %}
+  #shopify-section-{{section.id}} .hdt-section-main-heading{
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+  }
+  @media (max-width:768px) {
+    #shopify-section-{{section.id}} .hdt-section-main-heading{
+      justify-content:center;
+    }
+    #shopify-section-{{section.id}} .hdt-heading-viewall{
+      display:none;
+    }
+  }
+  {% endif %}
+  #shopify-section-{{section.id}} h3.hdt-sec-heading.hdt-rte.hdt-h3.hdt-s-text.hdt-flex.hdt-align-center {
+    font-weight: 500;
+    font-size: 32px;
+    line-height: 100%;
+  }
+  
+  {% if section.settings.navUI %}
+    #shopify-section-{{section.id}} .hdt-slider__dots{display:none;}
+  {% endif %}
+  @media (max-width:768px) {
+    #shopify-section-{{section.id}} h3.hdt-sec-heading.hdt-rte.hdt-h3.hdt-s-text.hdt-flex.hdt-align-center {
+      font-size: 24px;
+    }
+    #shopify-section-{{section.id}} .hdt-slider__button {display:flex;}
+  }
+  #shopify-section-{{section.id}} a.hdt-view-all-btn.hdt-btn:hover {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  #shopify-section-{{section.id}} a.hdt-view-all-btn.hdt-btn {
+    background: transparent;
+    color: #000;
+    border: none;
+    font-family: Helvetica Neue;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 100%;
+    text-decoration: underline;
+    text-decoration-style: solid;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration-skip-ink: auto;
+    padding: 0;
+  }
+  #shopify-section-{{section.id}} a.hdt-view-all-btn.hdt-btn::after {
+    display: none;
+  }
+</style>
 {%- liquid
   assign current_width = settings.page_width | append: 'px'
   assign current_width_tb = '100vw'
@@ -25,7 +84,7 @@
   (min-width: 1150px) calc(({{ current_width }} -  ({{ space_item }} * ( {{ section.settings.col_dk }} - 1 ))) * 1 / {{ section.settings.col_dk }}),(min-width: 768px) calc( ({{ current_width_tb }} - ({{ space_item_tb }} * ( {{ section.settings.col_tb }} - 1 ))) * 1 / {{ section.settings.col_tb }}), calc( ({{ current_width_mb }} - ({{ space_item_mb }} * ( {{ section.settings.col_mb }} - 1 ) )) * 1 / {{ section.settings.col_mb }})
 {%- endcapture -%}
 <div id="{{ section.id }}" class="hdt-s-gradient hdt-section-spacing" color-scheme="{{ section.settings.color_scheme }}">
-  <product-recently class="recently-products hdt-relative" data-url="{{ routes.search_url }}?section_id={{ section.id }}&q=%20NOT%20id:{{ product.id }}&limit={{ section.settings.limit }}&type=product" data-id="{{product.id}}">
+  <product-recently class="recently-products hdt-relative" data-url="{{ routes.search_url }}?section_id={{ section.id }}&q=&limit={{ section.settings.limit }}&type=product" data-id="{{product.id}}">
     <div class="hdt-container hdt-recently-skeleton">
       <div class="hdt-row-grid lg:hdt-grid-cols-{{ section.settings.col_dk }} md:hdt-grid-cols-{{ section.settings.col_tb }} hdt-grid-cols-{{ section.settings.col_mb }} hdt-slide-spacing-x">
         {%- for i in (1..section.settings.col_dk) -%}

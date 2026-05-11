@@ -1,0 +1,177 @@
+{%- liquid
+  assign current_width = settings.page_width | append: 'px'
+  assign current_width_tb = '100vw'
+  assign current_width_mb = '100vw'
+  assign space_item = "30px"
+  assign space_item_tb = "15px"
+  assign space_item_mb = "15px" 
+
+  if section.settings.section_fullwidth
+    if section.settings.boxed_fullwidth
+      assign current_width = '100vw - 80px'
+      assign current_width_tb = '100vw - 40px'
+      assign current_width_mb = '100vw - 10px'
+    else
+      assign current_width = '100vw'
+    endif
+  endif
+-%}
+
+<div id="{{ section.id }}" class="hdt-s-gradient hdt-section-spacing hdt-rv-simple-section" color-scheme="{{ section.settings.color_scheme }}" style="display: none;">
+  <div class="hdt-container{%- if section.settings.full_width -%}-full{% endif %}">
+    {%- render 'section-top-head' -%}
+  </div>
+  
+  <rv-simple-component class="hdt-container{%- if section.settings.full_width -%}-full{% endif %} hdt-relative" 
+    data-limit="{{ section.settings.limit }}" 
+    data-section-id="{{ section.id }}" 
+    data-current-handle="{{ product.handle }}" 
+    data-product-des="{{ section.settings.product_des }}"
+    data-image-ratio="{{ section.settings.image_ratio }}"
+    data-show-vendor="{{ section.settings.show_vendor }}"
+    data-nav-ui="{{ section.settings.navUI }}"
+    data-dot-ui="{{ section.settings.dotUI }}"
+    data-col-dk="{{ section.settings.col_dk }}"
+    data-col-tb="{{ section.settings.col_tb }}"
+    data-col-mb="{{ section.settings.col_mb }}"
+  >
+    <div class="hdt-rv-simple-placeholder">
+       {% comment %} Content injected by JS {% endcomment %}
+    </div>
+  </rv-simple-component>
+</div>
+
+{%- style -%}#shopify-section-{{section.id}}{--section-pt:{{section.settings.padding_top}}px;--section-pb:{{section.settings.padding_bottom}}px;--section-prate:{{section.settings.padding_rate}}}{%- endstyle -%}
+<style>
+  .hdt-rv-simple-section .hdt-slider__slide {
+    min-width: 250px; /* Prevents vertical squashing */
+  }
+  .hdt-rv-simple-section hdt-slider:not([initialized]) .hdt-slider__container {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding-bottom: 10px;
+  }
+  /* Ensure nav buttons are visible on hover if enabled */
+  .hdt-rv-simple-section .hdt-slider-has-nav:hover .hdt-slider__button {
+    opacity: 1;
+    visibility: visible;
+  }
+</style>
+
+<script>
+if (!customElements.get('rv-simple-component')) {
+  customElements.define('rv-simple-component', class extends HTMLElement {
+    connectedCallback() {
+      this.init();
+      document.addEventListener('shopify:section:load', (e) => {
+        if (e.detail.sectionId === this.dataset.sectionId) this.init();
+      });
+    }
+
+    async init() {
+      const sectionId = this.dataset.sectionId;
+      const placeholder = this.querySelector('.hdt-rv-simple-placeholder');
+      const wrapper = this.closest('.hdt-rv-simple-section');
+      if (!placeholder || !wrapper) return;
+
+      let stored = localStorage.getItem('hdt:recently-viewed') || '';
+      
+      // Editor Preview
+      if (window.Shopify && window.Shopify.designMode && !stored) {
+        wrapper.style.display = 'block';
+        placeholder.innerHTML = '<div style="text-align:center;padding:40px;border:2px dashed #eee;">Visit product pages to build history. (Section will show here)</div>';
+        // Mock some products for visual check
+        const mockResponse = await fetch(`${window.Shopify.routes.root}search/suggest.json?q=a&resources[type]=product&resources[limit]=4`).then(r => r.json());
+        if (mockResponse?.resources?.results?.products?.length) {
+           this.renderUI(mockResponse.resources.results.products.map(p => p.handle), placeholder, wrapper);
+        }
+        return;
+      }
+
+      let handles = stored.split(',').filter(h => h && h !== this.dataset.currentHandle).slice(0, parseInt(this.dataset.limit));
+
+      if (handles.length === 0) {
+        wrapper.style.display = 'none';
+        return;
+      }
+
+      this.renderUI(handles, placeholder, wrapper);
+    }
+
+    async renderUI(handles, placeholder, wrapper) {
+      wrapper.style.display = 'block';
+      const sectionId = this.dataset.sectionId;
+      const productDes = this.dataset.productDes;
+      const imageRatio = this.dataset.imageRatio;
+      const showVendor = this.dataset.showVendor;
+      const colDk = this.dataset.colDk;
+      const colTb = this.dataset.colTb;
+      const colMb = this.dataset.colMb;
+      const navUI = this.dataset.navUi === 'true';
+      const dotUI = this.dataset.dotUi === 'true';
+
+      const cardsHtml = await Promise.all(handles.map(handle => {
+        const url = `/products/${handle}?view=ajax-card&section_id=${sectionId}&product_des=${productDes}&image_ratio=${imageRatio}&show_vendor=${showVendor}&col_dk=${colDk}&col_tb=${colTb}&col_mb=${colMb}`;
+        return fetch(url).then(r => r.text()).then(html => {
+           const parser = new DOMParser();
+           const doc = parser.parseFromString(html, 'text/html');
+           const card = doc.querySelector('#HDT-RVP-Card-Response') || doc.querySelector('hdt-card-product');
+           return card ? card.innerHTML : '';
+        }).catch(() => '');
+      }));
+
+      const validCards = cardsHtml.filter(c => c.length > 0);
+      if (validCards.length === 0) {
+        wrapper.style.display = 'none';
+        return;
+      }
+
+      placeholder.innerHTML = `
+        <hdt-slider id="Slider-${sectionId}" class="hdt-collection-products hdt-slider__products hdt-collection-has-pr${productDes} hdt-slider hdt-slider-parent hdt-slide-spacing-x hdt-relative ${navUI ? 'hdt-slider-has-nav' : ''} ${dotUI ? 'hdt-slider-has-dots-dk' : ''} hdt-ratio--${imageRatio} lg:hdt-slides-${colDk} md:hdt-slides-${colTb} hdt-slides-${colMb}" config='{ "dotUI": ${dotUI}, "navUI": ${navUI}, "navUICenter":true }'>
+          <div class="hdt-slider__viewport hdt-relative">
+            <div class="hdt-slider__container">${validCards.join('')}</div>
+          </div>
+          ${navUI ? '<button class="hdt-slider__button hdt-slider__button--prev hdt-nav-icon-chrvon" hdt-slider-button="prev"><svg class="hdt-icon" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button><button class="hdt-slider__button hdt-slider__button--next hdt-nav-icon-chrvon" hdt-slider-button="next"><svg class="hdt-icon" viewBox="0 0 24 24"><path d="M9 16.59L10.41 18l6-6-6-6L9 7.41 13.17 12z"/></svg></button>' : ''}
+          ${dotUI ? '<div hdt-slider-dots aria-controls="Slider-' + sectionId + '" class="hdt-slider__dots hdt-flex hdt-align-center hdt-justify-center"></div>' : ''}
+        </hdt-slider>
+      `;
+
+      document.dispatchEvent(new CustomEvent('currency:update'));
+    }
+  });
+}
+</script>
+
+{% schema %}
+{
+  "name": "Recently Viewed Simple",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "header", "content": "t:sections.all.section_heading_options" },
+    { "type": "text", "id": "sec_heading", "label": "t:sections.all.heading.label", "default": "Recently Viewed" },
+    { "type": "select", "id": "heading_tag", "label": "t:sections.all.heading.heading_tag.label", "default": "h2", "options": [ { "value": "h2", "label": "h2" }, { "value": "h3", "label": "h3" } ] },
+    { "type": "select", "id": "heading_size", "label": "Heading Size", "default": "h2", "options": [ { "value": "h4", "label": "Small" }, { "value": "h3", "label": "Medium" }, { "value": "h2", "label": "Large" } ] },
+    { "type": "select", "id": "heading_align", "label": "Align", "default": "center", "options": [ { "value": "start", "label": "Left" }, { "value": "center", "label": "Center" } ] },
+    { "type": "header", "content": "Product Settings" },
+    { "type": "range", "id": "limit", "min": 2, "max": 10, "step": 1, "label": "Max products", "default": 5 },
+    { "type": "select", "id": "product_des", "label": "Card Design", "default": "1", "options": [ { "value": "1", "label": "Style 1" }, { "value": "2", "label": "Style 2" } ] },
+    { "type": "select", "id": "image_ratio", "label": "Image Ratio", "default": "adapt_image", "options": [ { "value": "adapt_image", "label": "Adapt" }, { "value": "square", "label": "Square" }, { "value": "portrait", "label": "Portrait" } ] },
+    { "type": "checkbox", "id": "show_vendor", "label": "Show Vendor", "default": false },
+    { "type": "header", "content": "Layout (Columns)" },
+    { "type": "select", "id": "col_dk", "label": "Desktop", "default": "4", "options": [ { "value": "3", "label": "3" }, { "value": "4", "label": "4" }, { "value": "5", "label": "5" } ] },
+    { "type": "select", "id": "col_tb", "label": "Tablet", "default": "3", "options": [ { "label": "2", "value": "2" }, { "label": "3", "value": "3" } ] },
+    { "type": "select", "id": "col_mb", "label": "Mobile", "default": "2", "options": [ { "label": "1", "value": "1" }, { "label": "2", "value": "2" } ] },
+    { "type": "header", "content": "Slider Settings" },
+    { "type": "checkbox", "id": "navUI", "label": "Show Arrows", "default": true },
+    { "type": "checkbox", "id": "dotUI", "label": "Show Dots", "default": false },
+    { "type": "header", "content": "Section Layout" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color Scheme", "default": "background-1" },
+    { "type": "checkbox", "id": "full_width", "label": "Full Width", "default": false },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "Top Padding", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "Bottom Padding", "default": 40 }
+  ],
+  "presets": [ { "name": "Recently Viewed Simple" } ]
+}
+{% endschema %}

@@ -31,7 +31,7 @@
       {%- endif -%} {% endcomment %}
 <div class="cart-drawer-left-panel" id="cart-related-panel" {% if cart == empty %}style="display:none"{% endif %}>
   <div class="cart-drawer-left-panel-full" id="cart-drawer-related-full">
-    <h4 class="cart-drawer-left-panel__title">Often Bought Together</h4>
+    <h4 class="cart-drawer-left-panel__title">{{ 'sections.cart.often_bought_together' | t }}</h4>
     <div class="cart-drawer-left-panel__scroll">
       <div class="cart-drawer-left-panel__products" id="cart-drawer-related-products">
         <div class="cart-related-loading">
@@ -43,7 +43,7 @@
 </div>
       <div class="cart-drawer-main-panel" id="cart-panel">
         <div class="cart-drawer-header">
-          <h3 class="cart-drawer-header__title">Your Cart</h3>
+          <h3 class="cart-drawer-header__title">{{ 'sections.cart.title' | t }}</h3>
           <div class="cart-drawer-header__actions">
             <button type="button" class="cart-drawer-toggle__btn cart-drawer-toggle__btn--cart is-active" data-drawer-toggle="cart"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-drawer-toggle__count" data-cart-count>{{ cart.item_count }}</span></button>
             <button type="button" class="cart-drawer-toggle__btn cart-drawer-toggle__btn--wishlist" data-drawer-toggle="wishlist"><svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M12.5 0H0.5C0.367 0 0.24 0.056 0.146 0.156C0.053 0.255 0 0.39 0 0.531V15.399C0 15.5 0.027 15.599 0.078 15.684C0.129 15.769 0.202 15.837 0.288 15.88C0.374 15.922 0.47 15.938 0.564 15.925C0.658 15.913 0.747 15.871 0.82 15.807L6.5 10.78L12.18 15.807C12.27 15.886 12.383 15.93 12.5 15.93C12.573 15.93 12.646 15.913 12.712 15.88C12.798 15.837 12.871 15.769 12.922 15.684C12.973 15.599 13 15.5 13 15.399V0.531C13 0.39 12.947 0.255 12.854 0.156C12.76 0.056 12.633 0 12.5 0ZM12 14.266L6.82 9.681C6.73 9.602 6.617 9.558 6.5 9.558C6.383 9.558 6.27 9.602 6.18 9.681L1 14.266V1.062H12V14.266Z" fill="currentColor"/></svg><span class="cart-drawer-toggle__count" id="toggle-wishlist-count">0</span></button>
@@ -62,9 +62,10 @@
           <div class="cart-drawer-shipping" id="cart-shipping-bar" data-threshold="{{ shipping_threshold }}" data-currency-iso="{{ cart.currency.iso_code }}">
             <p class="cart-drawer-shipping__text">
               {%- if remaining > 0 -%}
-                You're <span class="cart-drawer-shipping__amount" data-shipping-remaining>{{ cart.currency.symbol }}{{ remaining | money_without_currency }}</span> away from Free Standard Shipping
+                {%- assign remaining_money = remaining | money -%}
+                {{ 'sections.cart.shipping_away_html' | t: amount: remaining_money }}
               {%- else -%}
-                🎉 You've unlocked Free Standard Shipping!
+                {{ 'sections.cart.free_shipping_bar.success' | t }}
               {%- endif -%}
             </p>
             <div class="cart-drawer-shipping__bar"><div class="cart-drawer-shipping__progress" style="width: {{ progress }}%;" data-shipping-progress></div></div>
@@ -74,16 +75,16 @@
 
         <div class="cart-drawer-warning" id="cart-warning" {% if cart == empty %}style="display:none"{% endif %}>
           <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none"><path d="M8.5 0C3.81282 0 0 3.8131 0 8.5C0 13.1869 3.81282 17 8.5 17C13.1872 17 17 13.1869 17 8.5C17 3.8131 13.1872 0 8.5 0ZM8.5 15.8667C4.43813 15.8667 1.13333 12.5622 1.13333 8.5C1.13333 4.43785 4.43813 1.13333 8.5 1.13333C12.5619 1.13333 15.8667 4.43785 15.8667 8.5C15.8667 12.5622 12.5619 15.8667 8.5 15.8667Z" fill="black"/><path d="M8.69037 13.0486C8.6358 13.0486 8.58463 13.0178 8.53686 12.9562C8.48909 12.8946 8.46517 12.8184 8.46517 12.7277C8.46517 12.2543 8.82563 10.8668 9.54705 8.56521C9.98934 7.15829 10.2105 6.36076 10.2105 6.17274C10.2105 6.01714 10.152 5.89394 10.0365 5.80316C9.9206 5.71238 9.75405 5.66699 9.53572 5.66699C9.14058 5.66699 8.66192 5.81773 8.09967 6.11919C7.53743 6.42066 6.91545 6.92805 6.23438 7.64126L6.68465 7.97191C7.28497 7.41431 7.67218 7.08366 7.84615 6.97996C8.02011 6.8762 8.17532 6.82435 8.31178 6.82435C8.43457 6.82435 8.496 6.88918 8.496 7.01883C8.496 7.13557 8.47214 7.26851 8.42437 7.4176C7.40109 10.5687 6.88939 12.5494 6.88939 13.3598C6.88939 13.6127 6.95931 13.8104 7.09917 13.9531C7.23896 14.0956 7.42829 14.167 7.66702 14.167C7.93993 14.167 8.29126 14.0503 8.72102 13.8168C9.15084 13.5834 9.83305 13.0486 10.7677 12.2122L10.3686 11.8426C9.46806 12.6466 8.9087 13.0486 8.69037 13.0486Z" fill="black"/><path d="M8.50052 5.10016C9.12644 5.10016 9.63385 4.59275 9.63385 3.96683C9.63385 3.34091 9.12644 2.8335 8.50052 2.8335C7.8746 2.8335 7.36719 3.34091 7.36719 3.96683C7.36719 4.59275 7.8746 5.10016 8.50052 5.10016Z" fill="black"/></svg>
-          <p>Your items aren't reserved, <strong>checkout quickly to make sure you don't miss out.</strong></p>
+          <p>{{ 'sections.cart.items_not_reserved' | t }} <strong>{{ 'sections.cart.checkout_quickly' | t }}</strong></p>
         </div>
 
         <div class="cart-drawer-content">
           <div class="cart-drawer-scroll" id="cart-drawer-scroll">
             <div class="cart-drawer-empty" id="cart-empty-state" {% if cart != empty %}style="display:none"{% endif %}>
               <div class="cart-drawer-empty__icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></div>
-              <h3 class="cart-drawer-empty__title">Your cart is empty</h3>
-              <p class="cart-drawer-empty__text">Looks like you have not added anything yet</p>
-              <a href="/collections/all" class="cart-drawer-empty__btn">Continue Shopping</a>
+              <h3 class="cart-drawer-empty__title">{{ 'sections.cart.empty' | t }}</h3>
+              <p class="cart-drawer-empty__text">{{ 'sections.cart.cart_empty_text' | t }}</p>
+              <a href="/collections/all" class="cart-drawer-empty__btn">{{ 'general.continue_shopping' | t }}</a>
             </div>
 
             <div class="cart-drawer-items" id="cart-drawer-items" {% if cart == empty %}style="display:none"{% endif %}>
@@ -101,7 +102,7 @@
                         <button type="button" class="cart-drawer-item__wishlist" data-wishlist-btn data-product-id="{{ item.product.id }}" data-product-handle="{{ item.product.handle }}"><svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M12.5 0H0.5C0.367 0 0.24 0.056 0.146 0.156C0.053 0.255 0 0.39 0 0.531V15.399C0 15.5 0.027 15.599 0.078 15.684C0.129 15.769 0.202 15.837 0.288 15.88C0.374 15.922 0.47 15.938 0.564 15.925C0.658 15.913 0.747 15.871 0.82 15.807L6.5 10.78L12.18 15.807C12.27 15.886 12.383 15.93 12.5 15.93C12.573 15.93 12.646 15.913 12.712 15.88C12.798 15.837 12.871 15.769 12.922 15.684C12.973 15.599 13 15.5 13 15.399V0.531C13 0.39 12.947 0.255 12.854 0.156C12.76 0.056 12.633 0 12.5 0ZM12 14.266L6.82 9.681C6.73 9.602 6.617 9.558 6.5 9.558C6.383 9.558 6.27 9.602 6.18 9.681L1 14.266V1.062H12V14.266Z" fill="currentColor"/></svg></button>
                       </div>
                       <div class="cart-drawer-item__price-row">
-                        <span class="cart-drawer-item__price aa" data-item-price>{{ item.final_line_price | money }} <span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400;">Inc VAT</span></span>
+                        <span class="cart-drawer-item__price aa"><span data-item-price>{{ item.final_line_price | money }}</span> <span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400;">{{ 'sections.cart.inc_vat' | t }}</span></span>
                         {%- if item.original_line_price > item.final_line_price -%}
                           <s class="cart-drawer-item__compare">{{ item.original_line_price | money }}</s>
                         {%- else -%}
@@ -112,7 +113,7 @@
                   </div>
                   <div class="cart-drawer-item__actions">
                     <div class="cart-drawer-qty"><button type="button" class="cart-drawer-qty__btn" data-qty-minus data-line="{{ forloop.index }}">−</button><input type="number" class="cart-drawer-qty__input" value="{{ item.quantity }}" min="1" data-qty-input data-line="{{ forloop.index }}" data-unit-price="{{ item.final_price }}"><button type="button" class="cart-drawer-qty__btn" data-qty-plus data-line="{{ forloop.index }}">+</button></div>
-                    <button type="button" class="cart-drawer-item__remove" data-remove-item data-line="{{ forloop.index }}">Remove</button>
+                    <button type="button" class="cart-drawer-item__remove" data-remove-item data-line="{{ forloop.index }}">{{ 'sections.cart.remove' | t }}</button>
                   </div>
                 </div>
               {%- endfor -%}
@@ -139,7 +140,7 @@
               </div>
             {%- endif -%} {% endcomment %}
             <div class="cart-drawer-recommendations" id="cart-recommendations" {% if cart == empty %}style="display:none"{% endif %}>
-              <h4 class="cart-drawer-recommendations__title">often bought together</h4>
+              <h4 class="cart-drawer-recommendations__title">{{ 'sections.cart.often_bought_together' | t }}</h4>
               <div class="cart-drawer-recommendations__scroll" id="cart-recommendations-scroll">
                 <div class="cart-related-loading">
                   <span class="loading-spinner" style="width:20px;height:20px;border-width:3px;margin:30px auto;display:block;"></span>
@@ -182,14 +183,14 @@
                               data-cart-discount-input 
                               placeholder="{{ section.settings.discount_placeholder | default: 'Discount code' }}" 
                               value="{{ cart.discount }}">
-                        <button type="button" class="hdt-cart-discount__btn" data-cart-discount-apply aria-label="Apply discount">
+                        <button type="button" class="hdt-cart-discount__btn" data-cart-discount-apply aria-label="{{ 'sections.cart.apply_discount' | t }}">
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                             <polyline points="12 5 19 12 12 19"></polyline>
                           </svg>
                         </button>
                       </div>
-                      <div data-cart-discount-error class="hdt-discount-error hdt-text-error hdt-mt-2" style="display: none; color: #d32f2f; font-size: 13px; margin-top: 8px;">{{ section.settings.discount_error_message | default: 'Enter a valid discount code' }}</div>
+                      <div data-cart-discount-error class="hdt-discount-error hdt-text-error hdt-mt-2" style="display: none; color: #d32f2f; font-size: 13px; margin-top: 8px;">{{ section.settings.discount_error_message | default: 'sections.cart.discount_error' | t }}</div>
                     </hdt-cart-discount>
                     
                     {%- if cart.cart_level_discount_applications.size > 0 -%}
@@ -202,7 +203,7 @@
                             <span class="hdt-cart-discount-applied__code">{{ discount.title }}</span>
                             <span class="hdt-cart-discount-applied__amount">(-{{ discount.total_allocated_amount | money }})</span>
                           </div>
-                          <button type="button" class="hdt-cart-discount-applied__remove" data-discount-code="{{ discount.title }}" aria-label="Remove discount">
+                          <button type="button" class="hdt-cart-discount-applied__remove" data-discount-code="{{ discount.title }}" aria-label="{{ 'sections.cart.tool.remove_discount' | t }}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <line x1="18" y1="6" x2="6" y2="18"></line>
                               <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -213,9 +214,9 @@
                     {%- endif -%}
                   </div>
                 {%- endif -%}
-                <div class="cart-drawer-summary__row"><span class="ct-btm-subtotal">Item Subtotal (<span data-cart-count>{{ cart.item_count }}</span>)</span><span class="ct-btm-subtota" data-cart-subtotal>{{ cart.items_subtotal_price | money }} <span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400;">Inc VAT</span></span></div>
-                <div class="cart-drawer-summary__row"><span class="ct-btm-delivery">Delivery</span><span>Calculated in checkout</span></div>
-                <div class="cart-drawer-summary__row"><span class="ct-btm-tax">Estimated tax</span><span class="cart-drawer-summary__muted">Calculated in checkout</span></div>
+                <div class="cart-drawer-summary__row"><span class="ct-btm-subtotal">{{ 'sections.cart.item_subtotal' | t }} (<span data-cart-count>{{ cart.item_count }}</span>)</span><span class="ct-btm-subtota"><span data-cart-subtotal>{{ cart.items_subtotal_price | money }}</span> <span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400;">{{ 'sections.cart.inc_vat' | t }}</span></span></div>
+                <div class="cart-drawer-summary__row"><span class="ct-btm-delivery">{{ 'sections.cart.delivery' | t }}</span><span>{{ 'sections.cart.calculated_in_checkout' | t }}</span></div>
+                <div class="cart-drawer-summary__row"><span class="ct-btm-tax">{{ 'sections.cart.estimated_tax' | t }}</span><span class="cart-drawer-summary__muted">{{ 'sections.cart.calculated_in_checkout' | t }}</span></div>
 
                 {%- if cart.cart_level_discount_applications.size > 0 -%}
                   {%- for discount in cart.cart_level_discount_applications -%}
@@ -223,18 +224,21 @@
                   {%- endfor -%}
                 {%- endif -%}
 
-                <div class="cart-drawer-summary__row cart-drawer-summary__row--total"><span class="ct-btm-total">Total</span><span data-cart-total>{{ cart.total_price | money }} <span class="tax-text" style="color:#000;font-size:12px;font-weight:400;">Inc VAT</span></span></div>
+                <div class="cart-drawer-summary__row cart-drawer-summary__row--total"><span class="ct-btm-total">{{ 'sections.cart.headings.total' | t }}</span><span><span data-cart-total>{{ cart.total_price | money }}</span> <span class="tax-text" style="color:#000;font-size:12px;font-weight:400;">{{ 'sections.cart.inc_vat' | t }}</span></span></div>
 
               </div>
               {%- if section.settings.show_vat_validation -%}
                 {% content_for "blocks" %}
               {%- endif -%}
               {%- if section.settings.show_terms_checkbox -%}
-                <label class="cart-drawer-terms"><input type="checkbox" class="cart-drawer-terms__input" id="cart-agree-terms"><span class="cart-drawer-terms__check"></span><span class="cart-drawer-terms__text">I agree with the <a href="{{ section.settings.terms_page_url | default: '/policies/terms-of-service' }}">terms and conditions</a></span></label>
+                <label class="cart-drawer-terms"><input type="checkbox" class="cart-drawer-terms__input" id="cart-agree-terms"><span class="cart-drawer-terms__check"></span><span class="cart-drawer-terms__text">{{ 'sections.cart.agree_with_terms' | t }} <a href="{{ section.settings.terms_page_url | default: '/policies/terms-of-service' }}">{{ 'sections.cart.terms_and_conditions' | t }}</a></span></label>
               {%- endif -%}
-              <form action="{{ routes.cart_url }}" method="POST" id="CartDrawer-Form"><button type="submit" name="checkout" class="cart-drawer-checkout-btn">Proceed to Checkout</button></form>
-              <div class="cart-drawer-cta-info"><a href="/cart" class="cart-drawer-checkout-btn-link">VIEW CART</a></div>
-              <div class="cart-drawer-payments">{{ 'visa' | payment_type_svg_tag }}{{ 'apple_pay' | payment_type_svg_tag }}{{ 'google_pay' | payment_type_svg_tag }}{{ 'master' | payment_type_svg_tag }}{{ 'paypal' | payment_type_svg_tag }}<span class="cart-drawer-payments__more">+5 more</span></div>
+              <form action="{{ routes.cart_url }}" method="POST" id="CartDrawer-Form">
+                <input type="hidden" name="checkout" value="Checkout">
+                <button type="button" class="cart-drawer-checkout-btn" onclick="this.form.submit()">{{ 'sections.cart.proceed_to_checkout' | t }}</button>
+              </form>
+              <div class="cart-drawer-cta-info"><a href="/cart" class="cart-drawer-checkout-btn-link">{{ 'sections.cart.view_cart_caps' | t }}</a></div>
+              <div class="cart-drawer-payments">{{ 'visa' | payment_type_svg_tag }}{{ 'apple_pay' | payment_type_svg_tag }}{{ 'google_pay' | payment_type_svg_tag }}{{ 'master' | payment_type_svg_tag }}{{ 'paypal' | payment_type_svg_tag }}<span class="cart-drawer-payments__more">{{ 'sections.cart.plus_more' | t: count: 5 }}</span></div>
             </div>
           </div>
         </div>
@@ -242,7 +246,7 @@
 
       <div class="cart-drawer-wishlist-panel" id="wishlist-panel" style="display:none">
         <div class="cart-drawer-header">
-          <h3 class="cart-drawer-header__title">Your Wishlist (<span id="wishlist-count">0</span>)</h3>
+          <h3 class="cart-drawer-header__title">{{ 'sections.cart.your_wishlist' | t: count: '##COUNT##' | replace: '##COUNT##', '<span id="wishlist-count">0</span>' }}</h3>
           <div class="cart-drawer-header__actions">
             <button type="button" class="cart-drawer-toggle__btn cart-drawer-toggle__btn--cart" data-drawer-toggle="cart"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-drawer-toggle__count" data-cart-count>{{ cart.item_count }}</span></button>
             <button type="button" class="cart-drawer-toggle__btn cart-drawer-toggle__btn--wishlist is-active" data-drawer-toggle="wishlist"><svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M12.5 0H0.5C0.367 0 0.24 0.056 0.146 0.156C0.053 0.255 0 0.39 0 0.531V15.399C0 15.5 0.027 15.599 0.078 15.684C0.129 15.769 0.202 15.837 0.288 15.88C0.374 15.922 0.47 15.938 0.564 15.925C0.658 15.913 0.747 15.871 0.82 15.807L6.5 10.78L12.18 15.807C12.27 15.886 12.383 15.93 12.5 15.93C12.573 15.93 12.646 15.913 12.712 15.88C12.798 15.837 12.871 15.769 12.922 15.684C12.973 15.599 13 15.5 13 15.399V0.531C13 0.39 12.947 0.255 12.854 0.156C12.76 0.056 12.633 0 12.5 0ZM12 14.266L6.82 9.681C6.73 9.602 6.617 9.558 6.5 9.558C6.383 9.558 6.27 9.602 6.18 9.681L1 14.266V1.062H12V14.266Z" fill="currentColor"/></svg><span class="cart-drawer-toggle__count" id="toggle-wishlist-count-header">0</span></button>
@@ -253,12 +257,12 @@
           <div class="wishlist-items" id="wishlist-items"></div>
           <div class="cart-drawer-empty" id="wishlist-empty">
             <div class="cart-drawer-empty__icon"><svg width="40" height="48" viewBox="0 0 13 16" fill="none"><path d="M12.5 0H0.5C0.367 0 0.24 0.056 0.146 0.156C0.053 0.255 0 0.39 0 0.531V15.399C0 15.5 0.027 15.599 0.078 15.684C0.129 15.769 0.202 15.837 0.288 15.88C0.374 15.922 0.47 15.938 0.564 15.925C0.658 15.913 0.747 15.871 0.82 15.807L6.5 10.78L12.18 15.807C12.27 15.886 12.383 15.93 12.5 15.93C12.573 15.93 12.646 15.913 12.712 15.88C12.798 15.837 12.871 15.769 12.922 15.684C12.973 15.599 13 15.5 13 15.399V0.531C13 0.39 12.947 0.255 12.854 0.156C12.76 0.056 12.633 0 12.5 0ZM12 14.266L6.82 9.681C6.73 9.602 6.617 9.558 6.5 9.558C6.383 9.558 6.27 9.602 6.18 9.681L1 14.266V1.062H12V14.266Z" fill="currentColor"/></svg></div>
-            <h3 class="cart-drawer-empty__title">Your wishlist is empty</h3>
-            <p class="cart-drawer-empty__text">Save items you love by clicking the bookmark icon</p>
-            <a href="/collections/all" class="cart-drawer-empty__btn">Browse Products</a>
+            <h3 class="cart-drawer-empty__title">{{ 'sections.cart.wishlist_empty_title' | t }}</h3>
+            <p class="cart-drawer-empty__text">{{ 'sections.cart.wishlist_empty_text' | t }}</p>
+            <a href="/collections/all" class="cart-drawer-empty__btn">{{ 'sections.cart.browse_products' | t }}</a>
           </div>
         </div>
-        <div class="cart-drawer-wishlist-footer" id="wishlist-footer" style="display:none"><a href="/pages/wishlist" class="cart-drawer-checkout-btn">View Full Wishlist</a></div>
+        <div class="cart-drawer-wishlist-footer" id="wishlist-footer" style="display:none"><a href="/pages/wishlist" class="cart-drawer-checkout-btn">{{ 'sections.cart.view_full_wishlist' | t }}</a></div>
       </div>
     </div>
   </dialog>
@@ -267,7 +271,7 @@
 {{- '<!-- CQV PRE-RENDERED BLOCKS (Liquid, correct market currency) -->' -}}
 {%- if section.settings.collection != blank -%}
   {%- for product in collections[section.settings.collection].products limit: 5 -%}
-    {%- assign first_variant = product.variants | first -%}
+    {%- assign selected_variant = product.selected_or_first_available_variant | default: product.variants.first -%}
     {%- assign has_compare = false -%}
     {%- if product.compare_at_price > product.price -%}{%- assign has_compare = true -%}{%- endif -%}
     {%- assign discount_pct = 0 -%}
@@ -281,7 +285,7 @@
                 <div class="cqv-gallery__item"><img src="{{ img | image_url: width: 800 }}" alt="{{ img.alt | escape }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"></div>
               {%- endfor -%}
             {%- else -%}
-              <div class="cqv-gallery__placeholder">No image</div>
+              <div class="cqv-gallery__placeholder">{{ 'sections.cart.no_image' | t }}</div>
             {%- endif -%}
           </div>
         </div>
@@ -295,7 +299,7 @@
                     <span class="hdt-money">{% if has_compare %}{{ product.compare_at_price | money }}{% endif %}</span>
                   </hdt-compare-at-price>
                   <hdt-price class="hdt-price" data-qv-price>
-                    <span class="hdt-money">{{ product.price | money }} <span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400;" >Inc VAT</span></span>
+                    <span class="hdt-money">{{ product.price | money }} <span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400;" >{{ 'sections.cart.inc_vat' | t }}</span></span>
                   </hdt-price>
                 </div>
               </div>
@@ -307,7 +311,7 @@
             {%- for option in product.options -%}
               {%- assign opt_idx = forloop.index0 -%}
               <div class="cqv-option" data-option-index="{{ opt_idx }}">
-                <div class="cqv-option__label">{{ option }}: <strong data-option-selected="{{ opt_idx }}">{{ product.variants[0].options[opt_idx] }}</strong></div>
+                <div class="cqv-option__label">{{ option }}: <strong data-option-selected="{{ opt_idx }}">{{ selected_variant.options[opt_idx] }}</strong></div>
                 <div class="cqv-option__btns">
                   {%- assign seen_values = '' -%}
                   {%- for variant in product.variants -%}
@@ -315,25 +319,31 @@
                     {%- unless seen_values contains opt_val -%}
                       {%- assign seen_values = seen_values | append: opt_val | append: '|||' -%}
                       {%- assign is_first = forloop.first -%}
-                      <button type="button" class="cqv-option__btn {% if is_first %}is-active{% endif %} {% unless variant.available %}is-soldout{% endunless %}" data-option-index="{{ opt_idx }}" data-option-value="{{ opt_val }}">{{ opt_val }}</button>
+                      {%- assign is_val_available = false -%}
+                      {%- for v in product.variants -%}
+                        {%- if v.options[opt_idx] == opt_val and v.available -%}
+                          {%- assign is_val_available = true -%}{%- break -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+                      <button type="button" class="cqv-option__btn {% if opt_val == selected_variant.options[opt_idx] %}is-active{% endif %} {% unless is_val_available %}is-soldout{% endunless %}" data-option-index="{{ opt_idx }}" data-option-value="{{ opt_val }}">{{ opt_val }}</button>
                     {%- endunless -%}
                   {%- endfor -%}
                 </div>
               </div>
             {%- endfor -%}
           {%- endif -%}
-          <div class="cqv-product__availability" data-qv-availability>{% unless first_variant.available %}<span class="cqv-soldout-text">Sold Out</span>{% endunless %}</div>
+          <div class="cqv-product__availability" data-qv-availability>{% unless selected_variant.available %}<span class="cqv-soldout-text">{{ 'products.product.sold_out' | t }}</span>{% endunless %}</div>
           <div class="cqv-product__actions">
             <div class="cqv-qty">
               <button type="button" class="cqv-qty__btn" data-qv-minus>−</button>
               <input type="text" class="cqv-qty__input" value="1" data-qv-qty readonly>
               <button type="button" class="cqv-qty__btn" data-qv-plus>+</button>
             </div>
-            <button type="button" class="cqv-add {% unless first_variant.available %}is-disabled{% endunless %}" data-qv-add data-variant-id="{{ first_variant.id }}" {% unless first_variant.available %}disabled{% endunless %}>{% if first_variant.available %}ADD TO CART{% else %}SOLD OUT{% endif %}</button>
+            <button type="button" class="cqv-add {% unless selected_variant.available %}is-disabled{% endunless %}" data-qv-add data-variant-id="{{ selected_variant.id }}" {% unless selected_variant.available %}disabled{% endunless %}>{% if selected_variant.available %}{{ 'products.product.add_to_cart' | t }}{% else %}{{ 'products.product.sold_out' | t }}{% endif %}</button>
           </div>
           <button type="button" class="cqv-wishlist" data-qv-wishlist data-product-id="{{ product.id }}">
             <svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M12.5 0H0.5C0.367 0 0.24 0.056 0.146 0.156C0.053 0.255 0 0.39 0 0.531V15.399C0 15.5 0.027 15.599 0.078 15.684C0.129 15.769 0.202 15.837 0.288 15.88C0.374 15.922 0.47 15.938 0.564 15.925C0.658 15.913 0.747 15.871 0.82 15.807L6.5 10.78L12.18 15.807C12.27 15.886 12.383 15.93 12.5 15.93C12.573 15.93 12.646 15.913 12.712 15.88C12.798 15.837 12.871 15.769 12.922 15.684C12.973 15.599 13 15.5 13 15.399V0.531C13 0.39 12.947 0.255 12.854 0.156C12.76 0.056 12.633 0 12.5 0ZM12 14.266L6.82 9.681C6.73 9.602 6.617 9.558 6.5 9.558C6.383 9.558 6.27 9.602 6.18 9.681L1 14.266V1.062H12V14.266Z" fill="currentColor"></path></svg>
-            <span class="cqv-wishlist__text">Add to Wishlist</span>
+            <span class="cqv-wishlist__text">{{ 'sections.cart.add_to_wishlist' | t }}</span>
           </button>
         </div>
       </div>
@@ -347,7 +357,7 @@
 
 <div class="cqv-overlay" id="cqv-overlay"></div>
 <div class="cqv-modal" id="cqv-modal">
-  <div class="cqv-modal__header"><span class="cqv-modal__title">SELECT OPTIONS</span><button type="button" class="cqv-modal__close" id="cqv-close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+  <div class="cqv-modal__header"><span class="cqv-modal__title">{{ 'sections.cart.select_options' | t }}</span><button type="button" class="cqv-modal__close" id="cqv-close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
   <div class="cqv-modal__body" id="cqv-content"></div>
 </div>
 
@@ -388,7 +398,7 @@
 .wishlist-item__price.is-sale{color:#ef4444}
 .wishlist-item__compare{font-size:12px;color:#999}
 .wishlist-item__actions{display:flex;gap:10px;margin-top:auto}
-.wishlist-item__quickview,.wishlist-item__remove{padding:6px 12px;font-size:12px;border:1px solid #ddd;background:#fff;border-radius:4px;cursor:pointer;transition:all .2s ease}
+.wishlist-item__quickview,.wishlist-item__remove{padding:6px 12px;font-size:12px;border:1px solid #ddd;background:#fff;border-radius:4px;cursor:pointer;transition:all .2s ease;text-decoration:none !important}
 .wishlist-item__quickview:hover{background:#0047ab;color:#fff;border-color:#0047ab}
 .wishlist-item__remove:hover{background:#fef2f2;color:#ef4444;border-color:#ef4444}
 .wishlist-error{padding:20px;text-align:center;color:#999}
@@ -515,22 +525,27 @@ div#ExemptifyCartValidationSnippet div{color:#000;margin:5px 0;line-height: norm
 <script>
 (function(){
   'use strict';
+  const _root = (function(){ var r='{{ routes.root_url }}'; return r==='/'?'':r; })();
+  // ── Translation strings (resolved by Liquid on page load) ─────────────────
+  var _t_incVat    = {{ 'sections.cart.inc_vat' | t | json }};
+  var _t_quickView = {{ 'sections.cart.quick_view' | t | json }};
+  var _t_incVatSpan = '<span class="tax-text" style="color:#000;font-size:12px;font-weight:400;">' + _t_incVat + '</span>';
   // ── RELATED PRODUCTS (Shopify Recommendations API) ───────────────────────
 async function fetchRelatedProducts() {
   try {
-    const cartRes = await fetch('/cart.js');
+    const cartRes = await fetch(_root + '/cart.js');
     const cart    = await cartRes.json();
     if (cart.currency) _activeCurrencyISO = cart.currency;
     if (!cart.items || cart.items.length === 0) return [];
     const cartProductIds = [...new Set(cart.items.map(item => item.product_id))];
     const sourceId = cartProductIds[0];
-    const res  = await fetch(`/recommendations/products.json?product_id=${sourceId}&limit=8&intent=related`);
+    const res  = await fetch(`${_root}/recommendations/products.json?product_id=${sourceId}&limit=8&intent=related`);
     const data = await res.json();
     const filtered = data.products.filter(p => !cartProductIds.includes(p.id)).slice(0, 5);
 
     const enriched = await Promise.all(filtered.map(async (product) => {
       try {
-        const pRes  = await fetch(`/products/${product.handle}`);
+        const pRes  = await fetch(`${_root}/products/${product.handle}`);
         const pText = await pRes.text();
         const pDoc  = new DOMParser().parseFromString(pText, 'text/html');
         const priceEl   = pDoc.querySelector('.hdt-price__sale hdt-price .hdt-money, hdt-price .hdt-money');
@@ -584,11 +599,11 @@ function renderRelatedProductsInPanel(products) {
       ? `<s class="cart-drawer-left-product__compare">${compareDisplay}</s>
         <span class="cart-drawer-left-product__price cart-drawer-left-product__price--sale">
           ${priceDisplay}
-          <span class="tax-text" style="color:#000;font-size:12px;font-weight:400;">Inc VAT</span>
+          ${_t_incVatSpan}
         </span>`
       : `<span class="cart-drawer-left-product__price">
           ${priceDisplay}
-          <span class="tax-text" style="color:#000;font-size:12px;font-weight:400;">Inc VAT</span>
+          ${_t_incVatSpan}
         </span>`;
 
     return `<div class="cart-drawer-left-product">
@@ -598,7 +613,7 @@ function renderRelatedProductsInPanel(products) {
           data-quick-view data-product-handle="${product.handle}">
           <svg width="17" height="11" viewBox="0 0 17 11" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" clip-rule="evenodd" d="M8.5 0C10.3723 0 12.1095 0.821176 13.5136 1.82296C15.5567 3.28163 16.8833 5.10681 16.8833 5.10681C17.0389 5.32008 17.0389 5.60846 16.8833 5.82173C16.8833 5.82173 15.5567 7.64696 13.5136 9.10558C12.1096 10.1074 10.3723 10.9285 8.5 10.9285C6.62765 10.9285 4.89053 10.1074 3.48641 9.10558C1.44328 7.6469 0.116686 5.82173 0.116686 5.82173C-0.0388954 5.60846 -0.0388954 5.32008 0.116686 5.10681C0.116686 5.10681 1.4433 3.28157 3.48641 1.82296C4.89045 0.821176 6.62765 0 8.5 0ZM8.5 1.2143C6.88726 1.2143 5.40208 1.94742 4.19226 2.81111C2.84893 3.7704 1.84177 4.90048 1.37956 5.4643C1.84175 6.02818 2.84885 7.15825 4.19226 8.11749C5.40201 8.98116 6.88722 9.7143 8.5 9.7143C10.1128 9.7143 11.5979 8.98117 12.8077 8.11749C14.1511 7.15819 15.1582 6.02812 15.6204 5.4643C15.1583 4.90042 14.1511 3.77034 12.8077 2.81111C11.598 1.94744 10.1128 1.2143 8.5 1.2143ZM8.5 2.42859C10.1757 2.42859 11.5357 3.78861 11.5357 5.46434C11.5357 7.14007 10.1757 8.50008 8.5 8.50008C6.82427 8.50008 5.46426 7.14007 5.46426 5.46434C5.46426 3.78861 6.82427 2.42859 8.5 2.42859ZM8.5 3.64289C7.49441 3.64289 6.67855 4.45874 6.67855 5.46434C6.67855 6.46993 7.49441 7.28578 8.5 7.28578C9.50559 7.28578 10.3214 6.46993 10.3214 5.46434C10.3214 4.45874 9.50559 3.64289 8.5 3.64289Z" fill="white"/>
-          </svg> QUICK VIEW
+          </svg> ${_t_quickView}
         </button>
       </div>
       <div class="cart-drawer-left-product__info">
@@ -646,7 +661,7 @@ function renderRelatedProductsInScroll(products) {
       <div class="cart-drawer-rec-card__image">
         <a href="/products/${product.handle}">${imgTag}</a>
         <button type="button" class="cart-drawer-rec-card__quickview-hover" data-quick-view data-product-handle="${product.handle}">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Quick View
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>${_t_quickView}
         </button>
       </div>
       <div class="cart-drawer-rec-card__info">
@@ -655,7 +670,7 @@ function renderRelatedProductsInScroll(products) {
           <span class="cart-drawer-rec-card__price">${priceDisplay}</span>
           ${hasCompare ? `<s class="cart-drawer-rec-card__compare">${compareDisplay}</s>` : ''}
         </div>
-        <button type="button" class="cart-drawer-rec-card__quickview-text" data-quick-view data-product-handle="${product.handle}"><u>Quick View</u></button>
+        <button type="button" class="cart-drawer-rec-card__quickview-text" data-quick-view data-product-handle="${product.handle}">${_t_quickView}</button>
       </div>
     </div>`;
   }).join('');
@@ -686,7 +701,7 @@ function reRenderRelatedWithNewCurrency() {
   const WL_KEY='theme4:wishlist:id';
 
   function sectionUrl() {
-    return '/?section_id=cart-drawer&_=' + Date.now();
+    return _root + '/?section_id=cart-drawer&_=' + Date.now();
   }
 
   function replaceShippingBar(doc) {
@@ -841,16 +856,16 @@ function reRenderRelatedWithNewCurrency() {
     document.querySelectorAll('hdt-wishlist').forEach(btn=>{ const productId=btn.dataset.id; if(productId){ const inWishlist=ids.includes(productId.toString()); btn.setAttribute('action',inWishlist?'added':'add'); } });
   }
 
-  function renderWishlist(){
+function renderWishlist(){
     const ids=getWishlistIds(); const container=document.getElementById('wishlist-items');
     if(!container)return; updateWishlistUI();
     if(ids.length===0){ container.innerHTML=''; return; }
     const uncachedIds=ids.filter(id=>!productCache[id]);
     if(uncachedIds.length===0){ renderWishlistHTML(ids,container); return; }
-    fetch('/products.json?limit=250').then(r=>r.json()).then(data=>{ data.products.forEach(p=>productCache[p.id.toString()]=p); renderWishlistHTML(ids,container); }).catch(e=>{ console.error('Wishlist fetch error:',e); container.innerHTML='<div class="wishlist-error">Unable to load wishlist</div>'; });
-  }
+    fetch('/products.json?limit=250').then(r=>r.json()).then(data=>{ data.products.forEach(p=>productCache[p.id.toString()]=p); renderWishlistHTML(ids,container); }).catch(e=>{ console.error('Wishlist fetch error:',e); container.innerHTML='<div class="wishlist-error">{{ 'sections.cart.wishlist_load_error' | t }}</div>'; });
+}
 
-  function renderWishlistHTML(ids,container){
+function renderWishlistHTML(ids,container){
     let html='';
     [...new Set(ids)].forEach(id=>{
       const p=productCache[id];
@@ -859,7 +874,7 @@ function reRenderRelatedWithNewCurrency() {
         let priceValue=p.price||p.variants?.[0]?.price||0; let compareValue=p.compare_at_price||p.variants?.[0]?.compare_at_price||null;
         if(typeof priceValue==='string')priceValue=parseFloat(priceValue);
         if(typeof compareValue==='string')compareValue=parseFloat(compareValue);
-        const priceCents=Math.round(priceValue); const compareCents=compareValue?Math.round(compareValue):null;
+        const priceCents=Math.round(priceValue * 100); const compareCents=compareValue?Math.round(compareValue * 100):null;
         const hasDiscount=compareCents&&compareCents>priceCents;
         const price=fmtCurrency(priceCents); const comparePrice=hasDiscount?fmtCurrency(compareCents):null;
         html+=`<div class="wishlist-item" data-wishlist-item data-product-id="${id}">
@@ -868,15 +883,15 @@ function reRenderRelatedWithNewCurrency() {
             <a href="/products/${p.handle}" class="wishlist-item__title">${p.title}</a>
             <div class="wishlist-item__prices">${comparePrice?`<s class="wishlist-item__compare">${comparePrice}</s>`:''}<span class="wishlist-item__price ${comparePrice?'is-sale':''}">${price}</span></div>
             <div class="wishlist-item__actions">
-              <button type="button" class="wishlist-item__quickview" data-quick-view data-product-handle="${p.handle}">Quick View</button>
-              <button type="button" class="wishlist-item__remove" data-remove-wishlist="${id}">Remove</button>
+              <button type="button" class="wishlist-item__quickview" data-quick-view data-product-handle="${p.handle}">{{ 'sections.cart.quick_view' | t }}</button>
+              <button type="button" class="wishlist-item__remove" data-remove-wishlist="${id}">{{ 'sections.cart.remove' | t }}</button>
             </div>
           </div>
         </div>`;
       }
     });
     container.innerHTML=html;
-  }
+}
 
   function ajaxRemoveFromWishlist(productId,element){
     const item=element.closest('[data-wishlist-item]')||element.closest('.hdt-card-product')||element.closest('.hdt-card')||element.closest('[data-product-id]')||element.closest('.wishlist-product-item')||element.closest('.wishlist-card')||element.closest('.wishlist__item')||element.closest('[data-wishlist-product]');
@@ -906,61 +921,15 @@ function reRenderRelatedWithNewCurrency() {
     if(window.Taxify&&typeof window.Taxify.refresh==='function')window.Taxify.refresh();
     if(window.Taxify&&typeof window.Taxify.init==='function')window.Taxify.init();
     if(window.Exemptify&&typeof window.Exemptify.refresh==='function')window.Exemptify.refresh();
-    const evts=['taxify:refresh','taxify:cart:updated','cart:refresh','cart:updated','cart-drawer:refreshed','theme:cart:updated','section:load'];
+    const evts=['taxify:refresh','taxify:cart:updated','cart:refresh','cart:updated','cart-drawer:refreshed','theme:cart:updated'];
     evts.forEach(name=>document.dispatchEvent(new CustomEvent(name,{bubbles:true})));
   }
 
   async function refreshCart(){
     try{
-      const [sectionRes,cartRes]=await Promise.all([fetch(sectionUrl()),fetch('/cart.js')]);
+      const [sectionRes,cartRes]=await Promise.all([fetch(sectionUrl()),fetch(_root + '/cart.js')]);
       const [html,cart]=await Promise.all([sectionRes.text(),cartRes.json()]);
-
-      if (cart.currency) {
-        _activeCurrencyISO = cart.currency;
-        const hdtEl = document.querySelector('hdt-cart-drawer');
-        if (hdtEl) hdtEl.dataset.currencyIso = cart.currency;
-      }
-      const doc=new DOMParser().parseFromString(html,'text/html');
-
-      const newItems=doc.getElementById('cart-drawer-items');
-      const currentItems=document.getElementById('cart-drawer-items');
-      if(newItems&&currentItems)currentItems.innerHTML=newItems.innerHTML;
-
-      // ── Sync discount applied badge in discount section ──────────────────
-      const newDiscountSection=doc.querySelector('.hdt-cart-discount-section');
-      const currentDiscountSection=document.querySelector('.hdt-cart-discount-section');
-      if(newDiscountSection&&currentDiscountSection){
-        currentDiscountSection.querySelectorAll('.hdt-cart-discount-applied').forEach(el=>el.remove());
-        newDiscountSection.querySelectorAll('.hdt-cart-discount-applied').forEach(el=>currentDiscountSection.appendChild(el.cloneNode(true)));
-      }
-
-      // ── CHANGE 1: Sync discount rows in summary section ──────────────────
-      document.querySelectorAll('.cart-drawer-summary__row--discount').forEach(el=>el.remove());
-      const newDiscountRows=doc.querySelectorAll('.cart-drawer-summary__row--discount');
-      const summaryEl=document.querySelector('.cart-drawer-summary');
-      const totalRow=summaryEl?summaryEl.querySelector('.cart-drawer-summary__row--total'):null;
-      if(summaryEl&&newDiscountRows.length){
-        newDiscountRows.forEach(row=>{
-          totalRow?summaryEl.insertBefore(row.cloneNode(true),totalRow):summaryEl.appendChild(row.cloneNode(true));
-        });
-      }
-      // ─────────────────────────────────────────────────────────────────────
-
-      const liquidSubtotal=doc.querySelector('[data-cart-subtotal]');
-      const liquidSubtotalText=liquidSubtotal?liquidSubtotal.textContent.trim():null;
-
-      const liquidTotalEl = doc.querySelector('[data-cart-total]');
-      const liquidTotalHTML = liquidTotalEl ? liquidTotalEl.innerHTML : null;
-
-      const liquidShippingBar = doc.getElementById('cart-shipping-bar');
-      const currentShippingBar = document.getElementById('cart-shipping-bar');
-      if (liquidShippingBar && currentShippingBar) {
-        currentShippingBar.replaceWith(liquidShippingBar.cloneNode(true));
-      }
-
-      updateCartUI(cart,liquidSubtotalText,true, liquidTotalHTML);
-      triggerTaxifyRefresh();
-      updateRelatedPanel();
+      updateDrawerFromHTML(html, cart);
     }catch(e){console.error('Cart refresh error:',e);}
   }
 
@@ -974,8 +943,11 @@ function reRenderRelatedWithNewCurrency() {
     const formattedRemaining=fmtCurrency(remaining,iso);
     if(remainingEl)remainingEl.textContent=formattedRemaining;
     if(textEl){
-      if(remaining>0){textEl.innerHTML=`You're <span class="cart-drawer-shipping__amount" data-shipping-remaining>${formattedRemaining}</span> away from Free Standard Shipping`;}
-      else{textEl.innerHTML='🎉 You\'ve unlocked Free Standard Shipping!';}
+      if(remaining>0){
+        let amountStr = `<span class="cart-drawer-shipping__amount" data-shipping-remaining>${formattedRemaining}</span>`;
+        textEl.innerHTML = `{{ 'sections.cart.shipping_away_html' | t: amount: '[amount]' }}`.replace('[amount]', amountStr);
+      }
+      else{textEl.innerHTML='{{ 'sections.cart.free_shipping_bar.success' | t }}';}
     }
   }
 
@@ -990,7 +962,7 @@ function reRenderRelatedWithNewCurrency() {
     return null;
   }
 
-  function updateCartUI(cart, liquidSubtotalText, skipShippingBar, liquidTotalHTML){
+  function updateCartUI(cart, liquidSubtotalHTML, skipShippingBar, liquidTotalHTML){
     const isEmpty=cart.item_count===0;
     const emptyState=document.getElementById('cart-empty-state'); const itemsContainer=document.getElementById('cart-drawer-items');
     const bottomSection=document.getElementById('cart-drawer-bottom'); const warningSection=document.getElementById('cart-warning');
@@ -1005,10 +977,14 @@ function reRenderRelatedWithNewCurrency() {
    if (relatedPanelWrap) relatedPanelWrap.style.display = isEmpty ? 'none' : '';
     document.querySelectorAll('[data-cart-count]').forEach(el=>el.textContent=cart.item_count);
     document.querySelectorAll('.hdt-count-box,hdt-cart-count').forEach(el=>el.textContent=cart.item_count);
-    if(liquidSubtotalText){
-      document.querySelectorAll('[data-cart-subtotal]').forEach(el=>el.textContent=liquidSubtotalText);
+    if(liquidSubtotalHTML){
+      document.querySelectorAll('[data-cart-subtotal]').forEach(el=>{
+        el.innerHTML=liquidSubtotalHTML;
+      });
     } else {
-      document.querySelectorAll('[data-cart-subtotal]').forEach(el=>el.textContent=fmtCurrency(cart.items_subtotal_price));
+      document.querySelectorAll('[data-cart-subtotal]').forEach(el=>{
+        el.textContent=fmtCurrency(cart.items_subtotal_price);
+      });
     }
     // ── CHANGE 2: Total with Inc VAT text preserved ───────────────────────
     //document.querySelectorAll('[data-cart-total]').forEach(el=>{
@@ -1018,41 +994,110 @@ function reRenderRelatedWithNewCurrency() {
       if(liquidTotalHTML){
         el.innerHTML = liquidTotalHTML;
       } else {
-        el.innerHTML = fmtCurrency(cart.total_price) + ' <span class="tax-text" style="color:#000;font-size:12px;font-weight:400;">Inc VAT</span>';
+        el.textContent = fmtCurrency(cart.total_price);
       }
     });
     // ─────────────────────────────────────────────────────────────────────
     if(!skipShippingBar) updateShippingBar(cart.items_subtotal_price);
   }
 
-  async function changeQuantity(line,quantity,element){
-    if(!line)return; if(element)element.classList.add('is-updating');
-    try{
-      const response=await fetch('/cart/change.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({line:parseInt(line),quantity:parseInt(quantity)})});
-      if(!response.ok)throw new Error('Failed');
-      const cart=await response.json();
-
+  function updateDrawerFromHTML(html, cart) {
+    if (!html || !cart) return;
+    window._isInternalCartUpdate = true;
+    try {
       if (cart.currency) {
-        _activeCurrencyISO = cart.currency;
+        _activeCurrencyISO = cart.currency.iso_code || cart.currency;
         const hdtEl = document.querySelector('hdt-cart-drawer');
-        if (hdtEl) hdtEl.dataset.currencyIso = cart.currency;
+        if (hdtEl) hdtEl.dataset.currencyIso = _activeCurrencyISO;
       }
-      
-      if(quantity===0&&element){
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+
+      const newItems = doc.getElementById('cart-drawer-items');
+      const currentItems = document.getElementById('cart-drawer-items');
+      if (newItems && currentItems) currentItems.innerHTML = newItems.innerHTML;
+
+      // Sync discount applied badge
+      const newDiscountSection = doc.querySelector('.hdt-cart-discount-section');
+      const currentDiscountSection = document.querySelector('.hdt-cart-discount-section');
+      if (newDiscountSection && currentDiscountSection) {
+        currentDiscountSection.querySelectorAll('.hdt-cart-discount-applied').forEach(el => el.remove());
+        newDiscountSection.querySelectorAll('.hdt-cart-discount-applied').forEach(el => currentDiscountSection.appendChild(el.cloneNode(true)));
+      }
+
+      // Sync discount rows in summary
+      document.querySelectorAll('.cart-drawer-summary__row--discount').forEach(el => el.remove());
+      const newDiscountRows = doc.querySelectorAll('.cart-drawer-summary__row--discount');
+      const summaryEl = document.querySelector('.cart-drawer-summary');
+      const totalRow = summaryEl ? summaryEl.querySelector('.cart-drawer-summary__row--total') : null;
+      if (summaryEl && newDiscountRows.length) {
+        newDiscountRows.forEach(row => {
+          totalRow ? summaryEl.insertBefore(row.cloneNode(true), totalRow) : summaryEl.appendChild(row.cloneNode(true));
+        });
+      }
+
+      const liquidSubtotal = doc.querySelector('[data-cart-subtotal]');
+      const liquidSubtotalHTML = liquidSubtotal ? liquidSubtotal.innerHTML : null;
+
+      const liquidTotalEl = doc.querySelector('[data-cart-total]');
+      const liquidTotalHTML = liquidTotalEl ? liquidTotalEl.innerHTML : null;
+
+      const liquidShippingBar = doc.getElementById('cart-shipping-bar');
+      const currentShippingBar = document.getElementById('cart-shipping-bar');
+      if (liquidShippingBar && currentShippingBar) {
+        currentShippingBar.replaceWith(liquidShippingBar.cloneNode(true));
+      }
+
+      updateCartUI(cart, liquidSubtotalHTML, true, liquidTotalHTML);
+      triggerTaxifyRefresh();
+      updateRelatedPanel();
+    } catch (e) {
+      console.error('Error updating drawer from HTML:', e);
+    } finally {
+      setTimeout(() => { window._isInternalCartUpdate = false; }, 500);
+    }
+  }
+
+  async function changeQuantity(id, quantity, element) {
+    if (!id) return;
+    if (element) element.classList.add('is-updating');
+    try {
+      const response = await fetch(_root + '/cart/change.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, quantity: parseInt(quantity), sections: 'cart-drawer' })
+      });
+      if (!response.ok) throw new Error('Failed');
+      const json = await response.json();
+
+      if (parseInt(quantity) === 0 && element) {
         element.classList.add('is-removing');
-        setTimeout(async()=>{element.remove();document.querySelectorAll('[data-line-item]').forEach((item,idx)=>{item.dataset.line=idx+1;item.querySelectorAll('[data-line]').forEach(el=>el.dataset.line=idx+1);}); updateCartUI(cart); await refreshCart();},450);
-      }else{await refreshCart();if(element){const qtyInput=element.querySelector('[data-qty-input]');if(qtyInput)qtyInput.value=quantity;}}
-    }catch(e){await refreshCart();}
-    finally{if(element)element.classList.remove('is-updating');}
+        setTimeout(() => {
+          element.remove();
+          updateDrawerFromHTML(json.sections['cart-drawer'], json);
+        }, 450);
+      } else {
+        updateDrawerFromHTML(json.sections['cart-drawer'], json);
+      }
+    } catch (e) {
+      await refreshCart();
+    } finally {
+      if (element) element.classList.remove('is-updating');
+    }
   }
 
   async function addToCart(variantId,quantity,button){
-    if(button){button.disabled=true;button.dataset.originalText=button.textContent;button.innerHTML='<span class="loading-spinner"></span> Adding...';}
+    if(button){button.disabled=true;button.dataset.originalText=button.textContent;button.innerHTML='<span class="loading-spinner"></span> {{ 'sections.cart.adding' | t }}';}
     try{
-      const response=await fetch('/cart/add.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:parseInt(variantId),quantity:parseInt(quantity)||1})});
+      const response=await fetch(_root + '/cart/add.js',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({id:parseInt(variantId),quantity:parseInt(quantity)||1,sections:'cart-drawer'})
+      });
       if(!response.ok){const error=await response.json();throw new Error(error.description||'Failed to add');}
-      await refreshCart(); if(button){button.innerHTML='✓ Added!';button.disabled=false;} return{success:true};
-    }catch(e){console.error('Add to cart error:',e);if(button){button.innerHTML='Error - Try Again';button.disabled=false;}return{success:false,error:e.message};}
+      const json = await response.json();
+      updateDrawerFromHTML(json.sections['cart-drawer'], json);
+      if(button){button.innerHTML='✓ {{ 'sections.cart.added' | t }}';button.disabled=false;} return{success:true};
+    }catch(e){console.error('Add to cart error:',e);if(button){button.innerHTML='{{ 'sections.cart.error_try_again' | t }}';button.disabled=false;}return{success:false,error:e.message};}
   }
 
   function openDrawer(){ const drawer=document.querySelector('hdt-cart-drawer'); if(drawer&&drawer.open)drawer.open(); else document.querySelector('[aria-controls="CartDrawer"]')?.click(); }
@@ -1107,10 +1152,12 @@ function reRenderRelatedWithNewCurrency() {
       // ── Dynamic fallback path (Recommendations API products) ────────────
       qvContent.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:200px"><span class="loading-spinner" style="width:24px;height:24px;border-width:3px;"></span></div>';
       try {
-        const res  = await fetch(`/products/${handle}.js`);
+        // Use _root (e.g. "/it") so localized URL handles resolve correctly;
+        // without it, the bare /products/<handle>.js can 404 on non-default markets.
+        const res  = await fetch(`${_root}/products/${handle}.js`);
         const prod = await res.json();
         const productId = prod.id.toString();
-        const firstVariant = prod.variants[0];
+        const firstVariant = prod.variants.find(v => v.available) || prod.variants[0];
 
         const hasCompare = !!(prod.compare_at_price) && parseInt(prod.compare_at_price) > parseInt(prod.price);
         const discountPct = hasCompare ? Math.round((prod.compare_at_price - prod.price) * 100 / prod.compare_at_price) : 0;
@@ -1119,7 +1166,7 @@ function reRenderRelatedWithNewCurrency() {
         let qvPriceStr = fmtCurrency(prod.price);
         let qvCompareStr = hasCompare ? fmtCurrency(prod.compare_at_price) : '';
         try {
-          const hRes  = await fetch(`/products/${handle}`);
+          const hRes  = await fetch(`${_root}/products/${handle}`);
           const hText = await hRes.text();
           const hDoc  = new DOMParser().parseFromString(hText, 'text/html');
           const hPriceEl   = hDoc.querySelector('hdt-price .hdt-money, .hdt-price .hdt-money');
@@ -1132,7 +1179,7 @@ function reRenderRelatedWithNewCurrency() {
         const variantPriceCache = {};
         await Promise.all(prod.variants.map(async (v) => {
           try {
-            const vr = await fetch(`/products/${handle}?variant=${v.id}`);
+            const vr = await fetch(`${_root}/products/${handle}?variant=${v.id}`);
             const vt = await vr.text();
             const vd = new DOMParser().parseFromString(vt, 'text/html');
             const vp = vd.querySelector('hdt-price .hdt-money, .hdt-price .hdt-money');
@@ -1169,10 +1216,10 @@ function reRenderRelatedWithNewCurrency() {
             const val = typeof rawVal === 'string' ? rawVal : String(rawVal);
             if(seen.includes(val)) return;
             seen.push(val);
-            const isFirst = seen.length === 1;
-            btnsHtml += `<button type="button" class="cqv-option__btn ${isFirst?'is-active':''} ${!v.available?'is-soldout':''}" data-option-index="${idx}" data-option-value="${val}">${val}</button>`;
+            const isActive = firstVariant.options[idx] === val;
+            btnsHtml += `<button type="button" class="cqv-option__btn ${isActive?'is-active':''} ${!isValAvailable?'is-soldout':''}" data-option-index="${idx}" data-option-value="${val}">${val}</button>`;
           });
-          const firstVal = prod.variants[0].options[idx];
+          const firstVal = firstVariant.options[idx];
           const firstValStr = typeof firstVal === 'string' ? firstVal : String(firstVal);
           optionsHtml += `<div class="cqv-option" data-option-index="${idx}">
             <div class="cqv-option__label">${optName}: <strong data-option-selected="${idx}">${firstValStr}</strong></div>
@@ -1187,7 +1234,7 @@ function reRenderRelatedWithNewCurrency() {
               const cleanSrc = rawSrc.replace(/^\/\//, 'https://').replace(/(\?.*)?$/, '') + '?width=800';
               return `<div class="cqv-gallery__item"><img src="${cleanSrc}" alt="${prod.title.replace(/"/g,'&quot;')}" loading="${i===0?'eager':'lazy'}"></div>`;
             }).join('')
-          : '<div class="cqv-gallery__placeholder">No image</div>';
+          : '<div class="cqv-gallery__placeholder">{{ 'sections.cart.no_image' | t }}</div>';
 
         const inWl = isInWishlist(productId);
 
@@ -1202,21 +1249,21 @@ function reRenderRelatedWithNewCurrency() {
                 ${buildThemePriceFromStrings(qvPriceStr, qvCompareStr, hasCompare, discountPct)}
               </div>
               ${optionsHtml}
-              <div class="cqv-product__availability" data-qv-availability>${!firstVariant.available ? '<span class="cqv-soldout-text">Sold Out</span>' : ''}</div>
-              <div class="cqv-product__actions">
-                <div class="cqv-qty">
-                  <button type="button" class="cqv-qty__btn" data-qv-minus>−</button>
-                  <input type="text" class="cqv-qty__input" value="1" data-qv-qty readonly>
-                  <button type="button" class="cqv-qty__btn" data-qv-plus>+</button>
+                <div class="cqv-product__availability" data-qv-availability>${!firstVariant.available ? '<span class="cqv-soldout-text">{{ 'products.product.sold_out' | t }}</span>' : ''}</div>
+                <div class="cqv-product__actions">
+                  <div class="cqv-qty">
+                    <button type="button" class="cqv-qty__btn" data-qv-minus>−</button>
+                    <input type="text" class="cqv-qty__input" value="1" data-qv-qty readonly>
+                    <button type="button" class="cqv-qty__btn" data-qv-plus>+</button>
+                  </div>
+                  <button type="button" class="cqv-add ${!firstVariant.available ? 'is-disabled' : ''}" data-qv-add data-variant-id="${firstVariant.id}" ${!firstVariant.available ? 'disabled' : ''}>
+                    ${firstVariant.available ? '{{ 'products.product.add_to_cart' | t }}' : '{{ 'products.product.sold_out' | t }}'}
+                  </button>
                 </div>
-                <button type="button" class="cqv-add ${!firstVariant.available ? 'is-disabled' : ''}" data-qv-add data-variant-id="${firstVariant.id}" ${!firstVariant.available ? 'disabled' : ''}>
-                  ${firstVariant.available ? 'ADD TO CART' : 'SOLD OUT'}
+                <button type="button" class="cqv-wishlist ${inWl ? 'is-active' : ''}" data-qv-wishlist data-product-id="${productId}">
+                  <svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M12.5 0H0.5C0.367 0 0.24 0.056 0.146 0.156C0.053 0.255 0 0.39 0 0.531V15.399C0 15.5 0.027 15.599 0.078 15.684C0.129 15.769 0.202 15.837 0.288 15.88C0.374 15.922 0.47 15.938 0.564 15.925C0.658 15.913 0.747 15.871 0.82 15.807L6.5 10.78L12.18 15.807C12.27 15.886 12.383 15.93 12.5 15.93C12.573 15.93 12.646 15.913 12.712 15.88C12.798 15.837 12.871 15.769 12.922 15.684C12.973 15.599 13 15.5 13 15.399V0.531C13 0.39 12.947 0.255 12.854 0.156C12.76 0.056 12.633 0 12.5 0ZM12 14.266L6.82 9.681C6.73 9.602 6.617 9.558 6.5 9.558C6.383 9.558 6.27 9.602 6.18 9.681L1 14.266V1.062H12V14.266Z" fill="currentColor"></path></svg>
+                  <span class="cqv-wishlist__text">${inWl ? '{{ 'sections.cart.in_wishlist' | t }}' : '{{ 'sections.cart.add_to_wishlist' | t }}'}</span>
                 </button>
-              </div>
-              <button type="button" class="cqv-wishlist ${inWl ? 'is-active' : ''}" data-qv-wishlist data-product-id="${productId}">
-                <svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M12.5 0H0.5C0.367 0 0.24 0.056 0.146 0.156C0.053 0.255 0 0.39 0 0.531V15.399C0 15.5 0.027 15.599 0.078 15.684C0.129 15.769 0.202 15.837 0.288 15.88C0.374 15.922 0.47 15.938 0.564 15.925C0.658 15.913 0.747 15.871 0.82 15.807L6.5 10.78L12.18 15.807C12.27 15.886 12.383 15.93 12.5 15.93C12.573 15.93 12.646 15.913 12.712 15.88C12.798 15.837 12.871 15.769 12.922 15.684C12.973 15.599 13 15.5 13 15.399V0.531C13 0.39 12.947 0.255 12.854 0.156C12.76 0.056 12.633 0 12.5 0ZM12 14.266L6.82 9.681C6.73 9.602 6.617 9.558 6.5 9.558C6.383 9.558 6.27 9.602 6.18 9.681L1 14.266V1.062H12V14.266Z" fill="currentColor"></path></svg>
-                <span class="cqv-wishlist__text">${inWl ? 'In Wishlist' : 'Add to Wishlist'}</span>
-              </button>
             </div>
           </div>`;
 
@@ -1224,7 +1271,7 @@ function reRenderRelatedWithNewCurrency() {
 
       } catch(err) {
         console.error('QV dynamic fetch error:', err);
-        qvContent.innerHTML = '<div class="cqv-error"><p>Could not load product</p></div>';
+        qvContent.innerHTML = '<div class="cqv-error"><p>{{ 'sections.cart.product_load_error' | t }}</p></div>';
       }
     }
   }
@@ -1259,30 +1306,11 @@ function reRenderRelatedWithNewCurrency() {
     function isAvailable(opts){
       const v = findVariant(opts);
       if(v !== null) return { available: v.available, variant: v };
-      // DOM fallback: any active button is-soldout → sold out
-      const active = [...qvContent.querySelectorAll('.cqv-option__btn.is-active')];
-      const anySoldout = active.some(b => b.classList.contains('is-soldout'));
-      return { available: !anySoldout, variant: null };
+      return { available: false, variant: null };
     }
 
     // ── Apply button state ────────────────────────────────────────────────
-    // ── Apply button state ────────────────────────────────────────────────
     function applyState(opts, variantOverride){
-      // ── DOM check PEHLE: koi bhi active button soldout hai? ───────────
-      // Yeh sabse reliable source hai — Liquid ne render kiya hai
-      const activeButtons = [...qvContent.querySelectorAll('.cqv-option__btn.is-active')];
-      const domSaysUnavailable = activeButtons.some(b => b.classList.contains('is-soldout'));
-
-      if(domSaysUnavailable){
-        if(variantOverride && variantOverride.id) addBtn.dataset.variantId = variantOverride.id;
-        addBtn.disabled = true;
-        addBtn.classList.add('is-disabled');
-        addBtn.textContent = 'SOLD OUT';
-        if(availabilityEl) availabilityEl.innerHTML = '<span class="cqv-soldout-text">Sold Out</span>';
-        return;
-      }
-
-      // ── DOM ne available bola — variantsData/override se confirm karo ─
       const { available, variant } = variantOverride !== undefined
         ? { available: variantOverride.available, variant: variantOverride }
         : isAvailable(opts);
@@ -1292,13 +1320,13 @@ function reRenderRelatedWithNewCurrency() {
       if(available){
         addBtn.disabled        = false;
         addBtn.classList.remove('is-disabled');
-        addBtn.textContent     = 'ADD TO CART';
+        addBtn.textContent     = '{{ 'products.product.add_to_cart' | t }}';
         if(availabilityEl) availabilityEl.innerHTML = '';
       } else {
         addBtn.disabled        = true;
         addBtn.classList.add('is-disabled');
-        addBtn.textContent     = 'SOLD OUT';
-        if(availabilityEl) availabilityEl.innerHTML = '<span class="cqv-soldout-text">Sold Out</span>';
+        addBtn.textContent     = '{{ 'products.product.sold_out' | t }}';
+        if(availabilityEl) availabilityEl.innerHTML = '<span class="cqv-soldout-text">{{ 'products.product.sold_out' | t }}</span>';
       }
     }
 
@@ -1347,7 +1375,7 @@ function reRenderRelatedWithNewCurrency() {
               matchingVariant.price, matchingVariant.compare_price,
               matchingVariant.has_compare, matchingVariant.discount_pct
             );
-            fetch('/products/'+handle+'?variant='+matchingVariant.id)
+            fetch(_root + '/products/'+handle+'?variant='+matchingVariant.id)
               .then(r=>r.text())
               .then(html=>{
                 const vDoc=new DOMParser().parseFromString(html,'text/html');
@@ -1371,17 +1399,17 @@ function reRenderRelatedWithNewCurrency() {
     addBtn.onclick = async function(){
       if(this.disabled)return;
       const variantId=this.dataset.variantId; const quantity=parseInt(qtyInput.value)||1;
-      this.disabled=true; this.textContent='ADDING...';
+      this.disabled=true; this.textContent='{{ 'sections.cart.adding' | t | upcase }}';
       const result=await addToCart(variantId,quantity,null);
-      if(result.success){this.textContent='ADDED!';setTimeout(()=>{closeQuickView();setTimeout(openDrawer,300);},500);}
-      else{this.disabled=false;this.textContent='ADD TO CART';alert(result.error||'Could not add to cart');}
+      if(result.success){this.textContent='{{ 'sections.cart.added' | t | upcase }}';setTimeout(()=>{closeQuickView();setTimeout(openDrawer,300);},500);}
+      else{this.disabled=false;this.textContent='{{ 'products.product.add_to_cart' | t | upcase }}';alert(result.error||'{{ 'sections.cart.product_load_error' | t }}');}
     };
 
     if(wishlistBtn){
       wishlistBtn.onclick=function(){
         const pid=productId||this.dataset.productId; const text=this.querySelector('.cqv-wishlist__text');
-        if(isInWishlist(pid)){removeFromWishlist(pid);this.classList.remove('is-active');if(text)text.textContent='Add to Wishlist';}
-        else{addToWishlist(pid);this.classList.add('is-active');if(text)text.textContent='In Wishlist';}
+        if(isInWishlist(pid)){removeFromWishlist(pid);this.classList.remove('is-active');if(text)text.textContent='{{ 'sections.cart.add_to_wishlist' | t }}';}
+        else{addToWishlist(pid);this.classList.add('is-active');if(text)text.textContent='{{ 'sections.cart.in_wishlist' | t }}';}
         updateWishlistUI();renderWishlist();
       };
     }
@@ -1432,7 +1460,7 @@ function reRenderRelatedWithNewCurrency() {
             if(leftPanel){leftPanel.classList.remove('is-visible');setTimeout(()=>leftPanel.classList.add('is-visible'),200);}
             updateRelatedPanel(); 
             if(recsSection&&recsSection.style.display!=='none'){recsSection.classList.remove('is-visible');setTimeout(()=>recsSection.classList.add('is-visible'),400);}
-            fetch('/cart.js').then(r=>r.json()).then(cart=>{
+            fetch(_root + '/cart.js').then(r=>r.json()).then(cart=>{
               //updateShippingBar(cart.items_subtotal_price);
               refreshCart();
             }).catch(()=>{});
@@ -1483,18 +1511,18 @@ function reRenderRelatedWithNewCurrency() {
     if(plusBtn){
       e.preventDefault(); const item=plusBtn.closest('[data-line-item]'); if(!item)return;
       const input=item.querySelector('[data-qty-input]'); const newQty=(parseInt(input.value)||1)+1;
-      input.value=newQty; changeQuantity(item.dataset.line,newQty,item);return;
+      input.value=newQty; changeQuantity(item.dataset.key,newQty,item);return;
     }
 
     const minusBtn=e.target.closest('[data-qty-minus]');
     if(minusBtn){
       e.preventDefault(); const item=minusBtn.closest('[data-line-item]'); if(!item)return;
       const input=item.querySelector('[data-qty-input]'); const currentQty=parseInt(input.value)||1;
-      if(currentQty>1){input.value=currentQty-1;changeQuantity(item.dataset.line,currentQty-1,item);}return;
+      if(currentQty>1){input.value=currentQty-1;changeQuantity(item.dataset.key,currentQty-1,item);}return;
     }
 
     const removeBtn=e.target.closest('[data-remove-item]');
-    if(removeBtn){e.preventDefault();const item=removeBtn.closest('[data-line-item]');if(!item)return;changeQuantity(item.dataset.line,0,item);return;}
+    if(removeBtn){e.preventDefault();const item=removeBtn.closest('[data-line-item]');if(!item)return;changeQuantity(item.dataset.key,0,item);return;}
 
     const quickViewBtn=e.target.closest('[data-quick-view]');
     if(quickViewBtn){
@@ -1506,6 +1534,35 @@ function reRenderRelatedWithNewCurrency() {
     }
   });
 
+  document.addEventListener('keydown', e => {
+    const qtyInput = e.target.closest('[data-qty-input]');
+    if (qtyInput && e.key === 'Enter') {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      const item = qtyInput.closest('[data-line-item]');
+      if (item) {
+        changeQuantity(item.dataset.key, qtyInput.value, item);
+      }
+    }
+    const discountInput = e.target.closest('[data-cart-discount-input]');
+    if (discountInput && e.key === 'Enter') {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      const applyBtn = discountInput.closest('hdt-cart-discount')?.querySelector('[data-cart-discount-apply]');
+      if (applyBtn) applyBtn.click();
+    }
+  }, true);
+
+  document.addEventListener('change', e => {
+    const qtyInput = e.target.closest('[data-qty-input]');
+    if (qtyInput) {
+      const item = qtyInput.closest('[data-line-item]');
+      if (item) {
+        changeQuantity(item.dataset.key, qtyInput.value, item);
+      }
+    }
+  });
+
   document.addEventListener('submit',async e=>{
     const form=e.target;
     if(form.action&&form.action.includes('/cart/add')){
@@ -1513,7 +1570,7 @@ function reRenderRelatedWithNewCurrency() {
       const variantInput=form.querySelector('[name="id"]'); const qtyInput=form.querySelector('[name="quantity"]'); const submitBtn=form.querySelector('[type="submit"][name="add"]');
       if(!variantInput)return;
       const result=await addToCart(variantInput.value,qtyInput?qtyInput.value:1,submitBtn);
-      if(result.success){if(isQuickViewOpen)closeQuickView();setTimeout(openDrawer,300);if(submitBtn)setTimeout(()=>submitBtn.textContent='Add to cart',1500);}
+      if(result.success){if(isQuickViewOpen)closeQuickView();setTimeout(openDrawer,300);if(submitBtn)setTimeout(()=>submitBtn.textContent='{{ 'products.product.add_to_cart' | t }}',1500);}
     }
   },true);
 
@@ -1534,7 +1591,7 @@ function reRenderRelatedWithNewCurrency() {
   async function fetchAndCacheProducts(){
     if(Object.keys(productCache).length>0)return;
     try{
-      const response=await fetch('/products.json?limit=250'); const data=await response.json();
+      const response=await fetch(_root + '/products.json?limit=250'); const data=await response.json();
       data.products.forEach(p=>{productCache[p.id.toString()]=p;productCache[p.handle]=p;});
     }catch(e){console.error('Error fetching products:',e);}
   }
@@ -1555,6 +1612,7 @@ function reRenderRelatedWithNewCurrency() {
     const discountSection=document.querySelector('.hdt-cart-discount-section');
     if(discountSection){
       const discountObserver=new MutationObserver(()=>{
+        if (window._isInternalCartUpdate) return;
         clearTimeout(window._discountRefreshTimer);
         window._discountRefreshTimer=setTimeout(refreshCart,700);
       });
@@ -1575,7 +1633,7 @@ function reRenderRelatedWithNewCurrency() {
     });
 
     setTimeout(()=>{
-      fetch('/cart.js').then(r=>r.json()).then(cart=>{
+      fetch(_root + '/cart.js').then(r=>r.json()).then(cart=>{
         updateShippingBar(cart.items_subtotal_price);
       }).catch(()=>{});
     },900);

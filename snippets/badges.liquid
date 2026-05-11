@@ -24,13 +24,14 @@
   assign has_sold_out = false
   if use_variant
     assign target = product.selected_or_first_available_variant
+    assign available = target.available | default: false
     if target.inventory_management == 'shopify' and target.inventory_quantity <= 0 and target.available
       assign is_pre_order = true
     endif
   else
     assign target = product.variants | first
+    assign available = product.available | default: false
   endif
-  assign available = target.available | default: false
   if product.available
     assign variants_available = product.variants | where: 'available'
     assign variants_inventory_shopify = variants_available | where: 'inventory_management', 'shopify'

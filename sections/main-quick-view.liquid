@@ -24,8 +24,91 @@
   {%- endif -%}
 {%- endif -%}
 
+<style>
+  /* ---- Quick View layout-stability fixes ----
+     Strengthen the existing dialog hiding rule by also collapsing the custom-element
+     wrappers (hdt-popover / hdt-modal) when they have no open dialog. Without this,
+     after a variant change re-renders the info column, these wrappers can briefly
+     contribute their default block height to the scroll container, producing the
+     "empty space after Add to cart" gap and the extra space at the bottom. */
+  .hdt-main-product-quick-view hdt-popover,
+  .hdt-main-product-quick-view hdt-modal {
+    display: contents;
+  }
+  /* When the inner dialog is open, the custom element needs to participate in
+     layout again so the dialog can use it as its positioning context. */
+  .hdt-main-product-quick-view hdt-popover:has(> dialog[open]),
+  .hdt-main-product-quick-view hdt-modal:has(> dialog[open]) {
+    display: block;
+  }
+  /* Belt-and-suspenders: ensure the info-list height tracks its content tightly
+     so a re-rendered variant section can't leave residual height behind. */
+  .hdt-main-product-quick-view .hdt-product-info__list {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+</style>
+<script>
+  // Inject &variant=<id> into the Quick View / Quick Add section-render fetch
+  // when the triggering button carries a `variant` attribute. Without this,
+  // Shopify renders the section with selected_or_first_available_variant — which
+  // can show a different price than the product card (e.g. card shows price_min
+  // for products where prices vary across variants).
+  (function() {
+    if (window.__hdtQVFetchPatched) return;
+    window.__hdtQVFetchPatched = true;
+    const origFetch = window.fetch.bind(window);
+    const productSectionRe = /\/products\/[^/?#]+\?(?:[^#]*&)?section_id=/;
+    window.fetch = function(input, init) {
+      try {
+        const url = typeof input === 'string' ? input : (input && input.url) || '';
+        if (productSectionRe.test(url) && !/[?&]variant=/.test(url)) {
+          const btn = document.querySelector(
+            '[aria-controls="hdt-quick-view-modal"][aria-busy="true"][variant],' +
+            '[aria-controls="hdt-quick-add-modal"][aria-busy="true"][variant]'
+          );
+          const variantId = btn && btn.getAttribute('variant');
+          if (variantId) {
+            const newUrl = url + '&variant=' + encodeURIComponent(variantId);
+            if (typeof input === 'string') return origFetch(newUrl, init);
+            return origFetch(new Request(newUrl, input), init);
+          }
+        }
+      } catch (_) { /* fall through to original fetch */ }
+      return origFetch(input, init);
+    };
+  })();
+</script>
 <script>
   (function() {
+    // Reset scroll & force reflow on variant change inside Quick View.
+    // - Without scrollTop = 0, the info list keeps its prior scroll position
+    //   after the section re-renders, which hides the product title.
+    // - Forcing a reflow clears any stale height from popover/modal wrappers
+    //   that were open before the re-render.
+    if (!window.hdtQVVariantSyncBound) {
+      document.addEventListener('variant:change', function(e) {
+        const modal = document.getElementById('hdt-quick-view-modal');
+        if (!modal) return;
+        const isOpen = modal.hasAttribute('open') || modal.open;
+        if (!isOpen) return;
+        if (!modal.contains(e.target)) return;
+
+        // Wait one frame so the section-render swap finishes before we measure.
+        requestAnimationFrame(function() {
+          const list = modal.querySelector('.hdt-product-info__list');
+          if (!list) return;
+          list.scrollTop = 0;
+          // Toggle a no-op style to force layout recalculation.
+          const prev = list.style.minHeight;
+          list.style.minHeight = '0px';
+          void list.offsetHeight;
+          list.style.minHeight = prev;
+        });
+      });
+      window.hdtQVVariantSyncBound = true;
+    }
+
     // 1. Global Reset Function (Ensures buttons work on every click)
     // We define this on window to keep it consistent across AJAX reloads
     window.hdtResetQuickView = window.hdtResetQuickView || function(e) {

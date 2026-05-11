@@ -27,21 +27,19 @@
     }
 
     /* 2. Style the new permanent horizontal swatch list */
-    .hdt-color-picker-wrapper.js-color-picker,
-    .hdt-card-product__media .hdt-color-picker-wrapper.js-color-picker {
-      position: absolute !important;
-      top: 10px !important;
-      left: 10px !important;
-      z-index: 50 !important;
+    .hdt-color-picker-wrapper.js-color-picker {
+      position: relative !important;
+      z-index: 5 !important;
       display: flex !important;
       opacity: 1 !important;
       visibility: visible !important;
       pointer-events: auto !important;
-      background: rgba(255, 255, 255, 0.9) !important;
-      backdrop-filter: blur(4px) !important;
-      padding: 5px !important;
-      border-radius: 20px !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+      background: transparent !important;
+      backdrop-filter: none !important;
+      padding: 0 !important;
+      margin:0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
       transform: none !important;
       transition: all 0.3s ease !important;
     }
@@ -49,6 +47,7 @@
     .hdt-color-picker-colors {
       display: flex !important;
       flex-direction: row !important; /* Horizontal layout */
+      flex-wrap: wrap !important;
       align-items: center !important;
       gap: 6px !important;
       opacity: 1 !important;
@@ -57,30 +56,30 @@
 
     .hdt-color-swatch-item {
       position: relative !important;
-      width: 26px !important;
-      height: 26px !important;
+      width: 24px !important;
+      height: 24px !important;
       border-radius: 50% !important;
       cursor: pointer !important;
-      border: 2px solid transparent !important;
+      border: 1px solid #e8e8e8 !important;
       transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
       display: block !important;
     }
 
     .hdt-color-swatch-item:hover {
-      transform: scale(1.2) !important;
+      transform: scale(1.1) !important;
     }
 
     .hdt-color-swatch-item.is-selected {
       border-color: #0047AB !important; /* Premium blue accent */
-      transform: scale(1.1) !important;
+      border-width: 2px !important;
     }
 
     .hdt-color-swatch-item .color-bg {
       position: absolute !important;
-      top: 1px !important;
-      left: 1px !important;
-      right: 1px !important;
-      bottom: 1px !important;
+      top: 2px !important;
+      left: 2px !important;
+      right: 2px !important;
+      bottom: 2px !important;
       border-radius: 50% !important;
       background-color: var(--swatch-color, #ccc);
       background-image: var(--swatch-image, none);
@@ -89,14 +88,9 @@
     }
 
     @media (max-width: 768px) {
-      .hdt-color-picker-wrapper.js-color-picker {
-        top: 6px !important;
-        left: 6px !important;
-        padding: 4px !important;
-      }
       .hdt-color-swatch-item {
-        width: 22px !important;
-        height: 22px !important;
+        width: 20px !important;
+        height: 20px !important;
       }
     }
   </style>
@@ -147,12 +141,29 @@
              {%- endif -%}
           {%- else -%}
             {%- case color_handle -%}
-              {%- when 'black' -%} --swatch-color: #000;
-              {%- when 'white' -%} --swatch-color: #fff;
+              {%- when 'black', 'noir', 'nero', 'negro', 'zwart' -%} --swatch-color: #000;
+              {%- when 'white', 'blanc', 'bianco', 'blanco', 'wit' -%} --swatch-color: #fff;
               {%- when 'pc-brown' -%} --swatch-color: #4d3326;
-              {%- when 'hot-dip-galvanised', 'galvanised', 'silver' -%} --swatch-color: #9BA4A9;
+              {%- when 'hot-dip-galvanised', 'galvanised', 'silver', 'argent', 'plata', 'zilver' -%} --swatch-color: #9BA4A9;
+              {%- when 'grey', 'gray', 'gris', 'grigio', 'grijs' -%} --swatch-color: #808080;
+              {%- when 'red', 'rouge', 'rosso', 'rojo', 'rood' -%} --swatch-color: #ff0000;
+              {%- when 'blue', 'bleu', 'blu', 'azul', 'blauw' -%} --swatch-color: #0000ff;
+              {%- when 'green', 'vert', 'verde', 'groen' -%} --swatch-color: #008000;
+              {%- when 'yellow', 'jaune', 'giallo', 'amarillo', 'geel' -%} --swatch-color: #ffff00;
+              {%- when 'orange', 'arancio', 'naranja' -%} --swatch-color: #ffa500;
+              {%- when 'brown', 'marron', 'marrone', 'marrón', 'bruin' -%} --swatch-color: #a52a2a;
               {%- else -%} --swatch-color: #cccccc;
             {%- endcase -%}
+          {%- endif -%}
+        {%- endcapture -%}
+
+        {%- capture price_html -%}
+          {%- assign money_price = variant_first.price | money -%}
+          {%- if money_price contains '.' -%}
+            {%- assign parts = money_price | split: '.' -%}
+            {{ parts[0] }}.<span class="hdt-price__decimal">{{ parts[1] | slice: 0, 2 }}</span>
+          {%- else -%}
+            {{ money_price }}
           {%- endif -%}
         {%- endcapture -%}
 
@@ -160,7 +171,8 @@
              title="{{ color | escape }}" 
              style="{{ swatch_style | strip_newlines }}"
              data-variant-id="{{ variant_first.id }}"
-             data-image-src="{{ variant_image_url }}">
+             data-image-src="{{ variant_image_url }}"
+             data-price-html='{{ price_html | strip }}'>
           <span class="color-bg"></span>
         </div>
       {%- endfor -%}
@@ -175,19 +187,27 @@
       function performImageSwap(card, imageUrl, variantId) {
         if (!card) return;
 
+        /* Strip query string and Shopify size suffix (_300x.jpg, _500x500.jpg)
+           so URLs that point to the same source image match across sizes. */
+        function baseName(url) {
+          if (!url) return '';
+          var clean = url.split('?')[0].toLowerCase();
+          var name = clean.split('/').pop();
+          return name.replace(/_\d+x(\d+)?(\.\w+)$/, '$2');
+        }
+
         function updateDOM(url) {
           if (!url || url.trim() === '') return;
-          
+
           /* A. Handle Slider Cards */
           var track = card.querySelector('.mobile-slider-track');
           var swipedSlider = false;
-          
+
           if (track) {
             var slides = track.querySelectorAll('.mobile-slider-slide img');
-            var fileNamePart = url.split('/').pop().split('?')[0].toLowerCase();
+            var target = baseName(url);
             for (var i = 0; i < slides.length; i++) {
-              var slideSrc = (slides[i].src || '').toLowerCase();
-              if (slideSrc.includes(fileNamePart)) {
+              if (baseName(slides[i].src) === target) {
                 track.scrollTo({ left: i * track.offsetWidth, behavior: 'smooth' });
                 swipedSlider = true;
                 break;
@@ -243,12 +263,35 @@
         }
       }
 
+      /* Sync the card's price element to the initially-selected swatch's
+         data-price-html so the price on refresh matches what a swatch click
+         would show. card-price.liquid renders product.price / price_min,
+         which can differ from the selected variant's actual price. */
+      function syncInitialPrice(card, picker) {
+        if (!card) return;
+        var selected = picker.querySelector('.js-permanent-swatch.is-selected')
+                    || picker.querySelector('.js-permanent-swatch');
+        if (!selected) return;
+        var priceHtml = selected.getAttribute('data-price-html');
+        if (!priceHtml) return;
+        var priceEl = card.querySelector('.js-card-price');
+        if (!priceEl) return;
+        if (priceEl.innerHTML.trim() === priceHtml.trim()) return;
+        priceEl.innerHTML = priceHtml;
+        if (window.Taxify && typeof window.Taxify.rescanAllElements === 'function') {
+          window.Taxify.rescanAllElements();
+        }
+        document.dispatchEvent(new CustomEvent('recently-viewed:loaded'));
+      }
+
       function initPermanentSwatches() {
         document.querySelectorAll('.js-color-picker:not([data-hdt-processed])').forEach(picker => {
           picker.dataset.hdtProcessed = 'true';
           /* Find parent card element regardless of specific template structure */
           var card = picker.closest('hdt-card-product') || picker.closest('.hdt-card-product') || picker.closest('.hdt-product-item');
-          
+
+          syncInitialPrice(card, picker);
+
           picker.querySelectorAll('.js-permanent-swatch').forEach(swatch => {
             swatch.onclick = function(e) {
               e.preventDefault();
@@ -259,7 +302,23 @@
               
               var targetImg = this.getAttribute('data-image-src');
               var variantId = this.getAttribute('data-variant-id');
+              var priceHtml = this.getAttribute('data-price-html');
+              
               performImageSwap(card, targetImg, variantId);
+              
+              /* Update price on card */
+              if (priceHtml && card) {
+                var priceEl = card.querySelector('.js-card-price');
+                if (priceEl) {
+                  priceEl.innerHTML = priceHtml;
+                  /* Trigger Taxify rescan if available */
+                  if (window.Taxify && typeof window.Taxify.rescanAllElements === 'function') {
+                    window.Taxify.rescanAllElements();
+                  }
+                  /* Trigger decimal formatter if available */
+                  document.dispatchEvent(new CustomEvent('recently-viewed:loaded'));
+                }
+              }
             };
           });
         });

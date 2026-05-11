@@ -261,8 +261,7 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
   /* Show overlays when tapped */
   .card-2 .hdt-card-product__media.mobile-tapped .hdt-pr-btns-group1,
   .card-2 .hdt-card-product__media.mobile-tapped .hdt-pr-btns-group2.compare_absol_btn,
-  .card-2 .hdt-card-product__media.mobile-tapped .hdt-badge__wrapp,
-  .card-2 .hdt-card-product__media.mobile-tapped .hdt-color-picker-wrapper {
+  .card-2 .hdt-card-product__media.mobile-tapped .hdt-badge__wrapp {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
@@ -353,16 +352,7 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
             {%- endif -%}
           {%- endfor -%}
         </div>
-         {%- liquid
-            if color_count > 0
-              render 'color-list', section_id: section_id, color_picker_btnicon: settings.color_picker_btnicon, product: card_product, product_url: product_url, color_variants: color_variants, color_variants_avai: color_variants_avai, color_count: color_count, color_option_index: color_option_index, placement: 'top'
-            endif
-          -%}
-          {%- if color_count > 0 -%}
-          <style>
-                  .card-{{ card_product.id }} .hdt-card-product__wrapper .hdt-badge__wrapp { left: 50px !important; }
-          </style>
-  {% endif %}
+
         {%- render 'badges', product: card_product, use_variant: false -%}
         <div class="hdt-product-btns aa hdt-pr-btns-group2 hdt-absolute compare_absol_btn">
           {%- liquid
@@ -428,38 +418,45 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
           <div class="rating">{{ rating_value }}</div>  
         </div>
         <div class="areviews_product_item areviews_stars{{ card_product.id }}" data-product-id="{{ card_product.id }}"></div>
+        {%- liquid
+          if color_count > 0
+            render 'color-list', section_id: section_id, color_picker_btnicon: settings.color_picker_btnicon, product: card_product, product_url: product_url, color_variants: color_variants, color_variants_avai: color_variants_avai, color_count: color_count, color_option_index: color_option_index, placement: 'top'
+          endif
+        -%}
 
         <a data-pr-url href="{{ product_url }}" class="hdt-card-product__title hdt-text-{{ settings.pr_title_size }} hdt-font-{{ settings.pr_title_weight }} {% if settings.hdt_show_long_title == false %} hdt-line-clamp {% endif %}" data-instant>{{ card_product.title | escape }}</a>
         <div class="ict-wrapper">
-        <div class="ict-1">
-  <svg class="ict-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>
-    <path d="M6.66671 10L9.16671 12.5L13.3334 7.5" stroke="black" stroke-width="1.45833"/>
-  </svg>
-  <div class="ict-text">
-    {%- if card_product.variants.first.available == false -%}
-      Out of Stock
-    {%- elsif card_product.metafields.custom.card_product_text != blank -%}
-      {{ card_product.metafields.custom.card_product_text }}
-    {%- else -%}
-      In Stock, Same day shipping
-    {%- endif -%}
+  {%- assign current_variant =  card_product.variants.first -%}
+  <div class="ict-1">
+    <svg class="ict-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>
+      <path d="M6.66671 10L9.16671 12.5L13.3334 7.5" stroke="black" stroke-width="1.45833"/>
+    </svg>
+    <div class="ict-text">
+      {%- if card_product.available == false -%}
+        {{ 'products.product.sold_out' | t }}
+      {%- elsif current_variant.metafields.custom.variant_usps.value != blank -%}
+        {{ current_variant.metafields.custom.variant_usps.value }}
+      {%- else -%}
+        {{ 'products.product.in_stock_shipping' | t }}
+      {%- endif -%}
+    </div>
+  </div>
+  
+  <div class="ict-2">
+    <svg class="ict-icon-2" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>
+      <path d="M6.66671 10L9.16671 12.5L13.3334 7.5" stroke="black" stroke-width="1.45833"/>
+    </svg>
+    <div class="ict-text">
+      {% if current_variant.metafields.custom.variant_usps_second.value != blank %}
+        {{ current_variant.metafields.custom.variant_usps_second.value }}
+      {% else %} 
+        {{ 'products.product.certified_quality' | t }}
+      {% endif %}
+    </div>
   </div>
 </div>
-          <div class="ict-2">
-            <svg class="ict-icon-2" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>
-              <path d="M6.66671 10L9.16671 12.5L13.3334 7.5" stroke="black" stroke-width="1.45833"/>
-            </svg>
-            <div class="ict-text">
-              {% if card_product.metafields.custom.card_product_text_2 != blank %}
-                {{ card_product.metafields.custom.card_product_text_2 }}
-              {% else %} 
-                Certified Quality
-              {% endif %}
-            </div>
-          </div>
-        </div>
         <div class="price-with-badge">
           {%- liquid
             render 'card-price', product: card_product, show_volume_note: true, price_class: "hdt-text-base hdt-font-semibold"
@@ -641,123 +638,6 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
       if (c !== except) c.classList.remove('mobile-tapped');
     });
   }
-
-  /* ===== COLOR PICKER → VARIANT IMAGE CHANGE ===== */
-  document.addEventListener('click', function(e) {
-    if (!isMobile()) return;
-
-    // Match the label.hdt-color-swatch or anything inside it
-    var swatch = e.target.closest('.hdt-color-swatch, .hdt-color-picker__item, .hdt-color-picker__btn');
-    if (!swatch) return;
-
-    var cardProduct = swatch.closest('hdt-card-product');
-    if (!cardProduct) return;
-
-    var track = cardProduct.querySelector('.mobile-slider-track');
-    if (!track) return;
-
-    // Get the input inside the swatch - it has data-image and data-variant-id
-    var input = swatch.querySelector('input[data-image]') || swatch.querySelector('input[data-variant-id]');
-    
-    // Also check if clicked element itself has data-image
-    var dataImage = null;
-    var variantId = null;
-
-    if (input) {
-      dataImage = input.getAttribute('data-image');
-      variantId = input.getAttribute('data-variant-id');
-    }
-
-    // Fallback: check swatch itself or parent
-    if (!dataImage) {
-      dataImage = swatch.getAttribute('data-image') || e.target.getAttribute('data-image');
-    }
-
-    // METHOD 1: Direct image URL from data-image attribute (fastest, no API call needed)
-    if (dataImage) {
-      // Clean URL and find matching slide by comparing image src
-      var cleanUrl = dataImage.replace(/^\/\//, 'https://').split('?')[0].toLowerCase();
-      
-      var slides = track.querySelectorAll('.mobile-slider-slide');
-      var matched = false;
-
-      for (var i = 0; i < slides.length; i++) {
-        var slideImg = slides[i].querySelector('img');
-        if (!slideImg) continue;
-        var slideSrc = (slideImg.getAttribute('src') || '').split('?')[0].toLowerCase();
-        
-        // Compare the filename portion
-        var dataFilename = cleanUrl.split('/').pop();
-        var slideFilename = slideSrc.split('/').pop();
-        
-        if (dataFilename && slideFilename && dataFilename === slideFilename) {
-          track.scrollTo({ left: i * track.offsetWidth, behavior: 'smooth' });
-          matched = true;
-          break;
-        }
-      }
-
-      // Also update the main (desktop) image
-      var mainImg = cardProduct.querySelector('.hdt-card-product__media--main');
-      if (mainImg) {
-        var newSrc = dataImage.replace(/^\/\//, 'https://');
-        mainImg.setAttribute('src', newSrc);
-        mainImg.setAttribute('srcset', '');
-      }
-
-      // If no slide matched by filename, try API fallback
-      if (!matched && variantId) {
-        var handle = cardProduct.getAttribute('data-product-handle');
-        if (handle) {
-          fetch('/products/' + handle + '.js')
-            .then(function(res) { return res.json(); })
-            .then(function(data) {
-              for (var v = 0; v < data.variants.length; v++) {
-                if (String(data.variants[v].id) === String(variantId) && data.variants[v].featured_media) {
-                  var mediaId = data.variants[v].featured_media.id;
-                  var targetSlide = track.querySelector('[data-media-id="' + mediaId + '"]');
-                  if (targetSlide) {
-                    track.scrollTo({ left: parseInt(targetSlide.dataset.slideIndex) * track.offsetWidth, behavior: 'smooth' });
-                  }
-                  break;
-                }
-              }
-            })
-            .catch(function() {});
-        }
-      }
-      return;
-    }
-
-    // METHOD 2: No data-image, use variant-id + API
-    if (variantId) {
-      var handle = cardProduct.getAttribute('data-product-handle');
-      if (!handle) return;
-
-      fetch('/products/' + handle + '.js')
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          for (var v = 0; v < data.variants.length; v++) {
-            if (String(data.variants[v].id) === String(variantId) && data.variants[v].featured_media) {
-              var mediaId = data.variants[v].featured_media.id;
-              var targetSlide = track.querySelector('[data-media-id="' + mediaId + '"]');
-              if (targetSlide) {
-                track.scrollTo({ left: parseInt(targetSlide.dataset.slideIndex) * track.offsetWidth, behavior: 'smooth' });
-              }
-              if (data.variants[v].featured_media.preview_image) {
-                var mainImg = cardProduct.querySelector('.hdt-card-product__media--main');
-                if (mainImg) {
-                  mainImg.setAttribute('src', data.variants[v].featured_media.preview_image.src);
-                  mainImg.setAttribute('srcset', '');
-                }
-              }
-              break;
-            }
-          }
-        })
-        .catch(function(err) { console.warn('Color picker fetch error:', err); });
-    }
-  });
 
   /* ===== INIT ===== */
   if (document.readyState === 'loading') {

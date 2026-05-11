@@ -6,6 +6,20 @@
   - Proper height handling
 {%- endcomment -%}
 
+<style>
+  /* Prevent FOUC: Hide mega dropdown immediately until main CSS loads */
+  .hdt-mega-dropdown {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .hdt-mega-dropdown.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+</style>
+
 <div class="hdt-list-categories md hdt-relative">
   <!-- Trigger Button -->
   <a href="#" class="hdt-categories-title hdt-flex hdt-align-center hdt-text-base hdt-font-medium hdt-radius-lg" id="hdt-mega-trigger">
@@ -80,7 +94,7 @@
             {% if section.settings.promo_image_1 != blank %}
             <a href="{{ section.settings.promo_link_1 | default: '#' }}" class="hdt-promo-card">
               <div class="hdt-promo-img">
-                {{ section.settings.promo_image_1 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {{ section.settings.promo_image_1 | image_url: width: 400 | image_tag: loading: 'eager' }}
                 {% if section.settings.promo_text_1 != blank %}
                 <div class="hdt-promo-text">{{ section.settings.promo_text_1 }}</div>
                 {% endif %}
@@ -91,7 +105,7 @@
             {% if section.settings.promo_image_2 != blank %}
             <a href="{{ section.settings.promo_link_2 | default: '#' }}" class="hdt-promo-card">
               <div class="hdt-promo-img">
-                {{ section.settings.promo_image_2 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {{ section.settings.promo_image_2 | image_url: width: 400 | image_tag: loading: 'eager' }}
                 {% if section.settings.promo_text_2 != blank %}
                 <div class="hdt-promo-text">{{ section.settings.promo_text_2 }}</div>
                 {% endif %}
@@ -102,7 +116,7 @@
             {% if section.settings.promo_image_3 != blank %}
             <a href="{{ section.settings.promo_link_3 | default: '#' }}" class="hdt-promo-card">
               <div class="hdt-promo-img">
-                {{ section.settings.promo_image_3 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {{ section.settings.promo_image_3 | image_url: width: 400 | image_tag: loading: 'eager' }}
                 {% if section.settings.promo_text_3 != blank %}
                 <div class="hdt-promo-text">{{ section.settings.promo_text_3 }}</div>
                 {% endif %}
@@ -113,7 +127,7 @@
             {% if section.settings.promo_image_4 != blank %}
             <a href="{{ section.settings.promo_link_4 | default: '#' }}" class="hdt-promo-card">
               <div class="hdt-promo-img">
-                {{ section.settings.promo_image_4 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {{ section.settings.promo_image_4 | image_url: width: 400 | image_tag: loading: 'eager' }}
                 {% if section.settings.promo_text_4 != blank %}
                 <div class="hdt-promo-text">{{ section.settings.promo_text_4 }}</div>
                 {% endif %}
@@ -124,7 +138,7 @@
             {% if section.settings.promo_image_5 != blank %}
             <a href="{{ section.settings.promo_link_5 | default: '#' }}" class="hdt-promo-card">
               <div class="hdt-promo-img">
-                {{ section.settings.promo_image_5 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {{ section.settings.promo_image_5 | image_url: width: 400 | image_tag: loading: 'eager' }}
                 {% if section.settings.promo_text_5 != blank %}
                 <div class="hdt-promo-text">{{ section.settings.promo_text_5 }}</div>
                 {% endif %}
@@ -135,7 +149,7 @@
             {% if section.settings.promo_image_6 != blank %}
             <a href="{{ section.settings.promo_link_6 | default: '#' }}" class="hdt-promo-card">
               <div class="hdt-promo-img">
-                {{ section.settings.promo_image_6 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {{ section.settings.promo_image_6 | image_url: width: 400 | image_tag: loading: 'eager' }}
                 {% if section.settings.promo_text_6 != blank %}
                 <div class="hdt-promo-text">{{ section.settings.promo_text_6 }}</div>
                 {% endif %}
@@ -146,7 +160,7 @@
             {% if section.settings.promo_image_7 != blank %}
             <a href="{{ section.settings.promo_link_7 | default: '#' }}" class="hdt-promo-card">
               <div class="hdt-promo-img">
-                {{ section.settings.promo_image_7 | image_url: width: 400 | image_tag: loading: 'lazy' }}
+                {{ section.settings.promo_image_7 | image_url: width: 400 | image_tag: loading: 'eager' }}
                 {% if section.settings.promo_text_7 != blank %}
                 <div class="hdt-promo-text">{{ section.settings.promo_text_7 }}</div>
                 {% endif %}

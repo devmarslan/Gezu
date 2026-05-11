@@ -11,13 +11,27 @@
   Usage:
   {%- render 'btn-quick-view', product: card_product, section_id: section_id -%}
 {%- endcomment -%}
- {% liquid
+ {%- liquid
   if section.id contains 'quick-add' or section.id contains 'quick-view' or section.id contains 'search' or section.id contains 'cart-drawer' or section.id contains 'header'
     assign inner_tooltip = true
-  endif 
- %}
+  endif
+
+  # Find the variant whose price matches what the product card displays.
+  # card-price.liquid shows product.price_min when price_varies — without this,
+  # Quick View opens with selected_or_first_available_variant (which can be a
+  # more expensive variant), making the QV price not match the card price.
+  assign qv_variant_id = ''
+  if product.price_varies
+    for _v in product.variants
+      if _v.available and _v.price == product.price_min
+        assign qv_variant_id = _v.id
+        break
+      endif
+    endfor
+  endif
+-%}
 <div class="hdt-card-product__btn-qv hdt-theme-quick-view-wrapper" placement="{{ placement | default: 'none' }}" {% if inner_tooltip %} inner{% endif %}>
-  <button type="button" handle="{{ product.handle }}" aria-controls="hdt-quick-view-modal" aria-expanded="false" class="hdt-card-product__btn-quick-view hdt-theme-quick-view-btn {{ class }}" placement="{{ placement | default: 'none' }}" {{ attr }}>
+  <button type="button" handle="{{ product.handle }}"{% if qv_variant_id != blank %} variant="{{ qv_variant_id }}"{% endif %} aria-controls="hdt-quick-view-modal" aria-expanded="false" class="hdt-card-product__btn-quick-view hdt-theme-quick-view-btn {{ class }}" placement="{{ placement | default: 'none' }}" {{ attr }}>
     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><use xlink:href="#hdt-icon-quickview"></use></svg>
     <span {% unless disable_sr_only %}class="sr-only"{% endunless %}>{{ 'products.product.quick_view' | t }}</span>
   </button>

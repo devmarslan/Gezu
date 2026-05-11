@@ -79,7 +79,7 @@
                 {%- endif -%}
               </button>
             {% endif %}
-            <a hdt-reveal="slide-in" timeline class="hdt-btn hdt-inline-flex hdt-align-center hdt-justify-center hdt-relative hdt-text-sm hdt-font-semibold" href="{{ collection.url | default: routes.all_products_collection_url }}">
+            <a hdt-reveal="slide-in" timeline class="hdt-view-all-btn hdt-btn hdt-inline-flex hdt-align-center hdt-justify-center hdt-relative hdt-text-sm hdt-font-semibold" href="{{ collection.url | default: routes.all_products_collection_url }}">
               <span class="hdt-relative">{{ 'general.pagination.view_all' | t }}</span>
             </a>
             {% if nav_heading != "disable" %}

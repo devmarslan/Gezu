@@ -1,0 +1,88 @@
+{
+  "general": {
+    "continue_shopping": "Kontynuuj zakupy",
+    "cart": {
+      "view": "Zobacz koszyk ({{ count }})",
+      "view_empty_cart": "Zobacz koszyk",
+      "item_added": "Produkt dodany do koszyka"
+    },
+    "wishlist": {
+      "wishlist_page": "Twoja lista życzeń",
+      "wishlist_text": "Lista życzeń",
+      "login_to_use_wishlist": "Zaloguj się, aby korzystać z listy życzeń",
+      "add_to_wishlist": "Dodaj do listy życzeń",
+      "adding_to_wishlist": "Dodawanie do listy życzeń",
+      "browse_wishlist": "Przeglądaj listę życzeń",
+      "remove_wishlist": "Usuń z listy życzeń",
+      "empty_wishlist": "Lista życzeń jest pusta.",
+      "empty_info_wishlist": "Nie masz jeszcze żadnych produktów na liście życzeń. Znajdziesz wiele interesujących produktów na naszej stronie sklepu."
+    },
+    "compare": {
+      "compare_text": "Porównaj",
+      "login_to_use_compare": "Zaloguj się, aby porównać",
+      "add_to_compare": "Dodaj do porównania",
+      "compare": "Porównaj",
+      "browse_compare": "Przeglądaj porównania"
+    },
+    "breadcrumb": {
+      "home": "Strona główna"
+    }
+  },
+  "sections": {
+    "cart": {
+      "title": "Twój koszyk",
+      "remove": "Usuń",
+      "subtotal": "Suma częściowa",
+      "checkout": "Przejdź do kasy",
+      "empty": "Twój koszyk jest pusty",
+      "return_shop": "Wróć do sklepu",
+      "often_bought_together": "Często kupowane razem",
+      "items_not_reserved": "Twoje produkty nie są zarezerwowane,",
+      "checkout_quickly": "dokończ zakup szybko, aby ich nie przegapić.",
+      "cart_empty_text": "Wygląda na to, że nic jeszcze nie dodałeś",
+      "inc_vat": "Z VAT",
+      "delivery": "Dostawa",
+      "estimated_tax": "Szacowany podatek",
+      "calculated_in_checkout": "Obliczane przy płatności",
+      "agree_with_terms": "Zgadzam się z",
+      "terms_and_conditions": "regulaminem",
+      "proceed_to_checkout": "Przejdź do kasy",
+      "view_cart_caps": "ZOBACZ KOSZYK",
+      "your_wishlist": "Twoja lista życzeń ({{ count }})",
+      "wishlist_empty_title": "Twoja lista życzeń jest pusta",
+      "wishlist_empty_text": "Zapisuj produkty, które kochasz, klikając ikonę zakładki",
+      "browse_products": "Przeglądaj produkty",
+      "view_full_wishlist": "Zobacz pełną listę życzeń",
+      "select_options": "WYBIERZ OPCJE",
+      "no_image": "Brak zdjęcia",
+      "add_to_wishlist": "Dodaj do listy życzeń",
+      "shipping_away_html": "Brakuje Ci <span class=\"cart-drawer-shipping__amount\" data-shipping-remaining>{{ amount }}</span> do darmowej standardowej dostawy",
+      "plus_more": "+{{ count }} więcej",
+      "adding": "Dodawanie...",
+      "added": "Dodano!",
+      "in_wishlist": "Na liście życzeń",
+      "your_wishlist_html": "Twoja lista życzeń ({{ count }})",
+      "wishlist_load_error": "Nie można załadować listy życzeń",
+      "product_load_error": "Nie można załadować produktu",
+      "return_30_days": "30 dni na zwrot",
+      "quick_view": "Szybki podgląd",
+      "certified_quality": "Certyfikowana jakość",
+      "lowest_delivery": "Najtańsza dostawa",
+      "vat_validation_title": "Walidacja numeru VAT UE",
+      "vat_deducted_text": "(VAT zostanie odliczony w następnym kroku)",
+      "vat_id_placeholder": "Numer VAT UE",
+      "email_label": "E-mail",
+      "item_subtotal": "Suma produktów",
+      "apply_discount": "Zastosuj rabat",
+      "discount_error": "Wprowadź poprawny kod rabatowy",
+      "error_try_again": "Błąd - spróbuj ponownie"
+    }
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Dodaj do koszyka",
+      "sold_out": "Wyprzedane",
+      "unavailable": "Niedostępne"
+    }
+  }
+}

@@ -234,6 +234,28 @@
     }
     #shopify-section-{{section.id}} .hdt-slider__button {display:flex;}
   }
+  #shopify-section-{{section.id}} a.hdt-view-all-btn.hdt-btn:hover {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  #shopify-section-{{section.id}} a.hdt-view-all-btn.hdt-btn {
+    background: transparent;
+    color: #000;
+    border: none;
+    font-family: Helvetica Neue;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 100%;
+    text-decoration: underline;
+    text-decoration-style: solid;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration-skip-ink: auto;
+    padding: 0;
+  }
+  #shopify-section-{{section.id}} a.hdt-view-all-btn.hdt-btn::after {
+    display: none;
+  }
 </style>
 
 <!-- Custom Smooth Slider Script -->
@@ -658,7 +680,7 @@
     border-radius: 50%;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     cursor: pointer;
-    z-index: 100;
+    z-index: 2;
     display: flex !important;
     align-items: center;
     justify-content: center;
@@ -868,7 +890,7 @@
       "id": "sec_heading_spacing",
       "min": 0, "max": 100, "step": 1, "unit": "px",
       "label": "t:sections.all.sec_heading_spacing",
-      "default": 30
+      "default": 15
     },
     {
       "type": "header",

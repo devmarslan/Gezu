@@ -94,36 +94,38 @@
         <div class="areviews_product_item areviews_stars{{ card_product.id }}" data-product-id="{{ card_product.id }}"></div>
 
         <a data-pr-url href="{{ product_url }}" class="hdt-card-product__title hdt-text-{{ settings.pr_title_size }} hdt-font-{{ settings.pr_title_weight }} hdt-line-clamp" data-instant>{{ card_product.title | escape }}</a>
-        <div class="ict-wrapper">
-     <div class="ict-1">
-  <svg class="ict-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>
-    <path d="M6.66671 10L9.16671 12.5L13.3334 7.5" stroke="black" stroke-width="1.45833"/>
-  </svg>
-  <div class="ict-text">
-    {%- if card_product.variants.first.available == false -%}
-      Out of Stock
-    {%- elsif card_product.metafields.custom.card_product_text != blank -%}
-      {{ card_product.metafields.custom.card_product_text }}
-    {%- else -%}
-      In Stock, Same day shipping
-    {%- endif -%}
+   <div class="ict-wrapper">
+  {%- assign current_variant =  card_product.variants.first -%}
+  <div class="ict-1">
+    <svg class="ict-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>
+      <path d="M6.66671 10L9.16671 12.5L13.3334 7.5" stroke="black" stroke-width="1.45833"/>
+    </svg>
+    <div class="ict-text">
+      {%- if card_product.available == false -%}
+        {{ 'products.product.sold_out' | t }}
+      {%- elsif current_variant.metafields.custom.variant_usps.value != blank -%}
+        {{ current_variant.metafields.custom.variant_usps.value }}
+      {%- else -%}
+        {{ 'products.product.in_stock_shipping' | t }}
+      {%- endif -%}
+    </div>
+  </div>
+  
+  <div class="ict-2">
+    <svg class="ict-icon-2" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>
+      <path d="M6.66671 10L9.16671 12.5L13.3334 7.5" stroke="black" stroke-width="1.45833"/>
+    </svg>
+    <div class="ict-text">
+      {% if current_variant.metafields.custom.variant_usps_second.value != blank %}
+        {{ current_variant.metafields.custom.variant_usps_second.value }}
+      {% else %} 
+        {{ 'products.product.certified_quality' | t }}
+      {% endif %}
+    </div>
   </div>
 </div>
-          <div class="ict-2">
-            <svg class="ict-icon-2" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>
-              <path d="M6.66671 10L9.16671 12.5L13.3334 7.5" stroke="black" stroke-width="1.45833"/>
-            </svg>
-            <div class="ict-text">
-              {% if card_product.metafields.custom.card_product_text_2 != blank %}
-                {{ card_product.metafields.custom.card_product_text_2 }}
-              {% else %} 
-                Certified Quality
-              {% endif %}
-            </div>
-          </div>
-        </div>
         
         {%- render 'card-price', product: card_product, show_volume_note: true -%}
         {%- if card_product.description != blank -%}

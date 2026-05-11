@@ -393,7 +393,7 @@
 
             {%- if section.settings.use_pagination != "none" -%}
               <div data-wrap-lm class="hdt-prs-footer hdt-pagination-wrapp hdt-pagination-{{ section.settings.use_pagination }} hdt-flex hdt-justify-{{ section.settings.paginate_pos }}" timeline hdt-reveal="slide-in" style="--pagination-distance:{{ section.settings.dis_pagination }}px;">
-                  <a class="hdt-view-all-btn hdt-btn hdt-oh hdt-inline-flex hdt-align-center hdt-justify-center hdt-relative hdt-btn-{{ section.settings.btn_style }} hdt-font-{{ section.settings.btn_fw }}"  href="{{ block.settings.collection.url | default: routes.all_products_collection_url }}" hdt-reveal="slide-in" timeline>
+                  <a class="hdt-view-all-btn hdt-btn hdt-oh hdt-inline-flex hdt-align-center hdt-justify-center hdt-relative hdt-btn-{{ section.settings.btn_style }} hdt-font-{{ section.settings.btn_fw }}"  href="{{ block.settings.view_all_url | default: block.settings.collection.url | default: routes.all_products_collection_url }}" hdt-reveal="slide-in" timeline>
                     {% assign view_all_df = 'general.pagination.view_all' | t %}
                     <span>{{ section.settings.btn_label | default: view_all_df | escape }}</span>
                   </a>
@@ -1038,6 +1038,11 @@
     if (!section || !section.contains(tabBtn)) return;
     
     setTimeout(() => {
+      // Update active state for tab buttons
+      const allBtns = section.querySelectorAll('.hdt-tabs-item-title');
+      allBtns.forEach(btn => btn.setAttribute('aria-current', 'false'));
+      tabBtn.setAttribute('aria-current', 'true');
+
       const activeTab = section.querySelector('.hdt-tab-item[tab-selected]');
       if (activeTab) {
         const slider = activeTab.querySelector('.hdt-desktop-slider');
@@ -1762,6 +1767,12 @@
           "id": "product_list",
           "label": "t:sections.collection_products.settings.product_list.label",
           "info": "t:sections.collection_products.settings.product_list.info"
+        },
+        {
+          "type": "url",
+          "id": "view_all_url",
+          "label": "View All URL Override",
+          "info": "Leave blank to use the collection URL. Use this to link to a specific page or filtered collection."
         }
       ]
     },

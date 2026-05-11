@@ -520,6 +520,154 @@ customElements.define("hdt-compare-a", CompareLink);
 // ==========================================
 
 // --------------------------
+// Global swatch engine
+// --------------------------
+// The <script> inside color-list.liquid only fires when that snippet is
+// rendered server-side. On a PDP, related-products and recently-products
+// cards are injected via innerHTML, so their inline scripts never run.
+// This global engine guarantees swatches work on every page.
+(function () {
+  if (window.hdtSwatchEngineActive) return;
+  window.hdtSwatchEngineActive = true;
+
+  function baseName(url) {
+    if (!url) return '';
+    var clean = url.split('?')[0].toLowerCase();
+    var name = clean.split('/').pop();
+    return name.replace(/_\d+x(\d+)?(\.\w+)$/, '$2');
+  }
+
+  function performImageSwap(card, imageUrl, variantId) {
+    if (!card) return;
+
+    function updateDOM(url) {
+      if (!url || url.trim() === '') return;
+
+      var track = card.querySelector('.mobile-slider-track');
+      if (track) {
+        var slides = track.querySelectorAll('.mobile-slider-slide img');
+        var target = baseName(url);
+        for (var i = 0; i < slides.length; i++) {
+          if (baseName(slides[i].src) === target) {
+            track.scrollTo({ left: i * track.offsetWidth, behavior: 'smooth' });
+            break;
+          }
+        }
+      }
+
+      var imgWrap = card.querySelector('.hdt-card-product__media-wrapp')
+        || card.querySelector('.hdt-card-product__media');
+      if (imgWrap) {
+        imgWrap.querySelectorAll('source').forEach(function (s) { s.remove(); });
+        var targetImgs = imgWrap.querySelectorAll(
+          'img.hdt-card-product__media--main, img.hdt-card-product__media--hover, img[class*="main"]'
+        );
+        targetImgs.forEach(function (img) {
+          img.style.opacity = '0.3';
+          img.removeAttribute('srcset');
+          img.removeAttribute('data-srcset');
+          img.removeAttribute('sizes');
+          img.removeAttribute('data-src');
+          img.srcset = '';
+          img.src = url;
+          setTimeout(function () { img.style.opacity = '1'; }, 800);
+        });
+      }
+    }
+
+    if (imageUrl && imageUrl.trim() !== '') {
+      updateDOM(imageUrl);
+    } else if (variantId) {
+      var handle = card.getAttribute('data-product-handle');
+      if (!handle) {
+        var picker = card.querySelector('.js-color-picker');
+        handle = picker ? picker.getAttribute('data-product-handle') : null;
+      }
+      if (handle) {
+        fetch('/products/' + handle + '.js')
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            var v = data.variants.find(function (x) { return String(x.id) === String(variantId); });
+            if (v && v.featured_media && v.featured_media.preview_image) {
+              updateDOM(v.featured_media.preview_image.src);
+            } else if (v && v.featured_image) {
+              updateDOM(v.featured_image.src);
+            }
+          })
+          .catch(function () {});
+      }
+    }
+  }
+
+  function syncInitialPrice(card, picker) {
+    if (!card) return;
+    var selected = picker.querySelector('.js-permanent-swatch.is-selected')
+      || picker.querySelector('.js-permanent-swatch');
+    if (!selected) return;
+    var priceHtml = selected.getAttribute('data-price-html');
+    if (!priceHtml) return;
+    var priceEl = card.querySelector('.js-card-price');
+    if (!priceEl) return;
+    if (priceEl.innerHTML.trim() === priceHtml.trim()) return;
+    priceEl.innerHTML = priceHtml;
+    if (window.Taxify && typeof window.Taxify.rescanAllElements === 'function') {
+      window.Taxify.rescanAllElements();
+    }
+    document.dispatchEvent(new CustomEvent('recently-viewed:loaded'));
+  }
+
+  function initPermanentSwatches() {
+    document.querySelectorAll('.js-color-picker:not([data-hdt-processed])').forEach(function (picker) {
+      picker.dataset.hdtProcessed = 'true';
+      var card = picker.closest('hdt-card-product')
+        || picker.closest('.hdt-card-product')
+        || picker.closest('.hdt-product-item');
+
+      syncInitialPrice(card, picker);
+
+      picker.querySelectorAll('.js-permanent-swatch').forEach(function (swatch) {
+        swatch.onclick = function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          picker.querySelectorAll('.js-permanent-swatch').forEach(function (s) {
+            s.classList.remove('is-selected');
+          });
+          this.classList.add('is-selected');
+          var targetImg = this.getAttribute('data-image-src');
+          var variantId = this.getAttribute('data-variant-id');
+          var priceHtml = this.getAttribute('data-price-html');
+          performImageSwap(card, targetImg, variantId);
+          if (priceHtml && card) {
+            var priceEl = card.querySelector('.js-card-price');
+            if (priceEl) {
+              priceEl.innerHTML = priceHtml;
+              if (window.Taxify && typeof window.Taxify.rescanAllElements === 'function') {
+                window.Taxify.rescanAllElements();
+              }
+              document.dispatchEvent(new CustomEvent('recently-viewed:loaded'));
+            }
+          }
+        };
+      });
+    });
+  }
+
+  // Expose so AJAX injectors can call it explicitly after innerHTML assignment.
+  window.hdtInitSwatches = initPermanentSwatches;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPermanentSwatches);
+  } else {
+    initPermanentSwatches();
+  }
+  document.addEventListener('shopify:section:load', initPermanentSwatches);
+  new MutationObserver(initPermanentSwatches).observe(document.body || document.documentElement, {
+    childList: true,
+    subtree: true
+  });
+})();
+
+// --------------------------
 // Product Recommendations
 // --------------------------
 class ProductRecommendations extends HTMLElement {
@@ -541,6 +689,10 @@ class ProductRecommendations extends HTMLElement {
 
           if (recommendations && recommendations.innerHTML.trim().length) {
             this.innerHTML = recommendations.innerHTML;
+            if (typeof window.hdtInitSwatches === 'function') window.hdtInitSwatches();
+            document.querySelector('hdt-tmp-quick')?.dispatchEvent(
+              new CustomEvent('theme:update:id', { bubbles: false })
+            );
           }
           document.dispatchEvent(new CustomEvent("currency:update"));
         })
@@ -571,9 +723,20 @@ class ProductRecently extends HTMLElement {
       let handleProducts = localStorage.getItem("theme4:recently:id");
       let prdId = this.dataset.id;
 
-      if (handleProducts !== null) {
-        let products = handleProducts.split(',');
-        let url = this.dataset.url.replace('q=', 'q=id:' + products.join("%20OR%20id:"));
+      let arrayProducts = handleProducts ? handleProducts.split(',').filter(Boolean) : [];
+      
+      if (prdId) {
+        if (!arrayProducts.includes(prdId + '')) {
+          if (arrayProducts.length >= 10) {
+            arrayProducts.pop();
+          }
+          arrayProducts.unshift(prdId);
+          localStorage.setItem("theme4:recently:id", arrayProducts.join(','));
+        }
+      }
+
+      if (arrayProducts.length > 0) {
+        let url = this.dataset.url.replace('q=', 'q=id:' + arrayProducts.join("%20OR%20id:"));
         fetch(url)
           .then((response) => response.text())
           .then((text) => {
@@ -583,27 +746,16 @@ class ProductRecently extends HTMLElement {
 
             if (recently && recently.innerHTML.trim().length) {
               this.innerHTML = recently.innerHTML;
+              if (typeof window.hdtInitSwatches === 'function') window.hdtInitSwatches();
+              document.querySelector('hdt-tmp-quick')?.dispatchEvent(
+                new CustomEvent('theme:update:id', { bubbles: false })
+              );
             }
             document.dispatchEvent(new CustomEvent("currency:update"));
           })
           .catch((e) => {
             console.error(e);
           });
-
-      }
-      let arrayProducts = handleProducts !== null ? handleProducts.split(',') : new Array;
-      if (!arrayProducts.includes(prdId + '')) {
-        if (arrayProducts.length >= 10) {
-          arrayProducts.pop();
-        }
-        function prepend(value, array) {
-          var newArray = array.slice();
-          newArray.unshift(value);
-          return newArray;
-        }
-        arrayProducts = prepend(prdId, arrayProducts);
-        arrayProducts = arrayProducts.toString();
-        localStorage.setItem("theme4:recently:id", arrayProducts);
       }
     };
 
@@ -2240,7 +2392,9 @@ class countryFilter extends HTMLElement {
   }
 }
 
-customElements.define('country-filter', countryFilter);
+if (!customElements.get('country-filter')) {
+  customElements.define('country-filter', countryFilter);
+}
 
 
 // check purchase code
@@ -2537,4 +2691,260 @@ class popupVideo extends HTMLElement {
     })
   }
 }
-customElements.define('hdt-btn-popup-video', popupVideo)
+customElements.define('hdt-btn-popup-video', popupVideo);
+
+/**
+ * Dynamic Variant Availability (v1.0)
+ * Updates variant option labels (strikethrough) based on selection.
+ * Created to fix Issue: sold out variants not showing strikethrough dynamically.
+ */
+(function() {
+  function updateVariantAvailability(picker) {
+    if (!picker) return;
+    try {
+      const variantsScript = picker.querySelector('[data-variants-json]');
+      if (!variantsScript) return;
+
+      let variants;
+      try {
+        variants = JSON.parse(variantsScript.textContent);
+      } catch (e) {
+        return;
+      }
+
+      let inventoryMap = {};
+      const inventoryScript = picker.querySelector('[data-inventory-json]');
+      if (inventoryScript) {
+        try {
+          JSON.parse(inventoryScript.textContent).forEach(v => {
+            inventoryMap[v.id] = { qty: v.qty, policy: v.policy };
+          });
+        } catch(err) {}
+      }
+
+      const sectionId = picker.id.replace('variant-picker-', '');
+      const noscript = document.querySelector(`.product-form__noscript-wrapper-${sectionId}`);
+      if (noscript) {
+        try {
+          const doc = new DOMParser().parseFromString(noscript.textContent, 'text/html');
+          doc.querySelectorAll('option').forEach(opt => {
+            if (!inventoryMap[opt.value]) {
+              const qtyAttr = opt.getAttribute('data-inventoryquantity');
+              let qty = 1;
+              if (qtyAttr !== null && qtyAttr.trim() !== '') {
+                qty = parseInt(qtyAttr, 10);
+                if (isNaN(qty)) qty = 0;
+              }
+              inventoryMap[opt.value] = { 
+                qty: qty, 
+                policy: opt.getAttribute('data-inventorypolicy') || '' 
+              };
+            }
+          });
+        } catch(err) {}
+      }
+
+      const fieldsets = Array.from(picker.querySelectorAll('fieldset[data-index]'));
+      const selectedOptions = fieldsets.map(fieldset => {
+        const updateValueSpan = fieldset.querySelector('[update-value]');
+        if (updateValueSpan) {
+          const val = updateValueSpan.textContent.trim();
+          if (val && !val.toLowerCase().includes('choose') && !val.toLowerCase().includes('select')) return val;
+        }
+
+        const radio = fieldset.querySelector('input[type="radio"]:checked');
+        if (radio) return radio.value;
+        
+        const trigger = fieldset.querySelector('button[aria-controls]');
+        if (trigger) {
+          const popoverId = trigger.getAttribute('aria-controls');
+          if (popoverId) {
+            const popover = document.getElementById(popoverId);
+            if (popover) {
+              const selectedBtn = popover.querySelector('hdt-richlist button[aria-selected="true"]');
+              if (selectedBtn) return selectedBtn.value || selectedBtn.getAttribute('data-value') || selectedBtn.textContent.trim();
+            }
+          }
+        }
+
+        const hidden = fieldset.querySelector('input[is-value]');
+        if (hidden && hidden.value) return hidden.value;
+
+        return null;
+      });
+
+      fieldsets.forEach((fieldset, index) => {
+        let options = Array.from(fieldset.querySelectorAll('input[type="radio"], .hdt-variant-option'));
+        
+        const trigger = fieldset.querySelector('button[aria-controls]');
+        if (trigger) {
+          const popoverId = trigger.getAttribute('aria-controls');
+          if (popoverId) {
+            const popover = document.getElementById(popoverId);
+            if (popover) {
+              const popoverOptions = popover.querySelectorAll('hdt-richlist button');
+              options = options.concat(Array.from(popoverOptions));
+            }
+          }
+        }
+
+        options.forEach(option => {
+          const value = option.value || option.getAttribute('data-value') || option.textContent.trim();
+          const currentSelected = [...selectedOptions];
+          currentSelected[index] = value;
+
+          let isAvailable = false;
+          let exists = false;
+
+          for (const v of variants) {
+            const match = v.options.every((opt, idx) => {
+              if (currentSelected[idx] === null) return true;
+              return String(opt).trim() === String(currentSelected[idx]).trim();
+            });
+            
+            if (match) {
+              exists = true;
+              let effectivelyAvailable = v.available;
+              const inv = inventoryMap[v.id];
+              
+              if (inv && inv.qty <= 0) {
+                effectivelyAvailable = false;
+              }
+              
+              if (effectivelyAvailable) {
+                isAvailable = true;
+                break;
+              }
+            }
+          }
+
+          let targets = [option];
+          if (option.tagName === 'INPUT' && option.type === 'radio' && option.id) {
+            const label = picker.querySelector(`label[for="${option.id}"]`);
+            if (label) targets.push(label);
+          }
+
+          targets.forEach(t => {
+            if (!exists || !isAvailable) {
+              t.classList.add(!exists ? 'is-unavailable' : 'is-disabled');
+              t.classList.remove(exists ? 'is-unavailable' : 'is-disabled');
+              t.style.textDecoration = 'line-through';
+              t.style.opacity = '0.5';
+            } else {
+              t.classList.remove('is-disabled', 'is-unavailable');
+              t.style.textDecoration = '';
+              t.style.opacity = '';
+            }
+          });
+        });
+
+        if (trigger) {
+          const selectedValue = selectedOptions[index];
+          let isAvailable = false;
+          for (const v of variants) {
+            const match = v.options.every((opt, idx) => {
+              if (selectedOptions[idx] === null) return true;
+              return String(opt).trim() === String(selectedOptions[idx]).trim();
+            });
+            if (match) {
+              let effectivelyAvailable = v.available;
+              const inv = inventoryMap[v.id];
+              if (inv && inv.qty <= 0) {
+                effectivelyAvailable = false;
+              }
+              if (effectivelyAvailable) {
+                isAvailable = true;
+                break;
+              }
+            }
+          }
+          trigger.classList.toggle('is-disabled', !isAvailable);
+          if (!isAvailable) {
+            trigger.style.textDecoration = 'line-through';
+            trigger.style.opacity = '0.5';
+          } else {
+            trigger.style.textDecoration = '';
+            trigger.style.opacity = '';
+          }
+        }
+      });
+    } catch (criticalError) {
+      // Fail silently to avoid breaking the page
+    }
+  }
+
+  function setupObserver(picker) {
+    if (picker.dataset.obsSetup) return;
+    picker.dataset.obsSetup = 'true';
+    
+    // Create an observer to fight framework re-renders
+    const observer = new MutationObserver((mutations) => {
+      let shouldUpdate = false;
+      for (let m of mutations) {
+        if (m.type === 'childList') shouldUpdate = true;
+        if (m.type === 'attributes' && (m.attributeName === 'class' || m.attributeName === 'aria-selected')) shouldUpdate = true;
+      }
+      if (shouldUpdate) {
+        clearTimeout(picker.updateTimer);
+        picker.updateTimer = setTimeout(() => updateVariantAvailability(picker), 50);
+      }
+    });
+    
+    observer.observe(picker, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'aria-selected'] });
+    
+    // Observe teleported popovers
+    picker.querySelectorAll('button[aria-controls]').forEach(btn => {
+      const pId = btn.getAttribute('aria-controls');
+      if (pId) {
+        const popover = document.getElementById(pId);
+        if (popover && !popover.dataset.obsSetup) {
+          popover.dataset.obsSetup = 'true';
+          observer.observe(popover, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'aria-selected'] });
+        }
+      }
+    });
+  }
+
+  const handleUpdate = (e) => {
+    let picker = e.target ? e.target.closest('hdt-variant-picker') : null;
+    if (!picker && e.target) {
+      const popover = e.target.closest('.hdt-popover-variant');
+      if (popover && popover.id) {
+        const trigger = document.querySelector(`button[aria-controls="${popover.id}"]`);
+        if (trigger) picker = trigger.closest('hdt-variant-picker');
+      }
+    }
+    if (!picker && e.target) {
+      const trigger = e.target.closest('button[aria-controls]');
+      if (trigger) picker = trigger.closest('hdt-variant-picker');
+    }
+    
+    if (picker) {
+      setupObserver(picker);
+      setTimeout(() => updateVariantAvailability(picker), 10);
+      setTimeout(() => updateVariantAvailability(picker), 150);
+      setTimeout(() => updateVariantAvailability(picker), 400);
+    }
+  };
+
+  document.addEventListener('change', handleUpdate);
+  document.addEventListener('click', handleUpdate);
+
+  function init() {
+    document.querySelectorAll('hdt-variant-picker').forEach(updateVariantAvailability);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // Support for AJAX reloads (Quick View, etc)
+  document.addEventListener('shopify:section:load', init);
+  document.addEventListener('dialog:open', (e) => {
+    if (e.target.id === 'hdt-quick-view-modal' || e.target.closest('.hdt-quick-view-modal')) {
+      setTimeout(init, 500);
+    }
+  });
+})();

@@ -108,7 +108,7 @@
                 </svg>
                 <span class="hdt-btn-atc_text">{% if un_no_pick == false %}{{ 'products.product.choose_options' | t }}{% elsif is_pre_order %}{{ 'products.product.pre_order' | t }}{% elsif selected_variant.available == false or quantity_rule_soldout %}{{ 'products.product.sold_out' | t }}{% else %}{{ 'products.product.add_to_cart' | t }}{% endif %}</span> 
                 {%- if block.settings.show_price_variant -%}
-                  <hdt-qty-price variant-price="{{ price }}" class="hdt-qty-price"{% if un_no_pick == false %} hidden{% endif %} form="{{ product_form_id }}">{% comment %}<span style="display:inline-block;margin:0 2px;"> - </span>{% endcomment %}<span class="hdt-money">{{ money_price_clone | default: money_price }}</span></hdt-qty-price>
+                  <hdt-qty-price variant-price="{{ price }}" class="hdt-qty-price"{% if un_no_pick == false or selected_variant.available == false %} hidden{% endif %} form="{{ product_form_id }}">{% comment %}<span style="display:inline-block;margin:0 2px;"> - </span>{% endcomment %}<span class="hdt-money">{{ money_price_clone | default: money_price }}</span></hdt-qty-price>
                 {%- endif -%}
                 <span class="hdt-loading__spinner hdt-absolute" hidden>
                   <svg width="16" height="16" class="hdt-svg-spinner" focusable="false" role="presentation" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg"><circle class="hdt-path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle></svg>
@@ -261,7 +261,6 @@
                       <div class="hdt-request-quote__qty-wrapper">
                         <input 
                           type="number" 
-                          name="contact[products][0][quantity]" 
                           value="1" 
                           min="1" 
                           class="hdt-request-quote__qty-input"
@@ -284,10 +283,10 @@
                       <div class="hdt-request-quote__product-info">
                         <span class="hdt-request-quote__product-title">{{ product.title }}</span>
                         <span class="hdt-request-quote__product-sku">{% if product.selected_or_first_available_variant.sku != blank %}SKU: {{ product.selected_or_first_available_variant.sku }}{% else %}ID: {{ product.id }}{% endif %}</span>
-                        <input type="hidden" name="contact[products][0][id]" value="{{ product.id }}">
-                        <input type="hidden" name="contact[products][0][title]" value="{{ product.title }}">
-                        <input type="hidden" name="contact[products][0][sku]" value="{{ product.selected_or_first_available_variant.sku | default: product.id }}">
-                        <input type="hidden" name="contact[products][0][url]" value="{{ request.origin }}{{ product.url }}">
+                        <input type="hidden" class="quote-product-id" value="{{ product.id }}">
+                        <input type="hidden" class="quote-product-title" value="{{ product.title }}">
+                        <input type="hidden" class="quote-product-sku" value="{{ product.selected_or_first_available_variant.sku | default: product.id }}">
+                        <input type="hidden" class="quote-product-url" value="{{ request.origin }}{{ product.url }}">
                       </div>
                       <button type="button" class="hdt-request-quote__remove-btn" aria-label="Remove item" data-action="remove">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -926,16 +925,16 @@
           return '<div class="hdt-request-quote__product-row">' +
             '<div class="hdt-request-quote__row-number">' + idx + '</div>' +
             '<div class="hdt-request-quote__qty-wrapper">' +
-              '<input type="number" name="contact[products][' + idx + '][quantity]" value="' + qty + '" min="1" class="hdt-request-quote__qty-input" aria-label="Quantity">' +
+              '<input type="number" value="' + qty + '" min="1" class="hdt-request-quote__qty-input" aria-label="Quantity">' +
             '</div>' +
             '<div class="hdt-request-quote__product-image">' + imgHtml + '</div>' +
             '<div class="hdt-request-quote__product-info">' +
               '<span class="hdt-request-quote__product-title">' + title + '</span>' +
               '<span class="hdt-request-quote__product-sku">' + skuDisplay + '</span>' +
-              '<input type="hidden" name="contact[products][' + idx + '][id]" value="' + id + '">' +
-              '<input type="hidden" name="contact[products][' + idx + '][title]" value="' + title + '">' +
-              '<input type="hidden" name="contact[products][' + idx + '][sku]" value="' + sku + '">' +
-              '<input type="hidden" name="contact[products][' + idx + '][url]" value="' + url + '">' +
+              '<input type="hidden" class="quote-product-id" value="' + id + '">' +
+              '<input type="hidden" class="quote-product-title" value="' + title + '">' +
+              '<input type="hidden" class="quote-product-sku" value="' + sku + '">' +
+              '<input type="hidden" class="quote-product-url" value="' + url + '">' +
             '</div>' +
             '<button type="button" class="hdt-request-quote__remove-btn" aria-label="Remove item" data-action="remove">' + removeSVG + '</button>' +
           '</div>';
@@ -983,10 +982,10 @@
             productsList.querySelectorAll('.hdt-request-quote__product-item').forEach(function(item) {
               var imgEl = item.querySelector('.hdt-request-quote__product-image img');
               data.products.push({
-                id:       (item.querySelector('input[name*="[id]"]') || {}).value || '',
-                title:    (item.querySelector('input[name*="[title]"]') || {}).value || '',
-                sku:      (item.querySelector('input[name*="[sku]"]') || {}).value || '',
-                url:      (item.querySelector('input[name*="[url]"]') || {}).value || '',
+                id:       (item.querySelector('.quote-product-id') || {}).value || '',
+                title:    (item.querySelector('.quote-product-title') || {}).value || '',
+                sku:      (item.querySelector('.quote-product-sku') || {}).value || '',
+                url:      (item.querySelector('.quote-product-url') || {}).value || '',
                 image:    imgEl ? imgEl.src : '',
                 quantity: (item.querySelector('.hdt-request-quote__qty-input') || {}).value || '1'
               });
@@ -1167,7 +1166,7 @@
 
             var formData = new FormData(quoteForm);
 
-            fetch('/contact', {
+            fetch(quoteForm.action, {
                 method: 'POST',
                 headers: {
                   'Accept': 'application/json'
@@ -1175,12 +1174,15 @@
                 body: formData
               })
               .then(function(response) {
-                if (!response.ok) {
-                  return response.json().then(function(err) {
-                    throw new Error(err.description || 'Submission failed');
-                  });
+                // If it redirects (Shopify Challenge/Captcha or success)
+                if (response.url && response.url.indexOf('challenge') !== -1) {
+                  quoteForm.submit();
+                  throw new Error('challenge');
                 }
-                return response.json();
+                if (!response.ok && !response.redirected) {
+                  throw new Error('Submission failed');
+                }
+                return response.text();
               })
             .then(function() {
               clearSavedQuote();
@@ -1219,11 +1221,15 @@
               }, 4000);
             })
             .catch(function(err) {
+              if (err && err.message === 'challenge') return;
               console.error('Quote submit error:', err);
               if (submitBtn) submitBtn.disabled = false;
               if (spinner) spinner.hidden = true;
               if (btnText) btnText.style.opacity = '1';
 
+              // Fallback if AJAX totally fails
+              quoteForm.submit();
+              
               // Show error to user
               var errToast = document.createElement('div');
               errToast.className = 'hdt-quote-success-toast';
@@ -1326,9 +1332,9 @@
           var data = [];
           items.forEach(function(item) {
             var qty = item.querySelector('.hdt-request-quote__qty-input').value;
-            var title = item.querySelector('input[name*="[title]"]').value;
-            var sku = item.querySelector('input[name*="[sku]"]').value;
-            var url = item.querySelector('input[name*="[url]"]').value;
+            var title = item.querySelector('.quote-product-title').value;
+            var sku = item.querySelector('.quote-product-sku').value;
+            var url = item.querySelector('.quote-product-url').value;
             data.push(title + ' (' + sku + ') x ' + qty + ' - ' + url);
           });
           if (productDataField) productDataField.value = data.join('\n');
@@ -1396,15 +1402,15 @@
         var sku = variant.sku || '{{ product.id }}';
         var skuDisp = variant.sku ? 'SKU: ' + variant.sku : 'ID: {{ product.id }}';
         var skuSpan = item.querySelector('.hdt-request-quote__product-sku'); if (skuSpan) skuSpan.textContent = skuDisp;
-        var skuIn = item.querySelector('input[name="contact[products][0][sku]"]'); if (skuIn) skuIn.value = sku;
+        var skuIn = item.querySelector('.quote-product-sku'); if (skuIn) skuIn.value = sku;
         var vTitle = variant.name || '{{ product.title | escape }}';
-        var tIn = item.querySelector('input[name="contact[products][0][title]"]'); if (tIn) tIn.value = vTitle;
+        var tIn = item.querySelector('.quote-product-title'); if (tIn) tIn.value = vTitle;
         var tSpan = item.querySelector('.hdt-request-quote__product-title'); if (tSpan) tSpan.textContent = vTitle;
         var pdf = document.getElementById('quote-product-data-' + blockId);
         if (pdf) {
           var items = pl.querySelectorAll('.hdt-request-quote__product-item'), data = [];
           items.forEach(function(it) {
-            data.push(it.querySelector('input[name*="[title]"]').value + ' (' + it.querySelector('input[name*="[sku]"]').value + ') x ' + it.querySelector('.hdt-request-quote__qty-input').value + ' - ' + it.querySelector('input[name*="[url]"]').value);
+            data.push(it.querySelector('.quote-product-title').value + ' (' + it.querySelector('.quote-product-sku').value + ') x ' + it.querySelector('.hdt-request-quote__qty-input').value + ' - ' + it.querySelector('.quote-product-url').value);
           });
           pdf.value = data.join('\n');
         }

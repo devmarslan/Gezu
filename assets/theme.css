@@ -1,4 +1,7 @@
 /* GANERAL */
+
+
+
 @media (prefers-reduced-motion:no-preference) {
   :root{
     scroll-behavior:smooth
@@ -2845,42 +2848,206 @@ button.hdt-product__compare-color-atc[disabled]{
   .hdt-quick-view-modal::part(content){
     max-width: min(113rem,90vw);
   }
-  .hdt-quick-view-modal .hdt-product-media-wrapp{
-    padding-inline-end: 1.5rem;
-  }
   .hdt-main-product-quick-view .hdt-product-info__list{
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    position: relative;
     overflow: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     padding: 2rem 1.5rem;
     padding-inline-end: 3rem;
+    max-height: 80vh;
    }
  }
  @media(min-width: 1150px) {
-   .hdt-main-product-quick-view .hdt-row-flex{
-    flex-wrap: nowrap;
+   /* ============================================================
+      QUICK VIEW — image-out-of-flow technique
+      ============================================================
+      Why the previous attempts failed:
+        - The slider's `autoheight` JS sets `style="height:Npx"`
+          inline on the slider container at runtime. Any CSS height
+          rule on the slider was either fighting that inline style
+          or matching but not on the right node.
+        - With normal flow, the image column's intrinsic height is
+          whatever the image/slider natural height is. If that is
+          smaller than the info column, the row stretches to the
+          info column and the image column gets a tall empty band
+          underneath it. If larger, the modal blows past viewport.
+      Approach:
+        - Make .hdt-row-grid an explicit two-column CSS grid with
+          `align-items: stretch`. Row track height = max(content)
+          of grid items.
+        - Take the entire media subtree OUT OF FLOW with
+          `position:absolute; inset:0` inside a `position:relative`
+          column wrapper. An out-of-flow element contributes 0 to
+          its parent's intrinsic size, so the image side no longer
+          influences the row track height — only the info column
+          does.
+        - Result: row height = info column height (capped at 80vh
+          by the existing __list rule). The image column wrapper
+          stretches to that same height (align-items:stretch), and
+          the absolutely-positioned image fills it via
+          object-fit:contain. No whitespace under the image, no
+          whitespace under the info — they always match.
+      ============================================================ */
+
+   /* Cap the dialog */
+   .hdt-quick-view-modal,
+   .hdt-quick-view-modal > .hdt-dialog-modal__inner {
+     max-height: 90vh !important;
    }
-   .hdt-main-product-quick-view .hdt-product-media-wrapp{
-    width: min(calc(var(--pr-media-width) - (var(--spacing-x, 0px) / 2)) , 68vh) !important;
-    padding-inline-end: 0;
+   .hdt-quick-view-modal > .hdt-dialog-modal__inner {
+     overflow: hidden;
    }
-   .hdt-main-product-quick-view .hdt-product-info-wrapp{
-    width: max(calc(100% - var(--pr-media-width) - (var(--spacing-x, 0px) / 2)), calc(min(113rem,90vw) - 68vh) ) !important;
+
+   /* Row → explicit 2-col CSS grid, equal-height columns */
+   .hdt-main-product-quick-view .hdt-row-grid,
+   .hdt-main-product-quick-view .hdt-row-flex {
+     display: grid !important;
+     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+     grid-template-rows: minmax(0, 1fr) !important;
+     align-items: stretch !important;
+     gap: 0 !important;
+     max-height: 85vh;
    }
-    .hdt-quick-view-modal .hdt-dialog-btn__close {
-      top: 2rem;
-      right: 2rem;
-    }
+
+   /* Image column wrapper — positioning context, no intrinsic height */
+   .hdt-main-product-quick-view hdt-product-media {
+     position: relative !important;
+     display: block !important;
+     overflow: hidden !important;
+     width: 100% !important;
+     max-width: 100% !important;
+     min-width: 0 !important;
+     min-height: 0 !important;
+     height: auto !important;
+     align-self: stretch !important;
+     background: #fff;
+   }
+
+   /* The media subtree is fully absolutely positioned — contributes
+      0 to the row's intrinsic height. */
+   .hdt-main-product-quick-view hdt-product-media .hdt-product-media__main {
+     position: absolute !important;
+     inset: 0 !important;
+     width: 100% !important;
+     height: 100% !important;
+     max-height: none !important;
+     margin: 0 !important;
+     padding: 0 !important;
+     overflow: hidden !important;
+     display: block !important;
+   }
+
+   /* Override the slider's JS-set inline height + every nested wrapper */
+   .hdt-main-product-quick-view hdt-product-media .hdt-product-media__main hdt-slider,
+   .hdt-main-product-quick-view hdt-product-media .hdt-product-media__main .hdt-slider__viewport,
+   .hdt-main-product-quick-view hdt-product-media .hdt-product-media__main .hdt-slider__container {
+     width: 100% !important;
+     height: 100% !important;
+     max-height: none !important;
+     min-height: 0 !important;
+   }
+
+   /* Each slide is a flex item in the slider's translateX carousel —
+      keep it 100% wide so only one shows at a time, and 100% tall. */
+   .hdt-main-product-quick-view hdt-product-media .hdt-slider__slide {
+     flex: 0 0 100% !important;
+     min-width: 100% !important;
+     width: 100% !important;
+     height: 100% !important;
+     max-height: none !important;
+   }
+
+   /* Kill the .hdt-ratio aspect-ratio so the box fills its parent */
+   .hdt-main-product-quick-view hdt-product-media .hdt-ratio,
+   .hdt-main-product-quick-view hdt-product-media .hdt-product__media {
+     width: 100% !important;
+     height: 100% !important;
+     max-height: none !important;
+     aspect-ratio: auto !important;
+     display: flex !important;
+     align-items: center !important;
+     justify-content: center !important;
+     padding: 0 !important;
+   }
+
+   /* The image itself: contain inside the box, no distortion */
+   .hdt-main-product-quick-view hdt-product-media :where(img, picture, video, iframe, model-viewer) {
+     width: 100% !important;
+     height: 100% !important;
+     max-width: 100% !important;
+     max-height: 100% !important;
+     object-fit: contain !important;
+     object-position: center !important;
+   }
+
+   /* Slider nav arrows still need to be visible above the image */
+   .hdt-main-product-quick-view hdt-product-media .hdt-slider__button {
+     z-index: 4;
+   }
+
+   /* Info column — scroll inside __list, never break the row */
+   .hdt-main-product-quick-view .hdt-group-product-block {
+     align-self: stretch !important;
+     min-width: 0 !important;
+     min-height: 0 !important;
+     height: auto !important;
+     display: block !important;
+     position: relative !important;
+   }
+   .hdt-main-product-quick-view .hdt-product-info__list {
+     max-height: 85vh;
+     overflow-y: auto;
+     overflow-x: hidden;
+     padding: 3rem 2.5rem;
+     height: auto !important;
+     min-height: 0 !important;
+   }
+
+   /* ============================================================
+      Variant picker popover & Modals — phantom-height fix
+      ============================================================
+      The variant dropdown's <hdt-popover> or <hdt-modal> contains a <dialog> 
+      which the theme hides via `opacity:0; visibility:hidden`
+      but does NOT remove from layout, reserving phantom height.
+      Fix: when the dialog isn't [open], park it off-screen with
+      0x0 size so it contributes nothing to layout.
+      ============================================================ */
+    .hdt-main-product-quick-view dialog:not([open]) {
+       position: absolute !important;
+       top: 0 !important;
+       left: 0 !important;
+       width: 0 !important;
+       height: 0 !important;
+       max-width: 0 !important;
+       max-height: 0 !important;
+       padding: 0 !important;
+       margin: 0 !important;
+       border: 0 !important;
+       overflow: hidden !important;
+       pointer-events: none !important;
+       visibility: hidden !important;
+     }
+
+     .hdt-quick-view-modal .hdt-dialog-btn__close {
+       top: 2rem;
+       right: 2rem;
+     }
+     .hdt-quick-view-modal .hdt-slider__button {
+       background-color: #fff !important;
+       color: #000 !important;
+       border: 1px solid #ddd !important;
+       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+       opacity: 1 !important;
+     }
+     .hdt-quick-view-modal .hdt-slider__button svg {
+       fill: currentColor !important;
+     }
     .dir--rtl .hdt-quick-view-modal .hdt-dialog-btn__close {
       left: 2rem;
     }
-    .hdt-main-product-quick-view .hdt-product-info__list{
-      padding: 5rem 4rem;
+     .hdt-main-product-quick-view .hdt-product-info__list{
+      padding: 3rem 2.5rem;
     }
  }
  @media (-moz-touch-enabled: 0), (hover: hover) and (min-width: 1150px){

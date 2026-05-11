@@ -36,9 +36,25 @@
     {%- unless template == 'product.only_config' and request.design_mode == false -%}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta name="theme-color" content="">
     <link rel="canonical" href="{{ canonical_url }}">
+<style>
+  /* This fires immediately, preventing the horizontal jump */
+  :root, html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Target common 'leaky' elements in gaming themes */
+  img, video, iframe, canvas {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
 
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
@@ -66,13 +82,16 @@
       render 'css-variables', is_rtl: is_rtl
       echo 'theme.css' | asset_url | stylesheet_tag
       echo 'hdt-product-card.scss.css' | asset_url | stylesheet_tag
+      echo 'hdt-list-categories.css' | asset_url | stylesheet_tag
+      echo 'custom.css' | asset_url | stylesheet_tag
       if request.page_type == "policy"
       echo 'hdt-policy.css' | asset_url | stylesheet_tag
       endif
     -%}
     {{ content_for_header }}
     {%- endunless -%}
-
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <script src='https://areviewsapp.com/js_codes/collection_rating.js' defer></script>
     {% render 'theme_jquery', currency_variable: currency_variable %}
   </head>
@@ -583,6 +602,4 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 {% render 'consent-banner' %}
   </body>
-
-
 </html>

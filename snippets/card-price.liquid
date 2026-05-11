@@ -59,7 +59,7 @@
 -%}
 
 <div class="hdt-price-wrapp {{ price_class }}{% if show_badges %} hdt-price--show-badge{% endif %}">
-  <div class="hdt-price__list">
+  <div class="hdt-price__list hdt-price__container">
     {%- if product.quantity_price_breaks_configured? -%}
       {%- if show_compare_at_price and compare_at_price -%}
         {%- unless product.price_varies == false and product.compare_at_price_varies -%}
@@ -79,25 +79,25 @@
        
         <hdt-price class="hdt-price{{ price_varies_item }}">
           <span class="sr-only sr-only--inline">{{ 'products.product.price.sale_price' | t }}</span>
-          {%- if price_varies_item != '' %}
-            <span class="hdt-money">
+          <span class="hdt-money js-card-price">
+            {%- if price_varies_item != '' %}
               {%- if money_price contains '.' -%}
                 {% comment %} {%- assign parts = money_price | split: '.' -%}
                 {{ parts[0] }}.<span class="hdt-price__decimal">{{ parts[1] | slice: 0, 2 }}</span> {% endcomment %}
+                {{ money_price }}
               {%- else -%}
                 {{ money_price }}
               {%- endif -%}
-            </span>
-          {% else %}
-            <span class="hdt-money">
+            {% else %}
               {%- if money_price contains '.' -%}
                 {% comment %} {%- assign parts = money_price | split: '.' -%}
                 {{ parts[0] }}.<span class="hdt-price__decimal">{{ parts[1] | slice: 0, 2 }}</span> {% endcomment %}
+                {{ money_price }}
               {%- else -%}
                 {{ money_price }}
               {%- endif -%}
-            </span>
-          {%- endif -%}
+            {%- endif -%}
+          </span><span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400; margin-left: 4px;">Inc VAT</span>
         </hdt-price>
         {%- if compare_at_price and on_sale and show_compare_at_price -%}
           <hdt-compare-at-price class="hdt-compare-at-price">
@@ -433,7 +433,7 @@
 {%- else -%}
   {%- comment -%} ALL OTHER MARKETS: Decimal-styled price {%- endcomment -%}
   <div class="hdt-price-wrapp {{ price_class }}{% if show_badges %} hdt-price--show-badge 1133{% endif %}">
-    <div class="hdt-price__list de">
+    <div class="hdt-price__list hdt-price__container de">
       {%- if product.quantity_price_breaks_configured? -%}
         {%- if show_compare_at_price and compare_at_price -%}
           {%- unless product.price_varies == false and product.compare_at_price_varies -%}
@@ -450,14 +450,14 @@
       {%- else -%}
         <hdt-price class="hdt-price{{ price_varies_item }}">
           <span class="sr-only sr-only--inline">{{ 'products.product.price.sale_price' | t }}</span>
-          <span class="hdt-money">
+          <span class="hdt-money js-card-price">
             {%- if money_price contains '.' -%}
               {%- assign parts = money_price | split: '.' -%}
               {{ parts[0] }}.<span class="hdt-price__decimal">{{ parts[1] | slice: 0, 2 }}</span>
             {%- else -%}
               {{ money_price }}
             {%- endif -%}
-          </span>
+          </span><span class="tax-text" style="color:#000;font-size: 12px; font-weight: 400; margin-left: 4px;">Inc VAT</span>
         </hdt-price>
         {%- if compare_at_price and on_sale and show_compare_at_price -%}
           <hdt-compare-at-price class="hdt-compare-at-price">
@@ -546,7 +546,7 @@ if (!window._cardPriceSymbolFixed) {
   }
 
   function reformatCardPrices() {
-    document.querySelectorAll('.hdt-price__list.de hdt-price .hdt-money, .hdt-price__list.de .hdt-compare-at-price .hdt-money').forEach(function(el) {
+    document.querySelectorAll('.hdt-price__container hdt-price .hdt-money, .hdt-price__container .hdt-compare-at-price .hdt-money, .hdt-price__list hdt-price .hdt-money, .hdt-price__list .hdt-compare-at-price .hdt-money').forEach(function(el) {
       // Collect text nodes only (skip sr-only, skip decimal spans already set)
       var text = '';
       el.childNodes.forEach(function(node) {

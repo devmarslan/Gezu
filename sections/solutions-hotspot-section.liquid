@@ -1471,21 +1471,27 @@
         }
 
         const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-
-        const productHotspots = document.querySelectorAll('.solutions-product-hotspot');
+        const productHotspots = section.querySelectorAll('.solutions-product-hotspot');
         
         productHotspots.forEach(hotspot => {
           const productId = hotspot.dataset.productHotspot;
           const overlayImage = document.querySelector('[data-product-overlay="' + productId + '"]');
+          
+          // Hover effects (Desktop)
           hotspot.addEventListener('mouseenter', () => { if (overlayImage) overlayImage.classList.add('active'); });
           hotspot.addEventListener('mouseleave', () => { if (overlayImage) overlayImage.classList.remove('active'); });
-        });
 
-        productHotspots.forEach(hotspot => {
+          // Click handling (Mobile)
           hotspot.addEventListener('click', (e) => {
             if (isTouchDevice) {
+              // If click is inside the tooltip (like Quick View or Product Info), let it bubble
+              if (e.target.closest('.solutions-product-tooltip')) {
+                return;
+              }
+
               e.preventDefault();
               e.stopPropagation();
+              
               productHotspots.forEach(otherHotspot => {
                 if (otherHotspot !== hotspot) {
                   otherHotspot.classList.remove('tooltip-active');

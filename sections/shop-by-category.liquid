@@ -191,6 +191,31 @@
   /* ==========================================================================
    Desktop Slider Specific Styles
    ========================================================================== */
+  /* Pre-init layout: match Swiper's flex layout so slides don't jump on init.
+     Hide overflow so any extra slides past slidesPerView are clipped instead
+     of flashing before Swiper takes over. */
+  #shop-by-category-{{ section.id }} .swiper:not(.swiper-initialized) {
+    overflow: hidden;
+  }
+  #shop-by-category-{{ section.id }} .swiper:not(.swiper-initialized) .swiper-wrapper {
+    display: flex;
+    transform: translate3d(0, 0, 0);
+  }
+  #shop-by-category-{{ section.id }} .desktop-slider .swiper:not(.swiper-initialized) .swiper-slide {
+    flex: 0 0 calc(100% / {{ section.settings.desktop_slides_per_view }});
+    min-width: 0;
+  }
+  #shop-by-category-{{ section.id }} .shop-category-mobile-slider .swiper:not(.swiper-initialized) .swiper-slide {
+    flex: 0 0 calc(100% / {{ section.settings.mobile_slides_per_view | round }});
+    min-width: 0;
+  }
+  /* Hide pagination/nav arrows until Swiper builds them (prevents stray dots) */
+  #shop-by-category-{{ section.id }} .swiper:not(.swiper-initialized) .swiper-pagination,
+  #shop-by-category-{{ section.id }} .swiper:not(.swiper-initialized) .swiper-button-prev,
+  #shop-by-category-{{ section.id }} .swiper:not(.swiper-initialized) .swiper-button-next {
+    opacity: 0;
+  }
+
   .desktop-slider .swiper {
     width: 100%;
     padding: 10px 0 20px;
@@ -619,7 +644,7 @@
                             <img 
                               src="{{ block.settings.category_image | image_url: width: 200 }}" 
                               alt="{{ block.settings.category_title }}"
-                              loading="lazy"
+                              loading="eager"
                               width="200"
                               height="200"
                             >
@@ -631,7 +656,7 @@
                               <img 
                                 src="{{ linked_collection.image | image_url: width: 200 }}" 
                                 alt="{{ block.settings.category_title | default: linked_collection.title }}"
-                                loading="lazy"
+                                loading="eager"
                                 width="200"
                                 height="200"
                               >
@@ -639,7 +664,7 @@
                               <img 
                                 src="{{ linked_collection.products.first.featured_image | image_url: width: 200 }}" 
                                 alt="{{ block.settings.category_title | default: linked_collection.title }}"
-                                loading="lazy"
+                                loading="eager"
                                 width="200"
                                 height="200"
                               >
@@ -680,7 +705,7 @@
                       <img 
                         src="{{ block.settings.category_image | image_url: width: 200 }}" 
                         alt="{{ block.settings.category_title }}"
-                        loading="lazy"
+                        loading="eager"
                         width="200"
                         height="200"
                       >
@@ -707,7 +732,7 @@
                     <img 
                       src="{{ block.settings.category_image | image_url: width: 160 }}" 
                       alt="{{ block.settings.category_title }}"
-                      loading="lazy"
+                      loading="eager"
                     >
                   {% elsif block.settings.category_link != blank %}
                     {% assign link_url = block.settings.category_link %}
@@ -717,13 +742,13 @@
                       <img 
                         src="{{ linked_collection.image | image_url: width: 160 }}" 
                         alt="{{ block.settings.category_title | default: linked_collection.title }}"
-                        loading="lazy"
+                        loading="eager"
                       >
                     {% elsif linked_collection.products.first.featured_image != blank %}
                       <img 
                         src="{{ linked_collection.products.first.featured_image | image_url: width: 160 }}" 
                         alt="{{ block.settings.category_title | default: linked_collection.title }}"
-                        loading="lazy"
+                        loading="eager"
                       >
                     {% else %}
                       <div class="placeholder-icon">
@@ -756,7 +781,7 @@
                             <img 
                               src="{{ block.settings.category_image | image_url: width: 160 }}" 
                               alt="{{ block.settings.category_title }}"
-                              loading="lazy"
+                              loading="eager"
                             >
                           {% elsif block.settings.category_link != blank %}
                             {% assign link_url = block.settings.category_link %}
@@ -766,13 +791,13 @@
                               <img 
                                 src="{{ linked_collection.image | image_url: width: 160 }}" 
                                 alt="{{ block.settings.category_title | default: linked_collection.title }}"
-                                loading="lazy"
+                                loading="eager"
                               >
                             {% elsif linked_collection.products.first.featured_image != blank %}
                               <img 
                                 src="{{ linked_collection.products.first.featured_image | image_url: width: 160 }}" 
                                 alt="{{ block.settings.category_title | default: linked_collection.title }}"
-                                loading="lazy"
+                                loading="eager"
                               >
                             {% else %}
                               <div class="placeholder-icon">
@@ -808,14 +833,22 @@
   </div>
 </section>
 
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  (function() {
+    function initCategorySwiper{{ section.id | replace: '-', '_' }}() {
+      if (typeof Swiper === 'undefined') {
+        // Swiper still loading — retry on next frame
+        return requestAnimationFrame(initCategorySwiper{{ section.id | replace: '-', '_' }});
+      }
     {% if section.settings.enable_desktop_slider %}
     // Desktop Slider
-    const categoryDesktopSwiper{{ section.id | replace: '-', '_' }} = new Swiper('.category-desktop-swiper-{{ section.id }}', {
+    new Swiper('.category-desktop-swiper-{{ section.id }}', {
       slidesPerView: {{ section.settings.desktop_slides_per_view }},
       spaceBetween: {{ section.settings.desktop_space_between }},
       centeredSlides: false,
@@ -848,7 +881,7 @@
 
     {% if section.settings.enable_mobile_slider %}
     // Mobile Slider
-    const categoryMobileSwiper{{ section.id | replace: '-', '_' }} = new Swiper('.category-mobile-swiper-{{ section.id }}', {
+    new Swiper('.category-mobile-swiper-{{ section.id }}', {
       slidesPerView: {{ section.settings.mobile_slides_per_view }},
       spaceBetween: {{ section.settings.mobile_space_between }},
       centeredSlides: false,
@@ -878,7 +911,16 @@
       }
     });
     {% endif %}
-  });
+    }
+
+    // Init as soon as possible — don't wait for DOMContentLoaded.
+    // Section markup is already parsed above this script tag.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCategorySwiper{{ section.id | replace: '-', '_' }}, { once: true });
+    } else {
+      initCategorySwiper{{ section.id | replace: '-', '_' }}();
+    }
+  })();
 </script>
 
 {% schema %}

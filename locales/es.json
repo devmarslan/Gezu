@@ -1,1 +1,118 @@
-{"general":{"search":{"placeholder_products":"¿Qué buscas hoy?","reset":"Borrar búsqueda","quicklink_title":"Enlace rápido","content_title":"¿Necesitas inspiración?","search_text":"Buscar","no_product_results":"No se encontraron productos.","pages_type":"Página","all_categories":"Todas las categorías","quick_search":"Búsqueda rápida","suggestions":"Sugerencias"},"cart":{"view_empty_cart":"Ver carrito"},"wishlist":{"wishlist_page":"Tu lista de deseos","wishlist_text":"Lista de deseos","login_to_use_wishlist":"Inicia sesión para usar la lista de deseos","add_to_wishlist":"Añadir a la lista de deseos","adding_to_wishlist":"Añadiendo a la lista de deseos","browse_wishlist":"Ver lista de deseos","remove_wishlist":"Eliminar de la lista de deseos","empty_wishlist":"La lista de deseos está vacía.","empty_info_wishlist":"Aún no tienes productos en tu lista de deseos. Descubre muchos productos interesantes en nuestra tienda."},"compare":{"compare_text":"Comparar","login_to_use_compare":"Inicia sesión para usar la comparación","add_to_compare":"Añadir para comparar","compare":"Comparar","browse_compare":"Ver comparación"},"slider":{"of":"de","next_slide":"Deslizar a la derecha","previous_slide":"Deslizar a la izquierda","name":"Control deslizante"},"breadcrumb":{"home":"Inicio"},"demos":{"view_all_demo":"Ver todas las demos","demos_full_heading":"Tema Ultimate Shopify OS 2.0"},"aria":{"back_to_top":"Volver arriba","exit_popup":{"copy":"Copiar","copied":"Copiado"}}},"products":{"theme_settings":{"color":"color,colores,colorido,tonalidad","size":"talla,tallas,tamaño,medida"},"product":{"back_in_stock":{"success":"Te notificaremos cuando el artículo esté disponible","title":"Notificarme cuando esté disponible","sub_title":"Introduce tu dirección de correo electrónico para ser notificado cuando el producto vuelva a estar disponible.","please_notify":"Por favor, notifícame cuando este producto esté disponible."}}}}
+{
+  "general": {
+    "search": {
+      "placeholder_products": "¿Qué buscas hoy?",
+      "reset": "Borrar búsqueda",
+      "quicklink_title": "Enlace rápido",
+      "content_title": "¿Necesitas inspiración?",
+      "search_text": "Buscar",
+      "no_product_results": "No se encontraron productos.",
+      "pages_type": "Página",
+      "all_categories": "Todas las categorías",
+      "quick_search": "Búsqueda rápida",
+      "suggestions": "Sugerencias"
+    },
+    "cart": {
+      "view_empty_cart": "Ver carrito"
+    },
+    "wishlist": {
+      "wishlist_page": "Tu lista de deseos",
+      "wishlist_text": "Lista de deseos",
+      "login_to_use_wishlist": "Inicia sesión para usar la lista de deseos",
+      "add_to_wishlist": "Añadir a la lista de deseos",
+      "adding_to_wishlist": "Añadiendo a la lista de deseos",
+      "browse_wishlist": "Ver lista de deseos",
+      "remove_wishlist": "Eliminar de la lista de deseos",
+      "empty_wishlist": "La lista de deseos está vacía.",
+      "empty_info_wishlist": "Aún no tienes productos en tu lista de deseos. Descubre muchos productos interesantes en nuestra tienda."
+    },
+    "compare": {
+      "compare_text": "Comparar",
+      "login_to_use_compare": "Inicia sesión para usar la comparación",
+      "add_to_compare": "Añadir para comparar",
+      "compare": "Comparar",
+      "browse_compare": "Ver comparación"
+    },
+    "slider": {
+      "of": "de",
+      "next_slide": "Deslizar a la derecha",
+      "previous_slide": "Deslizar a la izquierda",
+      "name": "Control deslizante"
+    },
+    "breadcrumb": {
+      "home": "Inicio"
+    },
+    "demos": {
+      "view_all_demo": "Ver todas las demos",
+      "demos_full_heading": "Tema Ultimate Shopify OS 2.0"
+    },
+    "aria": {
+      "back_to_top": "Volver arriba",
+      "exit_popup": {
+        "copy": "Copiar",
+        "copied": "Copiado"
+      }
+    }
+  },
+  "products": {
+    "theme_settings": {
+      "color": "color,colors,couleur,colour,colores,colorido,tonalidad",
+      "size": "size,sizes,talla,tallas,tamaño,medida"
+    },
+    "product": {
+      "back_in_stock": {
+        "success": "Te notificaremos cuando el artículo esté disponible",
+        "title": "Notificarme cuando esté disponible",
+        "sub_title": "Introduce tu dirección de correo electrónico para ser notificado cuando el producto vuelva a estar disponible.",
+        "please_notify": "Por favor, notifícame cuando este producto esté disponible."
+      }
+    }
+  },
+  "sections": {
+    "cart": {
+      "often_bought_together": "Comprados juntos habitualmente",
+      "items_not_reserved": "Tus artículos no están reservados,",
+      "checkout_quickly": "completa el pedido rápido para no perderlos.",
+      "cart_empty_text": "Parece que aún no has añadido nada",
+      "inc_vat": "IVA incl.",
+      "delivery": "Entrega",
+      "estimated_tax": "Impuesto estimado",
+      "calculated_in_checkout": "Calculado en el pago",
+      "agree_with_terms": "Acepto los",
+      "terms_and_conditions": "términos y condiciones",
+      "proceed_to_checkout": "Pasar por caja",
+      "view_cart_caps": "VER CARRITO",
+      "your_wishlist": "Tu lista de deseos ({{ count }})",
+      "wishlist_empty_title": "Tu lista de deseos está vacía",
+      "wishlist_empty_text": "Guarda los artículos que te gustan haciendo clic en el icono del marcador",
+      "browse_products": "Explorar productos",
+      "view_full_wishlist": "Ver lista de deseos completa",
+      "select_options": "SELECCIONAR OPCIONES",
+      "no_image": "Sin imagen",
+      "add_to_wishlist": "Añadir a la lista de deseos",
+      "shipping_away_html": "Estás a <span class=\"cart-drawer-shipping__amount\" data-shipping-remaining>{{ amount }}</span> del envío estándar gratuito",
+      "plus_more": "+{{ count }} más",
+      "adding": "Añadiendo...",
+      "added": "¡Añadido!",
+      "in_wishlist": "En lista de deseos",
+      "your_wishlist_html": "Tu lista de deseos ({{ count }})",
+      "wishlist_load_error": "No se pudo cargar la lista de deseos",
+      "product_load_error": "No se pudo cargar el producto",
+      "return_30_days": "Devolución en 30 días",
+      "title": "Tu carrito",
+      "remove": "Eliminar",
+      "subtotal": "Subtotal",
+      "certified_quality": "Calidad Certificada",
+      "lowest_delivery": "Envío al mejor precio",
+      "vat_validation_title": "Validación del IVA de la UE",
+      "vat_deducted_text": "(El IVA se deducirá en el siguiente paso)",
+      "vat_id_placeholder": "ID de IVA de la UE",
+      "email_label": "Correo electrónico",
+      "quick_view": "Vista rápida",
+      "item_subtotal": "Subtotal de artículos",
+      "apply_discount": "Aplicar descuento",
+      "discount_error": "Introduce un código de descuento válido",
+      "error_try_again": "Error - Inténtalo de nuevo"
+    }
+  }
+}

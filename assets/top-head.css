@@ -33,6 +33,10 @@
     .hdt-top-heading {
         flex-direction: column;
     }
+
+    body{
+      overflow-x: hidden !important;
+}
 }
 
 @media(min-width:768px) {
