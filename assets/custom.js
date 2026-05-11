@@ -9,7 +9,7 @@ import { $4, $$4, $id4, debounce, formatMoney } from '@theme/utilities';
 import { getterAdd, getterGet, getterRunFn, btnTooltip, DrawerComponent, VariantChangeBase } from "@theme/global";
 
 
-const {dialogClose, dialogOpen} = ThemeEvents;
+const { dialogClose, dialogOpen } = ThemeEvents;
 
 // ==========================================
 // WISHLIST & COMPARE (FULLY FIXED MODULE)
@@ -45,9 +45,9 @@ var linkWishlistApp = '/apps/ecomrise/wishlist',
   conver_to_link_fn = function (prefix = this.textFn, array = this.array) {
     const x = themeHDN.routes.search_url + `/?view=${prefix}`,
       y = x + '&type=product&options[unavailable_products]=last&q=';
-    
+
     // 2. Add cache-buster to prevent Shopify from serving stale HTML
-    const cacheBuster = `&_v=${new Date().getTime()}`; 
+    const cacheBuster = `&_v=${new Date().getTime()}`;
     return (array.length) ? y + encodeURI(`id:${array.join(' OR id:')}`) + cacheBuster : x + cacheBuster;
   };
 
@@ -229,7 +229,7 @@ update_wis_text_fn = function (value) {
   if (icon) this.firstElementChild.replaceWith(document.createRange().createContextualFragment(icon));
   if (text) {
     this.lastElementChild.textContent = text;
-    this.setAttribute('data-txt-tt',text)
+    this.setAttribute('data-txt-tt', text)
   }
 };
 
@@ -272,36 +272,36 @@ add_wis_fn = function (e) {
         action: 'add'
       })
     })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.status != 'success') {
-        console.error(data.message || 'Unknown error');
-        return;
-      }
-      
-      // 4. Update LocalStorage immediately on add
-      if(this.isFnWishlist) {
-        arr_wishlist_list = JSON.parse(data.response.metafield.value).ecomrise_ids;
-        if (!Array.isArray(arr_wishlist_list)) {
-          arr_wishlist_list = arr_wishlist_list.split(',');
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status != 'success') {
+          console.error(data.message || 'Unknown error');
+          return;
         }
-        localStorage.setItem(nameCachedWishlist, arr_wishlist_list.toString());
-      } else {
-        arr_compare_list = JSON.parse(data.response.metafield.value).ecomrise_ids;
-        if (!Array.isArray(arr_compare_list)) {
-          arr_compare_list = arr_compare_list.split(',');
+
+        // 4. Update LocalStorage immediately on add
+        if (this.isFnWishlist) {
+          arr_wishlist_list = JSON.parse(data.response.metafield.value).ecomrise_ids;
+          if (!Array.isArray(arr_wishlist_list)) {
+            arr_wishlist_list = arr_wishlist_list.split(',');
+          }
+          localStorage.setItem(nameCachedWishlist, arr_wishlist_list.toString());
+        } else {
+          arr_compare_list = JSON.parse(data.response.metafield.value).ecomrise_ids;
+          if (!Array.isArray(arr_compare_list)) {
+            arr_compare_list = arr_compare_list.split(',');
+          }
+          localStorage.setItem(nameCachedCompare, arr_compare_list.toString());
+          getterRunFn(_show_popup_compare, this, show_popup_compare_fn).call(this);
         }
-        localStorage.setItem(nameCachedCompare, arr_compare_list.toString());
-        getterRunFn(_show_popup_compare, this, show_popup_compare_fn).call(this);
-      }
-      getterRunFn(_action_after_remove_add, this, action_after_remove_add_fn).call(this, this.actionAfterAdded);
-    })
-    .catch(function (error) {
-      console.log('Error: ' + error);
-    })
-    .finally(() => {
-      this.setAttribute('aria-busy', false);
-    });
+        getterRunFn(_action_after_remove_add, this, action_after_remove_add_fn).call(this, this.actionAfterAdded);
+      })
+      .catch(function (error) {
+        console.log('Error: ' + error);
+      })
+      .finally(() => {
+        this.setAttribute('aria-busy', false);
+      });
   } else {
     this.array.unshift(getterGet(_wishlist_id, this));
     if (this.array.length > this.limit) {
@@ -333,35 +333,35 @@ remove_wis_fn = function (e) {
         _method: 'DELETE'
       })
     })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.status != 'success') {
-        console.error(data.message || 'Unknown error');
-        return;
-      }
-      
-      // 5. Update LocalStorage immediately on remove
-      let updated_ids = JSON.parse(data.response.metafield.value).ecomrise_ids;
-      if (!Array.isArray(updated_ids)) {
-        updated_ids = updated_ids.split(',');
-      }
-      
-      if (this.isFnWishlist) {
-        arr_wishlist_list = updated_ids;
-        localStorage.setItem(nameCachedWishlist, arr_wishlist_list.toString());
-      } else {
-        arr_compare_list = updated_ids;
-        localStorage.setItem(nameCachedCompare, arr_compare_list.toString());
-      }
-      
-      getterRunFn(_action_after_remove_add, this, action_after_remove_add_fn).call(this, 'add');
-    })
-    .catch(function (error) {
-      console.log('Error: ' + error);
-    })
-    .finally(() => {
-      this.setAttribute('aria-busy', false);
-    });
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status != 'success') {
+          console.error(data.message || 'Unknown error');
+          return;
+        }
+
+        // 5. Update LocalStorage immediately on remove
+        let updated_ids = JSON.parse(data.response.metafield.value).ecomrise_ids;
+        if (!Array.isArray(updated_ids)) {
+          updated_ids = updated_ids.split(',');
+        }
+
+        if (this.isFnWishlist) {
+          arr_wishlist_list = updated_ids;
+          localStorage.setItem(nameCachedWishlist, arr_wishlist_list.toString());
+        } else {
+          arr_compare_list = updated_ids;
+          localStorage.setItem(nameCachedCompare, arr_compare_list.toString());
+        }
+
+        getterRunFn(_action_after_remove_add, this, action_after_remove_add_fn).call(this, 'add');
+      })
+      .catch(function (error) {
+        console.log('Error: ' + error);
+      })
+      .finally(() => {
+        this.setAttribute('aria-busy', false);
+      });
   } else {
     this.array.splice(this.array.indexOf(getterGet(_wishlist_id, this)), 1);
     localStorage.setItem(this.nameCached, this.array.toString());
@@ -371,11 +371,11 @@ remove_wis_fn = function (e) {
 
 action_after_remove_add_fn = function (action) {
   if (this.getAttribute('action') == 'remove' && this.hasAttribute('remove-on-page')) {
-    if (this.isFnWishlist) {      
+    if (this.isFnWishlist) {
       this.setAttribute('aria-busy', true);
       let card = this.closest('.hdt-card-product');
       if (card) { card.remove(); }
-      
+
       // Update browser URL silently
       if (window.isPageWishlist) {
         window.history.replaceState({}, document.title, conver_to_link_fn('wishlist', arr_wishlist_list));
@@ -450,7 +450,7 @@ clear_all_fn = function () {
   }));
   this.array = [];
   $id4(`drawerCompare`)?.closest('hdt-drawer')?.close();
-  if ($4(`#drawerCompare offcanvas-compare`)){
+  if ($4(`#drawerCompare offcanvas-compare`)) {
     $4(`#drawerCompare offcanvas-compare`).innerHTML = "";
   }
 };
@@ -594,7 +594,7 @@ customElements.define("hdt-compare-a", CompareLink);
               updateDOM(v.featured_image.src);
             }
           })
-          .catch(function () {});
+          .catch(function () { });
       }
     }
   }
@@ -724,7 +724,7 @@ class ProductRecently extends HTMLElement {
       let prdId = this.dataset.id;
 
       let arrayProducts = handleProducts ? handleProducts.split(',').filter(Boolean) : [];
-      
+
       if (prdId) {
         if (!arrayProducts.includes(prdId + '')) {
           if (arrayProducts.length >= 10) {
@@ -807,15 +807,15 @@ class PredictiveSearch extends DrawerComponent {
     this.setupEventListeners();
   }
 
-setupEventListeners() {
-  // FIX: guard all input references
-  if (!this.input || !this.input.form) return;
-  
-  this.input.form.addEventListener('submit', this.onFormSubmit.bind(this));
-  this.input.addEventListener('focus', this.onFocus.bind(this));
-  this.addEventListener('focusout', this.onFocusOut.bind(this));
-  this.addEventListener('keyup', this.onKeyup.bind(this));
-}
+  setupEventListeners() {
+    // FIX: guard all input references
+    if (!this.input || !this.input.form) return;
+
+    this.input.form.addEventListener('submit', this.onFormSubmit.bind(this));
+    this.input.addEventListener('focus', this.onFocus.bind(this));
+    this.addEventListener('focusout', this.onFocusOut.bind(this));
+    this.addEventListener('keyup', this.onKeyup.bind(this));
+  }
 
   getQuery() {
     return this.input.value.trim();
@@ -1138,29 +1138,29 @@ customElements.define('lookbook-product-carousel', LookbookProductCarousel);
 */
 
 function convertNameCookies(name) {
-  return name.replace(/=/g,'_');
+  return name.replace(/=/g, '_');
 }
-function setCookie(name,value,days,hours) {
+function setCookie(name, value, days, hours) {
   var expires = "";
   if (days || hours) {
     var date = new Date();
-    date.setTime(date.getTime() + (days ? days*24*60*60*1000 : hours*60*60*1000));
+    date.setTime(date.getTime() + (days ? days * 24 * 60 * 60 * 1000 : hours * 60 * 60 * 1000));
     expires = "; expires=" + date.toString();
   }
-  document.cookie = convertNameCookies(name) + "=" + (value || "")  + expires + "; path=/";
+  document.cookie = convertNameCookies(name) + "=" + (value || "") + expires + "; path=/";
 }
 function getCookie(name) {
   var nameEQ = convertNameCookies(name) + "=";
   var ca = document.cookie.split(';');
-  for(var i=0;i < ca.length;i++) {
+  for (var i = 0; i < ca.length; i++) {
     var c = ca[i];
-    while (c.charAt(0)==' ') c = c.substring(1,c.length);
-    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
   }
   return null;
 }
 function eraseCookie(name) {
-  document.cookie = convertNameCookies(name)+'=; Max-Age=-99999999;';
+  document.cookie = convertNameCookies(name) + '=; Max-Age=-99999999;';
 }
 
 class cookiesBar extends HTMLElement {
@@ -1256,14 +1256,14 @@ class newsletterModal extends HTMLElement {
     super();
     this.configs = JSON.parse(this.getAttribute('configs'));
     this.modal = this.querySelector("hdt-modal");
-    if ( !Shopify.designMode && getCookie("theme4:newsletter:"+this.configs.id) == 'shown' ){
-      this.modal.setAttribute('closed','');
+    if (!Shopify.designMode && getCookie("theme4:newsletter:" + this.configs.id) == 'shown') {
+      this.modal.setAttribute('closed', '');
       return;
     }
     this.dialog = this.querySelector("dialog");
     this.action_close = this.querySelectorAll('[action-close]');
-    this.time_delay     = this.configs.time_delay;
-    this.day_next       = this.configs.day_next;
+    this.time_delay = this.configs.time_delay;
+    this.day_next = this.configs.day_next;
     if (Shopify.designMode) {
       document.addEventListener('shopify:section:select', (event) => {
         const newsletterSelect = event.target.classList.contains('sys-newsletter');
@@ -1279,14 +1279,14 @@ class newsletterModal extends HTMLElement {
     else {
       const fnShow = this.showModal.bind(this);
       const fnShowScroll = this.showModalScroll.bind(this);
-      if(this.configs.after === 'time'){
-        let tm = setTimeout(fnShow,this.configs.time_delay * 1000);
+      if (this.configs.after === 'time') {
+        let tm = setTimeout(fnShow, this.configs.time_delay * 1000);
         this.dialog.addEventListener(`${dialogClose}`, () => {
           clearTimeout(tm);
           this.hideModal(false, true);
         });
-      }else{
-        window.addEventListener("scroll",fnShowScroll);
+      } else {
+        window.addEventListener("scroll", fnShowScroll);
         this.dialog.addEventListener(`${dialogClose}`, () => {
           window.removeEventListener("scroll", fnShowScroll);
           this.hideModal(false, true);
@@ -1299,7 +1299,7 @@ class newsletterModal extends HTMLElement {
   showModal() {
     this.modal.open();
   }
-  showModalScroll(){
+  showModalScroll() {
     if (window.scrollY > this.configs.scroll_delay) {
       this.modal.open();
     }
@@ -1310,14 +1310,14 @@ class newsletterModal extends HTMLElement {
     }
     if (off) {
 
-      setCookie("theme4:newsletter:"+this.configs.id, "shown", this.day_next);
+      setCookie("theme4:newsletter:" + this.configs.id, "shown", this.day_next);
     }
   }
-  actionClose(){
-    let self= this;
-    if(self.action_close){
+  actionClose() {
+    let self = this;
+    if (self.action_close) {
       self.action_close.forEach(btn => {
-        btn.addEventListener('click',function(){
+        btn.addEventListener('click', function () {
           self.modal.close();
           self.hideModal(false, true);
           setTimeout(() => {
@@ -1339,10 +1339,10 @@ class exitModal extends HTMLElement {
   constructor() {
     super();
     this.configs = JSON.parse(this.getAttribute('configs'));
-    if ( !Shopify.designMode && getCookie("theme4:exit:"+this.configs.id) == 'shown' ) return;
+    if (!Shopify.designMode && getCookie("theme4:exit:" + this.configs.id) == 'shown') return;
     this.modal = this.querySelector("hdt-modal");
     this.dialog = this.querySelector("dialog");
-    this.day_next     = this.configs.day_next;
+    this.day_next = this.configs.day_next;
     this.btn_copy = this.querySelector('button[is="discount_copy"]');
     this.discount = this.querySelector('[is="discount"]');
     if (Shopify.designMode) {
@@ -1358,23 +1358,23 @@ class exitModal extends HTMLElement {
       })
     }
     else {
-      if(this.configs.after === 'move_cursor'){
-        if(window.innerWidth > 1150){
+      if (this.configs.after === 'move_cursor') {
+        if (window.innerWidth > 1150) {
           this.moveCursor();
-        }else{
+        } else {
           this.scrollPage();;
         }
-      }else if(this.configs.after === 'scroll'){
+      } else if (this.configs.after === 'scroll') {
         this.scrollPage();
         console.log();
       }
-      else{
+      else {
         this.amountTime();
       }
     }
   }
   // Move cursor out screen
-  moveCursor(){
+  moveCursor() {
     const fnShow = this.showModal.bind(this);
     document.querySelector("body").addEventListener("mouseleave", fnShow);
     this.dialog.addEventListener(`${dialogClose}`, () => {
@@ -1383,24 +1383,24 @@ class exitModal extends HTMLElement {
     });
   }
   //  scroll page
-  scrollPage(){
+  scrollPage() {
     const fnShow = this.showModal.bind(this);
     let docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight - 500;
-    let scroll= ()=>{
+    let scroll = () => {
       if (window.scrollY >= docHeight) {
         fnShow();
       }
     }
-    window.addEventListener("scroll",scroll);
+    window.addEventListener("scroll", scroll);
     this.dialog.addEventListener(`${dialogClose}`, () => {
-      window.removeEventListener("scroll",scroll);
+      window.removeEventListener("scroll", scroll);
       this.hideModal(false, true);
     });
   }
   // countdown time to show exit popup
-  amountTime(){
+  amountTime() {
     const fnShow = this.showModal.bind(this);
-    let tm = setTimeout(fnShow,this.configs.time_delay * 1000);
+    let tm = setTimeout(fnShow, this.configs.time_delay * 1000);
     this.dialog.addEventListener(`${dialogClose}`, () => {
       clearTimeout(tm);
       this.hideModal(false, true);
@@ -1409,14 +1409,14 @@ class exitModal extends HTMLElement {
   showModal() {
     let self = this;
     this.modal.open();
-    if(self.btn_copy && self.discount){
-      self.btn_copy.addEventListener('click',function(){
+    if (self.btn_copy && self.discount) {
+      self.btn_copy.addEventListener('click', function () {
         self.discount.select();
         self.discount.setSelectionRange(0, 99999);
         document.execCommand("copy");
         self.btn_copy.querySelector('.hdt-tooltip-text').innerText = `${themeHDN.extras.exit_popup.copied}: ${self.discount.value}`
       })
-      self.btn_copy.addEventListener('mouseleave',function(){
+      self.btn_copy.addEventListener('mouseleave', function () {
         self.btn_copy.querySelector('.hdt-tooltip-text').innerText = themeHDN.extras.exit_popup.copy
       })
     }
@@ -1426,7 +1426,7 @@ class exitModal extends HTMLElement {
 
     }
     if (off) {
-      setCookie("theme4:exit:"+this.configs.id, "shown", this.day_next);
+      setCookie("theme4:exit:" + this.configs.id, "shown", this.day_next);
     }
   }
 }
@@ -1445,19 +1445,19 @@ class cartCountdown extends HTMLElement {
     function startTimer(duration, display) {
       let timer = duration, minutes, seconds;
       let countdown = setInterval(function () {
-          minutes = parseInt(timer / 60, 10)
-          seconds = parseInt(timer % 60, 10);
-          minutes = minutes < 10 ? minutes : minutes;
-          seconds = seconds < 10 ? "0" + seconds : seconds;
-          display.textContent = minutes + self.config.labelm + " : " + seconds + self.config.labels;
-          let calc = 60 * parseInt(timer / 60, 10) + parseInt(timer % 60, 10);
-          if (!Shopify.designMode) {
-            sessionStorage.setItem('cartTime', calc);
-          }
-          if (--timer < 0) {
-            window.clearInterval(countdown);
-            display.textContent = 0 + self.config.labelm + " : " + 0 + self.config.labels;
-            fetch(Shopify.routes.root+"cart/clear.js")
+        minutes = parseInt(timer / 60, 10)
+        seconds = parseInt(timer % 60, 10);
+        minutes = minutes < 10 ? minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+        display.textContent = minutes + self.config.labelm + " : " + seconds + self.config.labels;
+        let calc = 60 * parseInt(timer / 60, 10) + parseInt(timer % 60, 10);
+        if (!Shopify.designMode) {
+          sessionStorage.setItem('cartTime', calc);
+        }
+        if (--timer < 0) {
+          window.clearInterval(countdown);
+          display.textContent = 0 + self.config.labelm + " : " + 0 + self.config.labels;
+          fetch(Shopify.routes.root + "cart/clear.js")
             .then((response) => response.text())
             .then((text) => {
               console.log("Clear cart")
@@ -1466,11 +1466,11 @@ class cartCountdown extends HTMLElement {
             .catch((e) => {
               console.error(e);
             });
-          }
+        }
       }, 1000);
     };
-    if (time > 0) {startTimer(time, display);}
-    else {startTimer(settMinutes, display)}
+    if (time > 0) { startTimer(time, display); }
+    else { startTimer(settMinutes, display) }
   }
 }
 customElements.define('cart-countdown', cartCountdown);
@@ -1481,8 +1481,8 @@ customElements.define('cart-countdown', cartCountdown);
 
 
 const contactForm = $$4('form[action^="/contact"]');
-contactForm.forEach(function(form) {
-  form.addEventListener("submit", function(event){
+contactForm.forEach(function (form) {
+  form.addEventListener("submit", function (event) {
     sessionStorage.setItem("the4:recentform", this.getAttribute("id"));
   })
 });
@@ -1497,31 +1497,31 @@ const goToForm = (id) => {
 }
 var recentform = sessionStorage.getItem("the4:recentform") || "";
 
-if (location.href.indexOf('contact_posted=true') > 0 && recentform !== "" ) {
-  document.dispatchEvent( new CustomEvent('the4:recentform', { detail: { recentform: recentform }, bubbles: true, cancelable: true }) );
+if (location.href.indexOf('contact_posted=true') > 0 && recentform !== "") {
+  document.dispatchEvent(new CustomEvent('the4:recentform', { detail: { recentform: recentform }, bubbles: true, cancelable: true }));
   $id4(recentform)?.classList.add("on-live");
-  if ($4('.form-status-mirror-'+ recentform)) {
-    $4('.form-status-mirror-'+ recentform).style.cssText = "display: block;";
+  if ($4('.form-status-mirror-' + recentform)) {
+    $4('.form-status-mirror-' + recentform).style.cssText = "display: block;";
   }
   goToForm(recentform);
 }
 
-else if (location.href.indexOf('customer_posted=true') > 0 && recentform !== "" ) {
-  document.addEventListener('the4:recentform', (event)=>{
+else if (location.href.indexOf('customer_posted=true') > 0 && recentform !== "") {
+  document.addEventListener('the4:recentform', (event) => {
     let modal_id = document.getElementById(event.detail.recentform).getAttribute('data-id') || document.getElementById(event.detail.recentform).getAttribute('id');
     document.getElementById(modal_id)?.closest("hdt-modal:not([closed])")?.open();
   })
-  document.dispatchEvent( new CustomEvent('the4:recentform', { detail: { recentform: recentform }, bubbles: true, cancelable: true }) );
+  document.dispatchEvent(new CustomEvent('the4:recentform', { detail: { recentform: recentform }, bubbles: true, cancelable: true }));
   $id4(recentform)?.classList.add("on-live");
   goToForm(recentform);
 }
-else if (location.href.indexOf('contact_posted=true') > 0 && location.href.indexOf('#') > 0 ) {
+else if (location.href.indexOf('contact_posted=true') > 0 && location.href.indexOf('#') > 0) {
   var recentform = location.href.split("#")[1];
   if ($id4(recentform).length > 0) {
     sessionStorage.setItem("the4:recentform", recentform);
     $id4(recentform).classList.add("on-live");
-    if ($4('.form-status-mirror-'+ recentform)) {
-      $4('.form-status-mirror-'+ recentform).style.cssText = "display: block;";
+    if ($4('.form-status-mirror-' + recentform)) {
+      $4('.form-status-mirror-' + recentform).style.cssText = "display: block;";
     }
     goToForm(recentform);
   }
@@ -1552,11 +1552,11 @@ class flashSold extends VariantChangeBase {
     this.$hour = this.querySelector('[data-hour]');
     this.limitMinMax();
     this.updateSold(this.numS, this.numT);
-    setInterval(function () {
-      this.numS = this.numS + self.getRandomInt(1, 4);
+    setInterval(() => {
+      this.numS = this.numS + this.getRandomInt(1, 4);
       this.numT = this.numT + (Math.random() * (0.8 - 0.1) + 0.1).toFixed(1) * 1;
-      self.limitMinMax();
-      self.updateSold(self.numS, self.numT);
+      this.limitMinMax();
+      this.updateSold(this.numS, this.numT);
     }, this.intervalTime);
   }
 
@@ -1577,12 +1577,17 @@ class flashSold extends VariantChangeBase {
       ? document.querySelector(`hdt-variant-picker[form="${formId}"]`)
       : null;
     if (picker) {
+      picker.addEventListener("change", rerollHandler);
       picker.addEventListener("click", (e) => {
         if (e.target.closest("input, label, button, [role='option'], hdt-richlist")) {
           rerollHandler();
         }
       });
     }
+    // Reliable variant change listener
+    document.addEventListener("variant:change", (event) => {
+      this.onVariantChanged(event);
+    });
   }
 
   rerollSold() {
@@ -1598,13 +1603,13 @@ class flashSold extends VariantChangeBase {
 
   updateSold(num1, num2) {
     this.$sold.innerHTML = num1;
-    this.$hour.innerHTML = Math.floor(this.numT);
+    this.$hour.innerHTML = Math.floor(num2);
     sessionStorage.setItem("soldS" + this.dataID, num1);
     sessionStorage.setItem("soldT" + this.dataID, num2);
   }
   limitMinMax() {
     if (this.numS > this.maxs) this.numS = this.getRandomInt(this.mins, this.maxs)
-    if (this.numT > this.maxt) this.numT = this.getRandomInt(this.mins, this.maxt)
+    if (this.numT > this.maxt) this.numT = this.getRandomInt(this.mint, this.maxt)
   }
   onVariantChanged(event) {
     const variant = event.detail && event.detail.variant;
@@ -1624,21 +1629,21 @@ var hdtNavLoading = true;
 class multiBrands extends HTMLElement {
   constructor() {
     super();
-    if($id4("hdt-nav-ul").classList.value.includes("hdt-nav-loading") < 0){
+    if ($id4("hdt-nav-ul").classList.value.includes("hdt-nav-loading") < 0) {
       return false;
     }
     this.item = $$4("[item-brand]", this);
     // this.section_id = this.getAttribute("s_id");
     // this.url = "";
-    if(this.item.length) {
-      for(var i=0; i < this.item.length; i++) {
+    if (this.item.length) {
+      for (var i = 0; i < this.item.length; i++) {
         if (this.item[i].parentElement.classList.value.includes("is--active")) {
           this.url = this.item[i].getAttribute("href");
           const lazyMb = $4('hdt-lazy-submenu#sub-hdt-nav-mb');
           if (lazyMb) {
-            lazyMb.addEventListener('lazyhtml:added', () => $4(`#hdt-nav-ul-mb summary[data-url="${this.url}"]`)?.parentElement.setAttribute("open",""));
+            lazyMb.addEventListener('lazyhtml:added', () => $4(`#hdt-nav-ul-mb summary[data-url="${this.url}"]`)?.parentElement.setAttribute("open", ""));
           } else {
-            $4(`#hdt-nav-ul-mb summary[data-url="${this.url}"]`)?.parentElement.setAttribute("open","");
+            $4(`#hdt-nav-ul-mb summary[data-url="${this.url}"]`)?.parentElement.setAttribute("open", "");
           }
           // localStorage.setItem("the4:brand:url", this.url);
           break;
@@ -1654,15 +1659,15 @@ customElements.define('multi-brands', multiBrands);
 // Footer Accordion
 // --------------------------
 
-class FooterAccordion extends HTMLElement{
-  constructor(){
+class FooterAccordion extends HTMLElement {
+  constructor() {
     super();
     this.id = this.getAttribute('id');
-    this.heading = $4(`#Heading-${this.id}`,this);
-    this.content = $4(`#Content-${this.id}`,this);
+    this.heading = $4(`#Heading-${this.id}`, this);
+    this.content = $4(`#Content-${this.id}`, this);
     this.config = JSON.parse(this.getAttribute('config'));
     this.flag = false;
-    if(!this.config){
+    if (!this.config) {
       this.config = {
         accordion: true
       }
@@ -1670,7 +1675,7 @@ class FooterAccordion extends HTMLElement{
     // if(window.innerWidth > 767){
     //   return;
     // }
-    if(this.config.accordionMobile){
+    if (this.config.accordionMobile) {
       this.init();
       window.addEventListener('resize', () => {
         window.innerWidth > 767 ? this.removeAttribute('open') : this.flag ? " " : this.init();
@@ -1678,24 +1683,24 @@ class FooterAccordion extends HTMLElement{
     }
   }
   static observedAttributes = ['open'];
-  get open(){
+  get open() {
     return this.hasAttribute('open');
   }
   attributeChangedCallback(name, oldValue, newValue) {
     this.open ? this.content.style.setProperty('height', `${this.content.scrollHeight}px`) : this.content.style.removeProperty('height');
   }
-  init(){
+  init() {
     window.innerWidth < 768 ? this.handleHeadingClick() : this.removeAttribute('open');
   }
-  handleHeadingClick(){
+  handleHeadingClick() {
     this.flag = true;
-    this.heading.addEventListener('click', () =>{
-      if(window.innerWidth > 767) return;
+    this.heading.addEventListener('click', () => {
+      if (window.innerWidth > 767) return;
       this.open ? this.removeAttribute('open') : this.setAttribute('open', '');
     })
   }
 }
-customElements.define('hdt-faccordion',FooterAccordion);
+customElements.define('hdt-faccordion', FooterAccordion);
 
 // --------------------------
 // Delivery Time
@@ -1707,31 +1712,31 @@ class orderDelivery extends VariantChangeBase {
   constructor() {
     super();
     this.config = JSON.parse(this.getAttribute('config'));
-    this.offDays          = this.config.off_day.replace(/ /g,'').split(",");
-    this.nowDay           = dayjs();
-    var format_day       = this.config.format_day,
-        time             = this.config.time.replace("24:00:00", "23:59:59"),
-        arrDayWeek       = ["SUN","MON","TUE","WED","THU","FRI","SAT"],
-        dateStart        = this.config.estimateStartDate || 0,
-        dateEnd          = this.config.estimateEndDate || 0,
-        excludeDays      = this.config.cut_day.replace(/ /g,'').split(","),
-        startDay         = dayjs(),
-        i                = 0,
-        endDay           = dayjs(),
-        j                = 0,
-        nowTime          = this.nowDay.format('HHmmss'),
-        timeint          = time.replace(/ /g,'').replace(/:/g,''),
+    this.offDays = this.config.off_day.replace(/ /g, '').split(",");
+    this.nowDay = dayjs();
+    var format_day = this.config.format_day,
+      time = this.config.time.replace("24:00:00", "23:59:59"),
+      arrDayWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+      dateStart = this.config.estimateStartDate || 0,
+      dateEnd = this.config.estimateEndDate || 0,
+      excludeDays = this.config.cut_day.replace(/ /g, '').split(","),
+      startDay = dayjs(),
+      i = 0,
+      endDay = dayjs(),
+      j = 0,
+      nowTime = this.nowDay.format('HHmmss'),
+      timeint = time.replace(/ /g, '').replace(/:/g, ''),
 
-        arrDay           = themeHDN.extras.order.dayNames.replace(/ /g,'').split(","),
-        arrMth           = themeHDN.extras.order.monthNames.replace(/ /g,'').split(",");
+      arrDay = themeHDN.extras.order.dayNames.replace(/ /g, '').split(","),
+      arrMth = themeHDN.extras.order.monthNames.replace(/ /g, '').split(",");
 
     /**
      * Check Time, if nowTime >=  timeint +1 day
      */
     if (parseInt(nowTime) >= parseInt(timeint)) {
-      this.nowDay   = this.nowDay.add(1, 'day');
+      this.nowDay = this.nowDay.add(1, 'day');
       startDay = startDay.add(1, 'day');
-      endDay   = endDay.add(1, 'day');
+      endDay = endDay.add(1, 'day');
     }
 
     /**
@@ -1739,31 +1744,31 @@ class orderDelivery extends VariantChangeBase {
      * Mode: 1 - Only delivery
      */
 
-    if ( this.config.mode == '2' ) {
+    if (this.config.mode == '2') {
 
       // START DATE
       // if ngay khach mua trung voi ngay loai tru tang 1 ngay
-      while (excludeDays.indexOf( arrDayWeek[startDay.format('d')] ) > -1 || this.offDays.indexOf( startDay.format('DD/MM/****') ) > -1 || this.offDays.indexOf( startDay.format('DD/MM/YYYY') ) > -1) {
+      while (excludeDays.indexOf(arrDayWeek[startDay.format('d')]) > -1 || this.offDays.indexOf(startDay.format('DD/MM/****')) > -1 || this.offDays.indexOf(startDay.format('DD/MM/YYYY')) > -1) {
         startDay = startDay.add(1, 'day');
       }
       while (i < dateStart) {
         i++;
         startDay = startDay.add(1, 'day');
-        if (excludeDays.indexOf( arrDayWeek[startDay.format('d')] ) > -1 || this.offDays.indexOf( startDay.format('DD/MM/****') ) > -1 || this.offDays.indexOf( startDay.format('DD/MM/YYYY') ) > -1) {
+        if (excludeDays.indexOf(arrDayWeek[startDay.format('d')]) > -1 || this.offDays.indexOf(startDay.format('DD/MM/****')) > -1 || this.offDays.indexOf(startDay.format('DD/MM/YYYY')) > -1) {
           i--;
         }
       }
 
       // END DATE
       // if ngay khach mua trung voi ngay loai tru tang 1 ngay
-      while (excludeDays.indexOf( arrDayWeek[endDay.format('d')] ) > -1 || this.offDays.indexOf( endDay.format('DD/MM/****') ) > -1 || this.offDays.indexOf( endDay.format('DD/MM/YYYY') ) > -1) {
+      while (excludeDays.indexOf(arrDayWeek[endDay.format('d')]) > -1 || this.offDays.indexOf(endDay.format('DD/MM/****')) > -1 || this.offDays.indexOf(endDay.format('DD/MM/YYYY')) > -1) {
         endDay = endDay.add(1, 'day');
       }
 
       while (j < dateEnd) {
         j++;
         endDay = endDay.add(1, 'day');
-        if (excludeDays.indexOf( arrDayWeek[endDay.format('d')] ) > -1 || this.offDays.indexOf( endDay.format('DD/MM/****') ) > -1 || this.offDays.indexOf( endDay.format('DD/MM/YYYY') ) > -1) {
+        if (excludeDays.indexOf(arrDayWeek[endDay.format('d')]) > -1 || this.offDays.indexOf(endDay.format('DD/MM/****')) > -1 || this.offDays.indexOf(endDay.format('DD/MM/YYYY')) > -1) {
           j--;
         }
       }
@@ -1773,13 +1778,13 @@ class orderDelivery extends VariantChangeBase {
 
       // START DATE
       startDay = startDay.add(dateStart, 'day');
-      while (excludeDays.indexOf( arrDayWeek[startDay.format('d')] ) > -1 || this.offDays.indexOf( startDay.format('DD/MM/****') ) > -1 || this.offDays.indexOf( startDay.format('DD/MM/YYYY') ) > -1) {
+      while (excludeDays.indexOf(arrDayWeek[startDay.format('d')]) > -1 || this.offDays.indexOf(startDay.format('DD/MM/****')) > -1 || this.offDays.indexOf(startDay.format('DD/MM/YYYY')) > -1) {
         startDay = startDay.add(1, 'day');
       }
 
       // END DATE
       endDay = endDay.add(dateEnd, 'day');
-      while (excludeDays.indexOf( arrDayWeek[endDay.format('d')] ) > -1 || this.offDays.indexOf( endDay.format('DD/MM/****') ) > -1 || this.offDays.indexOf( endDay.format('DD/MM/YYYY') ) > -1) {
+      while (excludeDays.indexOf(arrDayWeek[endDay.format('d')]) > -1 || this.offDays.indexOf(endDay.format('DD/MM/****')) > -1 || this.offDays.indexOf(endDay.format('DD/MM/YYYY')) > -1) {
         endDay = endDay.add(1, 'day');
       }
       // endDay = endDay.add(this.offDaysf(endDay), 'day');
@@ -1795,33 +1800,33 @@ class orderDelivery extends VariantChangeBase {
     arrMth = this.ArrUnique(arrMth);
 
     var startDayDInt = parseInt(startDay.format('D')),
-    daystStart       = startDayDInt + this.nth(startDayDInt),
-    MntStart         = arrMth[ parseInt(startDay.format('M')) -1 ],
-    dayStart         = arrDay[ parseInt(startDay.format('d')) ],
+      daystStart = startDayDInt + this.nth(startDayDInt),
+      MntStart = arrMth[parseInt(startDay.format('M')) - 1],
+      dayStart = arrDay[parseInt(startDay.format('d'))],
 
-    EndDayDInt       = parseInt(endDay.format('D')),
-    daystEnd         = EndDayDInt + this.nth( EndDayDInt ),
-    MntEnd           = arrMth[ parseInt(endDay.format('M')) -1 ],
-    dayEnd           = arrDay[ parseInt(endDay.format('d')) ];
+      EndDayDInt = parseInt(endDay.format('D')),
+      daystEnd = EndDayDInt + this.nth(EndDayDInt),
+      MntEnd = arrMth[parseInt(endDay.format('M')) - 1],
+      dayEnd = arrDay[parseInt(endDay.format('d'))];
 
     //console.log( startDayDInt, EndDayDInt )
-    if($4('[data-start-delivery]', this)) $4('[data-start-delivery]', this).innerHTML = startDay.format(format_day).replace('t44',dayStart).replace('t45',daystStart).replace('t46',MntStart);
-    if($4('[data-end-delivery]', this)) $4('[data-end-delivery]', this).innerHTML = endDay.format(format_day).replace('t44',dayEnd).replace('t45',daystEnd).replace('t46',MntEnd);
+    if ($4('[data-start-delivery]', this)) $4('[data-start-delivery]', this).innerHTML = startDay.format(format_day).replace('t44', dayStart).replace('t45', daystStart).replace('t46', MntStart);
+    if ($4('[data-end-delivery]', this)) $4('[data-end-delivery]', this).innerHTML = endDay.format(format_day).replace('t44', dayEnd).replace('t45', daystEnd).replace('t46', MntEnd);
   }
 
   ArrUnique(arr) {
     var onlyUnique = function (value, index, self) {
       return self.indexOf(value) === index;
     };
-    return arr.filter( onlyUnique );
+    return arr.filter(onlyUnique);
   }
 
   nth(d) {
     if (d > 3 && d < 21) return 'th';
     switch (d % 10) {
-      case 1:  return "st";
-      case 2:  return "nd";
-      case 3:  return "rd";
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
       default: return "th";
     }
   }
@@ -1829,9 +1834,9 @@ class orderDelivery extends VariantChangeBase {
   onVariantChanged(event) {
     const variant = event.detail.variant;
     if (variant && this.#preVariantId != variant.id) {
-      if(variant.available){
+      if (variant.available) {
         this.closest(".hdt-product-info__item").style.display = ""
-        if( variant.variant_state.pre_order && this.config?.hideWithPreorder ) {
+        if (variant.variant_state.pre_order && this.config?.hideWithPreorder) {
           this.closest(".hdt-product-info__item").style.display = "none"
         }
       }
@@ -1856,11 +1861,11 @@ class countdownSimple extends HTMLElement {
 
     if (time == '19041994') return;
     this.textTemp = $4("template", this).innerHTML;
-    this.notHasDay  = !this.textTemp.includes('[days]');
-    let today        = dayjs();
+    this.notHasDay = !this.textTemp.includes('[days]');
+    let today = dayjs();
 
-    const nowTime      = today.format('HHmmss'),
-          configTime   = time.replace(/ /g,'').replace(/:/g,'')
+    const nowTime = today.format('HHmmss'),
+      configTime = time.replace(/ /g, '').replace(/:/g, '')
 
     if (parseInt(nowTime) >= parseInt(configTime)) {
       today = today.add(1, 'day');
@@ -1871,7 +1876,7 @@ class countdownSimple extends HTMLElement {
 
     // Update the count down every 1 second
     this.#update();
-    this.x = setInterval( this.#update.bind(this), this.textTemp.includes('[secs]') ? 1000 : 60000);
+    this.x = setInterval(this.#update.bind(this), this.textTemp.includes('[secs]') ? 1000 : 60000);
   }
   #update() {
     // Get today's date and time
@@ -1881,11 +1886,11 @@ class countdownSimple extends HTMLElement {
     const distance = this.countDownDate - now;
 
     // Time calculations for days, hours, minutes and seconds
-    const days    = Math.floor(distance / (1000 * 60 * 60 * 24));
-    let   hours   = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-    if (this.notHasDay) hours = days*24 + hours;
+    if (this.notHasDay) hours = days * 24 + hours;
 
     // Display the result in the element
     this.innerHTML = this.textTemp.replace('[days]', String(days).padStart(2, '0')).replace('[hours]', String(hours).padStart(2, '0')).replace('[mins]', String(minutes).padStart(2, '0')).replace('[secs]', String(seconds).padStart(2, '0'));
@@ -1911,7 +1916,7 @@ class countdownTimer extends VariantChangeBase {
   onVariantChanged(event) {
     const variant = event.detail.variant;
     if (variant && this.#preVariantId != variant.id) {
-      if(variant.available){
+      if (variant.available) {
         this.style.display = ""
       }
       else {
@@ -1924,13 +1929,13 @@ customElements.define('countdown-timer', countdownTimer);
 
 // quick order list
 
-var createCartPromise = ()=> {
+var createCartPromise = () => {
   return new Promise(async (resolve) => {
     resolve(await (await fetch(`${Shopify.routes.root}cart.js`)).json());
   });
 };
 var _upate_qty,
-upate_qty_fn;
+  upate_qty_fn;
 class QuickOrderList extends HTMLElement {
   constructor() {
     super();
@@ -1939,7 +1944,7 @@ class QuickOrderList extends HTMLElement {
       add: 'ADD',
       update: 'UPDATE',
     };
-    this.quickOrderListId = '#'+this.id;
+    this.quickOrderListId = '#' + this.id;
     this.sectionId = this.dataset.sectionId;
     this.updateThink();
 
@@ -1956,7 +1961,7 @@ class QuickOrderList extends HTMLElement {
   }
 
   connectedCallback() {
-    document.addEventListener($4('hdt-cart-drawer') ? 'cart:drawer:change' : 'variant:add', this.fetchQuickOrder.bind(this) );
+    document.addEventListener($4('hdt-cart-drawer') ? 'cart:drawer:change' : 'variant:add', this.fetchQuickOrder.bind(this));
   }
   //disconnectedCallback() {}
 
@@ -1993,18 +1998,18 @@ class QuickOrderList extends HTMLElement {
       this.updateQuantity(index, quantity, this.actions.add);
     }
   }
-  onLoading(id){
-    $4(`#Variant-${id} [price_loading]`, this)?.setAttribute('aria-busy',true);
-    $$4('#hdt-quick-order-list-total .hdt-btn-loading__svg', this).forEach(el => el.setAttribute('aria-busy',true));
+  onLoading(id) {
+    $4(`#Variant-${id} [price_loading]`, this)?.setAttribute('aria-busy', true);
+    $$4('#hdt-quick-order-list-total .hdt-btn-loading__svg', this).forEach(el => el.setAttribute('aria-busy', true));
   }
-  deLoading(id){
-    $4(`#Variant-${id} [price_loading]`, this)?.setAttribute('aria-busy',false);
-    $$4('#hdt-quick-order-list-total .hdt-btn-loading__svg', this).forEach(el => el.setAttribute('aria-busy',false));
+  deLoading(id) {
+    $4(`#Variant-${id} [price_loading]`, this)?.setAttribute('aria-busy', false);
+    $$4('#hdt-quick-order-list-total .hdt-btn-loading__svg', this).forEach(el => el.setAttribute('aria-busy', false));
   }
-  removeButton(id,quantity){
-    quantity !== 0 ? $4(`#Variant-${id} hdt-quick-order-list-remove-button`, this).removeAttribute('hidden') : $4(`#Variant-${id} hdt-quick-order-list-remove-button`, this).setAttribute('hidden','');
+  removeButton(id, quantity) {
+    quantity !== 0 ? $4(`#Variant-${id} hdt-quick-order-list-remove-button`, this).removeAttribute('hidden') : $4(`#Variant-${id} hdt-quick-order-list-remove-button`, this).setAttribute('hidden', '');
   }
-  updateInCart(id,variant_in_cart){
+  updateInCart(id, variant_in_cart) {
     //  label
     $4(`#Variant-${id} .hdt-quantity__rules-cart`, this).removeAttribute('hidden');
     let variant_qty_cart = $4(`#Variant-${id} .hdt-quantity-cart`, this);
@@ -2013,25 +2018,25 @@ class QuickOrderList extends HTMLElement {
     let variant_total = $4(`#Variant-${id} [variant_update_price]`, this);
 
     // update
-    if(variant_in_cart?.length !== 0 && variant_in_cart){
+    if (variant_in_cart?.length !== 0 && variant_in_cart) {
       let variant_total_price = parseFloat(variant_in_cart.original_line_price)
       variant_qty_cart.innerText = variant_in_cart.quantity
-      variant_total.innerText = formatMoney(variant_total_price,themeHDN.settings.currencyFormat);
+      variant_total.innerText = formatMoney(variant_total_price, themeHDN.settings.currencyFormat);
       variant_total.setAttribute('data-variant-price', variant_total_price);
     } else {
       variant_qty_cart.innerText = 0;
-      variant_total.innerText = formatMoney(0,themeHDN.settings.currencyFormat);
+      variant_total.innerText = formatMoney(0, themeHDN.settings.currencyFormat);
       variant_total.setAttribute('data-variant-price', 0);
-      $4(`#Variant-${id} .hdt-quantity__rules-cart`, this).setAttribute('hidden','');
+      $4(`#Variant-${id} .hdt-quantity__rules-cart`, this).setAttribute('hidden', '');
     }
     this.removeT4CrurrencyData(variant_total);
   }
   removeT4CrurrencyData(el, dataset = el.dataset) {
     for (const [key, value] of Object.entries(dataset)) {
-      if(key.toLowerCase().indexOf("currency") >= 0) delete el.dataset[key];
+      if (key.toLowerCase().indexOf("currency") >= 0) delete el.dataset[key];
     }
   }
-  updateTotalInCart(){
+  updateTotalInCart() {
     let items_total = 0;
     let items_price = 0;
 
@@ -2044,10 +2049,10 @@ class QuickOrderList extends HTMLElement {
 
     // update items_price
     let prices = $$4('[data-variant-price]', this);
-    prices.forEach(price =>{
+    prices.forEach(price => {
       return items_price += parseFloat(price.getAttribute('data-variant-price'));
     })
-    this.items_price_in_cart.innerText = formatMoney(items_price,themeHDN.settings.currencyFormat);
+    this.items_price_in_cart.innerText = formatMoney(items_price, themeHDN.settings.currencyFormat);
     this.removeT4CrurrencyData(this.items_price_in_cart);
     document.dispatchEvent(new CustomEvent("currency:update"));
   }
@@ -2060,8 +2065,8 @@ class QuickOrderList extends HTMLElement {
   }
   // update quantity product
   updateQuantity(id, quantity, action) {
-    document.dispatchEvent(new CustomEvent("theme:loading:doing",{bubbles:!0}));
-    this.removeButton(id,quantity);
+    document.dispatchEvent(new CustomEvent("theme:loading:doing", { bubbles: !0 }));
+    this.removeButton(id, quantity);
     this.onLoading(id);
     let bundleSections = [];
     document.dispatchEvent(new CustomEvent("cart:push:section.id", { bubbles: true, detail: { sections: bundleSections } }));
@@ -2090,30 +2095,30 @@ class QuickOrderList extends HTMLElement {
     }
 
     fetch(`${routeUrl}`, { ...this.fetchConfig(fetchConfigType), ...{ body } })
-    .then((response) => {
-      return response.text();
-    })
-    .then((state) => {
-      let cartContent = JSON.parse(state);
-      const quantityElement = document.getElementById(`Quantity-${id}`);
+      .then((response) => {
+        return response.text();
+      })
+      .then((state) => {
+        let cartContent = JSON.parse(state);
+        const quantityElement = document.getElementById(`Quantity-${id}`);
 
-      if(quantity === 0){
-        this.resetQuantityInput(id,quantityElement,true);
-      }
-      quantityElement.setAttribute('data-cart-quantity',quantity);
-      getterRunFn(_upate_qty, this, upate_qty_fn).call(this, cartContent, parseInt(id), action, bundleSections)
-    })
-    .catch((error) => {
-      console.log(error);
-    })
-    .finally(() => {
-      this.updateTotalInCart();
-      document.dispatchEvent(new CustomEvent("currency:update"));
-      document.dispatchEvent(new CustomEvent("theme:loading:done",{bubbles:!0}));
-      this.deLoading(id);
-    });
+        if (quantity === 0) {
+          this.resetQuantityInput(id, quantityElement, true);
+        }
+        quantityElement.setAttribute('data-cart-quantity', quantity);
+        getterRunFn(_upate_qty, this, upate_qty_fn).call(this, cartContent, parseInt(id), action, bundleSections)
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        this.updateTotalInCart();
+        document.dispatchEvent(new CustomEvent("currency:update"));
+        document.dispatchEvent(new CustomEvent("theme:loading:done", { bubbles: !0 }));
+        this.deLoading(id);
+      });
   }
-  resetQuantityInput(id, quantityElement,resetValue) {
+  resetQuantityInput(id, quantityElement, resetValue) {
     const input = quantityElement ?? document.getElementById(`Quantity-${id}`);
     input.value = input.getAttribute('value');
     resetValue ? input.value = 0 : input.value = input.getAttribute('value');
@@ -2138,10 +2143,10 @@ class QuickOrderList extends HTMLElement {
 
 }
 _upate_qty = new WeakSet();
-upate_qty_fn = async function(cartContent, id, action) {
+upate_qty_fn = async function (cartContent, id, action) {
   const variant_in_cart = cartContent.items.find((item) => item.variant_id === id);
-  this.updateInCart(id,variant_in_cart);
-  this.dispatchEvent(new CustomEvent("quickOrder:change", { bubbles: false}));
+  this.updateInCart(id, variant_in_cart);
+  this.dispatchEvent(new CustomEvent("quickOrder:change", { bubbles: false }));
   //document.dispatchEvent(new CustomEvent("cart:refresh"));
   let cart = cartContent;
   if (action === this.actions.add) {
@@ -2164,11 +2169,11 @@ customElements.define('hdt-quick-order-list', QuickOrderList);
 class QuickOrderListRemoveButton extends HTMLElement {
   constructor() {
     super();
-    this.addEventListener('click',(event) => {
+    this.addEventListener('click', (event) => {
       event.preventDefault();
       const quickOrderList = this.closest('hdt-quick-order-list');
       quickOrderList.updateQuantity(this.dataset.index, 0);
-      this.setAttribute('hidden','');
+      this.setAttribute('hidden', '');
     });
   }
 }
@@ -2195,13 +2200,13 @@ class QuickOrderListRemoveAllButton extends HTMLElement {
     });
 
     if (!hasVariantsInCart) {
-      this.setAttribute('hidden','')
+      this.setAttribute('hidden', '')
     }
 
     this.addEventListener('click', (event) => {
       event.preventDefault();
-      this.quickOrderList.updateMultipleQty(items,list_variants);
-      this.setAttribute('hidden','')
+      this.quickOrderList.updateMultipleQty(items, list_variants);
+      this.setAttribute('hidden', '')
     });
   }
 }
@@ -2220,10 +2225,10 @@ class instagramFeedAPI extends HTMLElement {
         this.refresh_ins();
       })
       document.addEventListener('shopify:section:deselect', (event) => {
-        const {acc,id} = this.config;
-        var data = sessionStorage.getItem('hdt_ins'+acc+id);
+        const { acc, id } = this.config;
+        var data = sessionStorage.getItem('hdt_ins' + acc + id);
         if (data != null && data != '') {
-          sessionStorage.removeItem('hdt_ins'+acc+id);
+          sessionStorage.removeItem('hdt_ins' + acc + id);
         }
       })
     }
@@ -2231,31 +2236,31 @@ class instagramFeedAPI extends HTMLElement {
   connectedCallback() {
     this.refresh_ins();
   }
-  refresh_ins(){
-    const {acc,id} = this.config;
+  refresh_ins() {
+    const { acc, id } = this.config;
 
     if (acc == '') return;
 
-    var data = sessionStorage.getItem('hdt_ins'+acc+id);
+    var data = sessionStorage.getItem('hdt_ins' + acc + id);
 
     if (data != null && data != '') {
       // calculate expiration time for content,
       // to force periodic refresh after 30 minutes
       var now = new Date(),
-      expiration = new Date(JSON.parse(data).timestamp);
+        expiration = new Date(JSON.parse(data).timestamp);
 
       expiration.setMinutes(expiration.getMinutes() + 30);
 
       // ditch the content if too old
       if (now.getTime() > expiration.getTime()) {
         data = null;
-        sessionStorage.removeItem('hdt_ins'+acc+id);
+        sessionStorage.removeItem('hdt_ins' + acc + id);
       }
     }
-    if ( data != null && data != '' ) {
-      this.instagramHTML(JSON.parse(data).content,false);
+    if (data != null && data != '') {
+      this.instagramHTML(JSON.parse(data).content, false);
     }
-    else{
+    else {
       if (dataInstagramCache[acc]) {
         $4('.hdt-slider__container', this).innerHTML = dataInstagramCache[acc];
         $4('.hdt-ins-loading', this)?.remove();
@@ -2267,33 +2272,33 @@ class instagramFeedAPI extends HTMLElement {
         return;
       }
 
-      fetch('https://graph.instagram.com/me/media?fields=id,media_type,media_url,permalink,thumbnail_url,caption,children&access_token='+atob(acc))
-      .then((response) => {
-        if(!response.ok) { throw new Error("not ok"); }
-        return response.json()
-      })
-      //.then(function(res)
-      .then((res) => {
-        //console.log('Success:', res);
-         this.instagramHTML(res.data,true);
-      })
-      .catch(() => {
-        $4('.hdt-ins-loading', this)?.remove();
-        console.error("Instagram Feed:error fetch");
-      });
+      fetch('https://graph.instagram.com/me/media?fields=id,media_type,media_url,permalink,thumbnail_url,caption,children&access_token=' + atob(acc))
+        .then((response) => {
+          if (!response.ok) { throw new Error("not ok"); }
+          return response.json()
+        })
+        //.then(function(res)
+        .then((res) => {
+          //console.log('Success:', res);
+          this.instagramHTML(res.data, true);
+        })
+        .catch(() => {
+          $4('.hdt-ins-loading', this)?.remove();
+          console.error("Instagram Feed:error fetch");
+        });
     }
   }
-  instagramHTML(data,saveSessionStorageIns) {
+  instagramHTML(data, saveSessionStorageIns) {
     const arrIcons = ($4('.hdt-icons-ins-svg', this).innerHTML || '').split('[hdtplit]'),
-    icons = {
-       image : arrIcons[0],
-       video : arrIcons[1],
-       carousel_album: arrIcons[2]
-    },
-    {id, acc, target, limit} = this.config;
+      icons = {
+        image: arrIcons[0],
+        video: arrIcons[1],
+        carousel_album: arrIcons[2]
+      },
+      { id, acc, target, limit } = this.config;
     let html = '';
 
-    data.forEach( (el, index) => {
+    data.forEach((el, index) => {
       if (index >= limit) return 0;
       const media_type = el.media_type.toLowerCase();
       html += `<div class="hdt-slider__slide hdt-ins-type-${media_type}"><a calc-nav data-no-instant rel="nofollow" class="hdt-ins-inner hdt-block hdt-relative hdt-oh hdt-radius" href="${el.permalink}" target="${target}"><div class="hdt-ratio"><img src="${el.thumbnail_url || el.media_url}" class="hdt-ins-img" loading="lazy"></div><div class="hdt-ins-icon">${icons[media_type]}</div></a></div>`
@@ -2307,8 +2312,8 @@ class instagramFeedAPI extends HTMLElement {
       lazySlider.InitLazy();
     }
 
-    if(saveSessionStorageIns){
-      sessionStorage.setItem('hdt_ins'+acc+id, JSON.stringify({
+    if (saveSessionStorageIns) {
+      sessionStorage.setItem('hdt_ins' + acc + id, JSON.stringify({
         timestamp: new Date(),
         content: data
       }));
@@ -2395,7 +2400,7 @@ class countryFilter extends HTMLElement {
     this.search.addEventListener('keydown', this.onSearchKeyDown.bind(this));
 
   }
-  filterCountries(){
+  filterCountries() {
     const searchValue = this.search.value.toLowerCase();
     const allCountries = this.closest("hdt-popover").querySelectorAll('hdt-richlist button');
     let visibleCountries = allCountries.length;
@@ -2426,7 +2431,7 @@ if (!customElements.get('country-filter')) {
 
 
 // check purchase code
-if(Shopify.designMode){
+if (Shopify.designMode) {
 
   /**
   * If it's a global variable then window[variableName] or in your case window["onlyVideo"] should do the trick.
@@ -2447,18 +2452,18 @@ if(Shopify.designMode){
     }
   };
 
-  var ThemeCode    = atob(window[atob('Y0hWeVkyaGg=')]),
-      ThemeName_base64 = window[atob('VkdobGJXVk9ZVzFsVkRR')],
-      ThemeName            = atob(ThemeName_base64),
-      CookieName           = 'SXNBY3RpdmVUaGVtZQ=='+ThemeName_base64,
-      ShopEmail            = atob(window[atob('VTJodmNFMWxiMVEw')]),
-      isTrueSet            = (sessionStorage.getItem(CookieName) === 'true' ),
-      str_temp_active      = atob('I3Q0cy10ZW1wLWtleS1hY3RpdmU='), // #t4s-temp-key-active
-      str_purchase         = atob('cHVyY2hhc2VfY29kZXQ0'); // purchase_codet4;
+  var ThemeCode = atob(window[atob('Y0hWeVkyaGg=')]),
+    ThemeName_base64 = window[atob('VkdobGJXVk9ZVzFsVkRR')],
+    ThemeName = atob(ThemeName_base64),
+    CookieName = 'SXNBY3RpdmVUaGVtZQ==' + ThemeName_base64,
+    ShopEmail = atob(window[atob('VTJodmNFMWxiMVEw')]),
+    isTrueSet = (sessionStorage.getItem(CookieName) === 'true'),
+    str_temp_active = atob('I3Q0cy10ZW1wLWtleS1hY3RpdmU='), // #t4s-temp-key-active
+    str_purchase = atob('cHVyY2hhc2VfY29kZXQ0'); // purchase_codet4;
 
-      // console.log(ThemeCode,ThemeName,ShopEmail,CookieName,str_temp_active,str_purchase)
+  // console.log(ThemeCode,ThemeName,ShopEmail,CookieName,str_temp_active,str_purchase)
   function alert_active_html() {
-    return `<section id="${str_purchase}" style="display: flex !important">${ $4(str_temp_active).innerHTML }</section>`;
+    return `<section id="${str_purchase}" style="display: flex !important">${$4(str_temp_active).innerHTML}</section>`;
   };
 
   // console.log('ThemeCode', ThemeCode, isTrueSet)
@@ -2471,19 +2476,19 @@ if(Shopify.designMode){
     sessionStorage.removeItem(CookieName);
     localStorage.removeItem(CookieName);
   }
-  else if ( !isTrueSet ) {
+  else if (!isTrueSet) {
 
     //console.log(ShopEmail, ThemeName, ThemeCode);
 
-    var domain     = window.location.hostname,
-    mix        = ['4','t','h','e','p','l','i','c','o','/','.',':','n','s'],
-    mix_domain = mix[2]+mix[1]+mix[1]+mix[4]+mix[13]+mix[11]+mix[9]+mix[9]+mix[5]+mix[6]+mix[7]+mix[10]+mix[1]+mix[2]+mix[3]+mix[0]+mix[10]+mix[7]+mix[8]+mix[9]+mix[5]+mix[6]+mix[7]+mix[3]+mix[12]+mix[13]+mix[3]+mix[9]+mix[7]+mix[2]+mix[3]+mix[7]+'k',
-    data       = {
-      "shopify_domain": domain,
-      "email"         : ShopEmail,
-      "theme"         : ThemeName,
-      "purchase_code" : ThemeCode
-    };
+    var domain = window.location.hostname,
+      mix = ['4', 't', 'h', 'e', 'p', 'l', 'i', 'c', 'o', '/', '.', ':', 'n', 's'],
+      mix_domain = mix[2] + mix[1] + mix[1] + mix[4] + mix[13] + mix[11] + mix[9] + mix[9] + mix[5] + mix[6] + mix[7] + mix[10] + mix[1] + mix[2] + mix[3] + mix[0] + mix[10] + mix[7] + mix[8] + mix[9] + mix[5] + mix[6] + mix[7] + mix[3] + mix[12] + mix[13] + mix[3] + mix[9] + mix[7] + mix[2] + mix[3] + mix[7] + 'k',
+      data = {
+        "shopify_domain": domain,
+        "email": ShopEmail,
+        "theme": ThemeName,
+        "purchase_code": ThemeCode
+      };
 
     fetch(mix_domain, {
       "headers": {
@@ -2491,95 +2496,95 @@ if(Shopify.designMode){
         "cache-control": "no-cache",
         "x-requested-with": "XMLHttpRequest"
       },
-      "body": btoa (encodeURIComponent(JSON.stringify(data))) ,
+      "body": btoa(encodeURIComponent(JSON.stringify(data))),
       "method": "POST",
       "mode": "cors"
     })
-    .then(function(response) {
-      if(response.ok){
-        return response.json()
-      } throw ""
-    })
-    .then(function(response) {
-      let dom = (new DOMParser).parseFromString(alert_active_html(), "text/html");
+      .then(function (response) {
+        if (response.ok) {
+          return response.json()
+        } throw ""
+      })
+      .then(function (response) {
+        let dom = (new DOMParser).parseFromString(alert_active_html(), "text/html");
 
-      if ( response.status == 1) {
+        if (response.status == 1) {
 
-        dom.body.firstElementChild.innerHTML = "<p>ACTIVATED SUCCESSFULLY. Thanks for buying my theme!</p>";
-        document.body.append(dom.body.firstElementChild);
+          dom.body.firstElementChild.innerHTML = "<p>ACTIVATED SUCCESSFULLY. Thanks for buying my theme!</p>";
+          document.body.append(dom.body.firstElementChild);
 
-        // Set a cookie to expire in 1 hour in Javascript
-        var isActived = localStorage.getItem(CookieName);
-        sessionStorage.setItem(CookieName, 'true')
+          // Set a cookie to expire in 1 hour in Javascript
+          var isActived = localStorage.getItem(CookieName);
+          sessionStorage.setItem(CookieName, 'true')
 
-        if (isActived === 'true') {
-          $4(atob('I3B1cmNoYXNlX2NvZGV0NA==')).remove(); // #purchase_codet4
-          // $4(atob('I2x1ZmZ5YWJjMTk0'))?.remove(); //#luffyabc194
-        }
-        else {
-          localStorage.setItem(CookieName, "true");
-          setTimeout(function(){
+          if (isActived === 'true') {
             $4(atob('I3B1cmNoYXNlX2NvZGV0NA==')).remove(); // #purchase_codet4
             // $4(atob('I2x1ZmZ5YWJjMTk0'))?.remove(); //#luffyabc194
-          }, 1000);
-        }
+          }
+          else {
+            localStorage.setItem(CookieName, "true");
+            setTimeout(function () {
+              $4(atob('I3B1cmNoYXNlX2NvZGV0NA==')).remove(); // #purchase_codet4
+              // $4(atob('I2x1ZmZ5YWJjMTk0'))?.remove(); //#luffyabc194
+            }, 1000);
+          }
 
-      }
-      else {
-
-        var mess = response.message;
-        if (mess == "No sale belonging to the current user found with that code") {
-
-          dom.body.firstElementChild.innerHTML = "<p>Purchase code error. It is a sales reversal or a refund. :(((</p>";
-
-        }
-        else if (mess.length == 58 || mess.length == 101) {
-          dom.body.firstElementChild.innerHTML = "<p>That license key doesn't appear to be valid. Please check your purchase code again!<br>Please open a ticket at <a href='https://support.the4.co' target='_blank'><span>support.the4.co</span></a> if you have any question.</p>";
-
-        }
-        else if (mess.length == 104) {
-          dom.body.firstElementChild.innerHTML = "<p>The license not match with current theme.!<br>Please open a ticket at <a href='https://support.the4.co' target='_blank'><span>support.the4.co</span></a> if you have any question.</p>";
         }
         else {
-          try {
-            var mess = mess.split('active domain `')[1].split('`. ')[0];
+
+          var mess = response.message;
+          if (mess == "No sale belonging to the current user found with that code") {
+
+            dom.body.firstElementChild.innerHTML = "<p>Purchase code error. It is a sales reversal or a refund. :(((</p>";
+
           }
-          catch(err) {
-            //var mess = mess;
+          else if (mess.length == 58 || mess.length == 101) {
+            dom.body.firstElementChild.innerHTML = "<p>That license key doesn't appear to be valid. Please check your purchase code again!<br>Please open a ticket at <a href='https://support.the4.co' target='_blank'><span>support.the4.co</span></a> if you have any question.</p>";
+
           }
-          dom.body.firstElementChild.innerHTML = "<p>Your purchase code is invalided since it is being activated at another store "+mess+".<br> Please open a ticket at <a class='cg' href='https://support.the4.co' target='_blank'><span>support.the4.co</span></a> to get quick assistance.</p>";
+          else if (mess.length == 104) {
+            dom.body.firstElementChild.innerHTML = "<p>The license not match with current theme.!<br>Please open a ticket at <a href='https://support.the4.co' target='_blank'><span>support.the4.co</span></a> if you have any question.</p>";
+          }
+          else {
+            try {
+              var mess = mess.split('active domain `')[1].split('`. ')[0];
+            }
+            catch (err) {
+              //var mess = mess;
+            }
+            dom.body.firstElementChild.innerHTML = "<p>Your purchase code is invalided since it is being activated at another store " + mess + ".<br> Please open a ticket at <a class='cg' href='https://support.the4.co' target='_blank'><span>support.the4.co</span></a> to get quick assistance.</p>";
+          }
+          document.body.append(dom.body.firstElementChild);
+
         }
-        document.body.append(dom.body.firstElementChild);
 
-      }
-
-    }).catch(function(e) {
-    //}).catch((e)=>{
-      console.error(e)
-    });
+      }).catch(function (e) {
+        //}).catch((e)=>{
+        console.error(e)
+      });
 
   }
 }
 // end check purchase code
 
 // readmore collection description
-class DescriptionShort extends HTMLElement{
-  constructor(){
+class DescriptionShort extends HTMLElement {
+  constructor() {
     super();
     this.button_readmore = $4('[data-read-more]', this);
     this.button_readless = $4('[data-read-less]', this);
     this.short_des = $4('.hdt-collection-description-short', this);
     this.full_des = $4('.hdt-collection-description-full', this);
-    if(!this.button_readmore || !this.button_readless || !this.short_des || !this.full_des){
+    if (!this.button_readmore || !this.button_readless || !this.short_des || !this.full_des) {
       return;
     }
-    this.button_readmore.addEventListener('click',(e)=>{
+    this.button_readmore.addEventListener('click', (e) => {
       // console.log(this);
       e.preventDefault();
       this.short_des.classList.add('hdt-hidden');
       this.full_des.classList.remove('hdt-hidden');
     })
-    this.button_readless.addEventListener('click',(e)=>{
+    this.button_readless.addEventListener('click', (e) => {
       // console.log(this);
       e.preventDefault();
       this.short_des.classList.remove('hdt-hidden');
@@ -2587,14 +2592,14 @@ class DescriptionShort extends HTMLElement{
     })
   }
 }
-customElements.define('description-short',DescriptionShort)
+customElements.define('description-short', DescriptionShort)
 
 // product description - readmore
-class ProductDescription extends HTMLElement{
-  constructor(){
+class ProductDescription extends HTMLElement {
+  constructor() {
     super();
   }
-  connectedCallback(){
+  connectedCallback() {
     const handleIntersection = (entries, observer) => {
       if (!entries[0].isIntersecting) return;
       observer.unobserve(this);
@@ -2603,16 +2608,16 @@ class ProductDescription extends HTMLElement{
 
     new IntersectionObserver(handleIntersection.bind(this), { rootMargin: '0px 0px 0px 0px' }).observe(this);
   }
-  init(){
-    
+  init() {
+
     this.lm_btn = this.querySelector('[data-button]');
     this.content = this.querySelector('[data-content]');
     this.m_h = parseInt(this.dataset.heightLimit);
-    if(!this.lm_btn || !this.content || !this.m_h) return;
-    
+    if (!this.lm_btn || !this.content || !this.m_h) return;
+
     let content_h = this.content.scrollHeight;
     // console.dir(this.content);
-    if(this.m_h > content_h){
+    if (this.m_h > content_h) {
       this.lm_btn.style.setProperty('display', 'none');
       return;
     }
@@ -2621,28 +2626,28 @@ class ProductDescription extends HTMLElement{
     this.content.style.setProperty('max-height', `${this.m_h}px`);
     this.content.style.setProperty('--max-height', `${this.m_h}px`);
 
-    this.lm_btn.addEventListener('click',()=>{
+    this.lm_btn.addEventListener('click', () => {
       this.classList.toggle('is--less');
     })
   }
 }
-customElements.define('product-description',ProductDescription);
+customElements.define('product-description', ProductDescription);
 
 
 // ===========================
 //        QUICK SEARCH
 // ===========================
-class QuickSearch extends HTMLElement{
-  constructor(){
+class QuickSearch extends HTMLElement {
+  constructor() {
     super();
     this.inpt = this.closest('hdt-predictive-search').querySelector('form input[data-input-search]');
     this.query = this.querySelector('a');
-    if(!this.inpt || !this.query) return;
+    if (!this.inpt || !this.query) return;
     this.onClick();
   }
-  onClick(){
+  onClick() {
     let self = this;
-    this.query.addEventListener('click',(e) => {
+    this.query.addEventListener('click', (e) => {
       e.preventDefault();
       self.inpt.value = e.target.dataset.query;
       self.inpt.dispatchEvent(new Event('input'));
@@ -2671,7 +2676,7 @@ function handleAccordionClick() {
   accordion.classList.toggle('open');
   if (window.innerWidth < 768) {
     let content = accordion.querySelector('.hdt-collapse-content');
-    if(!content) return;
+    if (!content) return;
     if (accordion.classList.contains('open')) {
       content.style.height = content.scrollHeight + 'px';
     } else {
@@ -2681,22 +2686,22 @@ function handleAccordionClick() {
 }
 function updateMaxHeight() {
   if (window.innerWidth >= 768) {
-    document.querySelectorAll('.hdt-footer-section .hdt-collapse-content').forEach(function(content) {
+    document.querySelectorAll('.hdt-footer-section .hdt-collapse-content').forEach(function (content) {
       content.style.height = '';
     });
   }
 }
-document.querySelectorAll('.hdt-footer-section .hdt-heading-f').forEach(function(element) {
+document.querySelectorAll('.hdt-footer-section .hdt-heading-f').forEach(function (element) {
   element.addEventListener('click', handleAccordionClick);
 });
-window.addEventListener('resize', function() {
+window.addEventListener('resize', function () {
   if (window.innerWidth < 768) {
-    document.querySelectorAll('.hdt-footer-section .hdt-heading-f').forEach(function(element) {
+    document.querySelectorAll('.hdt-footer-section .hdt-heading-f').forEach(function (element) {
       element.removeEventListener('click', handleAccordionClick);
       element.addEventListener('click', handleAccordionClick);
     });
   } else {
-    document.querySelectorAll('.hdt-footer-section .hdt-heading-f').forEach(function(element) {
+    document.querySelectorAll('.hdt-footer-section .hdt-heading-f').forEach(function (element) {
       element.removeEventListener('click', handleAccordionClick);
     });
     updateMaxHeight();
@@ -2706,15 +2711,15 @@ window.addEventListener('resize', function() {
 
 // video popup
 class popupVideo extends HTMLElement {
-  constructor(){
+  constructor() {
     super();
     this.modal = $4("hdt-modal", this);
     this.dialog = $4("dialog", this);
     this.video = $4("hdt-video-player", this);
-    this.dialog.addEventListener(`${dialogOpen}`, (e)=>{
+    this.dialog.addEventListener(`${dialogOpen}`, (e) => {
       this.video.play()
     })
-    this.dialog.addEventListener(`${dialogClose}`, (e)=>{
+    this.dialog.addEventListener(`${dialogClose}`, (e) => {
       this.video.pause()
     })
   }
@@ -2726,7 +2731,7 @@ customElements.define('hdt-btn-popup-video', popupVideo);
  * Updates variant option labels (strikethrough) based on selection.
  * Created to fix Issue: sold out variants not showing strikethrough dynamically.
  */
-(function() {
+(function () {
   function updateVariantAvailability(picker) {
     if (!picker) return;
     try {
@@ -2747,7 +2752,7 @@ customElements.define('hdt-btn-popup-video', popupVideo);
           JSON.parse(inventoryScript.textContent).forEach(v => {
             inventoryMap[v.id] = { qty: v.qty, policy: v.policy };
           });
-        } catch(err) {}
+        } catch (err) { }
       }
 
       const sectionId = picker.id.replace('variant-picker-', '');
@@ -2763,13 +2768,13 @@ customElements.define('hdt-btn-popup-video', popupVideo);
                 qty = parseInt(qtyAttr, 10);
                 if (isNaN(qty)) qty = 0;
               }
-              inventoryMap[opt.value] = { 
-                qty: qty, 
-                policy: opt.getAttribute('data-inventorypolicy') || '' 
+              inventoryMap[opt.value] = {
+                qty: qty,
+                policy: opt.getAttribute('data-inventorypolicy') || ''
               };
             }
           });
-        } catch(err) {}
+        } catch (err) { }
       }
 
       const fieldsets = Array.from(picker.querySelectorAll('fieldset[data-index]'));
@@ -2782,7 +2787,7 @@ customElements.define('hdt-btn-popup-video', popupVideo);
 
         const radio = fieldset.querySelector('input[type="radio"]:checked');
         if (radio) return radio.value;
-        
+
         const trigger = fieldset.querySelector('button[aria-controls]');
         if (trigger) {
           const popoverId = trigger.getAttribute('aria-controls');
@@ -2803,7 +2808,7 @@ customElements.define('hdt-btn-popup-video', popupVideo);
 
       fieldsets.forEach((fieldset, index) => {
         let options = Array.from(fieldset.querySelectorAll('input[type="radio"], .hdt-variant-option'));
-        
+
         const trigger = fieldset.querySelector('button[aria-controls]');
         if (trigger) {
           const popoverId = trigger.getAttribute('aria-controls');
@@ -2829,16 +2834,16 @@ customElements.define('hdt-btn-popup-video', popupVideo);
               if (currentSelected[idx] === null) return true;
               return String(opt).trim() === String(currentSelected[idx]).trim();
             });
-            
+
             if (match) {
               exists = true;
               let effectivelyAvailable = v.available;
               const inv = inventoryMap[v.id];
-              
+
               if (inv && inv.qty <= 0) {
                 effectivelyAvailable = false;
               }
-              
+
               if (effectivelyAvailable) {
                 isAvailable = true;
                 break;
@@ -2904,7 +2909,7 @@ customElements.define('hdt-btn-popup-video', popupVideo);
   function setupObserver(picker) {
     if (picker.dataset.obsSetup) return;
     picker.dataset.obsSetup = 'true';
-    
+
     // Create an observer to fight framework re-renders
     const observer = new MutationObserver((mutations) => {
       let shouldUpdate = false;
@@ -2917,9 +2922,9 @@ customElements.define('hdt-btn-popup-video', popupVideo);
         picker.updateTimer = setTimeout(() => updateVariantAvailability(picker), 50);
       }
     });
-    
+
     observer.observe(picker, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'aria-selected'] });
-    
+
     // Observe teleported popovers
     picker.querySelectorAll('button[aria-controls]').forEach(btn => {
       const pId = btn.getAttribute('aria-controls');
@@ -2946,7 +2951,7 @@ customElements.define('hdt-btn-popup-video', popupVideo);
       const trigger = e.target.closest('button[aria-controls]');
       if (trigger) picker = trigger.closest('hdt-variant-picker');
     }
-    
+
     if (picker) {
       setupObserver(picker);
       setTimeout(() => updateVariantAvailability(picker), 10);
