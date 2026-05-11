@@ -1560,6 +1560,38 @@ class flashSold extends VariantChangeBase {
     }, this.intervalTime);
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    if (this._fallbackBound) return;
+    this._fallbackBound = true;
+    const formId = this.getAttribute("form");
+    const form = formId ? document.forms[formId] : null;
+    const rerollHandler = () => {
+      clearTimeout(this._rerollTm);
+      this._rerollTm = setTimeout(() => this.rerollSold(), 60);
+    };
+    if (form) {
+      form.addEventListener("change", rerollHandler);
+    }
+    const picker = formId
+      ? document.querySelector(`hdt-variant-picker[form="${formId}"]`)
+      : null;
+    if (picker) {
+      picker.addEventListener("click", (e) => {
+        if (e.target.closest("input, label, button, [role='option'], hdt-richlist")) {
+          rerollHandler();
+        }
+      });
+    }
+  }
+
+  rerollSold() {
+    this.numS = this.getRandomInt(this.mins, this.maxs);
+    this.numT = this.getRandomInt(this.mint, this.maxt);
+    this.limitMinMax();
+    this.updateSold(this.numS, this.numT);
+  }
+
   getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -1571,20 +1603,16 @@ class flashSold extends VariantChangeBase {
     sessionStorage.setItem("soldT" + this.dataID, num2);
   }
   limitMinMax() {
-    if (this.numS > this.maxs) this.numS = self.getRandomInt(this.mins, this.maxs)
-    if (this.numT > this.maxt) this.numT = self.getRandomInt(this.mins, this.maxt)
+    if (this.numS > this.maxs) this.numS = this.getRandomInt(this.mins, this.maxs)
+    if (this.numT > this.maxt) this.numT = this.getRandomInt(this.mins, this.maxt)
   }
-  #preVariantId;
   onVariantChanged(event) {
-    const variant = event.detail.variant;
-    if (variant && this.#preVariantId != variant.id) {
-      if(variant.available){
-        this.closest(".hdt-product-info__item").style.display = "block"
-      }
-      else {
-        this.closest(".hdt-product-info__item").style.display = "none"
-      }
+    const variant = event.detail && event.detail.variant;
+    const wrapper = this.closest(".hdt-product-info__item");
+    if (wrapper && variant) {
+      wrapper.style.display = variant.available ? "block" : "none";
     }
+    this.rerollSold();
   }
 }
 customElements.define('flash-sold', flashSold);

@@ -922,12 +922,22 @@
     top: 20px !important;
     align-self: flex-start !important;
     z-index: 10 !important;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    overflow-x: hidden;
     transition: top 0.3s ease;
+    scrollbar-width: thin;
+  }
+  .hdt-shop-sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .hdt-shop-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 3px;
   }
   .hdt-shop-sidebar.scrolling-up {
     top: calc(var(--header-height, 0px) + 20px) !important;
     max-height: calc(100vh - var(--header-height, 0px) - 40px);
-    overflow-y: auto;
   }
 }
 
