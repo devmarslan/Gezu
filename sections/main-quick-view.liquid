@@ -112,10 +112,16 @@
     // 1. Global Reset Function (Ensures buttons work on every click)
     // We define this on window to keep it consistent across AJAX reloads
     window.hdtResetQuickView = window.hdtResetQuickView || function(e) {
-      // If triggered by an event, check if it's the right one
+      // If triggered by an event, check if it's the right one.
+      // `target.querySelector` only exists on Elements / Documents — guard
+      // against non-Element targets (e.g. native `close` event from <select>
+      // in some browsers) to avoid "undefined is not a function".
       if (e && e.target) {
         const target = e.target;
-        if (!(target.id === 'hdt-quick-view-modal' || target.querySelector('#hdt-quick-view-modal'))) return;
+        if (target.id !== 'hdt-quick-view-modal') {
+          if (typeof target.querySelector !== 'function') return;
+          if (!target.querySelector('#hdt-quick-view-modal')) return;
+        }
       }
 
       // Clear loading/open states on all Quickview trigger wrappers site-wide
@@ -167,16 +173,23 @@
     }
 
     // Shopify Design Mode Support
-    if (Shopify.designMode && !window.hdtDesignModeBound) {
+    // Guard `Shopify.designMode` — some apps run scripts before the Shopify
+    // global is defined, and a bare property access throws
+    // "undefined is not an object" early in page load.
+    if (typeof Shopify !== 'undefined' && Shopify.designMode && !window.hdtDesignModeBound) {
       document.addEventListener("shopify:section:select", (event) => {
-        const modal = event.target.querySelector('#hdt-quick-view-modal');
+        const t = event && event.target;
+        if (!t || typeof t.querySelector !== 'function') return;
+        const modal = t.querySelector('#hdt-quick-view-modal');
         if (modal) {
           const parent = modal.closest('hdt-lazy-modal, hdt-modal');
           if (parent && parent.open) parent.open();
         }
       });
       document.addEventListener("shopify:section:deselect", (event) => {
-        const modal = event.target.querySelector('#hdt-quick-view-modal');
+        const t = event && event.target;
+        if (!t || typeof t.querySelector !== 'function') return;
+        const modal = t.querySelector('#hdt-quick-view-modal');
         if (modal) {
           const parent = modal.closest('hdt-lazy-modal, hdt-modal');
           if (parent && parent.close) parent.close();

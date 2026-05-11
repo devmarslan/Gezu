@@ -119,7 +119,7 @@
     {%- endif -%}
   </div>
 </div>
-<script>var isPageCompare = !Shopify.designMode, isComparePerformed = {{ search.performed }};</script>
+<script>var isPageCompare = !(typeof Shopify !== 'undefined' && Shopify.designMode), isComparePerformed = {{ search.performed }};</script>
 {% schema %}
 {
   "name": "t:sections.main_compare.name",

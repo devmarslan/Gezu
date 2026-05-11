@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk 'NR>=94740 && NR<=94770' /tmp/gezu-index.html | head -c 3000)",
+      "Read(//tmp/**)"
+    ]
+  }
+}

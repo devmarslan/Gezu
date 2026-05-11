@@ -368,41 +368,46 @@
 }
 </style>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  if (window.innerWidth <= 768) {
-    
-    const footerItems = document.querySelectorAll(".hdt-footer-collapse-true .hdt-col-block");
+(function () {
+  document.addEventListener("click", function (e) {
+    if (window.innerWidth > 768) return;
+    var heading = e.target.closest(".hdt-footer-collapse-true .hdt-col-block .hdt-heading-f");
+    if (!heading) return;
 
-    footerItems.forEach(item => {
-      const heading = item.querySelector(".hdt-heading-f");
-      const content = item.querySelector(".hdt-collapse-content");
+    var item = heading.closest(".hdt-col-block");
+    var content = item && item.querySelector(".hdt-collapse-content");
+    if (!content) return;
 
-      if (heading && content) {
-        heading.addEventListener("click", function () {
-          
-          // Close others (optional - accordion style)
-          footerItems.forEach(other => {
-            if (other !== item) {
-              other.classList.remove("open");
-              const otherContent = other.querySelector(".hdt-collapse-content");
-              if (otherContent) otherContent.style.height = null;
-            }
-          });
+    e.preventDefault();
 
-          // Toggle current
-          item.classList.toggle("open");
+    document
+      .querySelectorAll(".hdt-footer-collapse-true .hdt-col-block.open")
+      .forEach(function (other) {
+        if (other !== item) {
+          other.classList.remove("open");
+          var c = other.querySelector(".hdt-collapse-content");
+          if (c) c.style.height = null;
+        }
+      });
 
-          if (item.classList.contains("open")) {
-            content.style.height = content.scrollHeight + "px";
-          } else {
-            content.style.height = null;
-          }
+    item.classList.toggle("open");
+    content.style.height = item.classList.contains("open")
+      ? content.scrollHeight + "px"
+      : null;
+  });
+
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 768) {
+      document
+        .querySelectorAll(".hdt-footer-collapse-true .hdt-col-block.open")
+        .forEach(function (item) {
+          item.classList.remove("open");
+          var c = item.querySelector(".hdt-collapse-content");
+          if (c) c.style.height = null;
         });
-      }
-    });
-
-  }
-});
+    }
+  });
+})();
 </script>
 {% schema %}
 {

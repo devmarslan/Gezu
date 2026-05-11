@@ -205,9 +205,3 @@ hdt-compare[action="added"] svg path {
   justify-content: center
 }
 
-@media (max-width: 750px) {
-.hdt-section-head.hdt-relative.hdt-flex.md\:hdt-align-center.hdt-justify-start.hdt-nav_in_content.hdt-top-dots_in_content.hdt-dots-outline {
-    justify-content: center;
-}
-
-}

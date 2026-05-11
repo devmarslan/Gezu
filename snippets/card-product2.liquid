@@ -426,7 +426,7 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
 
         <a data-pr-url href="{{ product_url }}" class="hdt-card-product__title hdt-text-{{ settings.pr_title_size }} hdt-font-{{ settings.pr_title_weight }} {% if settings.hdt_show_long_title == false %} hdt-line-clamp {% endif %}" data-instant>{{ card_product.title | escape }}</a>
         <div class="ict-wrapper">
-  {%- assign current_variant =  card_product.variants.first -%}
+  {%- assign current_variant = card_product.selected_or_first_available_variant | default: card_product.variants.first -%}
   <div class="ict-1">
     <svg class="ict-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>

@@ -6,7 +6,7 @@
       assign un_no_pick = false
     endunless
   elsif settings.pick_mode == 'first' and settings.hide_sold_out == false
-    assign selected_variant = product.selected_variant | default: product.variants.first
+    assign selected_variant = product.selected_or_first_available_variant | default: product.variants.first
   else
     assign selected_variant = product.selected_or_first_available_variant
   endif

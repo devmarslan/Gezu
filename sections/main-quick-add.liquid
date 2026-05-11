@@ -23,14 +23,18 @@
   </hdt-modal>
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
-      if (!Shopify.designMode) return;
+      if (typeof Shopify === 'undefined' || !Shopify.designMode) return;
       document.addEventListener("shopify:section:select", (event) => {
-        const modal = event.target.querySelector('#hdt-quick-add-modal');
-        if (modal) modal.parentElement.open();
+        const t = event && event.target;
+        if (!t || typeof t.querySelector !== 'function') return;
+        const modal = t.querySelector('#hdt-quick-add-modal');
+        if (modal && modal.parentElement) modal.parentElement.open();
       });
       document.addEventListener("shopify:section:deselect", (event) => {
-        const modal = event.target.querySelector('#hdt-quick-add-modal');
-        if (modal) modal.parentElement.close();
+        const t = event && event.target;
+        if (!t || typeof t.querySelector !== 'function') return;
+        const modal = t.querySelector('#hdt-quick-add-modal');
+        if (modal && modal.parentElement) modal.parentElement.close();
       });
     });
   </script>

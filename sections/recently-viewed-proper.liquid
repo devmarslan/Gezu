@@ -137,6 +137,7 @@ if (!customElements.get('rv-simple-component')) {
         </hdt-slider>
       `;
 
+      if (typeof window.hdtInitSwatches === 'function') window.hdtInitSwatches();
       document.dispatchEvent(new CustomEvent('currency:update'));
     }
   });

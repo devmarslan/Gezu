@@ -126,7 +126,7 @@
     {%- endif -%}
   </div>
 </div>
-<script>var isPageWishlist = !Shopify.designMode, isWishlistPerformed = {{ search.performed }};</script>
+<script>var isPageWishlist = !(typeof Shopify !== 'undefined' && Shopify.designMode), isWishlistPerformed = {{ search.performed }};</script>
 <style>
   #shopify-section-{{section.id}} hdt-compare.hdt-pr_btn.hdt-card-product__btn-compare.aa {
     display: none;

@@ -12,7 +12,7 @@
     assign color_values = shop.metaobjects.theme_swatch.values | first
     assign colors_2 = color_values.colors.value
     
-    assign selected_variant = product.selected_variant | default: product.variants.first
+    assign selected_variant = product.selected_or_first_available_variant | default: product.variants.first
     assign selected_color = selected_variant[color_option_index]
   -%}
 

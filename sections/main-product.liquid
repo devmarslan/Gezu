@@ -7,7 +7,7 @@
       assign un_no_pick = false
     endunless
   elsif settings.pick_mode == 'first' and settings.hide_sold_out == false
-    assign selected_variant = product.selected_variant | default: product.variants.first
+    assign selected_variant = product.selected_or_first_available_variant | default: product.variants.first
   else
     assign selected_variant = product.selected_or_first_available_variant
   endif
@@ -137,7 +137,7 @@
   {%- if section.settings.sticky_atc and product.available and request.page_type == 'product' -%}
     {%- liquid
       unless un_no_pick
-      assign selected_variant = product.variants.first
+      assign selected_variant = product.selected_or_first_available_variant | default: product.variants.first
       endunless
       assign check_against_inventory = true
       if selected_variant.inventory_management != 'shopify' or selected_variant.inventory_policy == 'continue'
