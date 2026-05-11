@@ -50,7 +50,7 @@
 {%- if has_sidebar -%}
   <style>
     .hdt-shop-sidebar{
-      margin-top:-8px
+      margin-top:-8px;
     }
     @media ( min-width: 1150px ){
       .hdt-row-flex .hdt-shop-content{
@@ -914,18 +914,20 @@
 }
 @media (min-width: 1150px) {
   .hdt-row-flex {
-    align-items: flex-start;
+    align-items: flex-start !important;
   }
   .hdt-shop-sidebar {
-    position: sticky;
-    top: 20px;
-    {% comment %} max-height: calc(100vh - 20px); {% endcomment %}
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 20px !important;
+    align-self: flex-start !important;
+    z-index: 10 !important;
     transition: top 0.3s ease;
   }
   .hdt-shop-sidebar.scrolling-up {
-    top: 200px; /* match your sticky header height */
-    max-height: calc(100vh - 80px);
-    overflow:hidden;
+    top: calc(var(--header-height, 0px) + 20px) !important;
+    max-height: calc(100vh - var(--header-height, 0px) - 40px);
+    overflow-y: auto;
   }
 }
 
