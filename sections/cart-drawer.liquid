@@ -1217,6 +1217,7 @@ function renderWishlistHTML(ids,container){
             if(seen.includes(val)) return;
             seen.push(val);
             const isActive = firstVariant.options[idx] === val;
+            const isValAvailable = variantsData.some(v2 => String(v2.options[idx]).trim() === val.trim() && v2.available);
             btnsHtml += `<button type="button" class="cqv-option__btn ${isActive?'is-active':''} ${!isValAvailable?'is-soldout':''}" data-option-index="${idx}" data-option-value="${val}">${val}</button>`;
           });
           const firstVal = firstVariant.options[idx];
