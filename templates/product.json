@@ -1190,6 +1190,15 @@
             "author_name": "Moisson Jean-philippe"
           }
         },
+        "review_xnYMWH": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "review_title": "Lorem ipsum dolor sit amet consectetur.",
+            "review_text": "Lorem ipsum dolor sit amet consectetur. Semper sagittis libero semper dui mauris. Odio ut massa sed nec vulputate dictum amet. A.",
+            "author_name": "Patrick bol."
+          }
+        },
         "review_wXGDHf": {
           "type": "review",
           "settings": {
@@ -1468,6 +1477,7 @@
         "review_6GLRdJ",
         "review_9MVWnL",
         "review_wx9CWW",
+        "review_xnYMWH",
         "review_wXGDHf",
         "review_a6jkxm",
         "review_jbmwqE",
