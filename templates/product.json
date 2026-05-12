@@ -600,7 +600,6 @@
                 "accordion_description_RBQC6w": {
                   "type": "_accordion_description",
                   "name": "t:sections.main-product-tabs.blocks.accordion_description.name",
-                  "disabled": true,
                   "settings": {
                     "open": true,
                     "title": "Product Information"
@@ -610,11 +609,10 @@
                 "accordion_html_ppHtDz": {
                   "type": "_accordion_html",
                   "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
-                  "disabled": true,
                   "settings": {
                     "open": false,
                     "title": "Features",
-                    "content": "{{ closest.product.metafields.custom.feature_tab | metafield_tag }}",
+                    "content": "<p>{{ closest.product.metafields.custom.feature_tab | metafield_tag }}</p>",
                     "page": ""
                   },
                   "blocks": {}
@@ -622,7 +620,6 @@
                 "accordion_html_LMW8gt": {
                   "type": "_accordion_html",
                   "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
-                  "disabled": true,
                   "settings": {
                     "open": false,
                     "title": "Versatility",
