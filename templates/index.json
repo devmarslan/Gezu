@@ -2357,16 +2357,6 @@
             "author_name": "Jean-Philippe Moisson"
           }
         },
-        "review_TMdeiQ": {
-          "type": "review",
-          "settings": {
-            "review_image": "shopify://shop_images/81-Qf9JEEtL.jpg",
-            "rating": 5,
-            "review_title": "Good value for money",
-            "review_text": "Perfect, especially for an elevated cabin.",
-            "author_name": "Jerem"
-          }
-        },
         "review_Lkn4E8": {
           "type": "review",
           "settings": {
@@ -2377,14 +2367,13 @@
             "author_name": "Chapelois"
           }
         },
-        "review_TiH7yj": {
+        "review_w3kj9V": {
           "type": "review",
           "settings": {
-            "review_image": "shopify://shop_images/61mGaapxALL-amazon-2_1.jpg",
             "rating": 5,
-            "review_title": "Eyebolts",
-            "review_text": "Eye bolt, shaft Ø 12 mm, length 350 mm, scaffold eye, scaffold anchoring bolt.\nFast delivery, perfect, that's all I can say.",
-            "author_name": "Hans Jurgen Gulde"
+            "review_title": "Scaffolding stabilizer bar",
+            "review_text": "Very useful, exactly as described and very sturdy.",
+            "author_name": "Aubert henri"
           }
         },
         "review_BFnj3M": {
@@ -2397,6 +2386,25 @@
             "author_name": "Mr M Kenning"
           }
         },
+        "review_EHebjB": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "review_title": "Swivel couplers for scaffold tubes",
+            "review_text": "the parts did what they needed to do\nSignaler",
+            "author_name": "Amazon Customer"
+          }
+        },
+        "review_TiH7yj": {
+          "type": "review",
+          "settings": {
+            "review_image": "shopify://shop_images/61mGaapxALL-amazon-2_1.jpg",
+            "rating": 5,
+            "review_title": "Eyebolts",
+            "review_text": "Eye bolt, shaft Ø 12 mm, length 350 mm, scaffold eye, scaffold anchoring bolt.\nFast delivery, perfect, that's all I can say.",
+            "author_name": "Hans Jurgen Gulde"
+          }
+        },
         "review_WDDb7V": {
           "type": "review",
           "settings": {
@@ -2405,15 +2413,6 @@
             "review_title": "Solid and well finished",
             "review_text": "The brackets are sturdy and don't bend during installation. There are no burrs or poorly deburred holes. Good product.",
             "author_name": "Alain E"
-          }
-        },
-        "review_EHebjB": {
-          "type": "review",
-          "settings": {
-            "rating": 5,
-            "review_title": "Swivel couplers for scaffold tubes",
-            "review_text": "the parts did what they needed to do\nSignaler",
-            "author_name": "Amazon Customer"
           }
         },
         "review_B6YbhU": {
@@ -2425,6 +2424,16 @@
             "author_name": "Martin L."
           }
         },
+        "review_TMdeiQ": {
+          "type": "review",
+          "settings": {
+            "review_image": "shopify://shop_images/81-Qf9JEEtL.jpg",
+            "rating": 5,
+            "review_title": "Good value for money",
+            "review_text": "Perfect, especially for an elevated cabin.",
+            "author_name": "Jerem"
+          }
+        },
         "review_bmtP6N": {
           "type": "review",
           "settings": {
@@ -2432,15 +2441,6 @@
             "review_title": "Consistent with photos",
             "review_text": "Consistent with photos",
             "author_name": "Marie"
-          }
-        },
-        "review_w3kj9V": {
-          "type": "review",
-          "settings": {
-            "rating": 5,
-            "review_title": "Scaffolding stabilizer bar",
-            "review_text": "Very useful, exactly as described and very sturdy.",
-            "author_name": "Aubert henri"
           }
         },
         "review_yTjQmG": {
@@ -2581,15 +2581,15 @@
         "review_yhGht7",
         "review_aKQ3tJ",
         "review_w4LbBW",
-        "review_TMdeiQ",
         "review_Lkn4E8",
-        "review_TiH7yj",
-        "review_BFnj3M",
-        "review_WDDb7V",
-        "review_EHebjB",
-        "review_B6YbhU",
-        "review_bmtP6N",
         "review_w3kj9V",
+        "review_BFnj3M",
+        "review_EHebjB",
+        "review_TiH7yj",
+        "review_WDDb7V",
+        "review_B6YbhU",
+        "review_TMdeiQ",
+        "review_bmtP6N",
         "review_yTjQmG",
         "review_GMrWyB",
         "review_HKrkPN",
