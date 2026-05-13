@@ -2981,3 +2981,77 @@ customElements.define('hdt-btn-popup-video', popupVideo);
     }
   });
 })();
+
+/**
+ * PRESERVE VARIANT ON LOCALIZATION SWITCH
+ * Stores the selected variant ID in sessionStorage before a language/market switch
+ * and restores it via URL parameter after the page reloads in the new locale.
+ */
+(function() {
+  /**
+   * Extract product handle from a URL path
+   * Supports /products/handle, /en/products/handle, /en-eu/products/handle, etc.
+   */
+  function getProductHandle(path) {
+    const parts = path.split('/');
+    const productIndex = parts.indexOf('products');
+    if (productIndex !== -1 && parts[productIndex + 1]) {
+      return parts[productIndex + 1].split('?')[0]; // Remove potential query params
+    }
+    return null;
+  }
+
+  /**
+   * Store the current variant ID and product handle in sessionStorage
+   */
+  function storeVariant() {
+    const handle = getProductHandle(window.location.pathname);
+    if (!handle) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let variantId = urlParams.get('variant');
+
+    if (!variantId) {
+      // Fallback: Try to find the selected variant ID in the main product form
+      const variantInput = document.querySelector('form[action*="/cart/add"] input[name="id"]');
+      if (variantInput) variantId = variantInput.value;
+    }
+
+    if (variantId) {
+      sessionStorage.setItem('hdt_preserved_variant', variantId);
+      sessionStorage.setItem('hdt_preserved_handle', handle);
+    }
+  }
+
+  // 1. Intercept localization form submissions (Country/Language switchers)
+  document.addEventListener('submit', function(e) {
+    if (e.target.closest('form[action*="/localization"]')) {
+      storeVariant();
+    }
+  });
+
+  // 2. Intercept clicks on links that might trigger a switch
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a[href*="/localization"]');
+    if (link) storeVariant();
+  });
+
+  // 3. Handle page load - Restore variant if we just switched locale
+  const currentHandle = getProductHandle(window.location.pathname);
+  if (currentHandle) {
+    const storedHandle = sessionStorage.getItem('hdt_preserved_handle');
+    const storedVariant = sessionStorage.getItem('hdt_preserved_variant');
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // If we have a stored variant for this specific product and no variant is currently in the URL
+    if (storedHandle === currentHandle && storedVariant && !urlParams.has('variant')) {
+      // Clear storage immediately to prevent loops or stale redirects
+      sessionStorage.removeItem('hdt_preserved_variant');
+      sessionStorage.removeItem('hdt_preserved_handle');
+
+      // Append variant param and reload
+      urlParams.set('variant', storedVariant);
+      window.location.search = urlParams.toString();
+    }
+  }
+})();
