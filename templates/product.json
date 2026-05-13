@@ -563,7 +563,7 @@
             "enable_video_looping": false,
             "image_ratio": "square",
             "image_size": true,
-            "image_zoom": "no",
+            "image_zoom": "zoom",
             "image_zoom_type": "inner",
             "zoom_level": 2,
             "max_zoom_lightbox": 3,
