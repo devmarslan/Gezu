@@ -173,61 +173,58 @@
 
 <script>
 (function() {
-  function initIcotextUpdate() {
-    // Scope the selector to this specific block instance
-    const blockContainer = document.querySelector('.hdt-icontext-wrap-{{ block.id }}');
+  function updateIcotext(variant, blockId, productId) {
+    if (!variant) return;
+    
+    // Re-find the container and span every time because the DOM might have been re-rendered
+    const blockContainer = document.querySelector('.hdt-icontext-wrap-' + blockId);
     if (!blockContainer) return;
     
     const qtySpan = blockContainer.querySelector('.js-icotext-qty');
     if (!qtySpan) return;
 
-    function updateQty(variant) {
-      if (!variant) return;
-      
-      // Replicate Liquid logic: base = qty + 30%, remaining = base - qty
-      let variantQty = variant.inventory_quantity || 0;
-      
-      // Get inventory data from the theme's JSON script if available (more reliable for some themes)
-      const inventoryData = document.querySelector('[data-inventory-json]');
-      if (inventoryData) {
-        try {
-          const inventories = JSON.parse(inventoryData.textContent);
-          const currentInv = inventories.find(inv => inv.id == variant.id);
-          if (currentInv) variantQty = currentInv.qty || 0;
-        } catch (e) {}
-      }
-
-      let extraPercent = Math.round(variantQty * 0.30);
-      let baseQuantity = variantQty + extraPercent;
-      if (baseQuantity < 5) baseQuantity = 10;
-      
-      let remainingQty = baseQuantity - variantQty;
-      if (remainingQty < 5) remainingQty = 5;
-
-      qtySpan.textContent = remainingQty;
-    }
-
-    // Listen for variant change and ensure it's for THIS product
-    document.addEventListener('variant:change', function(e) {
-      // Check if the event provides a product ID or if we can verify the context
-      const eventProductId = (e.detail && e.detail.product) ? e.detail.product.id : null;
-      const currentProductId = {{ product.id }};
-      
-      if (e.detail && e.detail.variant) {
-        // If we have a product ID in the event, verify it. Otherwise, assume it's the relevant one if scoped correctly.
-        if (!eventProductId || eventProductId == currentProductId) {
-          updateQty(e.detail.variant);
+    console.log("Updating Icotext for Variant:", variant.id, "Product:", productId);
+    
+    let variantQty = 0;
+    const inventoryScripts = document.querySelectorAll('[data-inventory-json]');
+    let found = false;
+    
+    inventoryScripts.forEach(script => {
+      try {
+        const inventories = JSON.parse(script.textContent);
+        const currentInv = inventories.find(inv => inv.id == variant.id);
+        if (currentInv) {
+          variantQty = currentInv.qty || 0;
+          found = true;
         }
-      }
+      } catch (e) {}
     });
+
+    if (!found) variantQty = variant.inventory_quantity || 0;
+
+    let extraPercent = Math.round(variantQty * 0.30);
+    let baseQuantity = variantQty + extraPercent;
+    if (baseQuantity < 5) baseQuantity = 10;
+    
+    let remainingQty = baseQuantity - variantQty;
+    if (remainingQty < 5) remainingQty = 5;
+
+    qtySpan.textContent = remainingQty;
   }
 
-  // Run on load and after any DOM changes
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initIcotextUpdate);
-  } else {
-    initIcotextUpdate();
-  }
+  // Use a single global listener on the document to handle all product blocks
+  document.addEventListener('variant:change', function(e) {
+    const currentProductId = {{ product.id }};
+    const blockId = "{{ block.id }}";
+    const eventProduct = e.detail ? (e.detail.product || e.detail.product_id) : null;
+    const eventId = eventProduct ? (eventProduct.id || eventProduct) : null;
+    
+    if (e.detail && e.detail.variant) {
+      if (!eventId || eventId == currentProductId) {
+        updateIcotext(e.detail.variant, blockId, currentProductId);
+      }
+    }
+  });
 })();
 </script>
 </div>
