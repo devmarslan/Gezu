@@ -185,14 +185,10 @@
 
     console.log("Updating Icotext with random number for Variant:", variant.id);
     
-    // Generate a "stable" random number based on variant ID
-    // This ensures it changes between variants but stays the same for each specific variant
-    // Range: 12 to 42
-    let randomQty = (variant.id % 31) + 12;
+    console.log("Updating Icotext with truly random number for Variant:", variant.id);
     
-    // Add a small offset based on the day to keep it feeling fresh
-    const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-    randomQty = ((randomQty + dayOfYear) % 35) + 10;
+    // Generate a truly random number between 15 and 45 every time
+    let randomQty = Math.floor(Math.random() * (45 - 15 + 1)) + 15;
 
     qtySpan.textContent = randomQty;
   }
