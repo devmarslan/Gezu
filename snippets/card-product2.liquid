@@ -186,16 +186,49 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
   }
   .card-2 button.hdt-card-product__btn-quick-view.hdt-pr_btn {
     height: 40px;
-    aspect-ratio: 0;
   }
-  .card-2 wrapp-hdt-open-modal-btn.hdt-card-product__btn-qv span, .card-2 .hdt-theme-quick-view-wrapper.hdt-card-product__btn-qv span {
-    display: block;
-    font-weight: 400;
-    font-size: 12px;
+  .card-2 .hdt-pr-btns-group1 {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    bottom: 15px !important;
+    top: auto !important;
+    left: 10px !important;
+    right: 10px !important;
+    transform: none !important;
+    width: auto !important;
   }
-  .card-2 .sale-badge {
-    font-size: 11px;
-    padding: 4px 8px;
+  .card-2 .hdt-pr-btns-group1 .hdt-card-product__btn-qv {
+    width: 100% !important;
+  }
+  .card-2 .hdt-pr-btns-group1 .hdt-card-product__btn-quick-view {
+    width: 100% !important;
+    background: #0047AB !important;
+    color: #ffffff !important;
+    border-radius: 6px !important;
+    height: 38px !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600 !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important;
+    border: none !important;
+  }
+  .card-2 .hdt-pr-btns-group1 .hdt-card-product__btn-quick-view svg {
+    display: none !important;
+  }
+  .card-2 .hdt-pr-btns-group1 .hdt-card-product__btn-quick-view span {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
   .card-2 .hdt-badge {
     height: 25px !important;
@@ -248,7 +281,6 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
   }
 
   /* ===== TAP TO REVEAL: Hide overlays by default ===== */
-  .card-2 .hdt-pr-btns-group1,
   .card-2 .hdt-pr-btns-group2.compare_absol_btn,
   .card-2 .hdt-badge__wrapp/*,
   .card-2 .hdt-color-picker-wrapper*/ {
