@@ -173,38 +173,14 @@
 
 <script>
 (function() {
-  function updateIcotext(variant, blockId, productId) {
-    if (!variant) return;
-    
-    // Re-find the container and span every time because the DOM might have been re-rendered
-    const blockContainer = document.querySelector('.hdt-icontext-wrap-' + blockId);
-    if (!blockContainer) return;
-    
-    const qtySpan = blockContainer.querySelector('.js-icotext-qty');
-    if (!qtySpan) return;
-
-    console.log("Updating Icotext with random number for Variant:", variant.id);
-    
-    console.log("Updating Icotext with truly random number for Variant:", variant.id);
-    
-    // Generate a truly random number between 15 and 45 every time
-    let randomQty = Math.floor(Math.random() * (45 - 15 + 1)) + 15;
-
-    qtySpan.textContent = randomQty;
-  }
-
-  // Use a single global listener on the document to handle all product blocks
-  document.addEventListener('variant:change', function(e) {
-    const currentProductId = {{ product.id }};
-    const blockId = "{{ block.id }}";
-    const eventProduct = e.detail ? (e.detail.product || e.detail.product_id) : null;
-    const eventId = eventProduct ? (eventProduct.id || eventProduct) : null;
-    
-    if (e.detail && e.detail.variant) {
-      if (!eventId || eventId == currentProductId) {
-        updateIcotext(e.detail.variant, blockId, currentProductId);
-      }
-    }
+  // Global listener for variant changes
+  document.addEventListener('variant:change', function() {
+    // Update every sales counter found on the page
+    document.querySelectorAll('.js-icotext-qty').forEach(function(span) {
+      const newQty = Math.floor(Math.random() * (45 - 15 + 1)) + 15;
+      span.textContent = newQty;
+      console.log("In-demand count updated:", newQty);
+    });
   });
 })();
 </script>
