@@ -183,33 +183,18 @@
     const qtySpan = blockContainer.querySelector('.js-icotext-qty');
     if (!qtySpan) return;
 
-    console.log("Updating Icotext for Variant:", variant.id, "Product:", productId);
+    console.log("Updating Icotext with random number for Variant:", variant.id);
     
-    let variantQty = 0;
-    const inventoryScripts = document.querySelectorAll('[data-inventory-json]');
-    let found = false;
+    // Generate a "stable" random number based on variant ID
+    // This ensures it changes between variants but stays the same for each specific variant
+    // Range: 12 to 42
+    let randomQty = (variant.id % 31) + 12;
     
-    inventoryScripts.forEach(script => {
-      try {
-        const inventories = JSON.parse(script.textContent);
-        const currentInv = inventories.find(inv => inv.id == variant.id);
-        if (currentInv) {
-          variantQty = currentInv.qty || 0;
-          found = true;
-        }
-      } catch (e) {}
-    });
+    // Add a small offset based on the day to keep it feeling fresh
+    const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+    randomQty = ((randomQty + dayOfYear) % 35) + 10;
 
-    if (!found) variantQty = variant.inventory_quantity || 0;
-
-    let extraPercent = Math.round(variantQty * 0.30);
-    let baseQuantity = variantQty + extraPercent;
-    if (baseQuantity < 5) baseQuantity = 10;
-    
-    let remainingQty = baseQuantity - variantQty;
-    if (remainingQty < 5) remainingQty = 5;
-
-    qtySpan.textContent = remainingQty;
+    qtySpan.textContent = randomQty;
   }
 
   // Use a single global listener on the document to handle all product blocks
