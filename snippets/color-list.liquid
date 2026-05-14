@@ -167,12 +167,28 @@
           {%- endif -%}
         {%- endcapture -%}
 
+        {%- liquid
+          assign stock_text = 'products.product.in_stock_shipping' | t
+          if variant_first.available == false
+            assign stock_text = 'products.product.sold_out' | t
+          elsif variant_first.metafields.custom.variant_usps.value != blank
+            assign stock_text = variant_first.metafields.custom.variant_usps.value
+          endif
+
+          assign stock_text_2 = 'products.product.certified_quality' | t
+          if variant_first.metafields.custom.variant_usps_second.value != blank
+            assign stock_text_2 = variant_first.metafields.custom.variant_usps_second.value
+          endif
+        -%}
         <div class="hdt-color-swatch-item js-permanent-swatch{% if is_selected %} is-selected{% endif %}" 
              title="{{ color | escape }}" 
              style="{{ swatch_style | strip_newlines }}"
              data-variant-id="{{ variant_first.id }}"
              data-image-src="{{ variant_image_url }}"
-             data-price-html='{{ price_html | strip }}'>
+             data-price-html='{{ price_html | strip }}'
+             data-stock-text="{{ stock_text | escape }}"
+             data-stock-text-2="{{ stock_text_2 | escape }}"
+             data-available="{{ variant_first.available }}">
           <span class="color-bg"></span>
         </div>
       {%- endfor -%}
@@ -303,6 +319,8 @@
               var targetImg = this.getAttribute('data-image-src');
               var variantId = this.getAttribute('data-variant-id');
               var priceHtml = this.getAttribute('data-price-html');
+              var stockText = this.getAttribute('data-stock-text');
+              var stockText2 = this.getAttribute('data-stock-text-2');
               
               performImageSwap(card, targetImg, variantId);
               
@@ -318,6 +336,14 @@
                   /* Trigger decimal formatter if available */
                   document.dispatchEvent(new CustomEvent('recently-viewed:loaded'));
                 }
+              }
+
+              /* Update stock status and USPs on card */
+              if (card) {
+                var stockEl = card.querySelector('.js-ict-text-1');
+                if (stockEl && stockText) stockEl.textContent = stockText;
+                var stockEl2 = card.querySelector('.js-ict-text-2');
+                if (stockEl2 && stockText2) stockEl2.textContent = stockText2;
               }
             };
           });

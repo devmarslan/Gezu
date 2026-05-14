@@ -636,6 +636,9 @@ customElements.define("hdt-compare-a", CompareLink);
           var targetImg = this.getAttribute('data-image-src');
           var variantId = this.getAttribute('data-variant-id');
           var priceHtml = this.getAttribute('data-price-html');
+          var stockText = this.getAttribute('data-stock-text');
+          var stockText2 = this.getAttribute('data-stock-text-2');
+
           performImageSwap(card, targetImg, variantId);
           if (priceHtml && card) {
             var priceEl = card.querySelector('.js-card-price');
@@ -646,6 +649,12 @@ customElements.define("hdt-compare-a", CompareLink);
               }
               document.dispatchEvent(new CustomEvent('recently-viewed:loaded'));
             }
+          }
+          if (card) {
+            var stockEl = card.querySelector('.js-ict-text-1');
+            if (stockEl && stockText) stockEl.textContent = stockText;
+            var stockEl2 = card.querySelector('.js-ict-text-2');
+            if (stockEl2 && stockText2) stockEl2.textContent = stockText2;
           }
         };
       });

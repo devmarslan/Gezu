@@ -20,7 +20,8 @@
   unless product_url
     assign product_url = card_product.url
   endunless
-  assign featured_media = card_product.featured_media | default: settings.placeholder_img
+  assign current_variant = card_product.selected_or_first_available_variant | default: card_product.variants.first
+  assign featured_media = current_variant.featured_media | default: card_product.featured_media | default: settings.placeholder_img
   assign color_count = 0
   assign size_count = 0
 
@@ -95,13 +96,12 @@
 
         <a data-pr-url href="{{ product_url }}" class="hdt-card-product__title hdt-text-{{ settings.pr_title_size }} hdt-font-{{ settings.pr_title_weight }} hdt-line-clamp" data-instant>{{ card_product.title | escape }}</a>
    <div class="ict-wrapper">
-  {%- assign current_variant = card_product.selected_or_first_available_variant | default: card_product.variants.first -%}
   <div class="ict-1">
     <svg class="ict-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>
       <path d="M6.66671 10L9.16671 12.5L13.3334 7.5" stroke="black" stroke-width="1.45833"/>
     </svg>
-    <div class="ict-text">
+    <div class="ict-text js-ict-text-1">
       {%- if card_product.available == false -%}
         {{ 'products.product.sold_out' | t }}
       {%- elsif current_variant.metafields.custom.variant_usps.value != blank -%}
@@ -117,7 +117,7 @@
       <circle cx="10" cy="10" r="7.5" stroke="black" stroke-width="1.45833"/>
       <path d="M6.66671 10L9.16671 12.5L13.3334 7.5" stroke="black" stroke-width="1.45833"/>
     </svg>
-    <div class="ict-text">
+    <div class="ict-text js-ict-text-2">
       {% if current_variant.metafields.custom.variant_usps_second.value != blank %}
         {{ current_variant.metafields.custom.variant_usps_second.value }}
       {% else %} 
