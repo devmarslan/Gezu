@@ -173,14 +173,27 @@
 
 <script>
 (function() {
-  // Global listener for variant changes
-  document.addEventListener('variant:change', function() {
-    // Update every sales counter found on the page
+  // Prevent duplicate listeners if the block is re-rendered
+  if (window._hdtIcotextInitialized) return;
+  window._hdtIcotextInitialized = true;
+
+  function applyRandomQty() {
     document.querySelectorAll('.js-icotext-qty').forEach(function(span) {
-      const newQty = Math.floor(Math.random() * (45 - 15 + 1)) + 15;
+      // Generate a random number between 18 and 48
+      const newQty = Math.floor(Math.random() * (48 - 18 + 1)) + 18;
       span.textContent = newQty;
-      console.log("In-demand count updated:", newQty);
     });
+  }
+
+  // Listen for variant change
+  document.addEventListener('variant:change', function() {
+    // We update multiple times with small delays to "beat" the theme's AJAX re-render
+    // which often overwrites the DOM a few milliseconds after the event fires.
+    applyRandomQty(); // Immediate update
+    setTimeout(applyRandomQty, 100);
+    setTimeout(applyRandomQty, 300);
+    setTimeout(applyRandomQty, 600);
+    setTimeout(applyRandomQty, 1000);
   });
 })();
 </script>
