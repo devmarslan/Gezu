@@ -299,7 +299,7 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
-    z-index: 5 !important;
+    z-index: 15 !important;
   }
 }
 
@@ -614,31 +614,44 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
     });
   }
 
-  // Click handler does all the work
-  document.addEventListener('click', function(e) {
-    if (!isMobile()) return;
+  // Use both click and touchstart for maximum reliability in carousels
+  ['click', 'touchstart'].forEach(function(evtType) {
+    document.addEventListener(evtType, function(e) {
+      if (!isMobile()) return;
 
-    var mediaEl = e.target.closest('.card-2 .hdt-card-product__media');
-    if (!mediaEl) {
-      // Click outside - close all
-      closeAllOverlays();
-      return;
-    }
-
-    if (isOverlayElement(e.target)) return;
-    if (!isImageArea(e.target)) return;
-
-    // Check if the slider was swiped (scroll position changed)
-    var track = mediaEl.querySelector('.mobile-slider-track');
-    if (track && trackScrollState.has(track)) {
-      var startScroll = trackScrollState.get(track);
-      if (Math.abs(track.scrollLeft - startScroll) > 10) {
-        // Was a swipe, don't toggle
+      // Simplify selector to be more robust across different section types
+      var mediaEl = e.target.closest('.hdt-card-product__media');
+      if (!mediaEl) {
+        if (evtType === 'click') closeAllOverlays();
         return;
       }
-    }
 
-    toggleOverlay(mediaEl);
+      // Ensure we are in a card that should have this behavior
+      var cardRoot = mediaEl.closest('hdt-card-product');
+      if (!cardRoot || (!cardRoot.classList.contains('card-2') && !cardRoot.classList.contains('hdt-pr-style2'))) return;
+
+      if (isOverlayElement(e.target)) return;
+      if (!isImageArea(e.target)) return;
+
+      // Swipe detection
+      var track = mediaEl.querySelector('.mobile-slider-track');
+      if (track && trackScrollState.has(track)) {
+        var startScroll = trackScrollState.get(track);
+        if (Math.abs(track.scrollLeft - startScroll) > 8) return;
+      }
+
+      if (evtType === 'touchstart') {
+        // For touchstart, we just mark the start position. 
+        // We'll let the click event (or a simulated one) handle the toggle 
+        // unless click is being blocked by a slider.
+        trackScrollState.set(track, track ? track.scrollLeft : 0);
+      } else {
+        // Click event
+        e.preventDefault();
+        e.stopPropagation();
+        toggleOverlay(mediaEl);
+      }
+    }, { capture: true, passive: false });
   });
 
   function isOverlayElement(el) {
