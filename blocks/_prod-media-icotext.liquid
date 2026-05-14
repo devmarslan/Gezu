@@ -145,11 +145,11 @@
   {%- assign remaining_qty = 5 -%}
 {%- endif -%}
 
-{%- assign display_text = block.settings.text_3 | replace: '[qty]', remaining_qty -%}
+{%- assign qty_html = '<span class="js-icotext-qty">' | append: remaining_qty | append: '</span>' -%}
+{%- assign display_text = block.settings.text_3 | replace: '[qty]', qty_html -%}
   
   <div class="hdt-icontext-bottom">
     <div class="hdt-icon-box"
-      data-base-quantity="{{ base_quantity }}"
       style="
         --bg: {{ block.settings.bg_3 }};
         --color: {{ block.settings.color_3 }};
@@ -172,38 +172,63 @@
 {%- endif -%}
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const baseQuantity = {{ base_quantity }};
-  const remainingCountEl = document.querySelector('.remaining-count');
-  
-  // Listen for variant change
-  document.addEventListener('variant:change', function(e) {
-    if (e.detail && e.detail.variant) {
-      const variantQty = e.detail.variant.inventory_quantity || 0;
-      const remaining = baseQuantity - variantQty;
-      if (remainingCountEl) {
-        remainingCountEl.textContent = remaining;
+(function() {
+  function initIcotextUpdate() {
+    // Scope the selector to this specific block instance
+    const blockContainer = document.querySelector('.hdt-icontext-wrap-{{ block.id }}');
+    if (!blockContainer) return;
+    
+    const qtySpan = blockContainer.querySelector('.js-icotext-qty');
+    if (!qtySpan) return;
+
+    function updateQty(variant) {
+      if (!variant) return;
+      
+      // Replicate Liquid logic: base = qty + 30%, remaining = base - qty
+      let variantQty = variant.inventory_quantity || 0;
+      
+      // Get inventory data from the theme's JSON script if available (more reliable for some themes)
+      const inventoryData = document.querySelector('[data-inventory-json]');
+      if (inventoryData) {
+        try {
+          const inventories = JSON.parse(inventoryData.textContent);
+          const currentInv = inventories.find(inv => inv.id == variant.id);
+          if (currentInv) variantQty = currentInv.qty || 0;
+        } catch (e) {}
       }
+
+      let extraPercent = Math.round(variantQty * 0.30);
+      let baseQuantity = variantQty + extraPercent;
+      if (baseQuantity < 5) baseQuantity = 10;
+      
+      let remainingQty = baseQuantity - variantQty;
+      if (remainingQty < 5) remainingQty = 5;
+
+      qtySpan.textContent = remainingQty;
     }
-  });
-  
-  // Alternative: Listen for Shopify's native variant change
-  const variantSelector = document.querySelector('select[name="id"], input[name="id"]');
-  if (variantSelector) {
-    variantSelector.addEventListener('change', function() {
-      const variantId = this.value;
-      const productJson = document.querySelector('[data-product-json]');
-      if (productJson) {
-        const product = JSON.parse(productJson.textContent);
-        const variant = product.variants.find(v => v.id == variantId);
-        if (variant && remainingCountEl) {
-          const remaining = baseQuantity - (variant.inventory_quantity || 0);
-          remainingCountEl.textContent = remaining;
+
+    // Listen for variant change and ensure it's for THIS product
+    document.addEventListener('variant:change', function(e) {
+      // Check if the event provides a product ID or if we can verify the context
+      const eventProductId = (e.detail && e.detail.product) ? e.detail.product.id : null;
+      const currentProductId = {{ product.id }};
+      
+      if (e.detail && e.detail.variant) {
+        // If we have a product ID in the event, verify it. Otherwise, assume it's the relevant one if scoped correctly.
+        if (!eventProductId || eventProductId == currentProductId) {
+          updateQty(e.detail.variant);
         }
       }
     });
   }
-});
+
+  // Run on load and after any DOM changes
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initIcotextUpdate);
+  } else {
+    initIcotextUpdate();
+  }
+})();
 </script>
 </div>
 {% schema %}
