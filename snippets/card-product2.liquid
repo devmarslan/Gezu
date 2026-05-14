@@ -188,9 +188,9 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
     height: 40px;
   }
   .card-2 .hdt-pr-btns-group1 {
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
     z-index: 10 !important;
     display: flex !important;
     justify-content: center;
@@ -201,6 +201,7 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
     right: 10px !important;
     transform: none !important;
     width: auto !important;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
   }
   .card-2 .hdt-pr-btns-group1 .hdt-card-product__btn-qv {
     width: 100% !important;
@@ -281,6 +282,7 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
   }
 
   /* ===== TAP TO REVEAL: Hide overlays by default ===== */
+  .card-2 .hdt-pr-btns-group1,
   .card-2 .hdt-pr-btns-group2.compare_absol_btn,
   .card-2 .hdt-badge__wrapp/*,
   .card-2 .hdt-color-picker-wrapper*/ {
