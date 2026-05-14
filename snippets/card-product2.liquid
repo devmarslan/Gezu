@@ -295,7 +295,9 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
   /* Show overlays when tapped */
   .card-2 .hdt-card-product__media.mobile-tapped .hdt-pr-btns-group1,
   .card-2 .hdt-card-product__media.mobile-tapped .hdt-pr-btns-group2.compare_absol_btn,
-  .card-2 .hdt-card-product__media.mobile-tapped .hdt-badge__wrapp {
+  .card-2 .hdt-card-product__media.mobile-tapped .hdt-badge__wrapp,
+  .related-products .hdt-pr-btns-group1,
+  .recently-products .hdt-pr-btns-group1 {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
@@ -362,7 +364,7 @@ hdt-wishlist.hdt-card-product__btn-wishlist.hdt-pr_btn[action="remove"] {
   endif
   -%}
   
-  <hdt-card-product class="hdt-card-product card-{{ card_product.id }} {{ class }}{% if card_product.available == false %} hdt-pr-sold_out{% endif %} card-2 hdt-pr-border_{{ section.settings.pr_border }}" data-product-handle="{{ card_product.handle }}">
+<hdt-card-product class="hdt-card-product hdt-pr-card-2 card-2 {{ class }} {% if settings.show_ultra_btn == false %} hdt-no-ultra_btn{% endif %}{% if card_product.available == false %} hdt-pr-sold_out{% endif %}" data-product-id="{{ card_product.id }}" data-product-handle="{{ card_product.handle }}">
     <div class="hdt-card-product__wrapper" hdt-reveal="slide-in" timeline>
       <div class="hdt-card-product__media hdt-relative hdt-oh{% if size_count > 0 %} hdt-has-size-list{% endif %}">
         <a data-pr-url href="{{ product_url }}" data-instant calc-nav class="hdt-card-product__media-wrapp hdt-ratio"{% if image_ratio == 'adapt_image' %} style="--aspect-ratioapt: {{ featured_media.aspect_ratio | default: '127.7777778%' }}"{% endif %}>
