@@ -205,3 +205,6 @@ hdt-compare[action="added"] svg path {
   justify-content: center
 }
 
+h3.hdt-sec-heading.hdt-rte.hdt-h3.hdt-s-text.hdt-flex.hdt-align-center {
+    font-weight: 500;
+}
