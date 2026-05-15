@@ -137,22 +137,50 @@ hdt-compare[action="added"] svg path {
   color: #fff !important;
 }
 
-/* — Make default-state buttons more visible — */
-.hdt-product-btns .hdt-pr_btn {
-  border: 1px solid #ddd !important;
-  background: #f8f8f8 !important;
-  color: #555 !important;
-  transition: all 0.2s ease;
+/* — Make default-state buttons more visible on desktop — */
+@media (min-width: 769px) {
+  .hdt-product-btns .hdt-pr_btn {
+    border: 1px solid #ddd !important;
+    background: #f8f8f8 !important;
+    color: #555 !important;
+    transition: all 0.2s ease;
+  }
+
+  .hdt-product-btns .hdt-pr_btn:hover {
+    border-color: #0047AB !important;
+    color: #0047AB !important;
+    background: #eef4ff !important;
+  }
+
+  .hdt-product-btns .hdt-pr_btn svg {
+    opacity: 1 !important;
+  }
 }
 
-.hdt-product-btns .hdt-pr_btn:hover {
-  border-color: #0047AB !important;
-  color: #0047AB !important;
-  background: #eef4ff !important;
-}
+/* — Mobile "Tap to Show" logic (Issue #38) — 
+   Hides buttons by default on mobile and shows them when the product card is tapped/hovered. */
+@media (max-width: 768px) {
+  .hdt-product-btns {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.3s ease, visibility 0.3s ease !important;
+    pointer-events: none !important;
+  }
 
-.hdt-product-btns .hdt-pr_btn svg {
-  opacity: 1 !important;
+  .hdt-card-product__wrapper:hover .hdt-product-btns,
+  .hdt-card-product__wrapper:active .hdt-product-btns,
+  .hdt-card-product:hover .hdt-product-btns {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+  
+  /* Ensure the buttons are styled even on mobile when shown */
+  .hdt-product-btns .hdt-pr_btn {
+    border: 1px solid #ddd !important;
+    background: #f8f8f8 !important;
+    color: #555 !important;
+  }
 }
 
 /* Override for card-2 Quick View full-width button */
