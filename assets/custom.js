@@ -3064,3 +3064,43 @@ customElements.define('hdt-btn-popup-video', popupVideo);
     }
   }
 })();
+
+// Global Mobile Tap-to-Reveal for Product Cards
+(function() {
+  document.addEventListener('click', function(e) {
+    if (window.innerWidth > 768) return;
+    
+    // Find the media container or the card itself
+    const media = e.target.closest('.hdt-card-product__media');
+    const card = e.target.closest('hdt-card-product') || e.target.closest('.hdt-card-product');
+    
+    if (!media && !card) {
+      // Close all if clicking outside
+      document.querySelectorAll('.mobile-tapped').forEach(el => el.classList.remove('mobile-tapped'));
+      return;
+    }
+
+    // If clicking an actual button/action inside the card, don't toggle (let the button work)
+    if (e.target.closest('.hdt-product-btns') || e.target.closest('hdt-wishlist') || e.target.closest('hdt-compare') || e.target.closest('hdt-color-list')) return;
+
+    const target = media || card;
+    const isTapped = target.classList.contains('mobile-tapped');
+
+    // On mobile, the first tap reveals buttons, subsequent taps are allowed through
+    if (!isTapped) {
+      // Check if it's the image area specifically
+      const isImg = e.target.closest('.hdt-card-product__media-wrapp') || e.target.closest('.mobile-slider-track') || e.target.tagName === 'IMG';
+      if (isImg) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Close other open cards
+        document.querySelectorAll('.mobile-tapped').forEach(el => {
+          if (el !== target) el.classList.remove('mobile-tapped');
+        });
+        
+        target.classList.add('mobile-tapped');
+      }
+    }
+  }, true); // Use capture to handle before other scripts
+})();

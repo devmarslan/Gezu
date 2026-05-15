@@ -167,12 +167,13 @@ hdt-compare[action="added"] svg path {
     pointer-events: none !important;
   }
 
-  .hdt-card-product__wrapper:hover .hdt-product-btns,
-  .hdt-card-product__wrapper:active .hdt-product-btns,
-  .hdt-card-product:hover .hdt-product-btns {
+  .hdt-card-product__media.mobile-tapped .hdt-product-btns,
+  .hdt-card-product.mobile-tapped .hdt-product-btns,
+  .hdt-card-product__wrapper.mobile-tapped .hdt-product-btns {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
+    z-index: 15 !important;
   }
   
   /* Ensure the buttons are styled even on mobile when shown */

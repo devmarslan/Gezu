@@ -22,7 +22,7 @@
               {%- when 'menu' -%}
                 <div id=" hdt-{{ block.id }}" class= "hdt-footer-menu hdt-border-column-{{ block.settings.border-column }} hdt-col-block hdt-col hdt-relative" style="--cus-width:{{ block.settings.custom_w_dk }}%;--pd-top: {{ pd_item[0] | default: 0 }};--pd-right: {{ pd_item[1] | default: 0 }};--pd-bottom: {{ pd_item[2] | default: 0 }};--pd-left: {{ pd_item[3] | default: 0 }};">
                   {%- if block.settings.heading_menu != blank -%}
-                    <div class="hdt-heading-f collapsible hdt-flex hdt-align-center hdt-justify-between">
+                    <div class="hdt-heading-f collapsible hdt-flex hdt-align-center hdt-justify-between" onclick="hdtFooterToggle(this)">
                       <h6 class=" {{ section.settings.heading_fs }} hdt-s-text {{ section.settings.text_weight }} mbl-accordion-heading"> {{ block.settings.heading_menu }}</h6>
                       <span class="hdt-collapse-icon hdt-relative accordions-arw-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="9" viewBox="0 0 14 9" fill="none">
@@ -89,7 +89,7 @@
                 {%- assign use_social = true -%}
                 <div class="hdt-social-media hdt-border-column-{{ block.settings.border-column }} hdt-col-block hdt-col hdt-relative {% if block.settings.hide-on-mobile %}hide-on-mbl{% endif %}" id="hdt-{{ block.id }}"style="--cus-width:{{ block.settings.custom_w_dk }}%;--pd-top: {{ pd_item[0] | default: 0 }};--pd-right: {{ pd_item[1] | default: 0 }};--pd-bottom: {{ pd_item[2] | default: 0 }};--pd-left: {{ pd_item[3] | default: 0 }};">
                   {%- if block.settings.heading_sm != blank -%}
-                    <div class="hdt-heading-f collapsible {% if block.settings.image_sm != blank %} hdt-overwrite-heading {% endif %} hdt-flex hdt-align-center hdt-justify-between hdt-relative">
+                    <div class="hdt-heading-f collapsible {% if block.settings.image_sm != blank %} hdt-overwrite-heading {% endif %} hdt-flex hdt-align-center hdt-justify-between hdt-relative" onclick="hdtFooterToggle(this)">
                       <h6 class=" {{ section.settings.heading_fs }} hdt-s-text {{ section.settings.text_weight }}{% if block.settings.image_sm != blank %} hdt-hidden {% endif %}"> {{ block.settings.heading_sm }}</h6>
                     </div>
                   {%- endif -%}
@@ -129,7 +129,7 @@
                 <div class="hdt-footer-newsletter hdt-border-column-{{ block.settings.border-column }} hdt-footer-news hdt-col-block hdt-col hdt-relative" id="hdt-{{ block.id }}"style="--cus-width:{{ block.settings.custom_w_dk }}%;--pd-top: {{ pd_item[0] | default: 0 }};--pd-right: {{ pd_item[1] | default: 0 }};--pd-bottom: {{ pd_item[2] | default: 0 }};--pd-left: {{ pd_item[3] | default: 0 }};">    
                 
                 {%- if block.settings.heading_newsletter != blank -%}
-                  <div class="hdt-heading-f collapsible hdt-flex hdt-align-center hdt-justify-between">
+                  <div class="hdt-heading-f collapsible hdt-flex hdt-align-center hdt-justify-between" onclick="hdtFooterToggle(this)">
                     <h6 class=" {{ section.settings.heading_fs }} hdt-s-text {{ section.settings.text_weight }}"> {{ block.settings.heading_newsletter }}</h6>
                     <span class="hdt-collapse-icon hdt-relative"></span>
                   </div>
@@ -368,58 +368,35 @@
 }
 </style>
 <script>
-(function () {
-  const initFooterAccordion = function () {
-    const headings = document.querySelectorAll(".hdt-heading-f.collapsible");
-    
-    headings.forEach(function (heading) {
-      if (heading.dataset.accordionBound) return;
-      heading.dataset.accordionBound = "true";
-
-      heading.addEventListener("click", function (e) {
-        if (window.innerWidth > 768) return;
-
-        const item = heading.closest(".hdt-col-block");
-        // Support both singular and plural class names found in the theme
-        const content = item ? (item.querySelector(".hdt-collapse-content") || item.querySelector(".hdt-collapse-contents")) : null;
-        
-        if (!content) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        const isOpen = item.classList.contains("open");
-
-        // Close other open footer items in the same section
-        const section = heading.closest(".hdt-footer-section") || document;
-        section.querySelectorAll(".hdt-col-block.open").forEach(function (other) {
-          if (other !== item) {
-            other.classList.remove("open");
-            const otherContent = other.querySelector(".hdt-collapse-content") || other.querySelector(".hdt-collapse-contents");
-            if (otherContent) otherContent.style.height = null;
-          }
-        });
-
-        // Toggle current item
-        if (isOpen) {
-          item.classList.remove("open");
-          content.style.height = null;
-        } else {
-          item.classList.add("open");
-          content.style.height = content.scrollHeight + "px";
-        }
-      });
-    });
-  };
-
-  // Run on load and also on shopify section load events
-  initFooterAccordion();
-  document.addEventListener("shopify:section:load", initFooterAccordion);
+window.hdtFooterToggle = function (heading) {
+  if (window.innerWidth > 768) return;
   
-  // Backup for any dynamic content
-  const observer = new MutationObserver(initFooterAccordion);
-  observer.observe(document.body, { childList: true, subtree: true });
+  const item = heading.closest(".hdt-col-block");
+  const content = item ? (item.querySelector(".hdt-collapse-content") || item.querySelector(".hdt-collapse-contents")) : null;
+  if (!content) return;
 
+  const isOpen = item.classList.contains("open");
+
+  // Close others in the same footer section
+  const section = heading.closest(".hdt-footer-section") || document;
+  section.querySelectorAll(".hdt-col-block.open").forEach(function(other) {
+    if (other !== item) {
+      other.classList.remove("open");
+      const oc = other.querySelector(".hdt-collapse-content") || other.querySelector(".hdt-collapse-contents");
+      if (oc) oc.style.height = null;
+    }
+  });
+
+  if (isOpen) {
+    item.classList.remove("open");
+    content.style.height = null;
+  } else {
+    item.classList.add("open");
+    content.style.height = content.scrollHeight + "px";
+  }
+};
+
+(function () {
   window.addEventListener("resize", function () {
     if (window.innerWidth > 768) {
       document.querySelectorAll(".hdt-col-block.open").forEach(function (item) {
