@@ -20,17 +20,17 @@
             -%}
             {%- case  block.type -%}
               {%- when 'menu' -%}
-                <div id=" hdt-{{ block.id }}" class= "hdt-footer-menu hdt-border-column-{{ block.settings.border-column }} hdt-col-block hdt-col hdt-relative" style="--cus-width:{{ block.settings.custom_w_dk }}%;--pd-top: {{ pd_item[0] | default: 0 }};--pd-right: {{ pd_item[1] | default: 0 }};--pd-bottom: {{ pd_item[2] | default: 0 }};--pd-left: {{ pd_item[3] | default: 0 }};">
+                <div id="hdt-{{ block.id }}" class="hdt-footer-menu hdt-border-column-{{ block.settings.border-column }} hdt-col-block hdt-col hdt-relative" style="--cus-width:{{ block.settings.custom_w_dk }}%;--pd-top: {{ pd_item[0] | default: 0 }};--pd-right: {{ pd_item[1] | default: 0 }};--pd-bottom: {{ pd_item[2] | default: 0 }};--pd-left: {{ pd_item[3] | default: 0 }};">
                   {%- if block.settings.heading_menu != blank -%}
-                    <div class="hdt-heading-f collapsible hdt-flex hdt-align-center hdt-justify-between" onclick="hdtFooterToggle(this)">
+                    <input type="checkbox" id="footer-toggle-{{ block.id }}" class="hdt-footer-toggle-check hdt-hidden">
+                    <label for="footer-toggle-{{ block.id }}" class="hdt-heading-f collapsible hdt-flex hdt-align-center hdt-justify-between">
                       <h6 class=" {{ section.settings.heading_fs }} hdt-s-text {{ section.settings.text_weight }} mbl-accordion-heading"> {{ block.settings.heading_menu }}</h6>
                       <span class="hdt-collapse-icon hdt-relative accordions-arw-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="9" viewBox="0 0 14 9" fill="none">
                         <path d="M12.7097 0.704376L6.70972 6.74951L0.709717 0.704377" stroke="white" stroke-width="2"/>
                         </svg>
                       </span>
-                      {% comment %} <span class="hdt-collapse-icon hdt-relative"></span> {% endcomment %}
-                    </div>
+                    </label>
                   {%- endif -%}
                   {%- if block.settings.menu != blank -%}
                     <ul class="hdt-collapse-content hdt-footer-menu-list">
@@ -89,9 +89,10 @@
                 {%- assign use_social = true -%}
                 <div class="hdt-social-media hdt-border-column-{{ block.settings.border-column }} hdt-col-block hdt-col hdt-relative {% if block.settings.hide-on-mobile %}hide-on-mbl{% endif %}" id="hdt-{{ block.id }}"style="--cus-width:{{ block.settings.custom_w_dk }}%;--pd-top: {{ pd_item[0] | default: 0 }};--pd-right: {{ pd_item[1] | default: 0 }};--pd-bottom: {{ pd_item[2] | default: 0 }};--pd-left: {{ pd_item[3] | default: 0 }};">
                   {%- if block.settings.heading_sm != blank -%}
-                    <div class="hdt-heading-f collapsible {% if block.settings.image_sm != blank %} hdt-overwrite-heading {% endif %} hdt-flex hdt-align-center hdt-justify-between hdt-relative" onclick="hdtFooterToggle(this)">
+                    <input type="checkbox" id="footer-toggle-{{ block.id }}" class="hdt-footer-toggle-check hdt-hidden">
+                    <label for="footer-toggle-{{ block.id }}" class="hdt-heading-f collapsible {% if block.settings.image_sm != blank %} hdt-overwrite-heading {% endif %} hdt-flex hdt-align-center hdt-justify-between hdt-relative">
                       <h6 class=" {{ section.settings.heading_fs }} hdt-s-text {{ section.settings.text_weight }}{% if block.settings.image_sm != blank %} hdt-hidden {% endif %}"> {{ block.settings.heading_sm }}</h6>
-                    </div>
+                    </label>
                   {%- endif -%}
                   <div class="hdt-collapse-contents">
                     {%- if block.settings.image_sm != blank -%}
@@ -129,10 +130,11 @@
                 <div class="hdt-footer-newsletter hdt-border-column-{{ block.settings.border-column }} hdt-footer-news hdt-col-block hdt-col hdt-relative" id="hdt-{{ block.id }}"style="--cus-width:{{ block.settings.custom_w_dk }}%;--pd-top: {{ pd_item[0] | default: 0 }};--pd-right: {{ pd_item[1] | default: 0 }};--pd-bottom: {{ pd_item[2] | default: 0 }};--pd-left: {{ pd_item[3] | default: 0 }};">    
                 
                 {%- if block.settings.heading_newsletter != blank -%}
-                  <div class="hdt-heading-f collapsible hdt-flex hdt-align-center hdt-justify-between" onclick="hdtFooterToggle(this)">
+                  <input type="checkbox" id="footer-toggle-{{ block.id }}" class="hdt-footer-toggle-check hdt-hidden">
+                  <label for="footer-toggle-{{ block.id }}" class="hdt-heading-f collapsible hdt-flex hdt-align-center hdt-justify-between">
                     <h6 class=" {{ section.settings.heading_fs }} hdt-s-text {{ section.settings.text_weight }}"> {{ block.settings.heading_newsletter }}</h6>
                     <span class="hdt-collapse-icon hdt-relative"></span>
-                  </div>
+                  </label>
                 {%- endif -%}
                   <div class="hdt-collapse-content">
                     {%- if block.settings.newsletter_logo != blank -%}
@@ -367,47 +369,7 @@
   }
 }
 </style>
-<script>
-window.hdtFooterToggle = function (heading) {
-  if (window.innerWidth > 768) return;
-  
-  const item = heading.closest(".hdt-col-block");
-  const content = item ? (item.querySelector(".hdt-collapse-content") || item.querySelector(".hdt-collapse-contents")) : null;
-  if (!content) return;
-
-  const isOpen = item.classList.contains("open");
-
-  // Close others in the same footer section
-  const section = heading.closest(".hdt-footer-section") || document;
-  section.querySelectorAll(".hdt-col-block.open").forEach(function(other) {
-    if (other !== item) {
-      other.classList.remove("open");
-      const oc = other.querySelector(".hdt-collapse-content") || other.querySelector(".hdt-collapse-contents");
-      if (oc) oc.style.height = null;
-    }
-  });
-
-  if (isOpen) {
-    item.classList.remove("open");
-    content.style.height = null;
-  } else {
-    item.classList.add("open");
-    content.style.height = content.scrollHeight + "px";
-  }
-};
-
-(function () {
-  window.addEventListener("resize", function () {
-    if (window.innerWidth > 768) {
-      document.querySelectorAll(".hdt-col-block.open").forEach(function (item) {
-        item.classList.remove("open");
-        const content = item.querySelector(".hdt-collapse-content") || item.querySelector(".hdt-collapse-contents");
-        if (content) content.style.height = null;
-      });
-    }
-  });
-})();
-</script>
+/* No JS needed for footer accordion - using CSS checkbox hack */
 {% schema %}
 {
   "name": "t:sections.footer.name",

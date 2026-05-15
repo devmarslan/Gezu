@@ -155,32 +155,40 @@ hdt-compare[action="added"] svg path {
   .hdt-product-btns .hdt-pr_btn svg {
     opacity: 1 !important;
   }
-}
-
-/* — Mobile "Tap to Show" logic (Issue #38) — 
-   Hides buttons by default on mobile and shows them when the product card is tapped/hovered. */
 @media (max-width: 768px) {
+  /* — Footer CSS Checkbox Hack — */
+  .hdt-footer-toggle-check { display: none !important; }
+  .hdt-footer-toggle-check:checked ~ .hdt-collapse-content,
+  .hdt-footer-toggle-check:checked ~ .hdt-collapse-contents,
+  .hdt-footer-toggle-check:checked ~ .hdt-footer-menu-list {
+    height: auto !important;
+    max-height: 2000px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    padding-bottom: 20px !important;
+    transition: max-height 0.4s ease-in-out !important;
+    display: block !important;
+  }
+  
+  .hdt-footer-toggle-check:checked ~ label .hdt-collapse-icon {
+    transform: rotate(180deg) !important;
+  }
+
+  /* — Mobile Tap-to-Reveal (All Product Cards) — */
   .hdt-product-btns {
     opacity: 0 !important;
     visibility: hidden !important;
-    transition: opacity 0.3s ease, visibility 0.3s ease !important;
     pointer-events: none !important;
+    transition: opacity 0.3s ease !important;
   }
 
+  .mobile-tapped .hdt-product-btns,
   .hdt-card-product__media.mobile-tapped .hdt-product-btns,
-  .hdt-card-product.mobile-tapped .hdt-product-btns,
   .hdt-card-product__wrapper.mobile-tapped .hdt-product-btns {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
-    z-index: 15 !important;
-  }
-  
-  /* Ensure the buttons are styled even on mobile when shown */
-  .hdt-product-btns .hdt-pr_btn {
-    border: 1px solid #ddd !important;
-    background: #f8f8f8 !important;
-    color: #555 !important;
+    z-index: 20 !important;
   }
 }
 
