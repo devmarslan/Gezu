@@ -58,8 +58,23 @@
       padding: 10px;
       border-radius: 30px;
   }
-  #shopify-section-{{ section.id }} .hdt-main-product-wrap {
+  #shopify-section-{{ section.id }} .hdt-main-product-wrap.is-in-stock {
       gap: 80px;
+      align-items: flex-start;
+  }
+  @media (min-width: 768px) {
+    #shopify-section-{{ section.id }} .hdt-main-product-wrap.is-in-stock {
+      max-height: 90vh;
+      overflow: hidden;
+    }
+    #shopify-section-{{ section.id }} .hdt-main-product-wrap.is-in-stock > * {
+      max-height: 90vh;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    #shopify-section-{{ section.id }} .hdt-main-product-wrap.is-in-stock > *::-webkit-scrollbar {
+      display: none;
+    }
   }
   #shopify-section-{{ section.id }} .hdt-product-info__list .hdt-product-info__item.hdt-product__price {
     margin-block-end: 1.5rem;
@@ -123,7 +138,7 @@
 <div class="hdt-s-inner hdt-s-gradient" color-scheme="{{ section.settings.color_scheme }}" hdt-reveal="fade-in">
   <div class="hdt-container {%- if section.settings.full_width -%}-full{%- endif %}">
     <div class="hdt-section-spacing">
-      <div class="hdt-secion-main-product--{{ section.id }} hdt-row-grid hdt-grid-cols-1 md:hdt-grid-cols-2 hdt-main-product-wrap">
+      <div class="hdt-secion-main-product--{{ section.id }} hdt-row-grid hdt-grid-cols-1 md:hdt-grid-cols-2 hdt-main-product-wrap {% if product.available %}is-in-stock{% else %}is-out-of-stock{% endif %}" style="align-items: flex-start;">
         {% content_for 'block', type: '_product-medias', id: 'main-product' %}
         {% content_for "blocks" %}
       </div>
