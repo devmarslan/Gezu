@@ -369,51 +369,63 @@
 </style>
 <script>
 (function () {
-  const handleFooterClick = function (e) {
-    if (window.innerWidth > 768) return;
+  const initFooterAccordion = function () {
+    const headings = document.querySelectorAll(".hdt-heading-f.collapsible");
     
-    // Target the heading or its descendants
-    const heading = e.target.closest(".hdt-heading-f.collapsible");
-    if (!heading) return;
+    headings.forEach(function (heading) {
+      if (heading.dataset.accordionBound) return;
+      heading.dataset.accordionBound = "true";
 
-    const item = heading.closest(".hdt-col-block");
-    const content = item ? item.querySelector(".hdt-collapse-content") : null;
-    if (!content) return;
+      heading.addEventListener("click", function (e) {
+        if (window.innerWidth > 768) return;
 
-    e.preventDefault();
-    e.stopPropagation(); // Prevent theme scripts from interfering
+        const item = heading.closest(".hdt-col-block");
+        // Support both singular and plural class names found in the theme
+        const content = item ? (item.querySelector(".hdt-collapse-content") || item.querySelector(".hdt-collapse-contents")) : null;
+        
+        if (!content) return;
 
-    const isOpen = item.classList.contains("open");
+        e.preventDefault();
+        e.stopPropagation();
 
-    // Close other open footer items
-    document.querySelectorAll(".hdt-footer-column .hdt-col-block.open").forEach(function (other) {
-      if (other !== item) {
-        other.classList.remove("open");
-        const otherContent = other.querySelector(".hdt-collapse-content");
-        if (otherContent) otherContent.style.height = null;
-      }
+        const isOpen = item.classList.contains("open");
+
+        // Close other open footer items in the same section
+        const section = heading.closest(".hdt-footer-section") || document;
+        section.querySelectorAll(".hdt-col-block.open").forEach(function (other) {
+          if (other !== item) {
+            other.classList.remove("open");
+            const otherContent = other.querySelector(".hdt-collapse-content") || other.querySelector(".hdt-collapse-contents");
+            if (otherContent) otherContent.style.height = null;
+          }
+        });
+
+        // Toggle current item
+        if (isOpen) {
+          item.classList.remove("open");
+          content.style.height = null;
+        } else {
+          item.classList.add("open");
+          content.style.height = content.scrollHeight + "px";
+        }
+      });
     });
-
-    // Toggle current item
-    if (isOpen) {
-      item.classList.remove("open");
-      content.style.height = null;
-    } else {
-      item.classList.add("open");
-      content.style.height = content.scrollHeight + "px";
-    }
   };
 
-  document.addEventListener("click", handleFooterClick);
+  // Run on load and also on shopify section load events
+  initFooterAccordion();
+  document.addEventListener("shopify:section:load", initFooterAccordion);
+  
+  // Backup for any dynamic content
+  const observer = new MutationObserver(initFooterAccordion);
+  observer.observe(document.body, { childList: true, subtree: true });
 
   window.addEventListener("resize", function () {
     if (window.innerWidth > 768) {
       document.querySelectorAll(".hdt-col-block.open").forEach(function (item) {
-        if (item.closest(".hdt-footer-column")) {
-          item.classList.remove("open");
-          const content = item.querySelector(".hdt-collapse-content");
-          if (content) content.style.height = null;
-        }
+        item.classList.remove("open");
+        const content = item.querySelector(".hdt-collapse-content") || item.querySelector(".hdt-collapse-contents");
+        if (content) content.style.height = null;
       });
     }
   });
