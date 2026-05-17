@@ -1,0 +1,61 @@
+<button id="custom-klaviyo-trigger" class="floating-discount-btn" aria-label="Claim 10% Off">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+  </svg>
+  <span>10% OFF</span>
+</button>
+
+<style>
+  .floating-discount-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 30px; /* Change to right: 30px if you prefer it on the right */
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #111827; /* Dark minimalist SaaS look */
+    color: #ffffff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 50px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+
+  .floating-discount-btn:hover {
+    transform: translateY(-2px);
+    background-color: #374151;
+  }
+
+  /* Optional: Hide on mobile if you only want it on desktop */
+  @media (max-width: 768px) {
+    .floating-discount-btn {
+      bottom: 20px;
+      left: 20px;
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const floatingBtn = document.getElementById('custom-klaviyo-trigger');
+    
+    if(floatingBtn) {
+      floatingBtn.addEventListener('click', function(e) {
+        e.preventDefault(); 
+        
+        // Klaviyo Custom Trigger
+        window._klOnsite = window._klOnsite || [];
+        window._klOnsite.push(['openForm', 'YhS7Cs']);
+      });
+    }
+  });
+</script>
