@@ -275,7 +275,7 @@
                 "show_wishlist": true,
                 "show_compare": true,
                 "show_price_variant": false,
-                "show_request_quote": true,
+                "show_request_quote": false,
                 "quote_button_text": "Request a quote",
                 "quote_popup_title": "Request a customized quote",
                 "quote_popup_description": "Interested in larger quantities of one or more products? Once you've submitted your request, we'll get back to you as soon as possible with a suitable offer.",
