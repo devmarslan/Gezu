@@ -2533,6 +2533,16 @@
             "author_name": "Mr Iahn johnny"
           }
         },
+        "review_7C6Edk": {
+          "type": "review",
+          "disabled": true,
+          "settings": {
+            "rating": 5,
+            "review_title": "Lorem ipsum dolor sit amet consectetur.",
+            "review_text": "Lorem ipsum dolor sit amet consectetur. Semper sagittis libero semper dui mauris. Odio ut massa sed nec vulputate dictum amet. A.",
+            "author_name": "Patrick bol."
+          }
+        },
         "review_TKN7BW": {
           "type": "review",
           "settings": {
@@ -2600,6 +2610,7 @@
         "review_hPYXjR",
         "review_JzVXCn",
         "review_GiUejQ",
+        "review_7C6Edk",
         "review_TKN7BW",
         "review_V6XxC4",
         "review_LUhFWq",
