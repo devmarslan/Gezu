@@ -53,15 +53,6 @@
   </button>
 </div>
 <script>
-  (function() {
-    var key = 'fnl_minimized_{{ section.id }}';
-    if (localStorage.getItem(key) === '1') {
-      var btn = document.getElementById('floating-newsletter-trigger-{{ section.id }}');
-      if (btn) btn.classList.add('is-minimized');
-    }
-  })();
-</script>
-<script>
 (function() {
   var STORAGE_KEY = 'fnl_minimized_{{ section.id }}';
 
@@ -87,53 +78,7 @@
       });
     }
     
-    // Listen for "Not interested" clicks in the newsletter popup
-    document.addEventListener('click', function(e) {
-      const target = e.target;
-      
-      // Check if clicked element is "Not interested" button
-      const isNotInterestedBtn = 
-        (target.textContent && target.textContent.trim().toLowerCase().includes('not interested')) ||
-        target.classList.contains('newsletter-decline') ||
-        target.classList.contains('modal-decline') ||
-        target.classList.contains('popup-decline') ||
-        target.closest('.newsletter-decline') ||
-        target.closest('.modal-decline') ||
-        target.hasAttribute('data-decline-newsletter') ||
-        target.closest('[data-decline-newsletter]');
-      
-      if (isNotInterestedBtn) {
-        // Close the newsletter popup
-        closeNewsletterPopup();
-      }
-    });
-    
-    // Function to close the newsletter popup
-    function closeNewsletterPopup() {
-      // Method 1: Find hdt-modal and call close() method
-      const hdtModal = document.querySelector('hdt-modal.hdt-modal-newsletter');
-      if (hdtModal && typeof hdtModal.close === 'function') {
-        hdtModal.close();
-        return;
-      }
-      
-      // Method 2: Close the dialog directly
-      const dialog = document.querySelector('.hdt-modal-newsletter dialog');
-      if (dialog && dialog.open) {
-        dialog.close();
-        return;
-      }
-      
-      // Method 3: Find by ID pattern and close
-      const newsletterDialogs = document.querySelectorAll('dialog[id*="Newsletter"], dialog[id*="newsletter"]');
-      newsletterDialogs.forEach(function(d) {
-        if (d.open) {
-          d.close();
-        }
-      });
-    }
-    
-    // Main button click - open newsletter popup or expand if minimized
+    // Main button click - open Klaviyo popup or expand if minimized
     floatingBtn.addEventListener('click', function(e) {
       // Check if close button was clicked
       if (e.target.closest('.floating-btn__close')) {
@@ -149,35 +94,9 @@
         return;
       }
       
-      // Method 1: Find hdt-modal with newsletter class and call open() method
-      const hdtModal = document.querySelector('hdt-modal.hdt-modal-newsletter');
-      if (hdtModal && typeof hdtModal.open === 'function') {
-        hdtModal.open();
-        return;
-      }
-      
-      // Method 2: Try the dialog inside hdt-modal
-      const dialog = document.querySelector('.hdt-modal-newsletter dialog');
-      if (dialog) {
-        if (typeof dialog.showModal === 'function' && !dialog.open) {
-          try {
-            dialog.showModal();
-            return;
-          } catch(err) {
-            console.log('Dialog showModal failed:', err);
-          }
-        }
-      }
-      
-      // Method 3: Find by ID pattern
-      const newsletterDialogs = document.querySelectorAll('dialog[id*="Newsletter"], dialog[id*="newsletter"]');
-      newsletterDialogs.forEach(function(d) {
-        if (!d.open && typeof d.showModal === 'function') {
-          try {
-            d.showModal();
-          } catch(err) {}
-        }
-      });
+      // TRIGGER KLAVIYO POPUP
+      window._klOnsite = window._klOnsite || [];
+      window._klOnsite.push(['openForm', 'YhS7Cs']);
     });
   }
   
