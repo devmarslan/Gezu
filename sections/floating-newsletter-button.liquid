@@ -79,25 +79,26 @@
     }
     
     // Main button click - open Klaviyo popup or expand if minimized
-    floatingBtn.addEventListener('click', function(e) {
-      // Check if close button was clicked
-      if (e.target.closest('.floating-btn__close')) {
-        return;
-      }
-      
-      e.preventDefault();
-      
-      // If minimized, expand first and clear saved state
-      if (floatingBtn.classList.contains('is-minimized')) {
-        floatingBtn.classList.remove('is-minimized');
-        localStorage.removeItem(STORAGE_KEY);
-        return;
-      }
-      
-      // TRIGGER KLAVIYO POPUP
-      window._klOnsite = window._klOnsite || [];
-      window._klOnsite.push(['openForm', 'YhS7Cs']);
-    });
+      floatingBtn.addEventListener('click', function(e) {
+        // Check if close button was clicked
+        if (e.target.closest('.floating-btn__close')) {
+          return;
+        }
+        
+        e.preventDefault();
+        
+        // If minimized, expand first and clear saved state
+        if (floatingBtn.classList.contains('is-minimized')) {
+          floatingBtn.classList.remove('is-minimized');
+          localStorage.removeItem(STORAGE_KEY);
+          return;
+        }
+        
+        // TRIGGER KLAVIYO POPUP
+        console.log("Floating button clicked! Telling Klaviyo to open form YhS7Cs...");
+        window._klOnsite = window._klOnsite || [];
+        window._klOnsite.push(['openForm', 'YhS7Cs']);
+      });
   }
   
   // Initialize when DOM is ready
