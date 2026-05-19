@@ -374,7 +374,7 @@
                 "validity_color": "#000000",
                 "validity_font_style": "italic",
                 "columns_desktop": 4,
-                "columns_mobile": 3,
+                "columns_mobile": 2,
                 "grid_gap": 12,
                 "item_bg_color": "#ffffff",
                 "item_border_width": 2,
