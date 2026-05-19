@@ -197,16 +197,28 @@
     if (!slider) return;
     
     const slide = slider.querySelector(`[data-media-id="${variant.featured_media_id}"]`);
-    if (slide) {
-      const index = Array.from(slide.parentElement.children).indexOf(slide);
-      if (index !== -1) {
-        if (typeof slider.slideTo === 'function') {
-          slider.slideTo(index);
-        } else if (typeof slider.index !== 'undefined') {
-          slider.index = index;
-        }
-      }
+    if (!slide || !slide.parentElement) return;
+
+    const siblings = Array.from(slide.parentElement.children);
+    const index = siblings.indexOf(slide);
+    if (index < 0) return;
+
+    // Bounds-check against the Embla slider API to avoid
+    // slideNodes()[selectedScrollSnap()] returning undefined downstream.
+    const api = (typeof slider.getSliderApi === 'function' && slider.getSliderApi())
+      || slider.sliderApi || slider.embla || null;
+    if (api && typeof api.slideNodes === 'function') {
+      const slideCount = api.slideNodes().length;
+      if (slideCount === 0 || index >= slideCount) return;
     }
+
+    try {
+      if (typeof slider.slideTo === 'function') {
+        slider.slideTo(index);
+      } else if (typeof slider.index !== 'undefined') {
+        slider.index = index;
+      }
+    } catch (_) { /* slider not ready */ }
   }
 
   function updateURLWithVariant() {
@@ -570,9 +582,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // Use createContextualFragment to ensure scripts in the injected content are executed
             modalInner.innerHTML = '';
             modalInner.appendChild(document.createRange().createContextualFragment(content.innerHTML));
-          }
-          
-          // 3. Open the modal (calls the existing hdt-lazy-modal or dialog open method)
+
+            // 3. Open the modal (calls the existing hdt-lazy-modal or dialog open method)
             // Mark the open timestamp so stale cart events don't auto-close this session
             window.__hdtQVOpenedAt = Date.now();
             const modalWrapper = modal.closest('hdt-lazy-modal, hdt-modal');

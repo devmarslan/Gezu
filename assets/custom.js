@@ -1665,7 +1665,8 @@ class multiBrands extends HTMLElement {
     // this.url = "";
     if (this.item.length) {
       for (var i = 0; i < this.item.length; i++) {
-        if (this.item[i].parentElement.classList.value.includes("is--active")) {
+        const itemParent = this.item[i] && this.item[i].parentElement;
+        if (itemParent && itemParent.classList.value.includes("is--active")) {
           this.url = this.item[i].getAttribute("href");
           const lazyMb = $4('hdt-lazy-submenu#sub-hdt-nav-mb');
           if (lazyMb) {
@@ -2387,7 +2388,7 @@ class TabsBrands extends HTMLElement {
       content.style.display = 'block';
       content.style.height = 'auto';
     });
-    this.querySelector('[data-filter="all"]').classList.add('is--active');
+    this.querySelector('[data-filter="all"]')?.classList.add('is--active');
   }
 
   openTab(tabName) {
@@ -2707,6 +2708,7 @@ customElements.define("tab-hover", tabHover);
 // footer accodion
 function handleAccordionClick() {
   let accordion = this.parentElement;
+  if (!accordion) return;
   accordion.classList.toggle('open');
   if (window.innerWidth < 768) {
     let content = accordion.querySelector('.hdt-collapse-content');
