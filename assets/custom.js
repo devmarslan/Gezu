@@ -36,6 +36,11 @@ if (localStorage.getItem(nameCachedCompare)) {
   localStorage.setItem(nameCachedCompare, arr_compare_list.toString());
 }
 
+if (typeof window.themeHDN !== 'object' || window.themeHDN === null) window.themeHDN = {};
+if (!window.themeHDN.extras) window.themeHDN.extras = {};
+if (!window.themeHDN.routes) window.themeHDN.routes = {};
+if (!window.themeHDN.settings) window.themeHDN.settings = {};
+
 var linkWishlistApp = '/apps/ecomrise/wishlist',
   linkCompareApp = '/apps/ecomrise/compare',
   actionAfterWishlistAdded = themeHDN.extras.AddedWishlistRemove ? 'remove' : 'added',
@@ -43,7 +48,8 @@ var linkWishlistApp = '/apps/ecomrise/wishlist',
   limitWishlist = $wishlist_list ? 100 : 50,
   limitCompare = 5,
   conver_to_link_fn = function (prefix = this.textFn, array = this.array) {
-    const x = themeHDN.routes.search_url + `/?view=${prefix}`,
+    const baseUrl = (themeHDN.routes && themeHDN.routes.search_url) || '/search';
+    const x = baseUrl + `/?view=${prefix}`,
       y = x + '&type=product&options[unavailable_products]=last&q=';
 
     // 2. Add cache-buster to prevent Shopify from serving stale HTML
@@ -280,17 +286,16 @@ add_wis_fn = function (e) {
         }
 
         // 4. Update LocalStorage immediately on add
+        let parsedIds = [];
+        try {
+          parsedIds = JSON.parse(data?.response?.metafield?.value || '{}').ecomrise_ids || [];
+        } catch (e) { parsedIds = []; }
+        if (!Array.isArray(parsedIds)) parsedIds = String(parsedIds).split(',').filter(Boolean);
         if (this.isFnWishlist) {
-          arr_wishlist_list = JSON.parse(data.response.metafield.value).ecomrise_ids;
-          if (!Array.isArray(arr_wishlist_list)) {
-            arr_wishlist_list = arr_wishlist_list.split(',');
-          }
+          arr_wishlist_list = parsedIds;
           localStorage.setItem(nameCachedWishlist, arr_wishlist_list.toString());
         } else {
-          arr_compare_list = JSON.parse(data.response.metafield.value).ecomrise_ids;
-          if (!Array.isArray(arr_compare_list)) {
-            arr_compare_list = arr_compare_list.split(',');
-          }
+          arr_compare_list = parsedIds;
           localStorage.setItem(nameCachedCompare, arr_compare_list.toString());
           getterRunFn(_show_popup_compare, this, show_popup_compare_fn).call(this);
         }
@@ -341,10 +346,11 @@ remove_wis_fn = function (e) {
         }
 
         // 5. Update LocalStorage immediately on remove
-        let updated_ids = JSON.parse(data.response.metafield.value).ecomrise_ids;
-        if (!Array.isArray(updated_ids)) {
-          updated_ids = updated_ids.split(',');
-        }
+        let updated_ids = [];
+        try {
+          updated_ids = JSON.parse(data?.response?.metafield?.value || '{}').ecomrise_ids || [];
+        } catch (e) { updated_ids = []; }
+        if (!Array.isArray(updated_ids)) updated_ids = String(updated_ids).split(',').filter(Boolean);
 
         if (this.isFnWishlist) {
           arr_wishlist_list = updated_ids;
@@ -1001,20 +1007,19 @@ const bundleProduct = () => {
   arrBundle.forEach((el) => {
     if (!el.dataset.trigger) {
       return;
-    } else {
-      el.onmouseover = () => {
-        $4(el.dataset.trigger).classList.add("is--hover");
-        $4(el.dataset.trigger)
-          .closest("[data-bundle-parent]")
-          .classList.add("has--hover");
-      };
-      el.onmouseleave = () => {
-        $4(el.dataset.trigger).classList.remove("is--hover");
-        $4(el.dataset.trigger)
-          .closest("[data-bundle-parent]")
-          .classList.remove("has--hover");
-      };
     }
+    el.onmouseover = () => {
+      const t = $4(el.dataset.trigger);
+      if (!t) return;
+      t.classList.add("is--hover");
+      t.closest("[data-bundle-parent]")?.classList.add("has--hover");
+    };
+    el.onmouseleave = () => {
+      const t = $4(el.dataset.trigger);
+      if (!t) return;
+      t.classList.remove("is--hover");
+      t.closest("[data-bundle-parent]")?.classList.remove("has--hover");
+    };
   });
 };
 bundleProduct();
@@ -1025,7 +1030,7 @@ bundleProduct();
 class BackToTop extends HTMLElement {
   constructor() {
     super();
-    this.config = JSON.parse(this.getAttribute('config'));
+    try { this.config = JSON.parse(this.getAttribute('config') || '{}'); } catch (e) { this.config = {}; }
     if (window.innerWidth < 768 && this.config.hiddenMobile) return;
     this.debounce_timer = 0;
     this.debounce_timer2 = 0;
@@ -1073,10 +1078,12 @@ customElements.define('back-to-top', BackToTop);
 class numberRandom extends HTMLElement {
   constructor() {
     super();
-    let config = JSON.parse(this.getAttribute("config"));
+    let config;
+    try { config = JSON.parse(this.getAttribute("config") || '{}'); } catch (e) { config = {}; }
     this.min = config.min;
     this.max = config.max;
     this.interval = config.interval;
+    if (typeof this.min !== 'number' || typeof this.max !== 'number') return;
     this.number = Math.floor(Math.random() * (this.max - this.min + 1)) + this.min;
     this.ofset = ["1", "2", "4", "3", "6", "10", "-1", "-3", "-2", "-4", "-6"];
     this.prioritize = ["10", "20", "15"];
@@ -1175,9 +1182,10 @@ function eraseCookie(name) {
 class cookiesBar extends HTMLElement {
   constructor() {
     super();
-    this.cookies = JSON.parse(this.getAttribute("configs"));
+    try { this.cookies = JSON.parse(this.getAttribute("configs") || '{}'); } catch (e) { this.cookies = {}; }
     this.cookies.cookiesName = "theme4:cookies";
     this.cookies.drawer = this.querySelector("hdt-drawer");
+    if (!this.cookies.drawer) return;
     this.isShowCookiesAll = (this.cookies.show == '1');
     this.acceptBtn = this.cookies.drawer.querySelector(".hdt-pp_cookies__accept-btn");
     this.declineBtn = this.cookies.drawer.querySelector(".hdt-pp_cookies__decline-btn");
@@ -1263,13 +1271,15 @@ customElements.define('sys-cookies', cookiesBar);
 class newsletterModal extends HTMLElement {
   constructor() {
     super();
-    this.configs = JSON.parse(this.getAttribute('configs'));
+    try { this.configs = JSON.parse(this.getAttribute('configs') || '{}'); } catch (e) { this.configs = {}; }
     this.modal = this.querySelector("hdt-modal");
+    if (!this.modal) return;
     if (!Shopify.designMode && getCookie("theme4:newsletter:" + this.configs.id) == 'shown') {
       this.modal.setAttribute('closed', '');
       return;
     }
     this.dialog = this.querySelector("dialog");
+    if (!this.dialog) return;
     this.action_close = this.querySelectorAll('[action-close]');
     this.time_delay = this.configs.time_delay;
     this.day_next = this.configs.day_next;
@@ -1347,10 +1357,11 @@ customElements.define('sys-newsletter', newsletterModal);
 class exitModal extends HTMLElement {
   constructor() {
     super();
-    this.configs = JSON.parse(this.getAttribute('configs'));
+    try { this.configs = JSON.parse(this.getAttribute('configs') || '{}'); } catch (e) { this.configs = {}; }
     if (!Shopify.designMode && getCookie("theme4:exit:" + this.configs.id) == 'shown') return;
     this.modal = this.querySelector("hdt-modal");
     this.dialog = this.querySelector("dialog");
+    if (!this.modal || !this.dialog) return;
     this.day_next = this.configs.day_next;
     this.btn_copy = this.querySelector('button[is="discount_copy"]');
     this.discount = this.querySelector('[is="discount"]');
@@ -1449,7 +1460,8 @@ class cartCountdown extends HTMLElement {
   constructor() {
     super();
     let settMinutes = 60 * this.getAttribute("time"), time = parseInt(sessionStorage.getItem('cartTime')), display = this.querySelector('#timer_count');
-    this.config = JSON.parse(this.getAttribute("config"));
+    if (!display) return;
+    try { this.config = JSON.parse(this.getAttribute("config") || '{}'); } catch (e) { this.config = {}; }
     var self = this;
     function startTimer(duration, display) {
       let timer = duration, minutes, seconds;
@@ -1496,10 +1508,12 @@ contactForm.forEach(function (form) {
   })
 });
 const goToForm = (id) => {
+  if (!id) return;
   const form = $4(`#${id}`);
+  if (!form) return;
   const formParent = form.closest("hdt-modal");
+  if (!formParent || !formParent.id) return;
   const buttonForm = $4(`[aria-controls="${formParent.id}"]`);
-  // console.log(buttonForm)
   if (buttonForm) {
     buttonForm.scrollIntoView({ behavior: 'smooth' });
   }
@@ -1517,7 +1531,10 @@ if (location.href.indexOf('contact_posted=true') > 0 && recentform !== "") {
 
 else if (location.href.indexOf('customer_posted=true') > 0 && recentform !== "") {
   document.addEventListener('the4:recentform', (event) => {
-    let modal_id = document.getElementById(event.detail.recentform).getAttribute('data-id') || document.getElementById(event.detail.recentform).getAttribute('id');
+    const el = document.getElementById(event.detail.recentform);
+    if (!el) return;
+    const modal_id = el.getAttribute('data-id') || el.getAttribute('id');
+    if (!modal_id) return;
     document.getElementById(modal_id)?.closest("hdt-modal:not([closed])")?.open();
   })
   document.dispatchEvent(new CustomEvent('the4:recentform', { detail: { recentform: recentform }, bubbles: true, cancelable: true }));
@@ -1526,7 +1543,7 @@ else if (location.href.indexOf('customer_posted=true') > 0 && recentform !== "")
 }
 else if (location.href.indexOf('contact_posted=true') > 0 && location.href.indexOf('#') > 0) {
   var recentform = location.href.split("#")[1];
-  if ($id4(recentform).length > 0) {
+  if (recentform && $id4(recentform)) {
     sessionStorage.setItem("the4:recentform", recentform);
     $id4(recentform).classList.add("on-live");
     if ($4('.form-status-mirror-' + recentform)) {
@@ -1546,19 +1563,20 @@ class flashSold extends VariantChangeBase {
     super();
     var self = this;
     this.time = this.getAttribute("time");
-    this.config = JSON.parse(this.getAttribute("flash-sold"));
+    try { this.config = JSON.parse(this.getAttribute("flash-sold") || '{}'); } catch (e) { this.config = {}; }
     this.mins = this.config.mins;
     this.maxs = this.config.maxs;
     this.mint = this.config.mint;
     this.maxt = this.config.maxt;
     this.dataID = this.config.id;
+    this.$sold = this.querySelector('[data-sold]');
+    this.$hour = this.querySelector('[data-hour]');
+    if (!this.$sold || !this.$hour || typeof this.mins !== 'number' || typeof this.maxs !== 'number') return;
     this.getS = sessionStorage.getItem("soldS" + this.dataID) || this.getRandomInt(this.mins, this.maxs);
     this.getT = sessionStorage.getItem("soldT" + this.dataID) || this.getRandomInt(this.mint, this.maxt);
     this.numS = parseInt(this.getS);
     this.numT = parseInt(this.getT);
     this.intervalTime = parseInt(this.config.time);
-    this.$sold = this.querySelector('[data-sold]');
-    this.$hour = this.querySelector('[data-hour]');
     this.limitMinMax();
     this.updateSold(this.numS, this.numT);
     setInterval(() => {
@@ -1638,7 +1656,8 @@ var hdtNavLoading = true;
 class multiBrands extends HTMLElement {
   constructor() {
     super();
-    if ($id4("hdt-nav-ul").classList.value.includes("hdt-nav-loading") < 0) {
+    const navUl = $id4("hdt-nav-ul");
+    if (!navUl || navUl.classList.value.includes("hdt-nav-loading") < 0) {
       return false;
     }
     this.item = $$4("[item-brand]", this);
@@ -1674,16 +1693,14 @@ class FooterAccordion extends HTMLElement {
     this.id = this.getAttribute('id');
     this.heading = $4(`#Heading-${this.id}`, this);
     this.content = $4(`#Content-${this.id}`, this);
-    this.config = JSON.parse(this.getAttribute('config'));
+    try { this.config = JSON.parse(this.getAttribute('config') || 'null'); } catch (e) { this.config = null; }
     this.flag = false;
     if (!this.config) {
       this.config = {
         accordion: true
       }
     }
-    // if(window.innerWidth > 767){
-    //   return;
-    // }
+    if (!this.heading || !this.content) return;
     if (this.config.accordionMobile) {
       this.init();
       window.addEventListener('resize', () => {
@@ -1696,12 +1713,14 @@ class FooterAccordion extends HTMLElement {
     return this.hasAttribute('open');
   }
   attributeChangedCallback(name, oldValue, newValue) {
+    if (!this.content) return;
     this.open ? this.content.style.setProperty('height', `${this.content.scrollHeight}px`) : this.content.style.removeProperty('height');
   }
   init() {
     window.innerWidth < 768 ? this.handleHeadingClick() : this.removeAttribute('open');
   }
   handleHeadingClick() {
+    if (!this.heading) return;
     this.flag = true;
     this.heading.addEventListener('click', () => {
       if (window.innerWidth > 767) return;
@@ -1720,9 +1739,11 @@ dayjs.locale('en'); // use locale globally
 class orderDelivery extends VariantChangeBase {
   constructor() {
     super();
-    this.config = JSON.parse(this.getAttribute('config'));
+    try { this.config = JSON.parse(this.getAttribute('config') || '{}'); } catch (e) { this.config = {}; }
+    if (!this.config || !this.config.off_day || !this.config.cut_day || !this.config.time) return;
     this.offDays = this.config.off_day.replace(/ /g, '').split(",");
     this.nowDay = dayjs();
+    const orderExtras = (themeHDN && themeHDN.extras && themeHDN.extras.order) || { dayNames: '', monthNames: '' };
     var format_day = this.config.format_day,
       time = this.config.time.replace("24:00:00", "23:59:59"),
       arrDayWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
@@ -1736,8 +1757,8 @@ class orderDelivery extends VariantChangeBase {
       nowTime = this.nowDay.format('HHmmss'),
       timeint = time.replace(/ /g, '').replace(/:/g, ''),
 
-      arrDay = themeHDN.extras.order.dayNames.replace(/ /g, '').split(","),
-      arrMth = themeHDN.extras.order.monthNames.replace(/ /g, '').split(",");
+      arrDay = (orderExtras.dayNames || '').replace(/ /g, '').split(","),
+      arrMth = (orderExtras.monthNames || '').replace(/ /g, '').split(",");
 
     /**
      * Check Time, if nowTime >=  timeint +1 day
@@ -1841,17 +1862,17 @@ class orderDelivery extends VariantChangeBase {
   }
   #preVariantId;
   onVariantChanged(event) {
-    const variant = event.detail.variant;
-    if (variant && this.#preVariantId != variant.id) {
-      if (variant.available) {
-        this.closest(".hdt-product-info__item").style.display = ""
-        if (variant.variant_state.pre_order && this.config?.hideWithPreorder) {
-          this.closest(".hdt-product-info__item").style.display = "none"
-        }
+    const variant = event.detail && event.detail.variant;
+    if (!variant || this.#preVariantId == variant.id) return;
+    const wrapper = this.closest(".hdt-product-info__item");
+    if (!wrapper) return;
+    if (variant.available) {
+      wrapper.style.display = "";
+      if (variant.variant_state && variant.variant_state.pre_order && this.config && this.config.hideWithPreorder) {
+        wrapper.style.display = "none";
       }
-      else {
-        this.closest(".hdt-product-info__item").style.display = "none"
-      }
+    } else {
+      wrapper.style.display = "none";
     }
   }
 }
@@ -1865,11 +1886,14 @@ class countdownSimple extends HTMLElement {
      * [days] [hours] [mins] [secs]
      */
 
-    this.config = JSON.parse(this.getAttribute('config'));
+    try { this.config = JSON.parse(this.getAttribute('config') || '{}'); } catch (e) { this.config = {}; }
+    if (!this.config || !this.config.time) return;
     const time = this.config.time.replace("24:00:00", "23:59:59")
 
     if (time == '19041994') return;
-    this.textTemp = $4("template", this).innerHTML;
+    const tpl = $4("template", this);
+    if (!tpl) return;
+    this.textTemp = tpl.innerHTML;
     this.notHasDay = !this.textTemp.includes('[days]');
     let today = dayjs();
 
@@ -1923,14 +1947,9 @@ class countdownTimer extends VariantChangeBase {
   }
   #preVariantId;
   onVariantChanged(event) {
-    const variant = event.detail.variant;
+    const variant = event.detail && event.detail.variant;
     if (variant && this.#preVariantId != variant.id) {
-      if (variant.available) {
-        this.style.display = ""
-      }
-      else {
-        this.style.display = "none"
-      }
+      this.style.display = variant.available ? "" : "none";
     }
   }
 }
@@ -1977,12 +1996,14 @@ class QuickOrderList extends HTMLElement {
   updateThink() {
     this.items_in_cart = $4('[update_items_in_cart]', this);
     this.items_price_in_cart = $4('[update_items_price_in_cart]', this);
-    $4('form#QuickOrderList', this).addEventListener('submit', this.onSubmit.bind(this));
+    $4('form#QuickOrderList', this)?.addEventListener('submit', this.onSubmit.bind(this));
   }
   fetchQuickOrder(event) {
-    const html = new DOMParser().parseFromString(event.detail.sections[this.sectionId], 'text/html');
+    if (!event.detail || !event.detail.sections) return;
+    const html = new DOMParser().parseFromString(event.detail.sections[this.sectionId] || '', 'text/html');
     const sourceQty = html.querySelector(this.quickOrderListId);
-    $4('form#QuickOrderList', this).removeEventListener('submit', this.onSubmit.bind(this));
+    if (!sourceQty) return;
+    $4('form#QuickOrderList', this)?.removeEventListener('submit', this.onSubmit.bind(this));
     this.innerHTML = sourceQty.innerHTML;
     document.dispatchEvent(new CustomEvent("currency:update"));
     this.updateThink();
@@ -2398,23 +2419,25 @@ class countryFilter extends HTMLElement {
     super();
     this.search = $4('[name=country_filter]', this);
     this.reset = $4(".hdt-country_filter__reset", this);
-    if (this.search) {
-      this.search.addEventListener(
-        'input',
-        debounce((event) => {
-          this.filterCountries();
-        }, 200).bind(this)
-      );
-    }
+    if (!this.search) return;
+    this.search.addEventListener(
+      'input',
+      debounce((event) => {
+        this.filterCountries();
+      }, 200).bind(this)
+    );
     this.search.addEventListener('keydown', this.onSearchKeyDown.bind(this));
 
   }
   filterCountries() {
+    if (!this.search) return;
+    const popover = this.closest("hdt-popover");
+    if (!popover) return;
     const searchValue = this.search.value.toLowerCase();
-    const allCountries = this.closest("hdt-popover").querySelectorAll('hdt-richlist button');
+    const allCountries = popover.querySelectorAll('hdt-richlist button');
     let visibleCountries = allCountries.length;
     allCountries.forEach((item) => {
-      const countryName = item.getAttribute('data-name').toLowerCase();
+      const countryName = (item.getAttribute('data-name') || '').toLowerCase();
       if (countryName.indexOf(searchValue) > -1) {
         item.classList.remove('hdt-d-none');
         visibleCountries++;
@@ -2423,8 +2446,9 @@ class countryFilter extends HTMLElement {
         visibleCountries--;
       }
     });
-    this.closest("hdt-popover").updatePos();
-    this.closest("hdt-popover").shadowRoot.querySelector('.hdt-current-scrollbar').scrollTop = 0;
+    if (typeof popover.updatePos === 'function') popover.updatePos();
+    const sb = popover.shadowRoot && popover.shadowRoot.querySelector('.hdt-current-scrollbar');
+    if (sb) sb.scrollTop = 0;
   }
 
   onSearchKeyDown(event) {
@@ -2649,7 +2673,8 @@ customElements.define('product-description', ProductDescription);
 class QuickSearch extends HTMLElement {
   constructor() {
     super();
-    this.inpt = this.closest('hdt-predictive-search').querySelector('form input[data-input-search]');
+    const ps = this.closest('hdt-predictive-search');
+    this.inpt = ps ? ps.querySelector('form input[data-input-search]') : null;
     this.query = this.querySelector('a');
     if (!this.inpt || !this.query) return;
     this.onClick();
@@ -2671,8 +2696,8 @@ class tabHover extends HTMLElement {
   constructor() {
     super();
     this.addEventListener("mouseenter", (event) => {
-      this.closest("hdt-tab").querySelector("button[aria-current=\"true\"]")?.setAttribute("aria-current", false);
-      this.parentElement.click()
+      this.closest("hdt-tab")?.querySelector("button[aria-current=\"true\"]")?.setAttribute("aria-current", false);
+      this.parentElement?.click();
     });
   }
 }
@@ -2725,11 +2750,12 @@ class popupVideo extends HTMLElement {
     this.modal = $4("hdt-modal", this);
     this.dialog = $4("dialog", this);
     this.video = $4("hdt-video-player", this);
+    if (!this.dialog) return;
     this.dialog.addEventListener(`${dialogOpen}`, (e) => {
-      this.video.play()
+      this.video?.play?.();
     })
     this.dialog.addEventListener(`${dialogClose}`, (e) => {
-      this.video.pause()
+      this.video?.pause?.();
     })
   }
 }
