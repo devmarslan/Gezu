@@ -413,7 +413,7 @@
                 "show_tier_3": true,
                 "tier_3_quantity": 12,
                 "tier_3_discount": 15,
-                "show_tier_4": false,
+                "show_tier_4": true,
                 "tier_4_quantity": 16,
                 "tier_4_discount": 20
               },
