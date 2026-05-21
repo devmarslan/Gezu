@@ -739,8 +739,8 @@
               "static": true,
               "settings": {
                 "icon_1": "shopify://shop_images/Vector_10.png",
-                "text_1": "<p><strong>SPRING DEAL 2026</strong></p>",
-                "bg_1": "#cb2424",
+                "text_1": "<p><strong>{{ closest.product.metafields.custom.offers.value }}</strong></p>",
+                "bg_1": "#0047ab",
                 "bordr_1": "#ffffff",
                 "color_1": "#ffffff",
                 "fontsize_1": 12,
