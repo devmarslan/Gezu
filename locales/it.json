@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin language editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "accessibility": {
     "skip_to_text": "Salta al contenuto",
@@ -55,9 +64,9 @@
       "address1": "Indirizzo 1",
       "address2": "Indirizzo 2",
       "city": "Città",
-      "country": "Paese\/regione",
+      "country": "Paese/regione",
       "province": "Provincia",
-      "zip": "Codice postale\/CAP",
+      "zip": "Codice postale/CAP",
       "phone": "Telefono",
       "set_default": "Imposta come indirizzo predefinito",
       "add": "Aggiungi indirizzo",
@@ -269,10 +278,10 @@
     "errorMsg": "Immagine non caricabile"
   },
   "localization": {
-    "country_label": "Paese\/regione",
+    "country_label": "Paese/regione",
     "language_label": "Lingua",
     "update_language": "Aggiorna lingua",
-    "update_country": "Aggiorna paese\/regione"
+    "update_country": "Aggiorna paese/regione"
   },
   "onboarding": {
     "product_title": "Titolo del prodotto di esempio",
@@ -284,217 +293,6 @@
     "no_content": "Questa sezione al momento non include alcun contenuto. Aggiungi contenuti a questa sezione utilizzando la barra laterale.",
     "sidebar_blog_heading": "Barra laterale",
     "open_sidebar": "Apri la barra laterale"
-  },
-  "sections": {
-    "cart": {
-      "shipping_estimator": {
-        "estimate": "Stima",
-        "multiple_rates": "Abbiamo trovato diverse tariffe di spedizione disponibili per il tuo indirizzo:",
-        "one_rate": "Abbiamo trovato una tariffa di spedizione disponibile per il tuo indirizzo:",
-        "no_rates": "Ci scusiamo, non spediamo in questa destinazione.",
-        "errors": "Ci sono alcuni errori:",
-        "free": "GRATIS",
-        "title": "Stima spedizione",
-        "country": "Paese",
-        "province": "Provincia",
-        "zip_code": "CAP"
-      },
-      "mini_cart": {
-        "title": "Carrello della spesa",
-        "close_cart": "Chiudi carrello"
-      },
-      "tool": {
-        "save": "Salva",
-        "cancel": "Annulla",
-        "close": "Chiudi",
-        "note": "Aggiungi nota dell'ordine",
-        "edit_note": "Modifica nota dell'ordine",
-        "placeholder_note": "Come possiamo aiutarti?",
-        "discount": "Aggiungi codice sconto",
-        "discount_label": "Codice sconto",
-        "placeholder_discount": "Inserisci codice sconto",
-        "apply": "Applica",
-        "remove_discount": "Rimuovi sconto",
-        "add_gift_wrap": "Aggiungi una confezione regalo",
-        "coupon": "Coupon:",
-        "add_coupon": "Aggiungi un coupon",
-        "info_coupon": "Il codice coupon funzionerà nella pagina di pagamento",
-        "placeholder_coupon": "Codice coupon"
-      },
-      "title": "Il tuo carrello",
-      "caption": "Articoli nel carrello",
-      "remove": "Rimuovi",
-      "remove_title": "Rimuovi {{ title }}",
-      "subtotal": "Subtotale",
-      "new_subtotal": "Nuovo subtotale",
-      "add_note": "Aggiungi nota dell'ordine",
-      "edit_note": "Modifica nota dell'ordine",
-      "placeholder_note": "Come possiamo aiutarti?",
-      "checkout": "Vai alla cassa",
-      "empty": "Il tuo carrello è vuoto",
-      "return_shop": "Torna al negozio",
-      "empty_sub": "Puoi visualizzare tutti i prodotti disponibili e acquistarne alcuni nel negozio",
-      "cart_error": "Si è verificato un errore durante l'aggiornamento del tuo carrello. Per favore riprova.",
-      "cart_quantity_error_html": "Puoi aggiungere solo {{ quantity }} di questo articolo al tuo carrello.",
-      "taxes_included_but_shipping_at_checkout": "IVA inclusa e spedizione calcolata al momento del pagamento",
-      "taxes_and_shipping_at_checkout": "Tasse e spedizione calcolate al momento del pagamento",
-      "terms_and_conditions": "Accetto i termini e le condizioni.",
-      "free_shipping_bar": {
-        "success": "Il tuo ordine è idoneo per la spedizione gratuita!"
-      },
-      "headings": {
-        "product": "Prodotto",
-        "price": "Prezzo",
-        "total": "Totale",
-        "quantity": "Quantità"
-      },
-      "update": "Aggiorna",
-      "edit_item": "Modifica",
-      "remove_item": "Rimuovi",
-      "login": {
-        "title": "Hai un account?"
-      },
-      "often_bought_together": "Spesso comprati insieme",
-      "items_not_reserved": "I tuoi articoli non sono riservati,",
-      "checkout_quickly": "completa l'ordine velocemente per non perderli.",
-      "cart_empty_text": "Sembra che tu non abbia ancora aggiunto nulla",
-      "inc_vat": "IVA incl.",
-      "delivery": "Consegna",
-      "estimated_tax": "Tassa stimata",
-      "calculated_in_checkout": "Calcolato al checkout",
-      "agree_with_terms": "Accetto i",
-      "proceed_to_checkout": "Procedi al checkout",
-      "view_cart_caps": "VEDI CARRELLO",
-      "your_wishlist": "La tua lista dei desideri ({{ count }})",
-      "wishlist_empty_title": "La tua lista dei desideri è vuota",
-      "wishlist_empty_text": "Salva gli articoli che ami cliccando sull'icona del segnalibro",
-      "browse_products": "Sfoglia i prodotti",
-      "view_full_wishlist": "Vedi la lista completa",
-      "select_options": "SELEZIONA OPZIONI",
-      "no_image": "Nessuna immagine",
-      "add_to_wishlist": "Aggiungi alla lista dei desideri",
-      "shipping_away_html": "Ti mancano <span class=\"cart-drawer-shipping__amount\" data-shipping-remaining>{{ amount }}<\/span> per la spedizione standard gratuita",
-      "plus_more": "+{{ count }} altri",
-      "adding": "Aggiunta in corso...",
-      "added": "Aggiunto!",
-      "in_wishlist": "In lista dei desideri",
-      "your_wishlist_html": "La tua lista dei desideri ({{ count }})",
-      "wishlist_load_error": "Impossibile caricare la lista dei desideri",
-      "product_load_error": "Impossibile caricare il prodotto",
-      "return_30_days": "Reso entro 30 giorni"
-    },
-    "quick_order_list": {
-      "variant": "Variante",
-      "variants": "Varianti",
-      "quantity": "Quantità",
-      "price": "Prezzo",
-      "variant_total": "Totale variante",
-      "view_cart": "Visualizza carrello",
-      "total_items": "Totale articoli",
-      "product_subtotal": "Subtotale prodotto"
-    },
-    "countdown_timmer": {
-      "day": "giorno",
-      "day_plural": "Giorni",
-      "hr": "ora",
-      "hr_plural": "Ore",
-      "min": "Minuti",
-      "sec": "Secondi"
-    },
-    "footer": {
-      "payment": "Metodi di pagamento"
-    },
-    "featured_blog": {
-      "view_all": "Visualizza tutto",
-      "onboarding_title": "Post del blog",
-      "onboarding_content": "Fornisci ai tuoi clienti un riassunto del tuo post del blog"
-    },
-    "featured_collection": {
-      "view_all": "Visualizza tutto",
-      "view_all_label": "Visualizza tutti i prodotti nella collezione {{ collection_name }}",
-      "product_stock": {
-        "available": "Disponibile:",
-        "sold": "Venduto:"
-      }
-    },
-    "announcements": {
-      "previous_announcement": "Annuncio precedente",
-      "next_announcement": "Prossimo annuncio",
-      "carousel": "Carosello",
-      "announcement": "Annuncio",
-      "announcement_bar": "Barra degli annunci"
-    },
-    "header": {
-      "announcement": "Annuncio",
-      "menu_empty": "Si prega di aggiungere il menu principale nella sezione intestazione",
-      "view_all_categories": "Visualizza tutta la collezione",
-      "add_content": "Si prega di aggiungere contenuti per il mega menu {{ item }}"
-    },
-    "collection_list": {
-      "view_all": "Visualizza tutto",
-      "view_all_categories": "Visualizza tutte le categorie"
-    },
-    "store_locator": {
-      "blocks": {
-        "address": "Indirizzo",
-        "phone": "Telefono"
-      }
-    },
-    "collection_template": {
-      "title": "Collezione",
-      "empty": "Questa collezione è vuota",
-      "continue_shopping": "Continua a fare acquisti",
-      "short_by_txt": "Ordina",
-      "read_more": "Leggi di più",
-      "read_less": "Leggi meno"
-    },
-    "slideshow": {
-      "load_slide": "Carica diapositiva",
-      "previous_slideshow": "Diapositiva precedente",
-      "next_slideshow": "Diapositiva successiva",
-      "pause_slideshow": "Pausa slideshow",
-      "play_slideshow": "Riproduci slideshow",
-      "carousel": "Carosello",
-      "slide": "Diapositiva",
-      "image": "Immagine",
-      "image_mb": "Immagine mobile"
-    },
-    "page": {
-      "title": "Titolo della pagina",
-      "show_view_all": "Mostra tutto"
-    },
-    "newsletter_form": {
-      "email_placeholder": "Inserisci indirizzo email",
-      "submit": "Invia",
-      "subscribing": "Invio in corso...",
-      "confirmation": "Grazie per esserti iscritto!",
-      "error_exist": "Email già utilizzata per un altro account"
-    },
-    "agree_mail": {
-      "conditions": "Devi accettare i termini e le condizioni per iscriverti.",
-      "link_conditions_emty": "Accetto i termini e le condizioni."
-    },
-    "testimonials": {
-      "verify_customer": "Verifica cliente",
-      "purchase": "Acquista articolo:",
-      "settings": {
-        "verify_customer": "Verifica cliente"
-      }
-    }
-  },
-  "products": {
-    "theme_settings": {
-      "color": "color,colors,couleur,colour,colore,colori",
-      "size": "size,sizes,taglia,taglie,grandezza,misura"
-    },
-    "product": {
-      "back_in_stock": {
-        "success": "Ti notificheremo quando l'articolo sarà disponibile",
-        "title": "Notificami quando sarà di nuovo disponibile",
-        "sub_title": "Inserisci il tuo indirizzo email per essere notificato quando il prodotto tornerà disponibile.",
-        "please_notify": "Per favore, notificami quando questo prodotto sarà disponibile."
-      }
-    }
   },
   "sections": {
     "cart": {
@@ -525,6 +323,25 @@
       "apply_discount": "Applica sconto",
       "discount_error": "Inserisci un codice sconto valido",
       "error_try_again": "Errore - Riprova"
+    }
+  },
+  "products": {
+    "theme_settings": {
+      "color": "color,colors,couleur,colour,colore,colori",
+      "size": "size,sizes,taglia,taglie,grandezza,misura"
+    },
+    "product": {
+      "back_in_stock": {
+        "success": "Ti notificheremo quando l'articolo sarà disponibile",
+        "title": "Notificami quando sarà di nuovo disponibile",
+        "sub_title": "Inserisci il tuo indirizzo email per essere notificato quando il prodotto tornerà disponibile.",
+        "please_notify": "Per favore, notificami quando questo prodotto sarà disponibile."
+      }
+    }
+  },
+  "templates": {
+    "search": {
+      "collection": "Collezioni"
     }
   }
 }
