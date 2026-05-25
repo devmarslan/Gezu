@@ -66,13 +66,14 @@
       "blocks": {
         "ai_gen_block_e45bbd5_FfWd8F": {
           "type": "ai_gen_block_e45bbd5",
+          "disabled": true,
           "settings": {
             "announcement_text": "<p>Final Clearance Sale — Last Chance to Save Big</p>",
             "button_text": "Shop now",
             "button_link": "shopify://collections/spring-sale",
             "container_width": 1100,
-            "padding_vertical": 12,
-            "spacing": 16,
+            "padding_vertical": 8,
+            "spacing": 12,
             "background_color": "#000000",
             "text_color": "#ffffff",
             "text_size": 14,
@@ -84,7 +85,7 @@
             "button_hover_text_color": "#000000",
             "button_hover_border_color": "#ebebeb",
             "button_padding_vertical": 4,
-            "button_padding_horizontal": 10,
+            "button_padding_horizontal": 8,
             "button_text_size": 11,
             "button_text_weight": "500",
             "button_radius": 5,
