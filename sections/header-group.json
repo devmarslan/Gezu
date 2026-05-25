@@ -61,6 +61,43 @@
         "fullwidth": false
       }
     },
+    "17797053798d828b13": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_e45bbd5_FfWd8F": {
+          "type": "ai_gen_block_e45bbd5",
+          "settings": {
+            "announcement_text": "<p>Free shipping on orders over €50</p>",
+            "button_text": "Shop now",
+            "button_link": "",
+            "container_width": 1400,
+            "padding_vertical": 12,
+            "spacing": 16,
+            "background_color": "#0047ab",
+            "text_color": "#ffffff",
+            "text_size": 14,
+            "text_weight": "400",
+            "button_background": "#ffffff",
+            "button_text_color": "#0047ab",
+            "button_border_color": "#ffffff",
+            "button_hover_background": "#ebebeb",
+            "button_hover_text_color": "#0047ab",
+            "button_hover_border_color": "#ebebeb",
+            "button_padding_vertical": 4,
+            "button_padding_horizontal": 12,
+            "button_text_size": 12,
+            "button_text_weight": "600",
+            "button_radius": 3,
+            "button_border_width": 1
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_e45bbd5_FfWd8F"
+      ],
+      "settings": {}
+    },
     "icon_box_Uh99cq": {
       "type": "icon-box",
       "blocks": {
@@ -483,6 +520,7 @@
   },
   "order": [
     "top_bar_gEzcQM",
+    "17797053798d828b13",
     "icon_box_Uh99cq",
     "header_menu_bottom_blocks_46Cw9T",
     "icon_box_bNAGm7",
