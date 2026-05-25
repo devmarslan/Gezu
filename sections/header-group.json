@@ -67,9 +67,9 @@
         "ai_gen_block_e45bbd5_FfWd8F": {
           "type": "ai_gen_block_e45bbd5",
           "settings": {
-            "announcement_text": "<p>Free shipping on orders over €50</p>",
+            "announcement_text": "<p>Final Clearance Sale — Last Chance to Save Big</p>",
             "button_text": "Shop now",
-            "button_link": "",
+            "button_link": "shopify://collections/spring-sale",
             "container_width": 1400,
             "padding_vertical": 12,
             "spacing": 16,
