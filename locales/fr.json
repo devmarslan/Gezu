@@ -244,7 +244,8 @@
         "other": "{{ count }} résultats trouvés pour \"{{ terms }}\""
       },
       "title": "Résultats de recherche",
-      "search_for": "Rechercher \"{{ terms }}\""
+      "search_for": "Rechercher \"{{ terms }}\"",
+      "collection": "Collections"
     },
     "cart": {
       "cart": "Panier"
@@ -457,10 +458,9 @@
       "badge_pre_order": "Précommander",
       "product_variants": "Variantes de produits",
       "show_more_colors": "Afficher Plus de Couleurs",
-            "sold_out": "Épuisé",
+      "sold_out": "Épuisé",
       "in_stock_shipping": "En stock, expédition le jour même",
       "certified_quality": "Qualité Certifiée",
-      "sold_out": "Épuisé",
       "unavailable": "Indisponible",
       "available": "Disponibilité :",
       "vendor": "Fournisseur  :",
