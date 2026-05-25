@@ -67,7 +67,7 @@
         "ai_gen_block_e45bbd5_FfWd8F": {
           "type": "ai_gen_block_e45bbd5",
           "settings": {
-            "announcement_text": "<p><a href=\"/collections/spring-sale\" title=\"Spring Sale\">Final Clearance Sale — Last Chance to Save Big</a></p>",
+            "announcement_text": "<p><a href=\"/collections/spring-sale\" title=\"Spring Sale\"><em>Spring Clearance Sale — Get Up to 40% Off</em></a></p>",
             "button_text": "",
             "button_link": "shopify://collections/spring-sale",
             "container_width": 1100,
