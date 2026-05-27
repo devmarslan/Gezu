@@ -15,7 +15,7 @@
       "type": "floating-newsletter-button",
       "name": "Floating Newsletter Button",
       "settings": {
-        "button_text": "Claim your 10% OFF",
+        "button_text": "Claim your 5% OFF",
         "show_arrow": false,
         "position": "bottom-left",
         "position_mobile": "bottom-left",
