@@ -318,11 +318,6 @@
     },
     "content_for_index": [],
     "blocks": {
-      "2680175748099902610": {
-        "type": "shopify://apps/amazon-reviews/blocks/product-rating-snippet-embed/88ab28f3-a438-4eb3-a83e-f1a9c62c5069",
-        "disabled": false,
-        "settings": {}
-      },
       "13386407466480679122": {
         "type": "shopify://apps/interakt-whatsapp-marketing/blocks/app_embed/8ae4eea6-7869-4909-8446-2f9389fe7a63",
         "disabled": false,
@@ -339,11 +334,6 @@
         "settings": {
           "enable_geolocation": true
         }
-      },
-      "16559847531084589941": {
-        "type": "shopify://apps/p-quantity-breaks/blocks/app-embed-block/170ada5d-6ed5-4d40-b93c-1aa195de1ccc",
-        "disabled": false,
-        "settings": {}
       },
       "17530695623102652971": {
         "type": "shopify://apps/exemptify/blocks/ExemptifyApp/53648040-92ea-472b-92a5-eb781e92b01b",
@@ -389,6 +379,11 @@
       },
       "855628211100114053": {
         "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/klaviyo-onsite-embed/2632fe16-c075-4321-a88b-50b567f42507",
+        "disabled": false,
+        "settings": {}
+      },
+      "6987625696575125306": {
+        "type": "shopify://apps/weglot-translate-your-store/blocks/weglot/3097482a-fafe-42ff-bc33-ea19e35c4a20",
         "disabled": false,
         "settings": {}
       }
