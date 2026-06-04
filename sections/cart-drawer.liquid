@@ -234,8 +234,7 @@
                 <label class="cart-drawer-terms"><input type="checkbox" class="cart-drawer-terms__input" id="cart-agree-terms"><span class="cart-drawer-terms__check"></span><span class="cart-drawer-terms__text">{{ 'sections.cart.agree_with_terms' | t }} <a href="{{ section.settings.terms_page_url | default: '/policies/terms-of-service' }}">{{ 'sections.cart.terms_and_conditions' | t }}</a></span></label>
               {%- endif -%}
               <form action="{{ routes.cart_url }}" method="POST" id="CartDrawer-Form">
-                <input type="hidden" name="checkout" value="Checkout">
-                <button type="button" class="cart-drawer-checkout-btn" onclick="this.form.submit()">{{ 'sections.cart.proceed_to_checkout' | t }}</button>
+                <button type="submit" name="checkout" value="Checkout" class="cart-drawer-checkout-btn">{{ 'sections.cart.proceed_to_checkout' | t }}</button>
               </form>
               <div class="cart-drawer-cta-info"><a href="/cart" class="cart-drawer-checkout-btn-link">{{ 'sections.cart.view_cart_caps' | t }}</a></div>
               <div class="cart-drawer-payments">{{ 'visa' | payment_type_svg_tag }}{{ 'apple_pay' | payment_type_svg_tag }}{{ 'google_pay' | payment_type_svg_tag }}{{ 'master' | payment_type_svg_tag }}{{ 'paypal' | payment_type_svg_tag }}<span class="cart-drawer-payments__more">{{ 'sections.cart.plus_more' | t: count: 5 }}</span></div>
