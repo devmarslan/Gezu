@@ -1959,7 +1959,7 @@
           "type": "tab_item",
           "settings": {
             "title": "Deal of the day",
-            "collection": "todays-deal",
+            "collection": "spring-sale",
             "product_list": []
           }
         },
