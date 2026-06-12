@@ -231,7 +231,7 @@
             "card_bg_image": "shopify://shop_images/website_banner_7.png",
             "card_bg_color_mbl": "#f5f5f5",
             "bgimg_contain": true,
-            "upto_text": "get",
+            "upto_text": "UPTO",
             "upto_font_size": 14,
             "upto_font_size_mobile": 12,
             "upto_color": "#000000",
