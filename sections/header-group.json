@@ -258,7 +258,7 @@
         "search_only_product": true,
         "show_currency_language": true,
         "header_bottom_height": 60,
-        "main_menu": "main-menu-new-1",
+        "main_menu": "contact-information",
         "lazy_mn": true,
         "menu_position": "start",
         "menu_size": "base",
