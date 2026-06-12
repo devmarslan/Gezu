@@ -272,7 +272,7 @@
         "header_categories": true,
         "title_categories": "Categories",
         "menu_categories": "main-menu-new-1",
-        "hide_mbl_menu_categories": true,
+        "hide_mbl_menu_categories": false,
         "show_products": true,
         "show_promo_banners": false,
         "products_count": 8,
