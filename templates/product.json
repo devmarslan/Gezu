@@ -704,7 +704,6 @@
             },
             "mob-product-review-rating": {
               "type": "_product_review_rating",
-              "disabled": true,
               "static": true,
               "settings": {
                 "rating_value": 4.4,
@@ -1553,15 +1552,14 @@
           "settings": {
             "hide_areviews_title_rating": false,
             "areviews_theme_font": "inherit",
-            "areviews_stars_colors": "#f3c621",
-            "areviews_write_reviews_botton_color": "#373737"
+            "areviews_stars_colors": "#0047AB",
+            "areviews_write_reviews_botton_color": "#0047AB"
           }
         }
       },
       "block_order": [
         "areviews_reviews_importer_areviews_display_reviews_3be3Am"
       ],
-      "disabled": true,
       "settings": {
         "include_margins": true
       }
