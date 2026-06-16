@@ -261,7 +261,7 @@
         "main_menu": "contact-information",
         "lazy_mn": true,
         "menu_position": "end",
-        "menu_size": "lg",
+        "menu_size": "base",
         "menu_weight": "normal",
         "text_transform": false,
         "dropdown_arrow": false,
