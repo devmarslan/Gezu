@@ -13,7 +13,6 @@
   "sections": {
     "floating_newsletter_button_7Xmq4b": {
       "type": "floating-newsletter-button",
-      "disabled": true,
       "name": "Floating Newsletter Button",
       "settings": {
         "button_text": "Claim your 5% OFF",
