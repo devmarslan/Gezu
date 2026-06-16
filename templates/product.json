@@ -704,6 +704,7 @@
             },
             "mob-product-review-rating": {
               "type": "_product_review_rating",
+              "disabled": true,
               "static": true,
               "settings": {
                 "rating_value": 4.4,
