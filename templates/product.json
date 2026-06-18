@@ -27,6 +27,14 @@
           "type": "_group-product",
           "settings": {},
           "blocks": {
+            "custom_liquid_GDWW9i": {
+              "type": "_custom-liquid",
+              "name": "Custom liquid",
+              "settings": {
+                "liquid": "{%- comment -%}\n  GeZu · Deal banner — tag icon + heading + message (compact, GeZu brand blue)\n  Metafields (custom namespace):\n    custom.deal_label  (Single line text)  -> bold heading (optional)\n    custom.deal_text   (Multi-line text)   -> body message (REQUIRED — banner hides if blank)\n{%- endcomment -%}\n\n{%- liquid\n  assign deal_label = product.metafields.custom.deal_label.value\n  assign deal_text  = product.metafields.custom.deal_text.value\n\n  assign show_promo = false\n  if deal_text != blank\n    assign show_promo = true\n  endif\n-%}\n\n{%- if show_promo -%}\n<div class=\"gz-promo\">\n  <span class=\"gz-promo__icon\" aria-hidden=\"true\">\n    <svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n      <path d=\"M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z\"></path>\n      <line x1=\"7\" y1=\"7\" x2=\"7.01\" y2=\"7\"></line>\n    </svg>\n  </span>\n  <span class=\"gz-promo__body\">\n    {% if deal_label != blank %}<span class=\"gz-promo__title\">{{ deal_label }}</span>{% endif %}\n    <span class=\"gz-promo__text\">{{ deal_text | newline_to_br }}</span>\n  </span>\n</div>\n\n<style>\n  .gz-promo{\n    /* ---- GeZu brand blue gradient (matched to your logo) ---- */\n    --gz-bg1:#2763c2;   /* brighter royal blue */\n    --gz-bg2:#123c87;   /* deep navy blue */\n    --gz-clear:80px;    /* right gap so wishlist/compare buttons don't overlap (desktop) */\n\n    display:flex; align-items:center; gap:12px;\n    padding:12px 16px;\n    margin:12px var(--gz-clear) 12px 0;\n    border-radius:12px;\n    background:linear-gradient(120deg, var(--gz-bg1), var(--gz-bg2));\n    color:#fff; font-family:inherit;\n    box-shadow:0 3px 10px rgba(18,60,135,.25);\n  }\n  .gz-promo__icon{ flex:0 0 auto; display:inline-flex; opacity:.95; }\n  .gz-promo__body{ display:flex; flex-direction:column; min-width:0; }\n  .gz-promo__title{ display:block; font-weight:800; font-size:16px; line-height:1.2; }\n  .gz-promo__text{ display:block; font-size:13px; line-height:1.4; opacity:.95; }\n  .gz-promo__title + .gz-promo__text{ margin-top:4px; }\n\n  @media (max-width:600px){\n    .gz-promo{ gap:10px; padding:11px 14px; margin:10px 0; }\n    .gz-promo__icon svg{ width:22px; height:22px; }\n    .gz-promo__title{ font-size:15px; }\n    .gz-promo__text{ font-size:12px; }\n  }\n</style>\n{%- endif -%}"
+              },
+              "blocks": {}
+            },
             "areviews_reviews_importer_areviews_title_rating_fbJAMj": {
               "type": "shopify://apps/areviews-reviews-importer/blocks/AreviewsTitleRating/ab0ec5fe-c95b-4fd6-bfb8-db2a30d0756f",
               "disabled": true,
@@ -94,6 +102,14 @@
             "product_price_VhBaXe": {
               "type": "_product-price",
               "settings": {},
+              "blocks": {}
+            },
+            "custom_liquid_zi7idz": {
+              "type": "_custom-liquid",
+              "name": "Custom liquid",
+              "settings": {
+                "liquid": "{%- comment -%}\n  GeZu · Timer badge — \"Ends in HH:MM:SS\" (flat red, square, compact)\n  Hides completely when the countdown ends, and when both fields are blank.\n  Metafields (custom namespace):\n    custom.deal_end              (Date and time)  -> fixed deadline (priority)\n    custom.deal_evergreen_hours  (Integer)        -> per-visitor rolling timer (fallback)\n{%- endcomment -%}\n\n{%- liquid\n  assign deal_end      = product.metafields.custom.deal_end.value\n  assign evergreen_hrs = product.metafields.custom.deal_evergreen_hours.value\n\n  assign show_timer = false\n  if deal_end != blank\n    assign show_timer = true\n  elsif evergreen_hrs != blank\n    assign show_timer = true\n  endif\n-%}\n\n{%- if show_timer -%}\n<div class=\"gz-timer-wrap\">\n  <span\n    class=\"gz-timer\"\n    {% if deal_end != blank %}data-deal-end=\"{{ deal_end | date: '%Y-%m-%dT%H:%M:%S%z' }}\"{% endif %}\n    {% if evergreen_hrs != blank %}data-deal-evergreen=\"{{ evergreen_hrs }}\" data-deal-key=\"gz-timer-{{ product.id }}\"{% endif %}\n  >\n    <span class=\"gz-timer__lead\">Ends in</span>\n    <span class=\"gz-timer__time\" data-time>00:00:00</span>\n  </span>\n</div>\n\n<style>\n  .gz-timer-wrap{ margin:10px 0; }\n  .gz-timer{\n    --gz-bg:#d32f2f;            /* flat sale red — no gradient. Change for exact red */\n    display:inline-flex; align-items:center; gap:6px;\n    padding:6px 12px;\n    border-radius:0;           /* square corners */\n    background:var(--gz-bg);\n    color:#fff; font-family:inherit; line-height:1;\n  }\n  .gz-timer__lead{ font-weight:800; font-size:14px; letter-spacing:.2px; }\n  .gz-timer__time{ font-weight:800; font-size:14px; font-variant-numeric:tabular-nums; letter-spacing:.8px; }\n  @media (max-width:600px){\n    .gz-timer{ padding:5px 10px; }\n    .gz-timer__lead, .gz-timer__time{ font-size:13px; }\n  }\n</style>\n\n<script>\n(function(){\n  function parseEnd(str){ str = str.replace(/([+-]\\d{2})(\\d{2})$/, '$1:$2'); return new Date(str).getTime(); }\n  function pad(n){ return (n < 10 ? '0' : '') + n; }\n  function fmt(diff){\n    var t=Math.floor(diff/1000), days=Math.floor(t/86400),\n        hh=pad(Math.floor((t%86400)/3600)), mm=pad(Math.floor((t%3600)/60)), ss=pad(t%60);\n    return (days>0 ? days+'d ' : '') + hh+':'+mm+':'+ss;\n  }\n  function init(){\n    document.querySelectorAll('.gz-timer:not([data-gz-init])').forEach(function(el){\n      el.setAttribute('data-gz-init','1');\n      var target=null, endAttr=el.getAttribute('data-deal-end'),\n          evergreen=el.getAttribute('data-deal-evergreen'), key=el.getAttribute('data-deal-key');\n      if(endAttr){ target=parseEnd(endAttr); }\n      else if(evergreen){ var ms=parseFloat(evergreen)*3600000, saved=key?localStorage.getItem(key):null;\n        if(saved){ target=parseInt(saved,10); } else { target=Date.now()+ms; if(key) localStorage.setItem(key,String(target)); } }\n\n      var wrap = el.closest('.gz-timer-wrap') || el;\n      if(!target || isNaN(target)){ wrap.style.display='none'; return; }\n\n      var timeEl=el.querySelector('[data-time]');\n      function tick(){\n        var diff=target-Date.now();\n        if(diff<=0){ wrap.style.display='none'; clearInterval(iv); return; }  // hide when ended\n        timeEl.textContent=fmt(diff);\n      }\n      tick(); var iv=setInterval(tick,1000);\n    });\n  }\n  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);\n  else init();\n  document.addEventListener('shopify:section:load',init);\n})();\n</script>\n{%- endif -%}"
+              },
               "blocks": {}
             },
             "product_link_text_ijiRXj": {
@@ -526,12 +542,14 @@
             }
           },
           "block_order": [
+            "custom_liquid_GDWW9i",
             "areviews_reviews_importer_areviews_title_rating_fbJAMj",
             "product_review_rating_kUejg9",
             "product_title_NntHaz",
             "product_meta_sku_yQmz9E",
             "product_badges_3qxfaW",
             "product_price_VhBaXe",
+            "custom_liquid_zi7idz",
             "product_link_text_ijiRXj",
             "product_inventory_Cm444n",
             "product_link_text_jRM3wR",
