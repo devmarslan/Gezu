@@ -195,7 +195,7 @@
           "settings": {
             "reverse": false,
             "card_bg_color": "#f9f9f9",
-            "card_bg_image": "shopify://shop_images/website_banner_7_be14fd0f-6c6f-4fd1-b44c-79422c52ce01.png",
+            "card_bg_image": "shopify://shop_images/website_banner_13.png",
             "card_bg_color_mbl": "#f5f5f5",
             "bgimg_contain": true,
             "upto_text": "Upto",
@@ -212,7 +212,7 @@
             "title_font_size": 20,
             "title_font_size_mobile": 14,
             "title_color": "#000000",
-            "description": "Exclusive Deals, Limited Time",
+            "description": "Exclusive Deals",
             "description_font_size": 14,
             "description_font_size_mobile": 12,
             "description_color": "#000000",
