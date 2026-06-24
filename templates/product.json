@@ -460,7 +460,6 @@
                 "accordion_description_nmGAaB": {
                   "type": "_accordion_description",
                   "name": "t:sections.main-product-tabs.blocks.accordion_description.name",
-                  "disabled": true,
                   "settings": {
                     "open": true,
                     "title": "Product Information"
@@ -470,7 +469,6 @@
                 "accordion_html_ERFrpw": {
                   "type": "_accordion_html",
                   "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
-                  "disabled": true,
                   "settings": {
                     "open": false,
                     "title": "Features",
@@ -482,7 +480,6 @@
                 "accordion_html_idgjGV": {
                   "type": "_accordion_html",
                   "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
-                  "disabled": true,
                   "settings": {
                     "open": false,
                     "title": "Versatility",
