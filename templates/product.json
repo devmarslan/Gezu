@@ -43,6 +43,7 @@
             "product_review_rating_kUejg9": {
               "type": "_product_review_rating",
               "name": "Product Rating",
+              "disabled": true,
               "settings": {
                 "rating_value": 4.4,
                 "reviews_count": 100,
