@@ -602,6 +602,37 @@
                 "hide_prod_info_accordoins": false
               },
               "blocks": {
+                "accordion_description_RBQC6w": {
+                  "type": "_accordion_description",
+                  "name": "t:sections.main-product-tabs.blocks.accordion_description.name",
+                  "settings": {
+                    "open": true,
+                    "title": "Product Information"
+                  },
+                  "blocks": {}
+                },
+                "accordion_html_ppHtDz": {
+                  "type": "_accordion_html",
+                  "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
+                  "settings": {
+                    "open": false,
+                    "title": "Features",
+                    "content": "{{ closest.product.metafields.custom.feature_tab | metafield_tag }}",
+                    "page": ""
+                  },
+                  "blocks": {}
+                },
+                "accordion_html_LMW8gt": {
+                  "type": "_accordion_html",
+                  "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
+                  "settings": {
+                    "open": false,
+                    "title": "Versatility",
+                    "content": "{{ closest.product.metafields.custom.versatility_tab | metafield_tag }}",
+                    "page": ""
+                  },
+                  "blocks": {}
+                },
                 "technical_details_LhFTF4": {
                   "type": "_technical-details",
                   "name": "Technical Details",
@@ -615,47 +646,13 @@
                     "padding_bottom": 20
                   },
                   "blocks": {}
-                },
-                "accordion_description_RBQC6w": {
-                  "type": "_accordion_description",
-                  "name": "t:sections.main-product-tabs.blocks.accordion_description.name",
-                  "disabled": true,
-                  "settings": {
-                    "open": true,
-                    "title": "Product Information"
-                  },
-                  "blocks": {}
-                },
-                "accordion_html_ppHtDz": {
-                  "type": "_accordion_html",
-                  "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
-                  "disabled": true,
-                  "settings": {
-                    "open": false,
-                    "title": "Features",
-                    "content": "{{ closest.product.metafields.custom.feature_tab | metafield_tag }}",
-                    "page": ""
-                  },
-                  "blocks": {}
-                },
-                "accordion_html_LMW8gt": {
-                  "type": "_accordion_html",
-                  "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
-                  "disabled": true,
-                  "settings": {
-                    "open": false,
-                    "title": "Versatility",
-                    "content": "{{ closest.product.metafields.custom.versatility_tab | metafield_tag }}",
-                    "page": ""
-                  },
-                  "blocks": {}
                 }
               },
               "block_order": [
-                "technical_details_LhFTF4",
                 "accordion_description_RBQC6w",
                 "accordion_html_ppHtDz",
-                "accordion_html_LMW8gt"
+                "accordion_html_LMW8gt",
+                "technical_details_LhFTF4"
               ]
             },
             "product_link_text2_YqnXta": {
