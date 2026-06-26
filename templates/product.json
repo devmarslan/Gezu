@@ -462,7 +462,7 @@
                   "type": "_accordion_description",
                   "name": "t:sections.main-product-tabs.blocks.accordion_description.name",
                   "settings": {
-                    "open": true,
+                    "open": false,
                     "title": "Product Information"
                   },
                   "blocks": {}
@@ -488,13 +488,25 @@
                     "page": ""
                   },
                   "blocks": {}
+                },
+                "accordion_html_HdTmzw": {
+                  "type": "_accordion_html",
+                  "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
+                  "settings": {
+                    "open": false,
+                    "title": "How to Install",
+                    "content": "{{ closest.product.metafields.custom.how_to_install | metafield_tag }}",
+                    "page": ""
+                  },
+                  "blocks": {}
                 }
               },
               "block_order": [
                 "technical_details_LYyeAq",
                 "accordion_description_nmGAaB",
                 "accordion_html_ERFrpw",
-                "accordion_html_idgjGV"
+                "accordion_html_idgjGV",
+                "accordion_html_HdTmzw"
               ]
             },
             "product_link_text2_xQGaJb": {
