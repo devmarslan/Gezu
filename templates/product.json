@@ -483,7 +483,7 @@
                   "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
                   "settings": {
                     "open": false,
-                    "title": "Versatility",
+                    "title": "Where to Use",
                     "content": "{{ product.metafields.custom.versatility_tab | metafield_tag }}",
                     "page": ""
                   },
