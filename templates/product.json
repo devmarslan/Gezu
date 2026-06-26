@@ -512,6 +512,7 @@
             "product_bundle_rbwdnm": {
               "type": "_product_bundle",
               "name": "Bundle product",
+              "disabled": true,
               "settings": {
                 "product_list": [],
                 "display_by_color": false,
