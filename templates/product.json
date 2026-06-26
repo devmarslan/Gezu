@@ -509,6 +509,16 @@
                 "accordion_html_HdTmzw"
               ]
             },
+            "product_bundle_rbwdnm": {
+              "type": "_product_bundle",
+              "name": "Bundle product",
+              "settings": {
+                "product_list": [],
+                "display_by_color": false,
+                "color_scheme": ""
+              },
+              "blocks": {}
+            },
             "product_link_text2_xQGaJb": {
               "type": "_product_link_text2",
               "name": "Product Link Text 2",
@@ -573,6 +583,7 @@
             "trust_icontext_8hC7xG",
             "buy_save_more_m4CYan",
             "group_accordion_JQgEdj",
+            "product_bundle_rbwdnm",
             "product_link_text2_xQGaJb"
           ]
         },
