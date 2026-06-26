@@ -248,7 +248,7 @@
                 "show_inventory_quantity": false,
                 "show_progress_bar": false,
                 "progress_bar_max": 50,
-                "invt_addition_text": "Grab it before it's bone!"
+                "invt_addition_text": "Grab it before it's gone!"
               },
               "blocks": {}
             },
