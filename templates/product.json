@@ -620,17 +620,6 @@
                   },
                   "blocks": {}
                 },
-                "accordion_html_DJpKN6": {
-                  "type": "_accordion_html",
-                  "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
-                  "settings": {
-                    "open": false,
-                    "title": "How to Install",
-                    "content": "{{ closest.product.metafields.custom.how_to_install | metafield_tag }}",
-                    "page": ""
-                  },
-                  "blocks": {}
-                },
                 "accordion_html_ppHtDz": {
                   "type": "_accordion_html",
                   "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
@@ -653,6 +642,17 @@
                   },
                   "blocks": {}
                 },
+                "accordion_html_DJpKN6": {
+                  "type": "_accordion_html",
+                  "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
+                  "settings": {
+                    "open": false,
+                    "title": "How to Install",
+                    "content": "{{ closest.product.metafields.custom.how_to_install | metafield_tag }}",
+                    "page": ""
+                  },
+                  "blocks": {}
+                },
                 "technical_details_LhFTF4": {
                   "type": "_technical-details",
                   "name": "Technical Details",
@@ -670,9 +670,9 @@
               },
               "block_order": [
                 "accordion_description_RBQC6w",
-                "accordion_html_DJpKN6",
                 "accordion_html_ppHtDz",
                 "accordion_html_LMW8gt",
+                "accordion_html_DJpKN6",
                 "technical_details_LhFTF4"
               ]
             },
