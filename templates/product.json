@@ -248,7 +248,7 @@
                 "show_inventory_quantity": false,
                 "show_progress_bar": false,
                 "progress_bar_max": 50,
-                "invt_addition_text": "Grab it Before It's Gone!"
+                "invt_addition_text": "Grab it before It's bone!"
               },
               "blocks": {}
             },
@@ -624,7 +624,7 @@
                   "name": "t:sections.main-product-tabs.blocks.accordion_htmlx.name",
                   "settings": {
                     "open": false,
-                    "title": "Versatility",
+                    "title": "Where to use",
                     "content": "{{ closest.product.metafields.custom.versatility_tab | metafield_tag }}",
                     "page": ""
                   },
