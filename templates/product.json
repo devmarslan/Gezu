@@ -337,6 +337,38 @@
               },
               "blocks": {}
             },
+            "gezu_pdp_trust_horizontal_Q6qHpx": {
+              "type": "gezu-pdp-trust-horizontal",
+              "name": "GeZu Trust Horizontal",
+              "disabled": true,
+              "settings": {
+                "accent_color": "#0047ab",
+                "space_above": 10,
+                "delivery_title": "Fast delivery — ships within 24 hrs",
+                "delivery_sub": "NL/BE 1–2 days · Rest of EU 2–4 days. Ordered before 16:00? Ships today.",
+                "delivery_cta": "Delivery times",
+                "returns_title": "30-day returns",
+                "returns_sub": "Not right for your project? Send it back within 30 days. Flat €9 return fee.",
+                "returns_cta": "How returns work",
+                "delivery_heading": "Delivery & transit times",
+                "delivery_intro": "<p>Orders placed before 16:00 on working days are shipped the same day with FedEx or DPD, fully tracked. Transit times are in working days and exclude weekends and Dutch public holidays.</p>",
+                "delivery_head": "Destination | Transit time",
+                "delivery_rows": "Netherlands & Belgium | 1–2 working days\nFrance | 2–3 working days\nItaly | 2–4 working days\nSpain | 2–4 working days\nUnited Kingdom | 2–5 working days\nRest of Europe | 2–4 working days",
+                "delivery_more_label": "See all countries",
+                "delivery_more_rows": "Germany | 2–3 working days\nAustria | 2–4 working days\nDenmark | 2–4 working days\nSweden | 2–4 working days\nPoland | 2–4 working days\nPortugal | 2–4 working days\nIreland | 2–4 working days\nLuxembourg | 1–2 working days",
+                "delivery_note": "<p>You receive a tracking link by email the moment your order leaves our warehouse. Heavy or oversized goods may ship by pallet — any surcharge is shown clearly at checkout before you pay.</p>",
+                "returns_heading": "Returns & refunds",
+                "returns_intro": "<p><strong>30 days to change your mind.</strong> Under EU law you may cancel within 14 days — we give you a full 30 days from delivery. A flat €9 return fee applies, the same across every country.</p>",
+                "returns_conditions": "<ul><li>Items must be unused, uninstalled and in their original packaging.</li><li>If you return because of a wrong choice on your side, the €9 return shipping is deducted from your refund.</li><li>If a product is damaged through incorrect use or assembly, the refund may be reduced or declined.</li><li>Custom-cut, made-to-order and certain safety items cannot be returned. This does not affect your statutory rights.</li></ul>",
+                "returns_btn_label": "Start a return / read the full policy",
+                "returns_btn_url": "",
+                "returns_note": "<p>Refunds are processed within 3–5 working days of us receiving your return.</p>",
+                "b2b_heading": "Business VAT reclaim",
+                "b2b_intro": "<p>For VAT-registered businesses outside the Netherlands. Add your details below — we verify your VAT number and apply the VAT reclaim to your order before it ships.</p>",
+                "b2b_note": "<p>For business customers only. VAT is reclaimed only after your number is verified as valid and registered outside the Netherlands. Consumers (B2C) are not eligible.</p>"
+              },
+              "blocks": {}
+            },
             "product_back_instock_qNYiT7": {
               "type": "_product_back_instock",
               "settings": {
@@ -580,6 +612,7 @@
             "product_inventory_e63L7E",
             "product_buy_button_9gRLMx",
             "product_trust_badge_V8a7Hy",
+            "gezu_pdp_trust_horizontal_Q6qHpx",
             "product_back_instock_qNYiT7",
             "trust_icontext_8hC7xG",
             "buy_save_more_m4CYan",
