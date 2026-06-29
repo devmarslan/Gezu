@@ -1,0 +1,278 @@
+{% comment %}
+  ============================================================================
+  GeZu PDP Trust  —  THEME BLOCK for "11 may | backup" (HideThemes / hdt theme)
+  Lives in:  blocks/gezu-pdp-trust.liquid (public)
+  Already allowed inside the "Product content" group (_group-product),
+  so it can be dragged directly UNDER the Buy-button block, fully editable.
+  Native theme-block format: {% stylesheet %} + {% javascript %} + {% schema %}.
+  Never uses {# #} (not valid Liquid). All copy is in block.settings.
+  ============================================================================
+{% endcomment %}
+
+{%- liquid
+  assign acc = block.settings.accent_color | default: '#0047ab'
+  assign sp  = block.settings.space_above | default: 10
+-%}
+
+<div class="gz-pdp gz-pdp--h" data-gz-pdp style="margin-top:{{ sp }}px;--gz-accent:{{ acc }};" {{ block.shopify_attributes }}>
+
+  {%- comment -%} Row 1 — Delivery {%- endcomment -%}
+  <button type="button" class="gz-row" data-gz-open="delivery">
+    <span class="gz-row__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1"/><path d="M14 9h4l3 3v5a1 1 0 0 1-1 1h-1"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg></span>
+    <span class="gz-row__txt"><strong>{{ block.settings.delivery_title }}</strong><span>{{ block.settings.delivery_sub }}</span></span>
+    <span class="gz-row__cta">{{ block.settings.delivery_cta }}</span>
+  </button>
+
+  {%- comment -%} Row 2 — Returns {%- endcomment -%}
+  <button type="button" class="gz-row" data-gz-open="returns">
+    <span class="gz-row__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11a5 5 0 0 1 0 10H8"/><path d="M6 4 3 7l3 3"/></svg></span>
+    <span class="gz-row__txt"><strong>{{ block.settings.returns_title }}</strong><span>{{ block.settings.returns_sub }}</span></span>
+    <span class="gz-row__cta">{{ block.settings.returns_cta }}</span>
+  </button>
+
+  {%- comment -%} Row 3 — B2B VAT {%- endcomment -%}
+  {%- if block.settings.b2b_show -%}
+  <button type="button" class="gz-row gz-row--b2b" data-gz-open="b2b">
+    <span class="gz-row__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h.01M9 12h.01M9 15h.01"/></svg></span>
+    <span class="gz-row__txt"><strong>{{ block.settings.b2b_title }}</strong><span>{{ block.settings.b2b_sub }}</span></span>
+    <span class="gz-row__cta">{{ block.settings.b2b_cta }}</span>
+  </button>
+  {%- endif -%}
+
+  {%- comment -%} MODAL: DELIVERY {%- endcomment -%}
+  <div class="gz-modal" data-gz-modal="delivery" hidden role="dialog" aria-modal="true">
+    <div class="gz-modal__overlay" data-gz-close></div>
+    <div class="gz-modal__panel" role="document">
+      <header class="gz-modal__head"><h3>{{ block.settings.delivery_heading }}</h3><button type="button" class="gz-modal__x" data-gz-close aria-label="Close">&times;</button></header>
+      <div class="gz-modal__body">
+        <div class="gz-lead">{{ block.settings.delivery_intro }}</div>
+        {%- if block.settings.delivery_rows != blank -%}
+          <div class="gz-table"><table>
+            {%- if block.settings.delivery_head != blank -%}
+              <thead><tr>{%- assign dh = block.settings.delivery_head | split: '|' -%}{%- for h in dh -%}<th>{{ h | strip }}</th>{%- endfor -%}</tr></thead>
+            {%- endif -%}
+            <tbody>
+              {%- assign drows = block.settings.delivery_rows | newline_to_br | split: '<br />' -%}
+              {%- for r in drows -%}{%- assign rc = r | strip -%}{%- if rc != blank -%}<tr>{%- assign cells = rc | split: '|' -%}{%- for c in cells -%}<td>{{ c | strip }}</td>{%- endfor -%}</tr>{%- endif -%}{%- endfor -%}
+            </tbody>
+          </table></div>
+        {%- endif -%}
+        {%- if block.settings.delivery_more_rows != blank -%}
+          <details class="gz-acc"><summary>{{ block.settings.delivery_more_label }}</summary>
+            <div class="gz-table"><table><tbody>
+              {%- assign mrows = block.settings.delivery_more_rows | newline_to_br | split: '<br />' -%}
+              {%- for r in mrows -%}{%- assign rc = r | strip -%}{%- if rc != blank -%}<tr>{%- assign cells = rc | split: '|' -%}{%- for c in cells -%}<td>{{ c | strip }}</td>{%- endfor -%}</tr>{%- endif -%}{%- endfor -%}
+            </tbody></table></div>
+          </details>
+        {%- endif -%}
+        {%- if block.settings.delivery_note != blank -%}<div class="gz-note">{{ block.settings.delivery_note }}</div>{%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%} MODAL: RETURNS {%- endcomment -%}
+  <div class="gz-modal" data-gz-modal="returns" hidden role="dialog" aria-modal="true">
+    <div class="gz-modal__overlay" data-gz-close></div>
+    <div class="gz-modal__panel" role="document">
+      <header class="gz-modal__head"><h3>{{ block.settings.returns_heading }}</h3><button type="button" class="gz-modal__x" data-gz-close aria-label="Close">&times;</button></header>
+      <div class="gz-modal__body">
+        <div class="gz-lead">{{ block.settings.returns_intro }}</div>
+        <div class="gz-rich">{{ block.settings.returns_conditions }}</div>
+        {%- if block.settings.returns_btn_label != blank -%}<a class="gz-btn" href="{{ block.settings.returns_btn_url | default: '/policies/refund-policy' }}">{{ block.settings.returns_btn_label }}</a>{%- endif -%}
+        {%- if block.settings.returns_note != blank -%}<div class="gz-note">{{ block.settings.returns_note }}</div>{%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%} MODAL: B2B VAT {%- endcomment -%}
+  {%- if block.settings.b2b_show -%}
+  <div class="gz-modal" data-gz-modal="b2b" hidden role="dialog" aria-modal="true">
+    <div class="gz-modal__overlay" data-gz-close></div>
+    <div class="gz-modal__panel" role="document">
+      <header class="gz-modal__head"><h3>{{ block.settings.b2b_heading }}</h3><button type="button" class="gz-modal__x" data-gz-close aria-label="Close">&times;</button></header>
+      <div class="gz-modal__body">
+        <div class="gz-lead">{{ block.settings.b2b_intro }}</div>
+        <form data-gz-b2b-form novalidate>
+          <label class="gz-field"><span>{{ block.settings.b2b_vat_label }}</span><input type="text" name="vat" autocomplete="off" placeholder="{{ block.settings.b2b_vat_ph }}" required></label>
+          <label class="gz-field"><span>{{ block.settings.b2b_email_label }}</span><input type="email" name="email" autocomplete="email" placeholder="{{ block.settings.b2b_email_ph }}" required></label>
+          <button type="submit" class="gz-btn">{{ block.settings.b2b_submit_label }}</button>
+          <p class="gz-field__msg" data-gz-b2b-msg role="status" aria-live="polite"></p>
+        </form>
+        {%- if block.settings.b2b_note != blank -%}<div class="gz-note">{{ block.settings.b2b_note }}</div>{%- endif -%}
+      </div>
+    </div>
+  </div>
+  {%- endif -%}
+
+</div>
+
+{% stylesheet %}
+  .gz-pdp{--gz-accent:#0047ab;--gz-ink:#1a1a1a;--gz-line:#e8e8e8;max-width:100%;color:var(--gz-ink)}
+  .gz-pdp .gz-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1px solid var(--gz-line);border-radius:10px;padding:11px 13px;margin:8px 0;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+  .gz-pdp .gz-row:hover{border-color:var(--gz-accent);box-shadow:0 1px 8px rgba(0,0,0,.06)}
+  .gz-pdp .gz-row--b2b{background:#f4f7fc;border-color:#d6e0f2}
+  .gz-pdp .gz-row__ico{flex:0 0 22px;color:var(--gz-accent);display:flex}
+  .gz-pdp .gz-row__txt{flex:1 1 auto;display:flex;flex-direction:column;line-height:1.35}
+  .gz-pdp .gz-row__txt strong{font-size:14px}
+  .gz-pdp .gz-row__txt span{font-size:12.5px;color:#666}
+  .gz-pdp .gz-row__cta{flex:0 0 auto;font-size:12px;font-weight:600;color:var(--gz-accent);white-space:nowrap;text-decoration:underline}
+  .gz-modal[hidden]{display:none}
+  .gz-modal{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center}
+  .gz-modal__overlay{position:absolute;inset:0;background:rgba(0,0,0,.5)}
+  .gz-modal__panel{position:relative;background:#fff;width:min(560px,92vw);max-height:88vh;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.25);animation:gzpop .18s ease}
+  @keyframes gzpop{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+  .gz-modal__head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--gz-line)}
+  .gz-modal__head h3{margin:0;font-size:17px}
+  .gz-modal__x{background:none;border:0;font-size:26px;line-height:1;cursor:pointer;color:#888;padding:0 4px}
+  .gz-modal__x:hover{color:#000}
+  .gz-modal__body{padding:18px;overflow-y:auto}
+  .gz-lead{font-size:14px;line-height:1.55;margin:0 0 14px}
+  .gz-lead p{margin:0 0 10px}
+  .gz-note{font-size:12.5px;line-height:1.5;color:#666;margin:14px 0 0}
+  .gz-note p{margin:0}
+  .gz-table table{width:100%;border-collapse:collapse;font-size:13.5px;margin:0 0 6px}
+  .gz-table th{text-align:left;font-weight:600;padding:8px 6px;border-bottom:1px solid #ddd}
+  .gz-table td{padding:9px 6px;border-bottom:1px solid #f0f0f0}
+  .gz-table td:last-child{text-align:right;white-space:nowrap;color:#333}
+  .gz-acc{margin:10px 0 0}
+  .gz-acc>summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--gz-accent);padding:6px 0;list-style:none}
+  .gz-acc>summary::-webkit-details-marker{display:none}
+  .gz-acc>summary::before{content:"+ ";font-weight:700}
+  .gz-acc[open]>summary::before{content:"\2013 "}
+  .gz-rich{font-size:13.5px;line-height:1.55;margin:0 0 16px}
+  .gz-rich ul{padding-left:18px;margin:0}
+  .gz-rich li{margin:0 0 8px}
+  .gz-btn{display:block;width:100%;text-align:center;background:var(--gz-accent);color:#fff;font-size:14.5px;font-weight:600;padding:13px 16px;border:0;border-radius:9px;text-decoration:none;cursor:pointer;transition:filter .15s}
+  .gz-btn:hover{filter:brightness(.93)}
+  .gz-field{display:block;margin:0 0 12px}
+  .gz-field>span{display:block;font-size:13px;font-weight:600;margin:0 0 5px}
+  .gz-field input{width:100%;box-sizing:border-box;font-size:15px;padding:11px 12px;border:1px solid #ccc;border-radius:8px}
+  .gz-field input:focus{outline:none;border-color:var(--gz-accent);box-shadow:0 0 0 3px rgba(0,71,171,.15)}
+  .gz-field__msg{font-size:13px;margin:8px 0 0;min-height:1em}
+  .gz-field__msg.is-ok{color:#157a3b}
+  .gz-field__msg.is-err{color:#c0392b}
+  @media (max-width:600px){
+    .gz-modal{align-items:flex-end}
+    .gz-modal__panel{width:100%;max-height:90vh;border-radius:16px 16px 0 0;animation:gzsheet .22s ease}
+    @keyframes gzsheet{from{transform:translateY(100%)}to{transform:none}}
+    .gz-pdp .gz-row__cta{display:none}
+  }
+  /* ---- HORIZONTAL layout overrides (scoped: do not affect the vertical block) ---- */
+  .gz-pdp--h{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
+  .gz-pdp--h .gz-row{flex:1 1 220px;min-width:180px;margin:0}
+  .gz-pdp--h .gz-row__cta{display:none}
+  @media (max-width:700px){ .gz-pdp--h .gz-row{flex:1 1 100%} }
+{% endstylesheet %}
+
+{% javascript %}
+  (function(){
+    if (window.__gzPdpTrust) return;
+    window.__gzPdpTrust = true;
+
+    function closeAll(){
+      document.querySelectorAll('[data-gz-modal]:not([hidden])').forEach(function(m){ m.hidden = true; });
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('click', function(e){
+      var opener = e.target.closest('[data-gz-open]');
+      if (opener){
+        var root = opener.closest('[data-gz-pdp]');
+        var m = root && root.querySelector('[data-gz-modal="' + opener.getAttribute('data-gz-open') + '"]');
+        if (m){
+          m.hidden = false;
+          document.body.style.overflow = 'hidden';
+          var f = m.querySelector('input, a, button:not([data-gz-close])');
+          if (f){ try { f.focus(); } catch(err){} }
+        }
+        return;
+      }
+      var closer = e.target.closest('[data-gz-close]');
+      if (closer){
+        var mm = closer.closest('[data-gz-modal]');
+        if (mm){ mm.hidden = true; document.body.style.overflow = ''; }
+      }
+    });
+
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeAll(); });
+
+    document.addEventListener('submit', function(e){
+      var form = e.target.closest('[data-gz-b2b-form]');
+      if (!form) return;
+      e.preventDefault();
+      var msg = form.querySelector('[data-gz-b2b-msg]');
+      var vat = (form.vat.value || '').trim().toUpperCase().replace(/\s+/g,'');
+      var email = (form.email.value || '').trim();
+      msg.className = 'gz-field__msg';
+      if (vat.length < 6 || !/^[A-Z]{2}/.test(vat)){ msg.textContent = 'Please enter a valid VAT number including the country code.'; msg.classList.add('is-err'); return; }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ msg.textContent = 'Please enter a valid business email.'; msg.classList.add('is-err'); return; }
+      if (/^NL/.test(vat)){ msg.textContent = 'VAT reclaim applies to businesses outside the Netherlands only.'; msg.classList.add('is-err'); return; }
+      msg.textContent = 'Saving…';
+      fetch('/cart/update.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ attributes: { 'B2B VAT Reclaim Requested': 'Yes', 'B2B VAT Number': vat, 'B2B Business Email': email } })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(){ msg.textContent = 'Saved. We will verify your VAT number and apply the reclaim to your order before it ships.'; msg.classList.add('is-ok'); })
+      .catch(function(){ msg.textContent = 'Could not save right now. Please try again or contact us.'; msg.classList.add('is-err'); });
+    });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "GeZu Trust Horizontal",
+  "settings": [
+    { "type": "header", "content": "Appearance" },
+    { "type": "color", "id": "accent_color", "label": "Accent colour", "default": "#0047ab" },
+    { "type": "range", "id": "space_above", "label": "Space above block", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 10 },
+
+    { "type": "header", "content": "Row 1 — Delivery" },
+    { "type": "text", "id": "delivery_title", "label": "Title", "default": "Fast delivery — ships within 24 hrs" },
+    { "type": "text", "id": "delivery_sub", "label": "Subtext", "default": "NL/BE 1–2 days · Rest of EU 2–4 days. Ordered before 16:00? Ships today." },
+    { "type": "text", "id": "delivery_cta", "label": "Link label", "default": "Delivery times" },
+
+    { "type": "header", "content": "Row 2 — Returns" },
+    { "type": "text", "id": "returns_title", "label": "Title", "default": "30-day returns" },
+    { "type": "text", "id": "returns_sub", "label": "Subtext", "default": "Not right for your project? Send it back within 30 days. Flat €9 return fee." },
+    { "type": "text", "id": "returns_cta", "label": "Link label", "default": "How returns work" },
+
+    { "type": "header", "content": "Row 3 — Business VAT" },
+    { "type": "checkbox", "id": "b2b_show", "label": "Show B2B VAT row", "default": true },
+    { "type": "text", "id": "b2b_title", "label": "Title", "default": "Business buyer outside the Netherlands?" },
+    { "type": "text", "id": "b2b_sub", "label": "Subtext", "default": "VAT-registered companies can reclaim VAT on their order." },
+    { "type": "text", "id": "b2b_cta", "label": "Link label", "default": "Add VAT number" },
+
+    { "type": "header", "content": "Delivery popup", "info": "Table: separate columns with | and rows with new lines." },
+    { "type": "text", "id": "delivery_heading", "label": "Heading", "default": "Delivery & transit times" },
+    { "type": "richtext", "id": "delivery_intro", "label": "Intro", "default": "<p>Orders placed before 16:00 on working days are shipped the same day with FedEx or DPD, fully tracked. Transit times are in working days and exclude weekends and Dutch public holidays.</p>" },
+    { "type": "text", "id": "delivery_head", "label": "Table headers", "default": "Destination | Transit time" },
+    { "type": "textarea", "id": "delivery_rows", "label": "Table rows", "default": "Netherlands & Belgium | 1–2 working days\nFrance | 2–3 working days\nItaly | 2–4 working days\nSpain | 2–4 working days\nUnited Kingdom | 2–5 working days\nRest of Europe | 2–4 working days" },
+    { "type": "text", "id": "delivery_more_label", "label": "Expand label", "default": "See all countries" },
+    { "type": "textarea", "id": "delivery_more_rows", "label": "Full country list", "default": "Germany | 2–3 working days\nAustria | 2–4 working days\nDenmark | 2–4 working days\nSweden | 2–4 working days\nPoland | 2–4 working days\nPortugal | 2–4 working days\nIreland | 2–4 working days\nLuxembourg | 1–2 working days" },
+    { "type": "richtext", "id": "delivery_note", "label": "Note", "default": "<p>You receive a tracking link by email the moment your order leaves our warehouse. Heavy or oversized goods may ship by pallet — any surcharge is shown clearly at checkout before you pay.</p>" },
+
+    { "type": "header", "content": "Returns popup" },
+    { "type": "text", "id": "returns_heading", "label": "Heading", "default": "Returns & refunds" },
+    { "type": "richtext", "id": "returns_intro", "label": "Intro", "default": "<p><strong>30 days to change your mind.</strong> Under EU law you may cancel within 14 days — we give you a full 30 days from delivery. A flat €9 return fee applies, the same across every country.</p>" },
+    { "type": "richtext", "id": "returns_conditions", "label": "Conditions", "default": "<ul><li>Items must be unused, uninstalled and in their original packaging.</li><li>If you return because of a wrong choice on your side, the €9 return shipping is deducted from your refund.</li><li>If a product is damaged through incorrect use or assembly, the refund may be reduced or declined.</li><li>Custom-cut, made-to-order and certain safety items cannot be returned. This does not affect your statutory rights.</li></ul>" },
+    { "type": "text", "id": "returns_btn_label", "label": "Button label", "default": "Start a return / read the full policy" },
+    { "type": "url", "id": "returns_btn_url", "label": "Button link" },
+    { "type": "richtext", "id": "returns_note", "label": "Note", "default": "<p>Refunds are processed within 3–5 working days of us receiving your return.</p>" },
+
+    { "type": "header", "content": "B2B VAT popup" },
+    { "type": "text", "id": "b2b_heading", "label": "Heading", "default": "Business VAT reclaim" },
+    { "type": "richtext", "id": "b2b_intro", "label": "Intro", "default": "<p>For VAT-registered businesses outside the Netherlands. Add your details below — we verify your VAT number and apply the VAT reclaim to your order before it ships.</p>" },
+    { "type": "text", "id": "b2b_vat_label", "label": "VAT field label", "default": "VAT number (incl. country code)" },
+    { "type": "text", "id": "b2b_vat_ph", "label": "VAT placeholder", "default": "e.g. BE0123456789" },
+    { "type": "text", "id": "b2b_email_label", "label": "Email field label", "default": "Business email" },
+    { "type": "text", "id": "b2b_email_ph", "label": "Email placeholder", "default": "name@company.com" },
+    { "type": "text", "id": "b2b_submit_label", "label": "Submit button label", "default": "Apply VAT reclaim to my order" },
+    { "type": "richtext", "id": "b2b_note", "label": "Note", "default": "<p>For business customers only. VAT is reclaimed only after your number is verified as valid and registered outside the Netherlands. Consumers (B2C) are not eligible.</p>" }
+  ],
+  "presets": [
+    { "name": "GeZu Trust Horizontal" }
+  ]
+}
+{% endschema %}
