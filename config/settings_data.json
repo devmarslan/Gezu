@@ -362,11 +362,6 @@
           "switcher_text_exclusive": "Excl."
         }
       },
-      "1910501027098541543": {
-        "type": "shopify://apps/starapps-variant-image/blocks/starapps-via-embed/2a01d106-3d10-48e8-ba53-5cb971217ac4",
-        "disabled": false,
-        "settings": {}
-      },
       "6251270934270006384": {
         "type": "shopify://apps/stape-conversion-tracking/blocks/gtm/7e13c847-7971-409d-8fe0-29ec14d5f048",
         "disabled": false,
@@ -384,6 +379,11 @@
       },
       "6987625696575125306": {
         "type": "shopify://apps/weglot-translate-your-store/blocks/weglot/3097482a-fafe-42ff-bc33-ea19e35c4a20",
+        "disabled": true,
+        "settings": {}
+      },
+      "1910501027098541543": {
+        "type": "shopify://apps/starapps-variant-image/blocks/starapps-via-embed/2a01d106-3d10-48e8-ba53-5cb971217ac4",
         "disabled": true,
         "settings": {}
       }
