@@ -340,7 +340,6 @@
             "gezu_pdp_trust_horizontal_Q6qHpx": {
               "type": "gezu-pdp-trust-horizontal",
               "name": "GeZu Trust Horizontal",
-              "disabled": true,
               "settings": {
                 "accent_color": "#0047ab",
                 "space_above": 10,
@@ -353,9 +352,9 @@
                 "delivery_heading": "Delivery & transit times",
                 "delivery_intro": "<p>Orders placed before 16:00 on working days are shipped the same day with FedEx or DPD, fully tracked. Transit times are in working days and exclude weekends and public holidays.</p>",
                 "delivery_head": "Destination | Transit time",
-                "delivery_rows": "Netherlands & Belgium | 1–2 working days\nFrance | 2–3 working days\nItaly | 2–4 working days\nSpain | 2–4 working days\nUnited Kingdom | 2–5 working days\nRest of Europe | 2–4 working days",
+                "delivery_rows": "Netherlands | 1–2 working days \nBelgium | 1–2 working days\nFrance | 2–3 working days\nItaly | 2–4 working days\nSpain | 2–4 working days\nUnited Kingdom | 2–5 working days",
                 "delivery_more_label": "See all countries",
-                "delivery_more_rows": "Germany | 2–3 working days\nAustria | 2–4 working days\nDenmark | 2–4 working days\nSweden | 2–4 working days\nPoland | 2–4 working days\nPortugal | 2–4 working days\nIreland | 2–4 working days\nLuxembourg | 1–2 working days",
+                "delivery_more_rows": "Sweden | 2–4 working days\nPoland | 2–4 working days\nPortugal | 2–4 working days\nIreland | 2–4 working days\nLuxembourg | 1–2 working days",
                 "delivery_note": "<p>You receive a tracking link by email the moment your order leaves our warehouse. Heavy or oversized goods may ship by pallet — any surcharge is shown clearly at checkout before you pay.</p>",
                 "returns_heading": "Returns & refunds",
                 "returns_intro": "<p><strong>30 days to change your mind.</strong> Under EU law you may cancel within 14 days — we give you a full 30 days from delivery. A flat €9 return fee applies, the same across every country.</p>",
