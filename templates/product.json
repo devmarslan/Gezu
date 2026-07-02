@@ -363,7 +363,7 @@
                 "returns_btn_url": "",
                 "returns_note": "<p>Refunds are processed within 3–5 working days of us receiving your return.</p>",
                 "b2b_heading": "Business VAT reclaim",
-                "b2b_intro": "<p>For VAT-registered businesses outside the Netherlands. Add your details below — we verify your VAT number and apply the VAT reclaim to your order before it ships.</p>",
+                "b2b_intro": "<p><strong>VAT-registered businesses outside the Netherlands </strong>Please add your VAT details in the slider cart before checkout. We will verify your VAT number and adjust or reclaim VAT on your order before it is processed.</p>",
                 "b2b_note": "<p>For business customers only. VAT is reclaimed only after your number is verified as valid and registered outside the Netherlands. Consumers (B2C) are not eligible.</p>"
               },
               "blocks": {}
@@ -378,6 +378,7 @@
             "trust_icontext_8hC7xG": {
               "type": "_trust_icontext",
               "name": "Trust Icon Text",
+              "disabled": true,
               "settings": {
                 "badge_1_image": "shopify://shop_images/icon43_1.png",
                 "badge_1_icon": "star",
